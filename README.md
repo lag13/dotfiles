@@ -18,6 +18,10 @@ Installation:
 
 ### Initialize The git-submodules
 
+    cd ~/.vim
+    git submodule init
+    git submodule update
+
 
 Adding New Plugins
 ------------------

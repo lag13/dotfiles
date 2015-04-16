@@ -9,6 +9,11 @@
 " Basic Settings {{{
 let mapleader = ","
 let maplocalleader = '\'
+
+if has("win32") || has("win64")
+    set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+endif
+
 execute pathogen#infect()
 " Just running: 'filetype on' allows for just the detection of different file
 " types. That means that every time a file is edited vim will try to recognize
