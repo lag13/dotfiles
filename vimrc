@@ -9,24 +9,32 @@
 " Basic Settings {{{
 let mapleader = ","
 let maplocalleader = '\'
-
-if has("win32") || has("win64")
-    set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
-endif
-
-execute pathogen#infect()
-" Just running: 'filetype on' allows for just the detection of different file
-" types. That means that every time a file is edited vim will try to recognize
-" the type and set the 'filetype' option. Setting this option then triggers
-" the 'FileType' event. Running the command 'filetype plugin on' does the same
-" thing as just 'filetype on' and also enables that when a file is edited,
-" it's plugin file is also loaded. I'm unsure why this wouldn't happen by
-" default? Wouldn't you always want to load any plugin files? There is also a
-" command: 'filetype indent on' which must mean that there are indent sort of
-" plugin files you can enable.
-filetype plugin indent on
 " We want vim not vi!
 set nocompatible
+
+" I originally had this code so my .vim/ directory could still be named '.vim'
+" on a windows machine rather than 'vimfiles'. Buut, it unfortunately breaks
+" things when I re-source my vimrc. The reason being is that this will
+" completely overwrite the existing value of 'runtimepath' and
+" pathogen#infectI() doesn't seem to run again. So the bundles never get added
+" and we can't find our plugins.
+" if has("win32") || has("win64")
+"     set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+" endif
+
+" With pathogen as my package manager, all plugins can be kept in their own
+" folders in the .vim/bundle directory.
+execute pathogen#infect()
+" Just running: 'filetype on' allows for just the detection of different file
+" types. That means that every time a file is edited, vim will try to
+" recognize the type and set 'filetype' accordingly. Setting 'filetype' will
+" then trigger the 'FileType' event. Running the command 'filetype plugin on'
+" does the same thing as just 'filetype on' and also enables that when a file
+" is edited, it's plugin file is also loaded. I'm unsure why this wouldn't
+" happen by default? Wouldn't you always want to load any plugin files? There
+" is also a command: 'filetype indent on' which must mean that there are
+" indent sort of plugin files you can enable.
+filetype plugin indent on
 " Normally this is turned off, and the effect it has is that everytime a
 " buffer is 'abandon'ed (i.e there is no window on the buffer) the buffer will
 " be unloaded. The only effect I know of that that has is that the undo tree
@@ -201,7 +209,11 @@ set pastetoggle=<F10>
 " capabilities.
 syntax enable
 if &term ==# 'win32'
-    colorscheme shine
+    " I'm using Git-Bash for windows and for some reason when I run vim in it
+    " it can't find the 'shine' colorscheme and it errors out which is
+    " irritating. By adding 'silent!' it won't bother me with that error
+    " message.
+    silent! colorscheme shine
     set nocursorline
 endif
 
@@ -216,6 +228,8 @@ if has('gui_running')
     colorscheme solarized
 endif
 " }}}
+
+" Checkout the 'virtualedit' option for editting ascii art.
 
 " I had to do a lot of yanks which were repetative. In particular I kept
 " running this yank: "*yi", so yank inside quotes into the clipboard. Turns
@@ -234,7 +248,8 @@ endif
 " eventually just loop back around to the first 'private' variable and so the
 " macro would just keep going. BUT if I used the g command and executed the
 " macro on each of those matches that 'g' found then I think my idea could
-" totally work.
+" totally work. Alternatively, I think setting the 'wrapscan' option would
+" help me accomplish what I want.
 
 " Automatically set marks 'w and 'm to match the marks '[ and '] respectively.
 " I chose 'w and 'm because those are easier to type and they are sort of
@@ -5212,6 +5227,9 @@ nnoremap <leader>lpm :call RunTranslatorMerge()<CR>
 
 " Normal Mappings {{{
 
+" ',' is my leader and I want to keep it's original functionality.
+noremap ,, ,
+
 " Move by screen lines rather than actual lines.
 noremap j gj
 noremap k gk
@@ -5220,10 +5238,10 @@ noremap k gk
 onoremap j j
 onoremap k k
 " Quickly scroll up and down the file. Sort of in between a 'j/k' and a
-" '<C-d>/<C-u>'. J is sometimes useful but I don't use it too often and I can
-" easily just use :j[oin]. I've almost never used 'K', in fact I'll usually
-" hit it by accident and scream profanities as I wait for the command to
-" complete. Consider changing 5 to 4.
+" '<C-d>/<C-u>'. The original J command is sometimes useful but I don't use it
+" too often and I can easily just use :j[oin]<CR>. And I've almost never used
+" 'K', in fact, I'll usually hit it by accident and scream profanities as I
+" wait for the command to complete.
 noremap J 5gj
 noremap K 5gk
 " I've had to delete 3 lines before and hence these mappings. The reason I
@@ -5235,12 +5253,6 @@ onoremap J 2j
 onoremap K 2k
 
 " Goes to the next and previous number on the current line
-" I don't know why this mapping is not working. I got the one below working
-" though So I'll just stick with that.
-"noremap <leader>n :call search('\v\d+\ze(\D|$)', '', line('.'))<CR>
-" So the mapping interprets some special characters. I'll have to look up
-" which ones in particular, but it seemed that the '|' was giving me the
-" trouble.
 noremap <silent> <leader>n :call search('\v\d+\ze(\D\|$)', '', line('.'))<CR>
 noremap <silent> <leader>N :call search('\v\d+\ze(\D\|$)', 'b', line('.'))<CR>
 
@@ -5254,41 +5266,19 @@ nnoremap <leader>sc :source <C-R>%<CR>
 nnoremap <leader>sv :source $MYVIMRC<CR>
 " Edits the .vimrc file in a new window.
 nnoremap <leader>ev :vsplit $MYVIMRC<CR>
-" Puts double quotes around a word.
-" THE BOOK'S EXAMPLE DOESN'T WORK ON A SINGLE CHARACTER. I THINK WE CAN JUST
-" GET RID OF THE 'h' MOVEMENT AND WE'RE FINE.
-nnoremap <leader>" viw<ESC>a"<ESC>bi"<ESC>lel
-nnoremap <leader>' viw<ESC>a'<ESC>bi'<ESC>lel
-nnoremap <leader>( viw<ESC>a)<ESC>bi(<ESC>lel
-nnoremap <leader>) viw<ESC>a)<ESC>bi(<ESC>lel
-nnoremap <leader>{ viw<ESC>a}<ESC>bi{<ESC>lel
-nnoremap <leader>} viw<ESC>a}<ESC>bi{<ESC>lel
-nnoremap <leader>[ viw<ESC>a]<ESC>bi[<ESC>lel
-nnoremap <leader>] viw<ESC>a]<ESC>bi[<ESC>lel
+" Opens previous buffer in a vertical split
+nnoremap <leader>e# :leftabove vsplit #<CR>
+
 " H now goes to the first non blank character on the current line.
 noremap H ^
 " L now goes to last character on the current line.
 noremap L $
 vnoremap L g_
-" We maintain the original H and L functionality.
+" We maintain the original H and L functionality just in case.
 noremap <leader>H H
 noremap <leader>L L
-"Opens previous buffer in a vertical split
-nnoremap <leader>e# :leftabove vsplit #<CR>
-" Don't think I'll use it but something to remember. <C-G>u in insert mode
-" breaks the undo sequence and starts a new change. The result is that when
-" you hit undo, it will undo the thing before and after the <C-G>u as separate
-" pieces.
-" Highlight trailing whitespace with the "Error" group
-nnoremap <silent> <leader>w :match Error / \+$/<CR>
-nnoremap <silent> <leader>W :match none<CR>
-" CREATE MAPPINGS TO SURROUND ANY word OR WORD WITH CHARACTERS. STUFF LIKE
-" {[("'...
-"
+
 " Create command to add a space before or after the cursor in insert mode.
-"
-" Make something that moves me up/down 10 lines or something smaller than
-" C-D/C-U. Maybe something better would be 1/4 of the screen size
 "
 " Could I make something that moves me 10 lines then 5 then 2... (as I
 " continue the command). Feel like that might be a quick way to get around
@@ -5297,15 +5287,10 @@ nnoremap <silent> <leader>W :match none<CR>
 " sort of thing??? Like you start in the middle and if no you can choose up or
 " down and the process repeats. That would be kind of cool.
 "
-" Could we define a search where it doesn't change the jump as we go? Then we
-" could get to where we want and be able to jump back and forth
+" Could we define a search where it doesn't change the jump list as we go?
+" Then we could get to where we want and be able to jump back and forth
 "
-" Create some commands useful for making ascii art. There probably won't be
-" many. In general, think about what things would be good to have when making
-" ascii art. One immediate thought is clearing all whitespace after the last
-
 " Make commands to jump to a function definition given the name.
-"
 
 nnoremap <leader>co :copen<CR>
 nnoremap <leader>cc :cclose<CR>
@@ -5342,8 +5327,9 @@ nnoremap <leader>ff :call FlipStr("false", "true", "cW")<CR>
 nnoremap <leader>fc :s#\v(<\u\l+\|\l+)(\u+)#\l\1_\L\2#g<CR>
 nnoremap <leader>fs :s/_\([a-z]\)/\u\1/g<CR>
 
-" Unfortunately vim can't understand some key combinations like: <C-=> as a
+" Unfortunately vim can't understand some key combinations like <C-=>. As a
 " workaround I'll just use <C-p> because it's close to '='.
+
 " TODO: Consider making some different mappings altogether. Turns out that
 " <C-w>w and <C-w>W cycle through the windows backwards and forwards. For most
 " cases those could remove the need for some of the <C-hjkl> mappings I've
@@ -5351,6 +5337,7 @@ nnoremap <leader>fs :s/_\([a-z]\)/\u\1/g<CR>
 " numbered)/bottom(hightest numbered) window. And there's <C-w>r and <C-w>R
 " commands which switch a window with it's neighbor. Those might be better to
 " map than the <C-w><C-h> mappings I have now.
+
 " TODO: try to find another mapping to get the windows equal size.
 nnoremap <C-_> <C-w>_
 nnoremap <C-\> <C-w>\|
@@ -5359,18 +5346,12 @@ nnoremap <C-c> <C-w>c
 " Quickly move between windows
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
-" Trying out these 'g' commands to move between vertical splits. I'm using the
-" old mappings to move between tabs.
-" nnoremap <C-h> <C-w>h
-" nnoremap <C-l> <C-w>l
+" This is a bit incosistent with the window movements but I wanted to the
+" <C-h> and <C-w> for switching between tabs.
 nnoremap gh <C-w>h
 nnoremap gl <C-w>l
-
-" The gt commands aren't very convenient, remapping...
-nnoremap <C-h> gT
-nnoremap <C-l> gt
-
 nnoremap <C-p> <C-w>p
+
 " Move and maximize a window
 nnoremap <C-w><C-h> <C-w>h<C-w><C-\|>
 nnoremap <C-w><C-j> <C-w>j<C-w><C-_>
@@ -5379,22 +5360,24 @@ nnoremap <C-w><C-l> <C-w>l<C-w><C-\|>
 nnoremap <C-w><C-t> <C-w>t<C-w><C-_>
 nnoremap <C-w><C-b> <C-w>b<C-w><C-_>
 nnoremap <C-w><C-p> <C-w>p<C-w><C-_>
-" Quick moving of windows
+" Move the windows
 nnoremap <C-w>h <C-w>H
 nnoremap <C-w>j <C-w>J
 nnoremap <C-w>k <C-w>K
 nnoremap <C-w>l <C-w>L
 
+" The gt and gT commands aren't very convenient for switching between tabs.
+nnoremap <C-h> gT
+nnoremap <C-l> gt
+
 " <CR> already does + so lets make <BS> do the opposite
 nnoremap <BS> -
-" I think I might like this mapping a lot better. % has always been a little
-" too inconvenient for my taste.
+" % has always been a little too inconvenient for my taste.
 noremap <SPACE> %
 " Keep the redrawing screen functionality that <C-l> gives us. I tried to map
-" <C-m> but that seems like it might be connected somehow with <CR>?? In
-" particular in the command line window when I'd hit <CR> it would run the
-" mapping below for some reqson. I picked <C-g> because I don't use it much
-" and I couldn't find a readily available ctrl mapping.
+" <C-m> but that seems like it might be connected somehow with <CR>?? I picked
+" <C-g> because I don't use it much and I couldn't find another readily
+" available ctrl mapping.
 nnoremap <C-g> :nohlsearch<CR><C-l>
 
 " gp and gP have uses but I haven't felt the need for to use them as of yet so
@@ -5433,7 +5416,7 @@ noremap ` '
 function! SearchTwo(direction)
     let char1 = nr2char(getchar())
     let char2 = nr2char(getchar())
-    call search(char1 . char2, 'sw' . a:direction)
+    call search('\V' . char1 . char2, 'sw' . a:direction)
 endfunction
 nnoremap <silent> s :call SearchTwo('')<CR>
 onoremap <silent> s :call SearchTwo('')<CR>
@@ -5452,48 +5435,25 @@ nnoremap <leader>Gf :grep! -r 'function <C-r>/' *<LEFT>
 nnoremap <leader>Gd :grep! -r 'define.*<C-r>/' *<LEFT>
 nnoremap <leader>Gc :grep! -r 'class <C-r>/' *<LEFT>
 
-"TODO: Make mappings '[[' to move to the parent xml node.
-
-" MAKE  TO GET THE COLORS RIGHT FOR A CANDIDATE WORKFLOW
-" MAKE MAPPING TO COPY A LINE AND INSERT IT WHERE THE CURSOR WAS PREVIOUSLY
 " }}}
 
 " Insert Mappings {{{
-" I'll try it out for a bit, another way to get out of insert mode.
+
+" Another way to get out of insert mode.
 inoremap jk <ESC>
 
-" <C-j> is the same as Enter so I'll remap it to paste from the default
-" register. This is also nice because <C-j> is right under my fingers. I also
-" added one to specifically paste from the 0 register.
-inoremap <C-j> <C-r><C-p>"
-inoremap <C-l> <C-r><C-p>0
+" These are nice because those keys are right under my fingers.
+inoremap <C-j> <C-r><C-p>" inoremap <C-l> <C-r><C-p>0
 
-" <C-a> normally inserts the previously inserted text. Haven't needed such
-" functionality as of yet so I thought I'd remap it to this functionality
-" which I HAVE done quite often.
-inoremap <C-a> <C-o>A
-" Makes the current word uppercase
-" NEED TO MAKE THE FIRST ONE WORK IF WE'RE ON THE SPACE AFTER TYPING THE WORD
-" Not sure why this doesn't work at the moment... I feel like it should. I
-" think there is some sort of issue with entering a command that doesn't take
-" you anywhere... I was getting similar problems with the C-F key mapping.
-" Yes, if you try to move in a mapping but you can't (like if you're at the
-" rightmost character and press 'l' then the mapping seems to fail... Try
-" using the below example on the top line, it won't work.
-" nnoremap s kjihi
+" TODO: Makes the current/previous word uppercase
+
 " }}}
 
 " Visual Mappings {{{
-" Adds single and double quotes around a visual selection.
-vnoremap <leader>" <ESC>a"<ESC>`<i"<ESC>
-vnoremap <leader>' <ESC>a'<ESC>`<i'<ESC>
 
-" Writing a bit of code to align a bunch of assignments nicely. I think there
-" is already a plugin called 'Tabular' that accomplishes this (and a lot more)
+" Writing a bit of code to align a bunch of assignments nicely. There is
+" already a plugin called 'Tabular' that accomplishes this (and a lot more)
 " but I wanted to try my hand at it.
-" TODO: Make this function able to align on the nth of some string. This will
-" always align on just the first one at the moment.
-" of the 'str_to_align_on' and that is the length.
 function! AlignAssignment(str_to_align_on) range
     " Finds the longest l-value (i.e thing that is being assigned)
     "let regex = '[^' . a:str_to_align_on . ']*' . a:str_to_align_on
@@ -5510,7 +5470,7 @@ function! AlignAssignment(str_to_align_on) range
         let lval_str = strpart(getline(line_no), 0, match(getline(line_no), a:str_to_align_on))
         "let lval_str = matchstr(getline(line_no), regex)
         if lval_str !=# ''
-            let padding = repeat(' ', longest_lval_str - len(lval_str))
+            let padding = repeat(' ', longest_lval_str - len(lval_str) - 1)
             let new_str = lval_str . padding . strpart(getline(line_no), len(lval_str))
             call setline(line_no, new_str)
         endif
@@ -5518,7 +5478,7 @@ function! AlignAssignment(str_to_align_on) range
 endfunction
 
 " Copied the visual star search plugin. Now hitting * or # when visually
-" selecting text will search for the highlighted text.
+" selecting text will search for the visually selected text.
 function! VGetSearch(cmdtype)
     let save_unnamed_register = @"
     normal! gvy
@@ -5530,23 +5490,10 @@ endfunction
 xnoremap * :<C-u>execute 'normal! /' . VGetSearch('/') . "\r"<CR>
 xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>
 
-function! CommentSelection(comment_str)
-    let line = getline('.')
-    let replace_line = substitute(line, '^', a:comment_str, '')
-    call setline('.', replace_line)
-endfunction
-
-function! UncommentSelection(comment_str)
-    let line = getline('.')
-    let replace_line = substitute(line, '\v^(\s*)' . a:comment_str, '\1', '')
-    call setline('.', replace_line)
-endfunction
-
-xnoremap <silent><C-k> :call CommentSelection('//')<CR>
-xnoremap <silent><C-l> :call UncommentSelection('//')<CR>
 " }}}
 
 " Operator-pending Mappings {{{
+
 " How do I make this work in visual mode???
 onoremap in( :<C-U>normal! f(vi(<CR>
 "onoremap in{ :<C-U>normal! /{<CR>vi(<CR>
