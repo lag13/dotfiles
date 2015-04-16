@@ -11,17 +11,15 @@ let mapleader = ","
 let maplocalleader = '\'
 " We want vim not vi!
 set nocompatible
-
-" I originally had this code so my .vim/ directory could still be named '.vim'
-" on a windows machine rather than 'vimfiles'. Buut, it unfortunately breaks
-" things when I re-source my vimrc. The reason being is that this will
-" completely overwrite the existing value of 'runtimepath' and
-" pathogen#infectI() doesn't seem to run again. So the bundles never get added
-" and we can't find our plugins.
-" if has("win32") || has("win64")
-"     set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
-" endif
-
+" This exists so the .vim/ directory can still be named 'vim' even on a
+" windows machine. The 'exists' check is so I can re-source my .vimrc and not
+" mess up 'runtimepath'.
+if !exists("g:set_windows_rtp")
+    if has("win32") || has("win64")
+        set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+        let g:set_windows_rtp = 1
+    endif
+endif
 " With pathogen as my package manager, all plugins can be kept in their own
 " folders in the .vim/bundle directory.
 execute pathogen#infect()
