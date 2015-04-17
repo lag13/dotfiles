@@ -227,6 +227,14 @@ if has('gui_running')
 endif
 " }}}
 
+" Create a :source operator which can source just the selected lines.
+
+" Could we configure the f/F/t/T commands to work on screen lines rather than
+" actual lines?
+
+" Add some function to create class diagrams. I could give it the hierarchy in
+" some form and it will draw a nicely spaced class diagram.
+
 " Checkout the 'virtualedit' option for editting ascii art.
 
 " I had to do a lot of yanks which were repetative. In particular I kept
@@ -5324,6 +5332,7 @@ nnoremap <leader>ff :call FlipStr("false", "true", "cW")<CR>
 " 'xml_is_fun', but I'll do that another day.
 nnoremap <leader>fc :s#\v(<\u\l+\|\l+)(\u+)#\l\1_\L\2#g<CR>
 nnoremap <leader>fs :s/_\([a-z]\)/\u\1/g<CR>
+"TODO: Have a flip for public, private, protected
 
 " Unfortunately vim can't understand some key combinations like <C-=>. As a
 " workaround I'll just use <C-p> because it's close to '='.
@@ -5437,8 +5446,12 @@ nnoremap <leader>Gc :grep! -r 'class <C-r>/' *<LEFT>
 
 " Insert Mappings {{{
 
-" Another way to get out of insert mode.
+" Another way to get out of insert mode. I cover all my bases by including
+" mappings for every capitalization possibility.
 inoremap jk <ESC>
+inoremap Jk <ESC>
+inoremap jK <ESC>
+inoremap JK <ESC>
 
 " These are nice because those keys are right under my fingers.
 inoremap <C-j> <C-r><C-p>" inoremap <C-l> <C-r><C-p>0
@@ -5497,11 +5510,15 @@ onoremap in( :<C-U>normal! f(vi(<CR>
 "onoremap in{ :<C-U>normal! /{<CR>vi(<CR>
 " Goes to next email address. My regex is probably not perfect but that's
 " fine.
-onoremap in@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvE"<CR>
-onoremap an@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvEl"<CR>
+onoremap i@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvE"<CR>
+onoremap a@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvEl"<CR>
 " Yanks the next chunck of code surrounded in '{ }'
 onoremap in{ :<C-U>execute "normal! /{\r:nohlsearch\rvi{"<CR>
 onoremap an{ :<C-U>execute "normal! /{\r:nohlsearch\rva{"<CR>
+
+" A text object for the entire buffer
+vnoremap ae :<C-u>normal! ggVG<CR>
+onoremap ae :<C-u>normal! ggVG<CR>
 
 " TODO: Add some other 'inner' and 'all' operator-pending stuff. Like for '#'
 " and such.
@@ -5605,6 +5622,7 @@ augroup END
 " PHP File Settings {{{
 augroup filetype_php
     autocmd!
+    autocmd FileType php setlocal commentstring=//\ %s
     autocmd FileType php nnoremap <buffer> <localleader>c I//<ESC>
     autocmd FileType php iabbrev vd var_dump("TEST1");
     " Does a var_dump of whatever is in the unnamed register.
