@@ -1,10 +1,37 @@
-" Vim sections to remember:
-" registers
-" keycodes
-" function-list
-" map-which-keys
-" index
-" internal-variables
+" Funny vim commands:
+" bad[d] - Adds a file name to the buffer list without loading it.
+" col[der] - Goes to an older quickfix list.
+
+" :[noremap]map	    Normal, Visual and Operator-pending
+" :v[noremap]map    Visual and Select
+" :x[noremap]map    Visual
+" :n[noremap]map    Normal
+" :o[noremap]map    Operator-pending
+" :[noremap]map!    Insert and Command-line
+" :i[noremap]map    Insert
+" :c[noremap]map    Command-line
+
+" Creating text-object:
+" 1. Define operator-pending mapping so you can operate on the text object
+" when using operators.
+" 2. Define a visual mapping so you can select the text-object in visual mode.
+" A thought I just had, visual mode is kind of like a prolonged
+" operator-pending mode. The 'normal' execution is for operator commands is:
+"
+"   operator -> operator-pending
+"
+" But visual sort of turns that sequence on it's head and you can think of it
+" as:
+"
+"   operator-pending/visual -> operator.
+"
+" 3. If makes sense to do so, define a normal mapping which will move the
+" cursor in adherance with the text-object.
+
+" Creating operator:
+" 1. Define a normal mapping so we can use this mapping from normal mode.
+" 2. Define a visual mapping so we can visually select the exact text we want
+" and have the operator operate on it.
 
 " Basic Settings {{{
 let mapleader = ","
@@ -227,18 +254,12 @@ if has('gui_running')
 endif
 " }}}
 
-" There's a vim variable called 'v:searchforward' which I could probably
-" leverage to make the n and N commands always go in the same direction.
+" Create text objects to change part of a snake/camel case variables.
 
 " Create a :source operator which can source just the selected lines.
 
-" Could we configure the f/F/t/T commands to work on screen lines rather than
-" actual lines?
-
 " Add some function to create class diagrams. I could give it the hierarchy in
 " some form and it will draw a nicely spaced class diagram.
-
-" Checkout the 'virtualedit' option for editting ascii art.
 
 " I had to do a lot of yanks which were repetative. In particular I kept
 " running this yank: "*yi", so yank inside quotes into the clipboard. Turns
@@ -267,28 +288,6 @@ endif
 " A text object to select a chunk of code stopping before any commented
 " sections.
 
-" Motion to go to the beginning of an rval (i.e the thing that is being stored
-" in a variable.
-
-" TODO: So I made something similar to Notepad++'s <C-k> and <C-K>
-" functionality, but at the moment is just uses the string '//' to comment out
-" lines. I want to make it so it works automatically for multiple languages.
-
-" TODO: An opearator to resize windows. So if for example I pass this operator
-" the motion 'at' then the current windows will resize to JUST contain the tag
-" selected by the 'at' motion. Take a look at the z{h}<CR> command which will
-" resize the window to a height of 'h'. I bet this could make this job not too
-" difficult. I could map it to 'zS' standing for 'S'ize. Since zs only works
-" when 'wrap' is off, I could consider mapping it to that as well.
-
-" TODO: A text-object to yank just the comments. So If I have something like
-" this:
-"    //hi there
-"    //his is fun
-"    some code goes here...
-" If I was on the 'h' in 'hi there' and I yanked the comments then it wouldn't
-" touch the code portions.
-
 " TODO: A mapping to type out the previously made auto-completion. This would
 " probably be an insert mapping.
 
@@ -313,16 +312,6 @@ endif
 " just write it again than copy it but it would have been even FASTER if I
 " could have autocompleted the string itself.
 
-" TODO: I want the following command written with thought that it will make it
-" easier to document some of the source code. So I want a command that will
-" grab the file name of all the visible windows (except for the active one)
-" and write those file names in a list like this:
-"     File: fname1
-"     File: fname2
-"     File: fname3
-"     File: fname4
-"     File: fname5
-
 " TODO: Make a command to reflect a range of lines. I think that would be a
 " cool way to make some ascii art. So like if I had some art like this:
 "
@@ -337,18 +326,16 @@ endif
 "  /      \
 "  In adition make other commands to rotate, resize, etc...
 
-" TODO: Read change.txt
-
 " TODO: Read about how settings are transferred/inherited from window to
 " window, buffer to buffer etc...
 
 " TODO: MAke it so that when you exit command mode it doesn't add the command
-" to the history list. Also try to make it so that any duoplicate commands in
+" to the history list. Also try to make it so that any duplicate commands in
 " the history list are removed.
 
-" TODO: Make some sort of notification. So like maybe I'll remind myself to
-" delete something. I'll add the message, associate it with a date and when
-" that date comes to pass I'll trigger the notification.
+" TODO: Make some sort of notification ability. So like maybe I'll remind
+" myself to delete something in a file. I'll add the message, associate it
+" with a date and when that date comes to pass I'll trigger the notification.
 
 " TODO: A bit of a weird request but here goes. So that 'sneak' plugin sounds
 " really cool. A search on just two characters! That would definitely help
@@ -420,12 +407,6 @@ endif
 " on a link, you want to see where you end up but the quickview is still
 " really big.
 
-" Configure some of the jumping commands (like 'n' and 'N') so that when they
-" jump to a location on the same line or they just jump one line from the
-" current one, that isn't added to the jump list. Maybe even change the 'N'
-" command to the same thing as 'n' but not change the jump list at all! That
-" could be cool.
-
 " That code that I wrote to semi-automatically add sertifi email tags was
 " nice. I liked the idea of going around the document and repeatedly adding
 " some bit of text to a list. What if we generalized it a bit? I could make an
@@ -480,7 +461,7 @@ endif
 " almost). Actually, I bet with a bit of thinking I could come up with a regex
 " for a roman numeral without too much trouble, just something like: [ivcl]*.
 " We could even literally have a list of the first 50 odd roman numerals like
-" this: (i|ii|iii|iv|...). I'll look into it.
+" this: (i|ii|iii|iv|...). I'll think about it.
 
 " When we open a bunch of files could we make it so the second file will be
 " the alternate file?
@@ -491,6 +472,14 @@ endif
 " picturing this tool would grab all the function names and for each function
 " name, see what function calls them. Then build a little graph based off that
 " knowledge.
+
+" Writing a command which will do a vertical replacement (R currently does a
+" horizontal replacement) sounds like a fun idea.
+
+" In general. how do i create a command which can work for different
+" parameters. Like say I want to createa a command which appends the / to any
+" buffer. How do i do the "any buffer" part?
+" :g/^match/y  seems to hold promise I think I can yank stuff in there.
 
 " Luceo Stuff {{{
 
@@ -5248,11 +5237,14 @@ onoremap j j
 onoremap k k
 " Quickly scroll up and down the file. Sort of in between a 'j/k' and a
 " '<C-d>/<C-u>'. The original J command is sometimes useful but I don't use it
-" too often and I can easily just use :j[oin]<CR>. And I've almost never used
-" 'K', in fact, I'll usually hit it by accident and scream profanities as I
-" wait for the command to complete.
+" too often and I can easily just use :j[oin]<CR> or remap it. And I've almost
+" never used 'K', in fact, I'll usually hit it by accident and scream
+" profanities as I wait for the command to complete.
 noremap J 5gj
 noremap K 5gk
+" This is easier to type than :j<CR>
+nnoremap <leader>J J
+
 " I've had to delete 3 lines before and hence these mappings. The reason I
 " don't have these mappings delete 5 lines (which would roughtly match how
 " they move in normal mode) is because I don't trust myself to actually look
@@ -5262,8 +5254,8 @@ onoremap J 2j
 onoremap K 2k
 
 " Goes to the next and previous number on the current line
-noremap <silent> <leader>n :call search('\v\d+\ze(\D\|$)', '', line('.'))<CR>
-noremap <silent> <leader>N :call search('\v\d+\ze(\D\|$)', 'b', line('.'))<CR>
+noremap <silent> <leader>d :call search('\v\d+\ze(\D\|$)', '', line('.'))<CR>
+noremap <silent> <leader>D :call search('\v\d+\ze(\D\|$)', 'b', line('.'))<CR>
 
 " Mapping to do a literal search (except for the / and ? characters of course)
 nnoremap <leader>/ /\V
@@ -5287,6 +5279,64 @@ vnoremap L g_
 noremap <leader>H H
 noremap <leader>L L
 
+" Makes it so the n and N commands always go in the same direction, forward
+" and backward respectively, no matter which direction we're actually
+" searching.
+function! PreserveSearchDirection(n_command_p, visual_p, keep_jump_p)
+    let command = 'n'
+    if !a:n_command_p && v:searchforward
+        let command = 'N'
+    elseif a:n_command_p && !v:searchforward
+        let command = 'N'
+    endif
+    execute (a:keep_jump_p ? 'keepjumps ':'').'normal! '.(a:visual_p ? 'gv':'').command
+endfunction
+" Calling :set hlsearch after was the only I knew how to turn the search back
+" on highlighting.
+noremap  <silent> n :call PreserveSearchDirection(1, 0, 0)<CR>:set hlsearch<CR>
+noremap  <silent> N :call PreserveSearchDirection(0, 0, 0)<CR>:set hlsearch<CR>
+xnoremap <silent> n :call PreserveSearchDirection(1, 1, 0)<CR>:set hlsearch<CR>
+xnoremap <silent> N :call PreserveSearchDirection(0, 1, 0)<CR>:set hlsearch<CR>
+
+" Goes to the next/previous search match without changing the jumplist.
+noremap <silent><leader>n :call PreserveSearchDirection(1, 0, 1)<CR>:set hlsearch<CR>
+" I used m rather than N becuase it's easier to type and m is close to n.
+noremap <silent><leader>m :call PreserveSearchDirection(0, 0, 1)<CR>:set hlsearch<CR>
+" Do I need to remap these to something that works? I don't think the jumplist
+" has the same effect when you're already inside visual mode.
+xnoremap <silent><leader>n <NOP>
+xnoremap <silent><leader>N <NOP>
+
+" An opearator to resize windows. For example, if I pass this operator the
+" motion 'at' then the current windows will resize to JUST contain the tag
+" selected by the 'at' motion. TODO: Consider making this also adjust
+" horizontal size. There are 3 possibilities I see with this, adjust vertical
+" height, adjust horizontal width, or adjust both. I wonder how I could
+" reconcile those options...
+function! ResizeWindowOperator(type)
+    if a:type ==# 'v' || a:type ==# 'V'
+        let start_line = line("'<")
+        let end_line = line("'>")
+    else
+        let start_line = line("'[")
+        let end_line = line("']")
+    endif
+
+    execute "resize ".(end_line-start_line+1)
+    execute "keepjumps normal! ".start_line."Gzt"
+endfunction
+" By default, if 'wrap' is off then zs moves the window horizontally,
+" positioning the cursor on the left side of the screen. I usually have 'wrap'
+" turned off though and since zs is easier to type I mapped it. But, for fun,
+" if 'wrap' is off then I'll map the 'zS' key sequence which isn't mapped..
+if !&wrap
+    nnoremap zs :set operatorfunc=ResizeWindowOperator<CR>g@
+    vnoremap zs :<C-u>call ResizeWindowOperator(visualmode())<CR>
+else
+    nnoremap zS :set operatorfunc=ResizeWindowOperator<CR>g@
+    vnoremap zS :<C-u>call ResizeWindowOperator(visualmode())<CR>
+endif
+
 " Create command to add a space before or after the cursor in insert mode.
 "
 " Could I make something that moves me 10 lines then 5 then 2... (as I
@@ -5295,9 +5345,6 @@ noremap <leader>L L
 " there with a couple of line movements. Could you even do a binary search
 " sort of thing??? Like you start in the middle and if no you can choose up or
 " down and the process repeats. That would be kind of cool.
-"
-" Could we define a search where it doesn't change the jump list as we go?
-" Then we could get to where we want and be able to jump back and forth
 "
 " Make commands to jump to a function definition given the name.
 
@@ -5445,6 +5492,10 @@ nnoremap <leader>Gf :grep! -r 'function <C-r>/' *<LEFT>
 nnoremap <leader>Gd :grep! -r 'define.*<C-r>/' *<LEFT>
 nnoremap <leader>Gc :grep! -r 'class <C-r>/' *<LEFT>
 
+" Normally Y is a synonym for yy. I think this mapping is more logical because
+" D and C behave in this fashion.
+nnoremap Y y$
+
 " }}}
 
 " Insert Mappings {{{
@@ -5512,7 +5563,7 @@ xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>
 " A text-object for the next set of parentheses
 onoremap in( :<C-U>normal! f(vi(<CR>
 vnoremap in( :<C-U>normal! f(vi(<CR>
-"onoremap in{ :<C-U>normal! /{<CR>vi(<CR>
+" onoremap in{ :<C-U>normal! /{<CR>vi(<CR>
 " Goes to next email address. My regex is probably not perfect but that's
 " fine.
 onoremap i@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvE"<CR>
@@ -5556,12 +5607,29 @@ function! TextObjSearchMatch(forward_p, visual_mode)
     call search(@/, 'cb')
     execute 'normal! '(a:visual_mode ? 'g':'').'v'.end_pos[1].'G'.end_pos[2].'|'
 endfunction
+" I think I could also use the <unique> tag which will only apply the mapping
+" if it isn't already defined.
 if v:version < 704
-    noremap <silent> gn :<C-u>call TextObjSearchMatch(1, 0)<CR>
+    " TODO: Make these commands repeatable with repeat.vim
+    noremap  <silent> gn :<C-u>call TextObjSearchMatch(1, 0)<CR>
     xnoremap <silent> gn :<C-u>call TextObjSearchMatch(1, 1)<CR>
-    noremap <silent> gN :<C-u>call TextObjSearchMatch(0, 0)<CR>
+    noremap  <silent> gN :<C-u>call TextObjSearchMatch(0, 0)<CR>
     xnoremap <silent> gN :<C-u>call TextObjSearchMatch(0, 1)<CR>
 endif
+
+" Text-object for an rvalue. As of now this only works for the kind of
+" languages that end in semi-colons.
+function! TextObjRVal()
+    normal! 0
+    call search('=\s*\zs')
+    let start_pos = getpos('.')
+    call search('.\ze;')
+    " execute 'normal! '(a:visual_mode ? 'g':'').'v'.end_pos[1].'G'.end_pos[2].'|'
+    execute 'normal! '.'v'.start_pos[1].'G'.start_pos[2].'|'
+endfunction
+" $temp = 'Change me!';
+onoremap rv :<C-u>call TextObjRVal()<CR>
+xnoremap rv :<C-u>call TextObjRVal()<CR>
 
 " }}}
 
@@ -5585,9 +5653,38 @@ cnoremap <C-n> <Down>
 "   inormap ln <C-r>=line('.')<CR>
 " So maybe that <expr> is just a convenience thing?
 
-
 " Makes it easier to open files in the same directory as other files.
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h') . '/' : '%%'
+
+" I envision that this command will set a bunch of options or define a bunch
+" of mappings to make it easier to create ascii art.
+command! -nargs=0 Ascii :set virtualedit=all
+
+" Whenever I needed to figure out what some piece of code did, I'd ususally do
+" some code diving, keeping all the pertinent files in active buffers. Then I
+" would write what each file helped accomplish in a format like this:
+"
+"     File: fname1
+"     File: fname2
+"     File: fname3
+"
+" So this command writes that for me.
+function! GetListOfActiveBuffers()
+    let buffer_nums = []
+    for tab in range(1, tabpagenr('$'))
+        for buffer in tabpagebuflist(tab) 
+            call add(buffer_nums, buffer)
+        endfor
+    endfor
+    " Removes duplicate buffer nums
+    return filter(buffer_nums, 'index(buffer_nums, v:val, v:key+1) ==# -1')
+endfunction
+function! WriteActiveBuffers()
+    let string = join(map(GetListOfActiveBuffers(), '"File: ".bufname(v:val)'), "\n")
+    execute "normal! o".string
+endfunction
+command! -nargs=0 PutActiveBuffers :call WriteActiveBuffers()
+
 " }}}
 
 " Insert Abbreviations {{{
@@ -5598,14 +5695,6 @@ iabbrev taht that
 "iabbrev @@ groenendaal92@gmail.com
 iabbrev ret return
 " }}}
-
-" Writing a command which will do a vertical replacement (R currently does a
-" horizontal replacement) sounds like a fun idea.
-
-" In general. how do i create a command which can work for different
-" parameters. Like say I want to createa a command which appends the / to any
-" buffer. How do i do the "any buffer" part?
-" :g/^match/y  seems to hold promise I think I can yank stuff in there.
 
 " XML File Settings {{{
 augroup filetype_xml
@@ -5655,7 +5744,6 @@ augroup filetype_sh
     " Create a command to type out a variable so it adds the dollar sign and
     " quotes and other things for us. Maybe I could even have a separate
     " command to type an array so I don't have to bother with those [] chars.
-    autocmd FileType sh nnoremap <buffer> <localleader>c I#<ESC>
 augroup END
 " }}}
 
@@ -5663,7 +5751,6 @@ augroup END
 augroup filetype_php
     autocmd!
     autocmd FileType php setlocal commentstring=//\ %s
-    autocmd FileType php nnoremap <buffer> <localleader>c I//<ESC>
     autocmd FileType php iabbrev vd var_dump("TEST1");
     " Does a var_dump of whatever is in the unnamed register.
     autocmd FileType php iabbrev dv var_dump(<C-r>");
@@ -5682,14 +5769,12 @@ augroup END
 " Common Lisp File Settings {{{
 augroup filetype_lisp
     autocmd!
-    autocmd FileType lisp nnoremap <buffer> <localleader>c I;;<ESC>
 augroup END
 " }}}
 
 " C File Settings {{{
 augroup filetype_c
     autocmd!
-    autocmd FileType c nnoremap <buffer> <localleader>c I//<ESC>
     "autocmd BufNewFile *.c :normal i#include <stdio.h><CR>Hi
     autocmd FileType c :iabbrev <buffer> iff if()<CR>{<CR>}
 augroup END
@@ -5703,7 +5788,6 @@ augroup filetype_vim
     " When foldmethod is "marker", vim will fold the lines starting at the one
     " containing {{{ and ending with the one containing }}}. See fold-marker
     autocmd FileType vim setlocal foldmethod=marker
-    autocmd FileType vim nnoremap <buffer> <localleader>c I"<ESC>
     autocmd FileType vim nnoremap <buffer> <localleader>f O" {{{<ESC>}O" }}}<ESC>
     autocmd FileType vim iabbrev fu function!<CR><CR>endfunction
     autocmd FileType vim iabbrev nno nnoremap
