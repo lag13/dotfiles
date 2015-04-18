@@ -227,6 +227,9 @@ if has('gui_running')
 endif
 " }}}
 
+" There's a vim variable called 'v:searchforward' which I could probably
+" leverage to make the n and N commands always go in the same direction.
+
 " Create a :source operator which can source just the selected lines.
 
 " Could we configure the f/F/t/T commands to work on screen lines rather than
@@ -5454,7 +5457,8 @@ inoremap jK <ESC>
 inoremap JK <ESC>
 
 " These are nice because those keys are right under my fingers.
-inoremap <C-j> <C-r><C-p>" inoremap <C-l> <C-r><C-p>0
+inoremap <C-j> <C-r><C-p>"
+inoremap <C-l> <C-r><C-p>0
 
 " TODO: Makes the current/previous word uppercase
 
@@ -5505,8 +5509,9 @@ xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>
 
 " Operator-pending Mappings {{{
 
-" How do I make this work in visual mode???
+" A text-object for the next set of parentheses
 onoremap in( :<C-U>normal! f(vi(<CR>
+vnoremap in( :<C-U>normal! f(vi(<CR>
 "onoremap in{ :<C-U>normal! /{<CR>vi(<CR>
 " Goes to next email address. My regex is probably not perfect but that's
 " fine.
@@ -5517,12 +5522,47 @@ onoremap in{ :<C-U>execute "normal! /{\r:nohlsearch\rvi{"<CR>
 onoremap an{ :<C-U>execute "normal! /{\r:nohlsearch\rva{"<CR>
 
 " A text object for the entire buffer
-vnoremap ae :<C-u>normal! ggVG<CR>
-onoremap ae :<C-u>normal! ggVG<CR>
+onoremap <silent> ae :<C-u>normal! ggVG<CR>
+vnoremap <silent> ae :<C-u>normal! ggVG<CR>
+" The InnerBuffer text-object will ignore any leading and trailing whitespace.
+function! TextObjInnerBuffer()
+    let save_pos = getpos('.')
+    call cursor(1, 1)
+    let start_line = search('\S', 'c')
+    call cursor('$', 1)
+    let end_line = search('\S', 'bc')
+    if start_line && start_line <=# end_line
+        execute 'normal! '.start_line.'GV'.end_line.'G'
+    else
+        call setpos('.', save_pos)
+    endif
+endfunction
+onoremap <silent> ie :<C-u>call TextObjInnerBuffer()<CR>
+vnoremap <silent> ie :<C-u>call TextObjInnerBuffer()<CR>
 
-" TODO: Add some other 'inner' and 'all' operator-pending stuff. Like for '#'
-" and such.
-"onoremap i# 
+" Text-object for a search pattern. So I wanted to implement or install the i/
+" text-object talked about in Practical Vim. This text object operates on the
+" current search pattern. In trying to implement it I learned about the gn
+" operator which behaves like i/ and is built into vim version 7.4.110!! So I
+" decided to implement my own gn. Now if gn is NOT mapped then I use my
+" defined gn mapping. I was trying to find a way to detect if a key sequence
+" is already mapped and I could for user defined mappings but not for built in
+" ones. So I check the version to see whether to define this operator or not.
+function! TextObjSearchMatch(forward_p, visual_mode)
+    if search(@/, 'ce' . (a:forward_p ? '' : 'b')) ==# 0
+        return 0
+    endif
+    let end_pos = getpos('.')
+    call search(@/, 'cb')
+    execute 'normal! '(a:visual_mode ? 'g':'').'v'.end_pos[1].'G'.end_pos[2].'|'
+endfunction
+if v:version < 704
+    noremap <silent> gn :<C-u>call TextObjSearchMatch(1, 0)<CR>
+    xnoremap <silent> gn :<C-u>call TextObjSearchMatch(1, 1)<CR>
+    noremap <silent> gN :<C-u>call TextObjSearchMatch(0, 0)<CR>
+    xnoremap <silent> gN :<C-u>call TextObjSearchMatch(0, 1)<CR>
+endif
+
 " }}}
 
 " Command Mode Mappings {{{
