@@ -11,12 +11,12 @@
 " :i[noremap]map    Insert
 " :c[noremap]map    Command-line
 
-" Creating text-object:
-" 1. Define operator-pending mapping so you can operate on the text object
+" Creating a text-object:
+" 1. Define the operator-pending mapping so you can operate on the text object
 " when using operators.
 " 2. Define a visual mapping so you can select the text-object in visual mode.
 " A thought I just had, visual mode is kind of like a prolonged
-" operator-pending mode. The 'normal' execution is for operator commands is:
+" operator-pending mode. The 'normal' execution for operator commands is:
 "
 "   operator -> operator-pending
 "
@@ -254,6 +254,34 @@ if has('gui_running')
 endif
 " }}}
 
+" I also could maybe make an autocommand which will turn off paste upon leaving
+" insert mode. I've never needed to paste more than once, so yes I think I'll
+" do that.
+
+" Could we create a paste operator? That sounds like a fun challenge. So
+" something like: ,pi" will paste from the default register into the i" text
+" object. It really probably wouldn't benefit me too much BUT I could make
+" this operator not change the default register, which would be nice.
+
+" Maybe an operator just like 'c' but it also sets paste mode upon deletion
+" and turns off paste mode upon leaving insert mode.
+
+" Create a text object for 'Here document' (heredoc) strings. I'm talking
+" about these constructs:
+"
+" echo <<<EOQ
+" This is a string
+" I can have 'single' quotes
+" I can have "double" quotes
+" Then I end the string like this:
+" EOQ;
+
+" Make a series of mappings to insert 'test' data. So I could have a 'phone
+" number' mapping which could insert the phone number "123-456-7890" or have
+" one that inserts a test email or something like that.
+
+" Create a text object for an IP address
+
 " Create text objects to change part of a snake/camel case variables.
 
 " Create a :source operator which can source just the selected lines.
@@ -329,7 +357,7 @@ endif
 " TODO: Read about how settings are transferred/inherited from window to
 " window, buffer to buffer etc...
 
-" TODO: MAke it so that when you exit command mode it doesn't add the command
+" TODO: Make it so that when you exit command mode it doesn't add the command
 " to the history list. Also try to make it so that any duplicate commands in
 " the history list are removed.
 
@@ -353,39 +381,21 @@ endif
 " operator isn't working even though the '>' works just fine. Look into this.
 " Actually, it seems that '<' needs to be on whitespace and then it works?
 
-" TODO: The 10th user manual also says that 'J' in visual mode removes joins
-" all lines and separates them by one space regardless of leading or trailing
-" whitespace. It looks like trailing whitespace is being retained. Look into
-" this.
+" TODO: The 10th user manual also says that 'J' in visual mode joins all lines
+" and separates them by one space regardless of leading or trailing
+" whitespace. But it looks like trailing whitespace IS being retained. Look
+" into this.
 
 " Just for fun, redefine how a number in front of the 'R' command
 " works so that when you type something like 3R it will allow you to
 " replace 3 characters then exit replace mode.
-
-" Also for fun, could I make replace operator so to speak? So I could call
-" this operator and tell it to replace the current word. What it would do is
-" replace the entire word with spaces and put me at the beginning of where the
-" word was. The inspiration was making this list:
-"               1. voyagecare (DEV AND PROD)
-"               2. saia       (DEV)
-"               3. voyagecare (DEV)
-"               4. voyagecare (DEV)
-"               5. voyagecare (DEV)
-"               6. voyagecare (DEV)
-"               7. voyagecare (DEV)
-" I'm going to update the later 'voyagecare' strings to a different name but
-" I'm going to want to keep the parentheses aligned. If I replaced a
-" voyagecare with whitespace and then just started replacing, the parentheses
-" will stay aligned (assuming that the new name isn't longer than voyagecare).
-" In all reality this is probably a job for the Tabular plugin but I thought
-" this could be fun.
 
 " Redefine the 'Search' highlighting group or change the group that 'hlsearch'
 " uses so that the highlighted color contrasts better with the cursor.
 
 " Make it so that doing <C-r>/ will NOT include the \<\> surrounding the
 " search text. I think I find myself fairly often using the * and then want to
-" paste that data somewhere but the \<\> is distracting.
+" paste that data somewhere but the \<\> is unecesarry.
 
 " Look up the pattern \%V when searching. Seems pretty cool, we cand search in
 " the last visual selection!
@@ -408,11 +418,11 @@ endif
 " really big.
 
 " That code that I wrote to semi-automatically add sertifi email tags was
-" nice. I liked the idea of going around the document and repeatedly adding
-" some bit of text to a list. What if we generalized it a bit? I could make an
-" operator which will add the selected text to the end of a global array. Then
-" I could have another mapping which would call a function using that array as
-" a parameter (or I could just do it manually). Yeah, I like that idea.
+" nice. I liked the idea of going around a file and appending some text to a
+" list which we later operate on. What if we generalized it a bit? I could
+" make an operator which will add the selected text to the end of a global
+" array. Then I could call function which would use that array to do
+" something. Yeah, I like that idea.
 
 " Sort of related to the idea above of having an operator to add a bit of text
 " to a global array. I recently had to take a comma delimited string and put
@@ -449,7 +459,7 @@ endif
 " What I want to do is be able to open ALL those files at once. I was thinking
 " about using a global command that looked something like this:
 "                   g/^File:/split | normal Wgf | wincmd p
-" But that doesn't work. Look into this! I read that if you call the :args
+" But that doesn't work. Look into this. I read that if you call the :args
 " command with a list of files it will open those files so maybe something
 " with that? Like use a global command to add all file names to an array
 " variable X, and run the command: execute 'args ' . X
@@ -467,19 +477,14 @@ endif
 " the alternate file?
 
 " I've already talked about this in some other list I was keeping track of but
-" I'll write it here as well. I want t make a little code analyzer that will
+" I'll write it here as well. I want to make a little code analyzer that will
 " look at one file of code and help me understand what's going on. I'm
 " picturing this tool would grab all the function names and for each function
 " name, see what function calls them. Then build a little graph based off that
 " knowledge.
 
-" Writing a command which will do a vertical replacement (R currently does a
+" Write a command which will do a vertical replacement (R currently does a
 " horizontal replacement) sounds like a fun idea.
-
-" In general. how do i create a command which can work for different
-" parameters. Like say I want to createa a command which appends the / to any
-" buffer. How do i do the "any buffer" part?
-" :g/^match/y  seems to hold promise I think I can yank stuff in there.
 
 " Luceo Stuff {{{
 
@@ -5289,10 +5294,11 @@ function! PreserveSearchDirection(n_command_p, visual_p, keep_jump_p)
     elseif a:n_command_p && !v:searchforward
         let command = 'N'
     endif
-    execute (a:keep_jump_p ? 'keepjumps ':'').'normal! '.(a:visual_p ? 'gv':'').command
+    execute (a:keep_jump_p ? 'keepjumps ':'').'normal! '.(a:visual_p ? 'gv':'').command.'zv'
 endfunction
-" Calling :set hlsearch after was the only I knew how to turn the search back
-" on highlighting.
+" Calling :set hlsearch after was the only I knew how to turn the search
+" highlighting back on. And calling zv was the only way I knew how to open a
+" fold.
 noremap  <silent> n :call PreserveSearchDirection(1, 0, 0)<CR>:set hlsearch<CR>
 noremap  <silent> N :call PreserveSearchDirection(0, 0, 0)<CR>:set hlsearch<CR>
 xnoremap <silent> n :call PreserveSearchDirection(1, 1, 0)<CR>:set hlsearch<CR>
@@ -5325,17 +5331,54 @@ function! ResizeWindowOperator(type)
     execute "resize ".(end_line-start_line+1)
     execute "keepjumps normal! ".start_line."Gzt"
 endfunction
-" By default, if 'wrap' is off then zs moves the window horizontally,
-" positioning the cursor on the left side of the screen. I usually have 'wrap'
-" turned off though and since zs is easier to type I mapped it. But, for fun,
-" if 'wrap' is off then I'll map the 'zS' key sequence which isn't mapped..
-if !&wrap
+" By default 'wrap' is off and the zs command will move the window
+" horizontally, positioning the cursor on the left side of the screen. I
+" usually have 'wrap' turned on though and, since zs is easier to type, I
+" mapped it. But, for fun, if 'wrap' is off then I'll map the 'zS' key
+" sequence which isn't mapped.
+if &wrap
     nnoremap zs :set operatorfunc=ResizeWindowOperator<CR>g@
     vnoremap zs :<C-u>call ResizeWindowOperator(visualmode())<CR>
 else
     nnoremap zS :set operatorfunc=ResizeWindowOperator<CR>g@
     vnoremap zS :<C-u>call ResizeWindowOperator(visualmode())<CR>
 endif
+
+" Also for fun, could I make replace operator so to speak? What it would do is
+" replace the text-object with spaces and put me in Replace mode, at the
+" beginning of where the text-object was. The inspiration for this idea was
+" making this list:
+"               1. voyagecare (DEV AND PROD)
+"               2. saia       (DEV)
+"               3. voyagecare (DEV)
+"               4. voyagecare (DEV)
+"               5. voyagecare (DEV)
+"               6. voyagecare (DEV)
+"               7. voyagecare (DEV)
+" I was going to update the later 'voyagecare' strings to a different name but
+" I'll want to keep the parentheses aligned. If I replaced a 'voyagecare' with
+" whitespace and then just started Replace mode, the parentheses will stay
+" aligned (assuming that the new name isn't longer than voyagecare). This
+" probably wouldn't something terribly useful at all. If I wanted to keep the
+" parentheses aligned, I could just use a plugin like Tabular after changing
+" all the 'voyagecares'. But I thought this could be fun if anything else.
+
+function! ReplaceOperator(type)
+    let start_pos = getpos("'[")
+    let end_pos = getpos("']")
+    execute 'normal! '.start_pos[1].'G'.start_pos[2].'|v'.end_pos[1].'G'.end_pos[2].'|r '
+
+    " echom a:type
+    " How do I exit a function in a different mode?
+    " normal! R
+endfunction
+" nnoremap <silent> gr :set operatorfunc=ReplaceOperator<CR>g@
+" vnoremap <silent> gr :<C-u>call ReplaceOperator(visualmode())<CR>
+" I'm unsure how to make an operator for the above request but I made this
+" super simple solution for visual mode. I'll just stick with this for now
+" because it does do what I want. In doing this, I wonder if it would be worth
+" it to create an operator to replace a text-object with a specfic character.
+vnoremap <silent> gr r<SPACE>R
 
 " Create command to add a space before or after the cursor in insert mode.
 "
@@ -5496,6 +5539,9 @@ nnoremap <leader>Gc :grep! -r 'class <C-r>/' *<LEFT>
 " D and C behave in this fashion.
 nnoremap Y y$
 
+" Sometimes I just want to clear the line but keep the space it took up.
+nnoremap dD :call setline('.', '')<CR>
+
 " }}}
 
 " Insert Mappings {{{
@@ -5506,6 +5552,12 @@ inoremap jk <ESC>
 inoremap Jk <ESC>
 inoremap jK <ESC>
 inoremap JK <ESC>
+" Because I think it could be useful I'm also defining the reverses of the
+" 'jk' mappings.
+inoremap kj <ESC>
+inoremap kJ <ESC>
+inoremap Kj <ESC>
+inoremap KJ <ESC>
 
 " These are nice because those keys are right under my fingers.
 inoremap <C-j> <C-r><C-p>"
@@ -5560,17 +5612,78 @@ xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>
 
 " Operator-pending Mappings {{{
 
+" TODO: Create better text objects for a bunch of these 'Inner next <char>'
+" objects. I want them for '"({[`. Also make iL mappings which will select the
+" actual last text object that can be found. Also, the quoted text-object only
+" work on one line. Make others that can span multiple lines. I'm thinking the
+" mapping could be I".
+function! NextAndPrevQuoteTextObj(char, backward_p, around_p, last_p)
+    " if no a:char before the cursor, go four char's ahead.
+    if a:last_p
+        normal! $
+    endif
+    let num_loops = (col('.') <# stridx(getline('.'), a:char) && !a:backward_p ? 4 : 2)
+    for i in range(1, num_loops)
+        call search(a:char, a:backward_p ? 'b':'')
+    endfor
+    execute "normal! v".(a:around_p ? 'a':'i').a:char
+endfunction
+" <node actif='false' som='thing' you='buddy'/>
+" <node actif=`false` som=`thing` you=`buddy`/>
+" <node actif="false" som="thing" you="buddy"/>
+
+" This loop looks formidable but all it's doing is creating mappings that look
+" like in', an', il', an', etc... There were just so many of these mappings to
+" make and since their structure was so similar I made the loop.
+for char in ["'", '"', '`']
+    let param = 0
+    for modifier in ['i', 'a']
+        execute 'onoremap '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, '.param.', 0)<CR>'
+        execute 'vnoremap '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, '.param.', 0)<CR>'
+        execute 'onoremap '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 0)<CR>'
+        execute 'vnoremap '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 0)<CR>'
+        execute 'onoremap '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 1)<CR>'
+        execute 'vnoremap '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 1)<CR>'
+        let param = 1
+    endfor
+endfor
+
+function! NextAndPrevBracket(char, search_char, backwards_p, around_p)
+    call search(a:search_char, a:backwards_p ? 'b':'')
+    execute "normal! v".(a:around_p ? 'a':'i').a:char
+endfunction
+" <node actif=(false) som=(thing) you=(buddy)/>
+" <node actif={false} som={thing} you={buddy}/>
+" <node actif=[false] som=[thing] you=[buddy]/>
+
+onoremap in( :<C-u>call NextAndPrevBracket('(', '(', 0, 0)<CR>
+vnoremap in( :<C-u>call NextAndPrevBracket('(', '(', 0, 0)<CR>
+onoremap il( :<C-u>call NextAndPrevBracket('(', ')', 1, 0)<CR>
+vnoremap il( :<C-u>call NextAndPrevBracket('(', ')', 1, 0)<CR>
+onoremap an( :<C-u>call NextAndPrevBracket('(', '(', 0, 1)<CR>
+vnoremap an( :<C-u>call NextAndPrevBracket('(', '(', 0, 1)<CR>
+onoremap al( :<C-u>call NextAndPrevBracket('(', ')', 1, 1)<CR>
+vnoremap al( :<C-u>call NextAndPrevBracket('(', ')', 1, 1)<CR>
+onoremap inb :<C-u>call NextAndPrevBracket('(', '(', 0, 0)<CR>
+vnoremap inb :<C-u>call NextAndPrevBracket('(', '(', 0, 0)<CR>
+onoremap ilb :<C-u>call NextAndPrevBracket('(', ')', 1, 0)<CR>
+vnoremap ilb :<C-u>call NextAndPrevBracket('(', ')', 1, 0)<CR>
+onoremap anb :<C-u>call NextAndPrevBracket('(', '(', 0, 1)<CR>
+vnoremap anb :<C-u>call NextAndPrevBracket('(', '(', 0, 1)<CR>
+onoremap alb :<C-u>call NextAndPrevBracket('(', ')', 1, 1)<CR>
+vnoremap alb :<C-u>call NextAndPrevBracket('(', ')', 1, 1)<CR>
+
 " A text-object for the next set of parentheses
-onoremap in( :<C-U>normal! f(vi(<CR>
-vnoremap in( :<C-U>normal! f(vi(<CR>
+" onoremap in( :<C-U>normal! f(vi(<CR>
+" vnoremap in( :<C-U>normal! f(vi(<CR>
 " onoremap in{ :<C-U>normal! /{<CR>vi(<CR>
 " Goes to next email address. My regex is probably not perfect but that's
 " fine.
 onoremap i@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvE"<CR>
 onoremap a@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvEl"<CR>
 " Yanks the next chunck of code surrounded in '{ }'
-onoremap in{ :<C-U>execute "normal! /{\r:nohlsearch\rvi{"<CR>
-onoremap an{ :<C-U>execute "normal! /{\r:nohlsearch\rva{"<CR>
+" onoremap in{ :<C-U>execute "normal! /{\r:nohlsearch\rvi{"<CR>
+" onoremap an{ :<C-U>execute "normal! /{\r:nohlsearch\rva{"<CR>
 
 " A text object for the entire buffer
 onoremap <silent> ae :<C-u>normal! ggVG<CR>
@@ -5633,7 +5746,7 @@ xnoremap rv :<C-u>call TextObjRVal()<CR>
 
 " }}}
 
-" Command Mode Mappings {{{
+" Command Mappings {{{
 " These commands used to scroll the list up and down but did NOT filter the
 " list as the Up and Down keys would. So we remap them because I like that
 " behavior.
