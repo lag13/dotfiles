@@ -14,14 +14,14 @@ Installation:
 
 ### Create The symlink
 
-    ln -s ~/.vim/vimrc ~/.vimrc
+    ln -s ~/.vim/vimrc ~/.vimrc (For Unix)
+    mklink .vimrc .vim\vimrc (For Windows)
 
 ### Initialize The git-submodules
 
     cd ~/.vim
     git submodule init
     git submodule update
-
 
 Adding New Plugins
 ------------------
