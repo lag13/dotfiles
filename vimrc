@@ -254,6 +254,134 @@ if has('gui_running')
 endif
 " }}}
 
+" I could try to make zt and zb operators! So for example, zt will position
+" the top of the window at the '< or '[ mark (depending), leaving the cursor
+" where it is.
+function! RedrawCursorLineAtTop(type)
+    " Whenever you use an operator, your cursor is positioned at the top of
+    " the operated area. So this operator is extremely trivial.
+    normal! zt
+endfunction
+nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
+
+" Could we make a visual mapping to repeat the last text-object movement? So
+" if I did vi{ and I wanted to repeat i{ I could just hit ',t' or something
+" like that.
+
+" Make indent text objects.
+" 1. ii - Select everything on the current indent level
+" 2. ai - Select everything on the current indent level plus a space
+" 3. iI and aI - Same as above but also select everything at a lower indent level. So if we had code like this:
+"         $this->logger->info(
+"             sprintf(
+"                 'These users were deleted from customer system %s: %s',
+"                 $this->id,
+"                 $responseJson
+"             )
+"         );
+" And we did viI when our cursor was on the first line, then it would select to
+" the last line because that is next line at the same indent level at the first
+" line. Or maybe I just need a text object for function calls and maybe I should
+" try to make iI and aI ignore empty spaces or something like that...
+
+" Make a mapping which will reformat a function call to look like this:
+" $this->abortIf(
+"     $this->connection->getDatabasePlatform()->getName() != 'mysql',
+"     'Migration can only be executed safely on \'mysql\'.'
+" );
+" So imagine that the above function used to be one giant line, this mapping
+" would make it look like it is right now..
+
+" Make text objects to go to the next occurrence of a comment. The same goes
+" with code.
+
+" Text object for function parameters. Maybe I could have something like you
+" could type c1f (or something like that) and it would change the first
+" function arg. c2f would be the second. etc...
+
+" I think in an older vimrc I mapped F3 and F4 keys to behave like emacs's
+" macros. I must of lost that somewhere. Make those mappings again.
+
+" Maybe make the in" text objects NOT change the next occurrence of double
+" quotes if they occur offscreen. Because that happened to me after a mistype
+" and it threw me off. Chances are you won't be changing quotes offscreen.
+
+" I think I said this before but I don't remember seeing it in my vimrc so
+" I'll say it again. Make an operator (or a series of commands) which will
+" print out the value of a variable. This will be helpful for debugging
+" purposes. Then I could just do something like: ,diw and in the case of php
+" it will insert a new line below the current one with the contents:
+" var_dump(yanked_string);
+
+" Make my \1, \2, ... markdown header changing things smarter. Like if I have
+" this header:
+"
+" Lucas Header
+" -----------------
+"
+"  And I want to remove 'Lucas' so it just becomes 'Header' then my \2 command
+"  should adjust the existing --- line rather than just appending a new line
+"  below Header. So running \2 on Header will give me this:
+"
+"  Header
+"  ---------
+"
+"  instead of this:
+"
+"  Header
+"  ---------
+"  -----------------
+"
+"
+"  Speaking of markdown. Create some text objects and movements (like [[ inner
+"  header) for editing markdown files.
+
+" I was having to make an example json string based off columns like this:
+ " /**
+   "   * @var \DateTime
+   "   *
+   "   * @ORM\Column(name="most_recent_mass_email_sent", type="datetime", nullable=true)
+   "   * @Serializer\Expose
+   "   */
+   "  private $mostRecentMassEmailSent;
+
+   "  /**
+   "   * @var integer
+   "   *
+   "   * @ORM\Column(name="candidate_emails_sent", type="integer", nullable=true)
+   "   * @Serializer\Expose
+   "   */
+   "  private $candidateEmailsSent;
+
+   "  /**
+   "   * @var \DateTime
+   "   *
+   "   * @ORM\Column(name="most_recent_candidate_email_sent", type="datetime", nullable=true)
+   "   * @Serializer\Expose
+   "   */
+   "  private $mostRecentCandidateEmailSent;
+
+   "  /**
+   "   * @var \DateTime
+   "   *
+   "   * @ORM\Column(name="last_connection", type="datetime", nullable=true)
+   "   * @Serializer\Expose
+   "   */
+   "  private $lastConnection;
+" So for the above data, the json string could look like this:
+"
+" {"most_recent_mass_email_sent":"DATE", "candidate_emails_sent":8, "most_recent_candidate_email_sent":"DATE", "last_connection":"DATE}
+"
+" I was doing it semi-manually. Think about a way to automate this more. I know
+" it can be done, I just don't how to yank multiple things but still use them in
+" a meaningful way.
+
+" The 'n' and N commands preserving search direction yells at me when there is
+" nothing to find.
+
+" Think about using <C-l> and <C-h> for window movements and bind other
+" Control key chords to switch between tabs.
+
 " I also could maybe make an autocommand which will turn off paste upon leaving
 " insert mode. I've never needed to paste more than once, so yes I think I'll
 " do that.
@@ -5249,6 +5377,11 @@ noremap J 5gj
 noremap K 5gk
 " This is easier to type than :j<CR>
 nnoremap <leader>J J
+" Splits a line at the cursor position. So it does the opposite of the J
+" command. If I had kept my original J mapping then I probably would have made
+" this mapping ,J. But since ,J is now J I figured this would be the next best
+" thing.
+nnoremap <leader>j dli<CR><ESC>
 
 " I've had to delete 3 lines before and hence these mappings. The reason I
 " don't have these mappings delete 5 lines (which would roughtly match how
@@ -5331,18 +5464,8 @@ function! ResizeWindowOperator(type)
     execute "resize ".(end_line-start_line+1)
     execute "keepjumps normal! ".start_line."Gzt"
 endfunction
-" By default 'wrap' is off and the zs command will move the window
-" horizontally, positioning the cursor on the left side of the screen. I
-" usually have 'wrap' turned on though and, since zs is easier to type, I
-" mapped it. But, for fun, if 'wrap' is off then I'll map the 'zS' key
-" sequence which isn't mapped.
-if &wrap
-    nnoremap zs :set operatorfunc=ResizeWindowOperator<CR>g@
-    vnoremap zs :<C-u>call ResizeWindowOperator(visualmode())<CR>
-else
-    nnoremap zS :set operatorfunc=ResizeWindowOperator<CR>g@
-    vnoremap zS :<C-u>call ResizeWindowOperator(visualmode())<CR>
-endif
+nnoremap zS :set operatorfunc=ResizeWindowOperator<CR>g@
+vnoremap zS :<C-u>call ResizeWindowOperator(visualmode())<CR>
 
 " Also for fun, could I make replace operator so to speak? What it would do is
 " replace the text-object with spaces and put me in Replace mode, at the
@@ -5362,7 +5485,6 @@ endif
 " probably wouldn't something terribly useful at all. If I wanted to keep the
 " parentheses aligned, I could just use a plugin like Tabular after changing
 " all the 'voyagecares'. But I thought this could be fun if anything else.
-
 function! ReplaceOperator(type)
     let start_pos = getpos("'[")
     let end_pos = getpos("']")
@@ -5542,6 +5664,14 @@ nnoremap Y y$
 " Sometimes I just want to clear the line but keep the space it took up.
 nnoremap dD :call setline('.', '')<CR>
 
+" Inserts a new line above/below the cursor but remains in normal mode. TODO:
+" Consider making these mappings repeatable with Tim Pope's repeat.vim.
+nnoremap <leader>o :call append('.', '')<CR>
+nnoremap <leader>O :call append(line('.')-1, '')<CR>
+
+" A quick way to save
+nnoremap <leader>w :w<CR>
+
 " }}}
 
 " Insert Mappings {{{
@@ -5552,12 +5682,6 @@ inoremap jk <ESC>
 inoremap Jk <ESC>
 inoremap jK <ESC>
 inoremap JK <ESC>
-" Because I think it could be useful I'm also defining the reverses of the
-" 'jk' mappings.
-inoremap kj <ESC>
-inoremap kJ <ESC>
-inoremap Kj <ESC>
-inoremap KJ <ESC>
 
 " These are nice because those keys are right under my fingers.
 inoremap <C-j> <C-r><C-p>"
@@ -5595,8 +5719,9 @@ function! AlignAssignment(str_to_align_on) range
     endfor
 endfunction
 
-" Copied the visual star search plugin. Now hitting * or # when visually
-" selecting text will search for the visually selected text.
+" Copied the code from visual star search plugin mentioned in 'Practical Vim'.
+" Now hitting * or # when visually selecting text will search for the visually
+" selected text.
 function! VGetSearch(cmdtype)
     let save_unnamed_register = @"
     normal! gvy
@@ -5604,9 +5729,35 @@ function! VGetSearch(cmdtype)
     let @" = save_unnamed_register
     return search_pat
 endfunction
-
 xnoremap * :<C-u>execute 'normal! /' . VGetSearch('/') . "\r"<CR>
 xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>
+
+" In this video at 6:49: https://www.youtube.com/watch?v=zIOOLZJb87U he uses a
+" mapping where he visually selects some text and is prompted for a variable
+" name. Once he entered the variable name 'tmp', 'tmp' got assigned the value
+" of the visual selection and the variable name was pasted where the visual
+" selection was. For example say I have this line of code:
+
+"   $this->getDoctrine()->getEntityManager()->remove($row);
+
+" If I highlight this portion: $this->getDoctrine()->getEntityManager(),
+" call this mapping and type the variable name $em then the result would be:
+"
+"   $em = $this->getDoctrine()->getEntityManager();
+"   $em->remove($row);
+function! CreateVariableFromSelection()
+    let save_unnamed_register = @"
+    normal! gvy
+    let var_name = input("Enter Variable Name: ")
+    " Insert new line above cursor position and put: 
+    " 'variable_name = yanked_value'
+    execute 'normal! O'.var_name." = \<C-r>".'";'
+    " Put 'variable_name' in place of the visual selection
+    let @" = var_name
+    normal! gvp
+    let @" = save_unnamed_register
+endfunction
+xnoremap <leader>v :<C-u>call CreateVariableFromSelection()<CR>
 
 " }}}
 
