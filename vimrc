@@ -5358,7 +5358,13 @@ nnoremap <leader>lpm :call RunTranslatorMerge()<CR>
 
 " Normal Mappings {{{
 
-" ',' is my leader and I want to keep it's original functionality.
+" I remember seeing this mapping on a vim talk and thinking 'What?!? How dare
+" he do that'. But I've been thinking lately that it's not a bad idea. I
+" definitely use Ex commands more often than the ';' command.
+nnoremap ; :
+nnoremap : ;
+
+" ',' is my leader but I want to keep it's original functionality.
 noremap ,, ,
 
 " Move by screen lines rather than actual lines.
