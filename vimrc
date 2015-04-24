@@ -5363,6 +5363,8 @@ nnoremap <leader>lpm :call RunTranslatorMerge()<CR>
 " definitely use Ex commands more often than the ';' command.
 nnoremap ; :
 nnoremap : ;
+vnoremap ; :
+vnoremap : ;
 
 " ',' is my leader but I want to keep it's original functionality.
 noremap ,, ,
