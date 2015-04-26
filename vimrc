@@ -11,6 +11,9 @@
 " :i[noremap]map    Insert
 " :c[noremap]map    Command-line
 
+" Seemed like a nice quick vimscript tutorial
+" http://andrewscala.com/vimscript/
+
 " Creating a text-object:
 " 1. Define the operator-pending mapping so you can operate on the text object
 " when using operators.
@@ -5421,34 +5424,38 @@ noremap H ^
 " L now goes to last character on the current line.
 noremap L $
 vnoremap L g_
-" We maintain the original H and L functionality just in case.
+" We maintain the original H and L functionality.
 noremap <leader>H H
 noremap <leader>L L
 
 " Makes it so the n and N commands always go in the same direction, forward
 " and backward respectively, no matter which direction we're actually
 " searching.
-function! PreserveSearchDirection(n_command_p, visual_p, keep_jump_p)
-    let command = 'n'
-    if !a:n_command_p && v:searchforward
-        let command = 'N'
-    elseif a:n_command_p && !v:searchforward
-        let command = 'N'
-    endif
-    execute (a:keep_jump_p ? 'keepjumps ':'').'normal! '.(a:visual_p ? 'gv':'').command.'zv'
+function! PreserveSearchDirection(n_p, visual_p)
+    let v:searchforward = 1
+    try
+        execute "normal! ".(a:visual_p ? 'gv':'').(a:n_p ? 'n':'N')
+    catch
+        echohl ErrorMsg
+        echo v:errmsg
+        echohl None
+    endtry
+    " In vim version 704 there is this variable which can be used to turn
+    " off/on search highlighting. So I can use this line of code when I get
+    " that version. That will be nice because then ALL the logic for this
+    " mapping will be contained within this function and we can just call it.
+    " For now, the best I can do is call 'set hlsearch' in the mapping after
+    " calling the function.
+    " let v:hlsearch = 1
 endfunction
-" Calling :set hlsearch after was the only I knew how to turn the search
-" highlighting back on. And calling zv was the only way I knew how to open a
-" fold.
-noremap  <silent> n :call PreserveSearchDirection(1, 0, 0)<CR>:set hlsearch<CR>
-noremap  <silent> N :call PreserveSearchDirection(0, 0, 0)<CR>:set hlsearch<CR>
-xnoremap <silent> n :call PreserveSearchDirection(1, 1, 0)<CR>:set hlsearch<CR>
-xnoremap <silent> N :call PreserveSearchDirection(0, 1, 0)<CR>:set hlsearch<CR>
-
+noremap  <silent> n :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(1, 0)<CR>
+noremap  <silent> N :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(0, 0)<CR>
+xnoremap <silent> n :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(1, 1)<CR>
+xnoremap <silent> N :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(0, 1)<CR>
 " Goes to the next/previous search match without changing the jumplist.
-noremap <silent><leader>n :call PreserveSearchDirection(1, 0, 1)<CR>:set hlsearch<CR>
+noremap <silent><leader>n :set hlsearch<CR>:call PreserveSearchDirection(1, 0)<CR>
 " I used m rather than N becuase it's easier to type and m is close to n.
-noremap <silent><leader>m :call PreserveSearchDirection(0, 0, 1)<CR>:set hlsearch<CR>
+noremap <silent><leader>m :set hlsearch<CR>:call PreserveSearchDirection(0, 0)<CR>
 " Do I need to remap these to something that works? I don't think the jumplist
 " has the same effect when you're already inside visual mode.
 xnoremap <silent><leader>n <NOP>
@@ -5633,6 +5640,7 @@ nnoremap z} }kzb``
 
 " Slightly easier to type and it wasn't being used!
 nnoremap q; q:
+xnoremap q; q:
 
 " ' is easier to reach and it's nice for it to go to the exact spot.
 noremap ' `
@@ -5756,7 +5764,7 @@ xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>
 function! CreateVariableFromSelection()
     let save_unnamed_register = @"
     normal! gvy
-    let var_name = input("Enter Variable Name: ")
+    let var_name = input("Variable Name: ")
     " Insert new line above cursor position and put: 
     " 'variable_name = yanked_value'
     execute 'normal! O'.var_name." = \<C-r>".'";'
@@ -5767,15 +5775,58 @@ function! CreateVariableFromSelection()
 endfunction
 xnoremap <leader>v :<C-u>call CreateVariableFromSelection()<CR>
 
+" A mapping/command that surrounds a selection with an ascii text box like
+" this:
+" Other text SELECTED_TEXT Other text
+"            +---------------+
+" Other text | SELECTED_TEXT | Other text
+"            +---------------+
+" Ideas:
+" 1. The function currently opens a new line below and above the current line
+" to put the bottom of the box. Consider trying to have it use the existing
+" line.
+" 2. Make it work for muliple selected lines.
+function! SurroundWithBox(...) range
+    " This is the best we can do to get default values
+    let pipe_num_spaces = 1
+    let top_bottom_num_spaces = 0
+    if a:0 > 0
+        let pipe_num_spaces = a:1
+    endif
+    if a:0 > 1
+        let top_bottom_num_spaces = a:2
+    endif
+    let save_unnamed_register = @"
+    normal! gvy
+    let @" = substitute(@", "\n", "", "")
+    " Create the top and bottom of the box
+    let padding = repeat(' ', col("'<")-1)
+    let topAndBottom = padding . '+'.repeat('-', len(@")+2*pipe_num_spaces).'+'
+    call append('.', topAndBottom)
+    call append(line('.')-1, topAndBottom)
+
+    " Add more pipes if they want padding above or below the selected text
+    let pipe_padding = repeat(' ', pipe_num_spaces)
+    let pipe_string = padding.'|'.pipe_padding.repeat(' ', len(@")).pipe_padding.'|'
+    for i in range(1, top_bottom_num_spaces)
+        call append('.', pipe_string)
+        call append(line('.')-1, pipe_string)
+    endfor
+
+    " Add the pipes on either side of the selected text
+    let cur_line = getline('.')
+    let first_part = strpart(cur_line, 0, col("'<")-1)
+    let second_part = strpart(cur_line, col("'>"))
+    call setline('.', first_part.'|'.pipe_padding.@".pipe_padding.'|'.second_part)
+    let @" = save_unnamed_register
+endfunction
+command! -nargs=* -range Boxify call SurroundWithBox(<f-args>)
+
 " }}}
 
 " Operator-pending Mappings {{{
 
-" TODO: Create better text objects for a bunch of these 'Inner next <char>'
-" objects. I want them for '"({[`. Also make iL mappings which will select the
-" actual last text object that can be found. Also, the quoted text-object only
-" work on one line. Make others that can span multiple lines. I'm thinking the
-" mapping could be I".
+" Mappings for the next/previous pair of '"` characters.
 function! NextAndPrevQuoteTextObj(char, backward_p, around_p, last_p)
     " if no a:char before the cursor, go four char's ahead.
     if a:last_p
@@ -5790,10 +5841,9 @@ endfunction
 " <node actif='false' som='thing' you='buddy'/>
 " <node actif=`false` som=`thing` you=`buddy`/>
 " <node actif="false" som="thing" you="buddy"/>
-
 " This loop looks formidable but all it's doing is creating mappings that look
 " like in', an', il', an', etc... There were just so many of these mappings to
-" make and since their structure was so similar I made the loop.
+" make and since their structure is so similar I made the loop.
 for char in ["'", '"', '`']
     let param = 0
     for modifier in ['i', 'a']
@@ -5807,6 +5857,7 @@ for char in ["'", '"', '`']
     endfor
 endfor
 
+" Mappings for the next/previous pair of ([{ characters.
 function! NextAndPrevBracket(char, search_char, backwards_p, around_p)
     call search(a:search_char, a:backwards_p ? 'b':'')
     execute "normal! v".(a:around_p ? 'a':'i').a:char
@@ -5814,28 +5865,21 @@ endfunction
 " <node actif=(false) som=(thing) you=(buddy)/>
 " <node actif={false} som={thing} you={buddy}/>
 " <node actif=[false] som=[thing] you=[buddy]/>
+" Another formidable looking loop. There were just a lot of mappings to make
+" for example parentheses have inner next mappings 'in(' 'in)' AND 'inb'.
+for map_chars in [[['(', ')', 'b'], "()"], [['{', '}', 'B'], "{}"], [['[', ']'], "[]"]]
+    let param = 0
+    for modifier in ['i', 'a']
+        for map_char in map_chars[0]
+            execute 'onoremap '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, '.param.')<CR>'
+            execute 'vnoremap '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, '.param.')<CR>'
+            execute 'onoremap '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, '.param.')<CR>'
+            execute 'vnoremap '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, '.param.')<CR>'
+        endfor
+        let param = 1
+    endfor
+endfor
 
-onoremap in( :<C-u>call NextAndPrevBracket('(', '(', 0, 0)<CR>
-vnoremap in( :<C-u>call NextAndPrevBracket('(', '(', 0, 0)<CR>
-onoremap il( :<C-u>call NextAndPrevBracket('(', ')', 1, 0)<CR>
-vnoremap il( :<C-u>call NextAndPrevBracket('(', ')', 1, 0)<CR>
-onoremap an( :<C-u>call NextAndPrevBracket('(', '(', 0, 1)<CR>
-vnoremap an( :<C-u>call NextAndPrevBracket('(', '(', 0, 1)<CR>
-onoremap al( :<C-u>call NextAndPrevBracket('(', ')', 1, 1)<CR>
-vnoremap al( :<C-u>call NextAndPrevBracket('(', ')', 1, 1)<CR>
-onoremap inb :<C-u>call NextAndPrevBracket('(', '(', 0, 0)<CR>
-vnoremap inb :<C-u>call NextAndPrevBracket('(', '(', 0, 0)<CR>
-onoremap ilb :<C-u>call NextAndPrevBracket('(', ')', 1, 0)<CR>
-vnoremap ilb :<C-u>call NextAndPrevBracket('(', ')', 1, 0)<CR>
-onoremap anb :<C-u>call NextAndPrevBracket('(', '(', 0, 1)<CR>
-vnoremap anb :<C-u>call NextAndPrevBracket('(', '(', 0, 1)<CR>
-onoremap alb :<C-u>call NextAndPrevBracket('(', ')', 1, 1)<CR>
-vnoremap alb :<C-u>call NextAndPrevBracket('(', ')', 1, 1)<CR>
-
-" A text-object for the next set of parentheses
-" onoremap in( :<C-U>normal! f(vi(<CR>
-" vnoremap in( :<C-U>normal! f(vi(<CR>
-" onoremap in{ :<C-U>normal! /{<CR>vi(<CR>
 " Goes to next email address. My regex is probably not perfect but that's
 " fine.
 onoremap i@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvE"<CR>
@@ -5930,7 +5974,7 @@ cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h') . '/' : '%%'
 
 " I envision that this command will set a bunch of options or define a bunch
 " of mappings to make it easier to create ascii art.
-command! -nargs=0 Ascii :set virtualedit=all
+command! -nargs=0 Ascii set virtualedit=all
 
 " Whenever I needed to figure out what some piece of code did, I'd ususally do
 " some code diving, keeping all the pertinent files in active buffers. Then I
@@ -5955,7 +5999,7 @@ function! WriteActiveBuffers()
     let string = join(map(GetListOfActiveBuffers(), '"File: ".bufname(v:val)'), "\n")
     execute "normal! o".string
 endfunction
-command! -nargs=0 PutActiveBuffers :call WriteActiveBuffers()
+command! -nargs=0 PutActiveBuffers call WriteActiveBuffers()
 
 " }}}
 
