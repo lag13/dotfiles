@@ -5431,31 +5431,32 @@ noremap <leader>L L
 " Makes it so the n and N commands always go in the same direction, forward
 " and backward respectively, no matter which direction we're actually
 " searching.
-function! PreserveSearchDirection(n_p, visual_p)
+function! PreserveSearchDirection(n_p, visual_p, keepjumps_p)
     let v:searchforward = 1
     try
-        execute "normal! ".(a:visual_p ? 'gv':'').(a:n_p ? 'n':'N')
+        execute (a:keepjumps_p ? 'keepjumps ':'')."normal! ".(a:visual_p ? 'gv':'').(a:n_p ? 'n':'N')
     catch
         echohl ErrorMsg
         echo v:errmsg
         echohl None
     endtry
-    " In vim version 704 there is this variable which can be used to turn
-    " off/on search highlighting. So I can use this line of code when I get
-    " that version. That will be nice because then ALL the logic for this
-    " mapping will be contained within this function and we can just call it.
-    " For now, the best I can do is call 'set hlsearch' in the mapping after
-    " calling the function.
+    " I would like to be able to turn on search highlighting inside of this
+    " function but unfortunately this is not possible with vims below version
+    " 704. For now I just set 'hlsearch' in the mapping when I call this
+    " function. BUT In vim version 704 there is a new defined variable I can
+    " use to turn on/off search highlighting. That will be nice because then
+    " ALL the logic for this mapping will be contained within this function
+    " and we can just call it.
     " let v:hlsearch = 1
 endfunction
-noremap  <silent> n :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(1, 0)<CR>
-noremap  <silent> N :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(0, 0)<CR>
-xnoremap <silent> n :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(1, 1)<CR>
-xnoremap <silent> N :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(0, 1)<CR>
+noremap  <silent> n :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(1, 0, 0)<CR>
+noremap  <silent> N :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(0, 0, 0)<CR>
+xnoremap <silent> n :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(1, 1, 0)<CR>
+xnoremap <silent> N :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(0, 1, 0)<CR>
 " Goes to the next/previous search match without changing the jumplist.
-noremap <silent><leader>n :set hlsearch<CR>:call PreserveSearchDirection(1, 0)<CR>
+noremap <silent><leader>n :set hlsearch<CR>:call PreserveSearchDirection(1, 0, 1)<CR>
 " I used m rather than N becuase it's easier to type and m is close to n.
-noremap <silent><leader>m :set hlsearch<CR>:call PreserveSearchDirection(0, 0)<CR>
+noremap <silent><leader>N :set hlsearch<CR>:call PreserveSearchDirection(0, 0, 1)<CR>
 " Do I need to remap these to something that works? I don't think the jumplist
 " has the same effect when you're already inside visual mode.
 xnoremap <silent><leader>n <NOP>
@@ -5688,6 +5689,8 @@ nnoremap <leader>O :call append(line('.')-1, '')<CR>
 " A quick way to save
 nnoremap <leader>w :w<CR>
 
+" Run the program given by the makeprg option
+nnoremap <silent><leader>m :w<CR>:make!<CR>
 " }}}
 
 " Insert Mappings {{{
@@ -6001,6 +6004,9 @@ function! WriteActiveBuffers()
 endfunction
 command! -nargs=0 PutActiveBuffers call WriteActiveBuffers()
 
+" Command to remove any lines with trailing whitespace
+command! -nargs=0 ClearTrailingWhitespace %substitute/\s*$//
+
 " }}}
 
 " Insert Abbreviations {{{
@@ -6067,6 +6073,12 @@ augroup END
 augroup filetype_php
     autocmd!
     autocmd FileType php setlocal commentstring=//\ %s
+    " Check out this for a possibly better way to do all this :make stuff.
+    " Right now I just do this and then I have a mapping ,m which will write
+    " the current file and then call 'php' on it.
+    " http://vim.wikia.com/wiki/Runtime_syntax_check_for_php
+    autocmd FileType php setlocal makeprg=php\ %
+    autocmd FileType php setlocal errorformat=%m\ in\ %f\ on\ line\ %l
     autocmd FileType php iabbrev vd var_dump("TEST1");
     " Does a var_dump of whatever is in the unnamed register.
     autocmd FileType php iabbrev dv var_dump(<C-r>");
