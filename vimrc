@@ -133,7 +133,7 @@ set matchtime=2
 set nostartofline
 " Long lines will wrap rather than run offscreen.
 set wrap
-" Wrapp text will break on a character in 'breakat' rather than at the last
+" Wrapped text will break on a character in 'breakat' rather than at the last
 " character that fits on screen.
 set linebreak
 " Character to display before each broken line.
@@ -236,14 +236,6 @@ set pastetoggle=<F10>
 " that's the price you pay when you rely on another program for your display
 " capabilities.
 syntax enable
-if &term ==# 'win32'
-    " I'm using Git-Bash for windows and for some reason when I run vim in it
-    " it can't find the 'shine' colorscheme and it errors out which is
-    " irritating. By adding 'silent!' it won't bother me with that error
-    " message.
-    silent! colorscheme shine
-    set nocursorline
-endif
 
 if has('gui_running')
     set guifont=Courier_New:h10:cANSI
@@ -254,7 +246,21 @@ if has('gui_running')
     " set guioptions-=T
     set background=dark
     colorscheme solarized
+elseif &term ==# 'win32'
+    " I'm using Git-Bash for windows and for some reason when I run vim in it
+    " it can't find the 'shine' colorscheme and it errors out which is
+    " irritating. By adding 'silent!' it won't bother me with that error
+    " message.
+    silent! colorscheme shine
+    set nocursorline
+elseif has('unix')
+    let uname = system('echo -n "$(uname -s)"')
+    if uname ==# "Darwin"
+        set background=dark
+        colorscheme solarized
+    endif
 endif
+
 " }}}
 
 " I could try to make zt and zb operators! So for example, zt will position
@@ -5384,15 +5390,13 @@ onoremap k k
 " too often and I can easily just use :j[oin]<CR> or remap it. And I've almost
 " never used 'K', in fact, I'll usually hit it by accident and scream
 " profanities as I wait for the command to complete.
-noremap J 5gj
-noremap K 5gk
+noremap J 4gj
+noremap K 4gk
 " This is easier to type than :j<CR>
 nnoremap <leader>J J
-" Splits a line at the cursor position. So it does the opposite of the J
-" command. If I had kept my original J mapping then I probably would have made
-" this mapping ,J. But since ,J is now J I figured this would be the next best
-" thing.
-nnoremap <leader>j dli<CR><ESC>
+" Splits a line at the cursor position, so it does the opposite of the J
+" command. I do ciw because that will delete all whitespace.
+nnoremap <leader>j ciw<CR><ESC>
 
 " I've had to delete 3 lines before and hence these mappings. The reason I
 " don't have these mappings delete 5 lines (which would roughtly match how
