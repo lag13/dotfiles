@@ -1,6 +1,8 @@
 " Funny vim commands:
 " bad[d] - Adds a file name to the buffer list without loading it.
 " col[der] - Goes to an older quickfix list.
+" nun[map] - Removes the mapping for a normal mode command. A quote from the
+" help pages: 'can also be used outside of a monastery'
 
 " :[noremap]map	    Normal, Visual and Operator-pending
 " :v[noremap]map    Visual and Select
@@ -262,6 +264,67 @@ elseif has('unix')
 endif
 
 " }}}
+
+" Autocommands {{{
+
+" Makes it so I'll be able to see what text I was editing previously even if
+" it was inside a fold.
+autocmd VimEnter * normal! zv
+
+" }}}
+
+" I'm super curious to check this out more: http://vim.spf13.com/. It is a
+" distribution of vim which includes a lot of plugins and a vimrc. I doubt I'd
+" use it but I bet there's some good mappings I could take. I found that on
+" this site: http://statico.github.io/vim2.html
+
+" This seems useful:
+" http://vim.wikia.com/wiki/Repeat_last_command_and_put_cursor_at_start_of_change
+" perhaps I will make such a mapping.
+
+" Consider making the 'd' command actually delete text (so no messing with the
+" default register) and have the <leader>d command cut text.
+
+" Could we configure the % command to work on pairs of quotes as well?
+
+" Learn more about and make some abbreviations, I feel those can be useful in
+" the right contexts.
+
+" So I remember that this guy made a brainfuck interpreter using only the
+" C-preprocessor: https://github.com/orangeduck/CPP_COMPLETE (amazing, I'll
+" have to look through that one day). I wonder if something similar could be
+" accomplished with recursive mappings in vim? So this mapping expands to this
+" then to that etc... and through that process some useful computation is
+" being done. Like could I make a recursive vim mapping to keep appending the
+" next fibonacci number to the end of the file or something like that?
+
+" WOAAAAA!!! So I already know that you can precede a command with a number
+" and then the command will be executed that many times. But I didn't know
+" that that functionality automatically works for user defined mappings!! For
+" example I made a mapping <leader>o to insert a line below the current one
+" and stay in normal mode. If I type 3,o or 5,o it works as expected
+" (inserting 3 and 5 lines respectively).
+
+" Look into mapping alt key chords: help map-which-keys. Also help index.txt
+" for some key sequences which are not mapped.
+
+" There was this little example in the map.txt help page:
+" Here is an example that inserts a list number that increases: >
+"     let counter = 0
+"     inoremap <expr> <C-L> ListItem()
+"     inoremap <expr> <C-R> ListReset()
+
+"     func ListItem()
+"       let g:counter += 1
+"       return g:counter . '. '
+"     endfunc
+
+"     func ListReset()
+"       let g:counter = 0
+"       return ''
+    " endfunc
+" I kind of like that idea, being able to insert the next increasing number.
+" Maybe I'll implement it at some point.
 
 " I could try to make zt and zb operators! So for example, zt will position
 " the top of the window at the '< or '[ mark (depending), leaving the cursor
@@ -5381,6 +5444,10 @@ noremap ,, ,
 " Move by screen lines rather than actual lines.
 noremap j gj
 noremap k gk
+" Maintain the original 'moving by actual lines' behavior which can still be
+" useful. One use I had for it was creating a macro.
+noremap gj j
+noremap gk k
 " I like being able to hit dj or yj to delete/yank two whole lines rather than
 " part of both lines.
 onoremap j j
@@ -5438,7 +5505,7 @@ noremap <leader>L L
 function! PreserveSearchDirection(n_p, visual_p, keepjumps_p)
     let v:searchforward = 1
     try
-        execute (a:keepjumps_p ? 'keepjumps ':'')."normal! ".(a:visual_p ? 'gv':'').(a:n_p ? 'n':'N')
+        execute (a:keepjumps_p ? 'keepjumps ':'')."normal! ".(a:visual_p ? 'gv':'').(a:n_p ? 'n':'N')."zv"
     catch
         echohl ErrorMsg
         echo v:errmsg
@@ -5685,16 +5752,20 @@ nnoremap Y y$
 " Sometimes I just want to clear the line but keep the space it took up.
 nnoremap dD :call setline('.', '')<CR>
 
-" Inserts a new line above/below the cursor but remains in normal mode. TODO:
-" Consider making these mappings repeatable with Tim Pope's repeat.vim.
-nnoremap <leader>o :call append('.', '')<CR>
-nnoremap <leader>O :call append(line('.')-1, '')<CR>
+" Inserts a new line above/below the cursor but remains in normal mode. These
+" changes are also made repeatable thanks to repeat.vim. TODO: These mappings
+" don't repeat correctly with a count, look into this.
+nnoremap <silent> <leader>o :call append('.', '')<CR>
+            \:silent! call repeat#set("\<leader>o", v:count)<CR>
+nnoremap <silent> <leader>O :call append(line('.')-1, '')<CR>
+            \:silent! call repeat#set("\<leader>O", v:count)<CR>
 
 " A quick way to save
 nnoremap <leader>w :w<CR>
 
 " Run the program given by the makeprg option
 nnoremap <silent><leader>m :w<CR>:make!<CR>
+
 " }}}
 
 " Insert Mappings {{{
@@ -5707,8 +5778,10 @@ inoremap jK <ESC>
 inoremap JK <ESC>
 
 " These are nice because those keys are right under my fingers.
-inoremap <C-j> <C-r><C-p>"
-inoremap <C-l> <C-r><C-p>0
+" inoremap <C-j> <C-r><C-p>"
+" inoremap <C-l> <C-r><C-p>0
+noremap! <C-j> <C-r>"
+noremap! <C-l> <C-r>0
 
 " TODO: Makes the current/previous word uppercase
 
@@ -5854,12 +5927,12 @@ endfunction
 for char in ["'", '"', '`']
     let param = 0
     for modifier in ['i', 'a']
-        execute 'onoremap '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, '.param.', 0)<CR>'
-        execute 'vnoremap '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, '.param.', 0)<CR>'
-        execute 'onoremap '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 0)<CR>'
-        execute 'vnoremap '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 0)<CR>'
-        execute 'onoremap '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 1)<CR>'
-        execute 'vnoremap '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 1)<CR>'
+        execute 'onoremap <silent> '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, '.param.', 0)<CR>'
+        execute 'vnoremap <silent> '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, '.param.', 0)<CR>'
+        execute 'onoremap <silent> '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 0)<CR>'
+        execute 'vnoremap <silent> '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 0)<CR>'
+        execute 'onoremap <silent> '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 1)<CR>'
+        execute 'vnoremap <silent> '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 1)<CR>'
         let param = 1
     endfor
 endfor
@@ -5878,10 +5951,10 @@ for map_chars in [[['(', ')', 'b'], "()"], [['{', '}', 'B'], "{}"], [['[', ']'],
     let param = 0
     for modifier in ['i', 'a']
         for map_char in map_chars[0]
-            execute 'onoremap '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, '.param.')<CR>'
-            execute 'vnoremap '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, '.param.')<CR>'
-            execute 'onoremap '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, '.param.')<CR>'
-            execute 'vnoremap '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, '.param.')<CR>'
+            execute 'onoremap <silent> '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, '.param.')<CR>'
+            execute 'vnoremap <silent> '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, '.param.')<CR>'
+            execute 'onoremap <silent> '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, '.param.')<CR>'
+            execute 'vnoremap <silent> '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, '.param.')<CR>'
         endfor
         let param = 1
     endfor
@@ -6027,8 +6100,7 @@ augroup filetype_xml
     autocmd! 
     autocmd Filetype xml setlocal iskeyword+=-
     autocmd Filetype xml setlocal breakat-=-
-    " HAVE TO MAKE THIS BETTER.
-    autocmd Filetype xml noremap [[ vapo<ESC>
+    autocmd Filetype xml noremap <silent> [[ :call GoToParentNode()<CR>
 augroup END 
 " }}}
 
