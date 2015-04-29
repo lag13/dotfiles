@@ -5917,6 +5917,23 @@ function! NextAndPrevQuoteTextObj(char, backward_p, around_p, last_p)
         call search(a:char, a:backward_p ? 'b':'')
     endfor
     execute "normal! v".(a:around_p ? 'a':'i').a:char
+    " Adding these two lines into this function makes this operator-pending
+    " mapping repeatable!!!! I think the way it works is that this function is
+    " being called in operator-pending mode, so the v:operator is
+    " appropriately set by the time we enter this function. The line above
+    " visually selects the area to act on which remains after the function
+    " exits (yeah, I guess running other commands inside of a function doesn't
+    " disturb a visual area). Then we tell repeat.vim to repat the last
+    " command we made (the operator+text-object). I think when we call
+    " repeat#set(cmd) what happens is repeat.vim will literally make the '.'
+    " command act as if we're retyping 'cmd' again. So it just takes what we
+    " typed and shoves it back into vim as user input. That is why we need to
+    " do the extra cajoling to get the 'c'hange command to work. If we didn't
+    " have that then repeat.vim would just repeat the cin' part which leaves
+    " us in insert mode. But adding \<C-r>. inserts the last inserted text
+    " while \<ESC> puts us back in normal mode.
+    let cmd = v:operator.(a:around_p ? 'a':'i')."n".a:char.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
+    silent! call repeat#set(cmd, v:count)
 endfunction
 " <node actif='false' som='thing' you='buddy'/>
 " <node actif=`false` som=`thing` you=`buddy`/>
@@ -5936,6 +5953,23 @@ for char in ["'", '"', '`']
         let param = 1
     endfor
 endfor
+" I'm trying to get operator-pending mappings to also be repeatable. I think
+" I'm getting pretty close. This sometimes sort of works?? I think I have to
+" do something similar to this guy:
+" https://github.com/tek/vim-argh/blob/master/autoload/argh.vim#L54
+
+" onoremap <silent> in' :<C-u>call NextAndPrevQuoteTextObj("'", 0, 0, 0) \| silent! call repeat#set(v:operator."in'\<C-r>.", v:count)<CR>
+
+" Oh my god this totally works. I think the key is to have the function calls
+" on separate lines? Then the '.' register will get appropriately updated.
+" I'll look into it more later.
+
+" function! MakeSingleQuoteMappingRepeatable()
+"     call NextAndPrevQuoteTextObj("'", 0, 0, 0)
+"     let cmd = v:operator."in'".(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
+"     silent! call repeat#set(cmd, v:count)
+" endfunction
+" onoremap <silent> in' :<C-u>call MakeSingleQuoteMappingRepeatable()<CR>
 
 " Mappings for the next/previous pair of ([{ characters.
 function! NextAndPrevBracket(char, search_char, backwards_p, around_p)
