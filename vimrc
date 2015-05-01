@@ -273,6 +273,24 @@ autocmd VimEnter * normal! zv
 
 " }}}
 
+" Ascii diagrams are nice but I would be interseted in being able to type
+" characters like those displayed by the 'tree' command. Look into how I could
+" type those sorts of characters in vim.
+
+" Make my 'split' command which is ,j smarter. If it is on a word it will
+" search forward (or backward, not sure which one makes more sense) for the
+" next whitepace to split on.
+
+" Make is so that the :source command does NOT highlight all the search
+" results again. This sort of annoys me.
+
+" I think this could be fun. Create a little mode (or something) where I'll
+" enter a keystroke then I'll be in insert mode and whenever I type a variable
+" name like thisisavariablename, it will try to make the variable snake case
+" or camel case (depending on the mode) as I type. So I suppose it would look
+" for whole words and make the snakiness/camelniness happen on those word
+" boundaries.
+
 " I'm super curious to check this out more: http://vim.spf13.com/. It is a
 " distribution of vim which includes a lot of plugins and a vimrc. I doubt I'd
 " use it but I bet there's some good mappings I could take. I found that on
@@ -385,28 +403,8 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 " it will insert a new line below the current one with the contents:
 " var_dump(yanked_string);
 
-" Make my \1, \2, ... markdown header changing things smarter. Like if I have
-" this header:
-"
-" Lucas Header
-" -----------------
-"
-"  And I want to remove 'Lucas' so it just becomes 'Header' then my \2 command
-"  should adjust the existing --- line rather than just appending a new line
-"  below Header. So running \2 on Header will give me this:
-"
-"  Header
-"  ---------
-"
-"  instead of this:
-"
-"  Header
-"  ---------
-"  -----------------
-"
-"
-"  Speaking of markdown. Create some text objects and movements (like [[ inner
-"  header) for editing markdown files.
+" Speaking of markdown. Create some text objects and movements (like [[ inner
+" header) for editing markdown files.
 
 " I was having to make an example json string based off columns like this:
  " /**
@@ -760,6 +758,40 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 " that.
 
 " Make a mapping to configure the email apply customization.
+
+" I created a command to call this funtion, the only problem is that commands
+" pass their arguments as strings. I don't know how to get around this so I've
+" just eval'd all of the arguments.
+" function! CalculateQuarterlyBonus(target, company_achievement, individual_achievement, company_bonus_percent, individual_bonus_percent)
+function! CalculateQuarterlyBonus(...)
+    let company_achievement = 1.0
+    let individual_achievement = 1.5
+    let target = 1100.0
+    let company_bonus_percent = 0.5
+    let individual_bonus_percent = 0.5
+    if a:0 > 0
+        let company_achievement = eval(a:1)
+    endif
+    if a:0 > 1
+        let individual_achievement = eval(a:2)
+    endif
+    if a:0 > 2
+        let target = eval(a:3)
+    endif
+    if a:0 > 3
+        let company_bonus_percent = eval(a:4)
+    endif
+    if a:0 > 4
+        let individual_bonus_percent = eval(a:5)
+    endif
+    echo 'Company Achievement      = 1.0'
+    echo 'Individual Achievement   = 1.5'
+    echo 'Target                   = 1100.0'
+    echo 'Company Bonus Percent    = 0.5'
+    echo 'Individual Bonus Percent = 0.5'
+    echo target * company_achievement * company_bonus_percent + target * individual_achievement * individual_bonus_percent
+endfunction
+command! -nargs=* EchoQuarterlyBonus call CalculateQuarterlyBonus(<f-args>)
 
 " PSF commands {{{
 " Runs psf translator:generate.
@@ -5461,9 +5493,21 @@ noremap J 4gj
 noremap K 4gk
 " This is easier to type than :j<CR>
 nnoremap <leader>J J
+" So apparently \r in a substitute command will insert an actual newline:
+" http://stackoverflow.com/questions/71323/how-to-replace-a-character-for-a-newline-in-vim
+" Okay, this is super cool. The atom \%# in a search/substitution will match
+" the cursor position. So if I search for this '\%#\S*\zs\s*' then as I move
+" the cursor, all the space AFTER the current word I'm on will be highlighted.
+" Or, looking at there example, this highlights the current word that the
+" cursor is on: '\k*\%#\k*'. Damn that's cool.
 " Splits a line at the cursor position, so it does the opposite of the J
 " command. I do ciw because that will delete all whitespace.
+" I want to create a substitution to do this mapping just for fun. This is
+" what I have so far: \s*\%#\s\+
+" Maybe make this command repeatable and when the cursor is on the FIRST
+" column in the line, it will just move the line down one more time.
 nnoremap <leader>j ciw<CR><ESC>
+" to to    to
 
 " I've had to delete 3 lines before and hence these mappings. The reason I
 " don't have these mappings delete 5 lines (which would roughtly match how
@@ -5499,6 +5543,8 @@ vnoremap L g_
 noremap <leader>H H
 noremap <leader>L L
 
+" TODO: I'm an idiot, I should just map n to do '/' and N to do ?. There won't
+" be any need to catch errors or anything like that.
 " Makes it so the n and N commands always go in the same direction, forward
 " and backward respectively, no matter which direction we're actually
 " searching.
@@ -5520,14 +5566,14 @@ function! PreserveSearchDirection(n_p, visual_p, keepjumps_p)
     " and we can just call it.
     " let v:hlsearch = 1
 endfunction
-noremap  <silent> n :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(1, 0, 0)<CR>
-noremap  <silent> N :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(0, 0, 0)<CR>
-xnoremap <silent> n :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(1, 1, 0)<CR>
-xnoremap <silent> N :<C-u>set hlsearch<CR>:<C-u>call PreserveSearchDirection(0, 1, 0)<CR>
+noremap  <silent> n :<C-u>set hlsearch \| call PreserveSearchDirection(1, 0, 0)<CR>
+noremap  <silent> N :<C-u>set hlsearch \| call PreserveSearchDirection(0, 0, 0)<CR>
+xnoremap <silent> n :<C-u>set hlsearch \| call PreserveSearchDirection(1, 1, 0)<CR>
+xnoremap <silent> N :<C-u>set hlsearch \| call PreserveSearchDirection(0, 1, 0)<CR>
 " Goes to the next/previous search match without changing the jumplist.
-noremap <silent><leader>n :set hlsearch<CR>:call PreserveSearchDirection(1, 0, 1)<CR>
+noremap <silent><leader>n :set hlsearch \| call PreserveSearchDirection(1, 0, 1)<CR>
 " I used m rather than N becuase it's easier to type and m is close to n.
-noremap <silent><leader>N :set hlsearch<CR>:call PreserveSearchDirection(0, 0, 1)<CR>
+noremap <silent><leader>N :set hlsearch \| call PreserveSearchDirection(0, 0, 1)<CR>
 " Do I need to remap these to something that works? I don't think the jumplist
 " has the same effect when you're already inside visual mode.
 xnoremap <silent><leader>n <NOP>
@@ -5825,6 +5871,7 @@ function! VGetSearch(cmdtype)
     let @" = save_unnamed_register
     return search_pat
 endfunction
+" TODO: This doesn't seem to open up folds when searching. Why is this?
 xnoremap * :<C-u>execute 'normal! /' . VGetSearch('/') . "\r"<CR>
 xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>
 
@@ -5906,6 +5953,8 @@ command! -nargs=* -range Boxify call SurroundWithBox(<f-args>)
 
 " Operator-pending Mappings {{{
 
+" TODO: Looks like these don't repeat correctly when doing the 'last'
+" mappings.
 " Mappings for the next/previous pair of '"` characters.
 function! NextAndPrevQuoteTextObj(char, backward_p, around_p, last_p)
     " if no a:char before the cursor, go four char's ahead.
@@ -6125,6 +6174,7 @@ command! -nargs=0 ClearTrailingWhitespace %substitute/\s*$//
 " character that is not in 'iskeyword' then the text will expand.
 iabbrev teh the
 iabbrev taht that
+iabbrev waht what
 "iabbrev @@ groenendaal92@gmail.com
 iabbrev ret return
 " }}}
@@ -6152,13 +6202,29 @@ augroup filetype_markdown
     autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
     autocmd Filetype markdown onoremap <buffer> ah :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rg_vk0"<CR>
     autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
-    " TODO: Make these work regardless of 'textwidth'
-    autocmd Filetype markdown nnoremap <buffer> <localleader>1 yypVr=
-    autocmd Filetype markdown nnoremap <buffer> <localleader>2 yypVr-
-    autocmd Filetype markdown nnoremap <buffer> <localleader>3 I###<space><esc>A<space>###<esc>
-    autocmd Filetype markdown nnoremap <buffer> <localleader>4 I####<space><esc>A<space>####<esc>
-    autocmd Filetype markdown nnoremap <buffer> <localleader>5 I#####<space><esc>A<space>#####<esc>
-    autocmd Filetype markdown nnoremap <buffer> <localleader>6 I######<space><esc>A<space>######<esc>
+    function! MarkdownChangeHeader(header_type)
+        " Remove the existing header.
+        if match(getline('.'), '^\(===\|---\)') ==# 0
+            normal! k
+        endif
+        let cur_line = substitute(getline('.'), '^#\+\s*', '', '')
+        if match(getline(line('.')+1), '^\(===\|---\)') ==# 0
+            normal! jddk
+        endif
+        if a:header_type ==# 1
+            call append('.', repeat('=', strlen(cur_line)))
+        elseif a:header_type ==# 2
+            call append('.', repeat('-', strlen(cur_line)))
+        else
+            call setline('.', repeat('#', a:header_type).' '.cur_line)
+        endif
+    endfunction
+    autocmd Filetype markdown nnoremap <buffer> <localleader>1 :call MarkdownChangeHeader(1)<CR>
+    autocmd Filetype markdown nnoremap <buffer> <localleader>2 :call MarkdownChangeHeader(2)<CR>
+    autocmd Filetype markdown nnoremap <buffer> <localleader>3 :call MarkdownChangeHeader(3)<CR>
+    autocmd Filetype markdown nnoremap <buffer> <localleader>4 :call MarkdownChangeHeader(4)<CR>
+    autocmd Filetype markdown nnoremap <buffer> <localleader>5 :call MarkdownChangeHeader(5)<CR>
+    autocmd Filetype markdown nnoremap <buffer> <localleader>6 :call MarkdownChangeHeader(6)<CR>
     " TODO: Make an operator pending mode mapping called 'ih' (inner header)
     " which selects all the text inside the current header (ignoring any child
     " headers). Then formatting could be easier because I could just do
