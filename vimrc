@@ -686,6 +686,11 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 
 " Luceo Stuff {{{
 
+" Make an autocommand to run translator:generate everytime we save a
+" php.en.json file. On a similar note, look into what needs to be done so I
+" could call the functions defined in my .bashrc inside of vim. It would be
+" nice to be able to call my 'psf' commands.
+
 " ABOUT: Learning vimscript was a recent endeavor and this is my first attempt
 " at doing any serious work with it. The goal with this code is to help
 " automate the various things we must do when working with the configuration
@@ -4289,6 +4294,72 @@ function! ChangeLabel(constant_to_find, new_label)
     endwhile
 endfunction
 
+" Echo's the label for a xml node if you're in the CDATA OR at the node
+" itself. Useful if one of us didn't add the label for a node in the CDATA.
+" Check out this page
+" http://vim.wikia.com/wiki/Avoid_scrolling_when_switch_buffers for more about
+" saving and restoring window views.
+function! GetLabelNameWrapper()
+    let save_view = winsaveview()
+    if getline('.') !~# 'TXT'
+        call LuceoFindNode()
+    endif
+    if getline('.') =~# 'TXT'
+        normal! 0
+        call search('TXT', '', line('.'))
+        let save_unnamed_register = @@
+        normal! yiw
+        " I have 'hidden' set so this isn't necessary anyway. But I want to
+        " test this to make sure it does what I think it should (i.e hide the
+        " current buffer and edit the json file. Then when I return to the
+        " first file it will unhide it.
+        silent hide edit ../tools/translations/php.en.json
+        let label = GetLabelName(@@)
+        " If I edit a new file AND echo a message, it prompts me to hit enter
+        " after the echo message. I think it happens because both actions
+        " print something to screen or something like that. For example if I
+        " run the command :echo 'no' | echo 'yes' then I will be asked to hit
+        " enter, but If I just do :echo 'no' then I am not prompted. Since we
+        " don't want to hit enter so we run this command silently. We run the
+        " above buffer switch silently for the same reason.
+        silent edit #
+        if label !=# ''
+            echo label
+        else
+            " We couldn't find a label, print error message.
+            echohl ErrorMsg
+            echo "Could not find the label: ".@@
+            echohl None
+        endif
+        let @@ = save_unnamed_register
+    endif
+    call winrestview(save_view)
+endfunction
+
+" Does the main work of finding the json label's value. It has the same sort
+" of loop structure as the ChangeLabel() function.
+function! GetLabelName(label_constant)
+    " Move to the top of the file
+    call cursor(1, 1)
+    let to_find = a:label_constant
+    while search('\<' . to_find . '\>')
+        " If we don't see two TXT's then we've found our label
+        if getline('.') !~# "TXT.*TXT"
+            " Return the label to echo out.
+            return matchstr(getline('.'), '^[^"]*"[^"]*"[^"]*"\zs[^"]*')
+        else
+            " Otherwise we grab the other constant and search for THAT
+            normal! $
+            call search("TXT", 'b', line('.'))
+            let save_unnamed_register = @@
+            normal! yiw
+            let to_find = @@
+            let @@ = save_unnamed_register
+        endif
+    endwhile
+    return ''
+endfunction
+
 " Returns the proper amount of spacing for the comment string.
 function! GetProperIndentationHelper(pattern, offset, line_no)
     call cursor(a:line_no, 1)
@@ -5442,6 +5513,8 @@ nnoremap <leader>ls :call AddSectionWrapper()<CR>
 
 " Changes the label attached to a node
 nnoremap <leader>ll :call ChangeNodeLabelWrapper()<CR>
+" Echo's the label attached to a node
+nnoremap <silent><leader>lL :call GetLabelNameWrapper()<CR>
 
 " Removes a field
 nnoremap <leader>lr :call RemoveFieldWrapper()<CR>
