@@ -267,10 +267,16 @@ endif
 
 " Autocommands {{{
 
-" Makes it so I'll be able to see what text I was editing previously even if
-" it was inside a fold.
-autocmd VimEnter * normal! zv
-
+augroup general_autocommands
+    autocmd!
+    " Makes it so I'll be able to see what text I was editing previously even if
+    " it was inside a fold.
+    autocmd VimEnter * normal! zv
+    " Normally, when you execute a :source command it will highlight the previous
+    " search item, assuming that 'hlsearch' is turned on. I don't like this, so I
+    " prevent it.
+    autocmd SourceCmd *.vim nohlsearch
+augroup END
 " }}}
 
 " Ascii diagrams are nice but I would be interseted in being able to type
@@ -4298,7 +4304,8 @@ endfunction
 " itself. Useful if one of us didn't add the label for a node in the CDATA.
 " Check out this page
 " http://vim.wikia.com/wiki/Avoid_scrolling_when_switch_buffers for more about
-" saving and restoring window views.
+" saving and restoring window views. Or see this:
+" http://stackoverflow.com/questions/4251533/vim-keep-window-position-when-switching-buffers
 function! GetLabelNameWrapper()
     let save_view = winsaveview()
     if getline('.') !~# 'TXT'
@@ -5486,7 +5493,7 @@ nnoremap <leader>lm :call LuceoFindNode()<CR>:call ChangeNodeAttribute("obligato
 nnoremap <leader>lM :call LuceoFindNode()<CR>:call ChangeNodeAttribute("obligatoire", "false")<CR>
 
 " Orders the numbers on the 'field' nodes in the build/application form.
-nnoremap <leader>lb vit:call OrderXMLNodes('field')<CR>
+nnoremap <leader>lb vit:call OrderXMLNodes('<field')<CR>
 
 " Orders the numbers on the 'transitions' nodes
 nnoremap <leader>lo vit:call OrderXMLNodes('<transition')<CR>
@@ -5616,28 +5623,24 @@ vnoremap L g_
 noremap <leader>H H
 noremap <leader>L L
 
-" TODO: I'm an idiot, I should just map n to do '/' and N to do ?. There won't
-" be any need to catch errors or anything like that.
 " Makes it so the n and N commands always go in the same direction, forward
 " and backward respectively, no matter which direction we're actually
 " searching.
 function! PreserveSearchDirection(n_p, visual_p, keepjumps_p)
-    let v:searchforward = 1
     try
-        execute (a:keepjumps_p ? 'keepjumps ':'')."normal! ".(a:visual_p ? 'gv':'').(a:n_p ? 'n':'N')."zv"
+        execute (a:keepjumps_p ? 'keepjumps ':'')."normal! ".(a:visual_p ? 'gv':'').(a:n_p ? '/':'?').@/."\<CR>zv"
     catch
         echohl ErrorMsg
         echo v:errmsg
         echohl None
     endtry
     " I would like to be able to turn on search highlighting inside of this
-    " function but unfortunately this is not possible with vims below version
+    " function but unfortunately this is not possible with vims versions below
     " 704. For now I just set 'hlsearch' in the mapping when I call this
     " function. BUT In vim version 704 there is a new defined variable I can
     " use to turn on/off search highlighting. That will be nice because then
     " ALL the logic for this mapping will be contained within this function
-    " and we can just call it.
-    " let v:hlsearch = 1
+    " and we can just call it. let v:hlsearch = 1
 endfunction
 noremap  <silent> n :<C-u>set hlsearch \| call PreserveSearchDirection(1, 0, 0)<CR>
 noremap  <silent> N :<C-u>set hlsearch \| call PreserveSearchDirection(0, 0, 0)<CR>
@@ -6277,14 +6280,15 @@ augroup filetype_markdown
     autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
     function! MarkdownChangeHeader(header_type)
         " Remove the existing header.
-        if match(getline('.'), '^\(===\|---\)') ==# 0
+        if match(getline('.'), '^\(==\|--\)') ==# 0
             normal! k
         endif
         let cur_line = substitute(getline('.'), '^#\+\s*', '', '')
-        if match(getline(line('.')+1), '^\(===\|---\)') ==# 0
+        if match(getline(line('.')+1), '^\(==\|--\)') ==# 0
             normal! jddk
         endif
         if a:header_type ==# 1
+            call setline('.', cur_line)
             call append('.', repeat('=', strlen(cur_line)))
         elseif a:header_type ==# 2
             call append('.', repeat('-', strlen(cur_line)))
