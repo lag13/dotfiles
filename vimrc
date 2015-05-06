@@ -272,23 +272,37 @@ augroup general_autocommands
     " Makes it so I'll be able to see what text I was editing previously even if
     " it was inside a fold.
     autocmd VimEnter * normal! zv
-    " Normally, when you execute a :source command it will highlight the previous
-    " search item, assuming that 'hlsearch' is turned on. I don't like this, so I
-    " prevent it.
-    autocmd SourceCmd *.vim nohlsearch
+    " Normally, when you execute a :source command it will re-highlight the
+    " current search item, assuming that 'hlsearch' is turned on. I don't like
+    " this. Originally I thought this autocommand would solve my problem:
+
+    " autocmd SourceCmd * nohlsearch
+
+    " But it turns out that SourceCmd is a special event called a Cmd-event.
+    " According to the documentation, if I define an autocommand using this
+    " event it is expected that my autocommand will do all the sourcing
+    " functionality. So this definitely does not work.
+
+    " Saw this on http://www.bestofvim.com/ (wish there was more on that
+    " site...) and thought I'd try it out. So now, whenever I save a vim
+    " file, it will automatically source it for me.
+    autocmd BufWritePost *.vim,*vimrc* source %
 augroup END
 " }}}
+
+" Check out this guy's text object mapping plugin:
+" https://github.com/wellle/targets.vim. He seems to have been quite thorough
+" with it. Skimming it over, I didn't agree with everything he did but there
+" were definitely some nice ideas. Also look at this
+" http://www.reddit.com/r/vim/comments/1x7pfr/targetsvim_plugin_to_add_many_text_objects_in_the/
+" Actually, just search 'vim argument text object' in google. Actually, in the
+" spirit of text objects, consider removing my 'iL' text objects. They really
+" aren't that useful in the long run and they just add another mapping for me
+" to practice.
 
 " Ascii diagrams are nice but I would be interseted in being able to type
 " characters like those displayed by the 'tree' command. Look into how I could
 " type those sorts of characters in vim.
-
-" Make my 'split' command which is ,j smarter. If it is on a word it will
-" search forward (or backward, not sure which one makes more sense) for the
-" next whitepace to split on.
-
-" Make is so that the :source command does NOT highlight all the search
-" results again. This sort of annoys me.
 
 " I think this could be fun. Create a little mode (or something) where I'll
 " enter a keystroke then I'll be in insert mode and whenever I type a variable
@@ -307,7 +321,8 @@ augroup END
 " perhaps I will make such a mapping.
 
 " Consider making the 'd' command actually delete text (so no messing with the
-" default register) and have the <leader>d command cut text.
+" default register). Actually when I have time look that this plugin:
+" https://github.com/svermeulen/vim-easyclip. Perhaps I'll give it a whirl.
 
 " Could we configure the % command to work on pairs of quotes as well?
 
@@ -362,7 +377,8 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 
 " Could we make a visual mapping to repeat the last text-object movement? So
 " if I did vi{ and I wanted to repeat i{ I could just hit ',t' or something
-" like that.
+" like that. See https://github.com/terryma/vim-expand-region, it might be my
+" best bet.
 
 " Make indent text objects.
 " 1. ii - Select everything on the current indent level
@@ -5580,20 +5596,24 @@ nnoremap <leader>J J
 " the cursor, all the space AFTER the current word I'm on will be highlighted.
 " Or, looking at there example, this highlights the current word that the
 " cursor is on: '\k*\%#\k*'. Damn that's cool.
-" Splits a line at the cursor position, so it does the opposite of the J
-" command. I do ciw because that will delete all whitespace.
-" I want to create a substitution to do this mapping just for fun. This is
-" what I have so far: \s*\%#\s\+
-" Maybe make this command repeatable and when the cursor is on the FIRST
-" column in the line, it will just move the line down one more time.
-nnoremap <leader>j ciw<CR><ESC>
-" to to    to
 
-" I've had to delete 3 lines before and hence these mappings. The reason I
-" don't have these mappings delete 5 lines (which would roughtly match how
-" they move in normal mode) is because I don't trust myself to actually look
-" at 5 lines and say 'hey there are 5 lines there to delete', but 3 lines I
-" can definately eyeball.
+" Splits a line at the next occurrence of whitespace or at the cursor position
+" if there is no whitespace. So this essentially does the opposite of the J
+" command.
+function! SplitLine()
+    if search('\s', 'c', line('.'))
+        normal! "_diw
+    endif
+    execute "normal! i\<CR>"
+endfunction
+nnoremap <leader>j :call SplitLine()
+            \\| silent! call repeat#set("\<leader>j", v:count)<CR>
+
+" I've had to delete 3 lines before hence these mappings. The reason I don't
+" have these mappings delete 5 lines (which would match how they move in
+" normal mode) is because I don't trust myself to actually look at 5 lines and
+" say 'hey there are 5 lines there to delete', but 3 lines I can definitely
+" eyeball.
 onoremap J 2j
 onoremap K 2k
 
@@ -5606,9 +5626,9 @@ nnoremap <leader>/ /\V
 nnoremap <leader>? ?\V
 
 " Sources the current file
-nnoremap <leader>sc :source <C-R>%<CR>
+nnoremap <leader>sc :source <C-R>% \| nohlsearch<CR>
 " Sources .vimrc
-nnoremap <leader>sv :source $MYVIMRC<CR>
+nnoremap <leader>sv :source $MYVIMRC \| nohlsearch<CR>
 " Edits the .vimrc file in a new window.
 nnoremap <leader>ev :vsplit $MYVIMRC<CR>
 " Opens previous buffer in a vertical split
