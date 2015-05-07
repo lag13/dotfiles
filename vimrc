@@ -94,11 +94,6 @@ set softtabstop=4
 set expandtab
 " Copies the indent from the previous line when using o, O, or <CR>.
 set autoindent
-" Tries to do indentation automatically for you. I feel like this option
-" should be called autoindent but that's just me.
-set smartindent
-"set ignorecase
-"set smartcase
 " A must have, highlight the search as you type.
 set incsearch
 " Also good, necessary in my opinion. It highlights your search results.
@@ -257,10 +252,11 @@ elseif &term ==# 'win32'
     set nocursorline
 elseif has('unix')
     let uname = system('echo -n "$(uname -s)"')
-    if uname ==# "Darwin"
-        set background=dark
-        colorscheme solarized
+    if uname !=# "Darwin"
+        let g:solarized_termcolors = 256
     endif
+    set background=dark
+    colorscheme solarized
 endif
 
 " }}}
@@ -288,7 +284,26 @@ augroup general_autocommands
     " file, it will automatically source it for me.
     autocmd BufWritePost *.vim,*vimrc* source %
 augroup END
+
 " }}}
+
+" I have my command PutActiveBuffers, make another command to 'Put' the active
+" buffers that are in a single tab.
+
+" Could I make mappings <M-x> and <M-a> to add and subtract but look backwards
+" instead of forwards?
+
+" Check out https://github.com/tpope/vim-eunuch, seems like it has some useful
+" stuff.
+
+" Just learned that <C-&> also maximizes a window?? I.e it does the same as
+" <C-w>_. I'll have to look into this.
+
+" Consider making the command g/ comment out things instead of gc. I kind of
+" like that because then in visual mode I could have a text object, gc, for
+" actually selecting some commented text.
+
+" Really get usr_29.txt into your head. Seems like it has some useful things.
 
 " Check out this guy's text object mapping plugin:
 " https://github.com/wellle/targets.vim. He seems to have been quite thorough
@@ -302,7 +317,21 @@ augroup END
 
 " Ascii diagrams are nice but I would be interseted in being able to type
 " characters like those displayed by the 'tree' command. Look into how I could
-" type those sorts of characters in vim.
+" type those sorts of characters in vim. On a similar note about the 'tree'
+" command. Could I create a 'gf' command of sorts that works with the tree
+" command's output?? So if I had this:
+"
+" web/param/src/
+" ├── model
+"     ├── correspondances
+"         └── correspondanceactions.php
+"
+" And I wanted to open
+" web/param/src/model/correspondances/correspondanceactions.php, I could just
+" put my cursor on that line and hit 'gf' (or something) then that file would
+" be opened. Then again, it would probably be simpler to just use netrw and
+" keep a tree of files open that I want to work with...
+
 
 " I think this could be fun. Create a little mode (or something) where I'll
 " enter a keystroke then I'll be in insert mode and whenever I type a variable
@@ -325,9 +354,6 @@ augroup END
 " https://github.com/svermeulen/vim-easyclip. Perhaps I'll give it a whirl.
 
 " Could we configure the % command to work on pairs of quotes as well?
-
-" Learn more about and make some abbreviations, I feel those can be useful in
-" the right contexts.
 
 " So I remember that this guy made a brainfuck interpreter using only the
 " C-preprocessor: https://github.com/orangeduck/CPP_COMPLETE (amazing, I'll
@@ -5561,10 +5587,8 @@ nnoremap <leader>lpm :call RunTranslatorMerge()<CR>
 " I remember seeing this mapping on a vim talk and thinking 'What?!? How dare
 " he do that'. But I've been thinking lately that it's not a bad idea. I
 " definitely use Ex commands more often than the ';' command.
-nnoremap ; :
-nnoremap : ;
-vnoremap ; :
-vnoremap : ;
+noremap ; :
+noremap : ;
 
 " ',' is my leader but I want to keep it's original functionality.
 noremap ,, ,
@@ -6356,7 +6380,7 @@ augroup filetype_php
     " Does a var_dump of whatever is in the unnamed register.
     autocmd FileType php iabbrev dv var_dump(<C-r>");
     autocmd FileType php setlocal matchpairs-=<:>
-    autocmd Filetype php setlocal iskeyword+=$
+    " autocmd Filetype php setlocal iskeyword+=$
 augroup END
 " }}}
 
