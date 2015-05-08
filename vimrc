@@ -287,6 +287,13 @@ augroup END
 
 " }}}
 
+" Seems like a way to grep on all buffers is with these 2 commands:
+" 1. call setqflist([]) - Clears the quickfix lists
+" 2. bufdo grepadd! regex % - Goes through each buffer and does a grep for
+" your regex. The grepadd commands adds to the quickfix list rather than
+" replacing it like :grep would do. I just tried running the command but had
+" to hit enter for EVERY buffer. Try prepending 'silent!' next time.
+
 " I have my command PutActiveBuffers, make another command to 'Put' the active
 " buffers that are in a single tab.
 
@@ -5611,6 +5618,19 @@ onoremap k k
 " profanities as I wait for the command to complete.
 noremap J 4gj
 noremap K 4gk
+" I've had to delete 3 lines before hence these mappings. The reason I don't
+" have these mappings delete 5 lines (which would match how they move in
+" normal mode) is because I don't trust myself to actually look at 5 lines and
+" say 'hey there are 5 lines there to delete', but 3 lines I can definitely
+" eyeball.
+onoremap J 2j
+onoremap K 2k
+" Just for fun, here are some mappings to delete 4 and 5 lines respectively.
+onoremap <leader>j 3j
+onoremap <leader>k 3k
+onoremap <leader>J 4j
+onoremap <leader>K 4k
+
 " This is easier to type than :j<CR>
 nnoremap <leader>J J
 " So apparently \r in a substitute command will insert an actual newline:
@@ -5632,14 +5652,6 @@ function! SplitLine()
 endfunction
 nnoremap <leader>j :call SplitLine()
             \\| silent! call repeat#set("\<leader>j", v:count)<CR>
-
-" I've had to delete 3 lines before hence these mappings. The reason I don't
-" have these mappings delete 5 lines (which would match how they move in
-" normal mode) is because I don't trust myself to actually look at 5 lines and
-" say 'hey there are 5 lines there to delete', but 3 lines I can definitely
-" eyeball.
-onoremap J 2j
-onoremap K 2k
 
 " Goes to the next and previous number on the current line
 noremap <silent> <leader>d :call search('\v\d+\ze(\D\|$)', '', line('.'))<CR>
@@ -6335,6 +6347,7 @@ augroup filetype_markdown
             call setline('.', cur_line)
             call append('.', repeat('=', strlen(cur_line)))
         elseif a:header_type ==# 2
+            call setline('.', cur_line)
             call append('.', repeat('-', strlen(cur_line)))
         else
             call setline('.', repeat('#', a:header_type).' '.cur_line)
@@ -6354,7 +6367,49 @@ augroup filetype_markdown
     " just go to the first header they encounter. Make these maybe take a
     " number argument? so 1[ would look for a 1 header, 2[ would look for a 2
     " header etc...
+    function! MoveToHeader()
+        let save_view = winsaveview()
+        let header_lines = [0, 0, 0, 0, 0, 0]
+        let start_line = line('.')
+        if search('^==', 'bW')
+            let header_lines[0] = line('.') - 1
+            call cursor(start_line, 1)
+        endif
+
+        if search('^--', 'bW')
+            let header_lines[1] = line('.') - 1
+            call cursor(start_line, 1)
+        endif
+
+        if search('^###[^#]', 'bW')
+            let header_lines[2] = line('.')
+            call cursor(start_line, 1)
+        endif
+
+        if search('^####[^#]', 'bW')
+            let header_lines[3] = line('.')
+            call cursor(start_line, 1)
+        endif
+
+        if search('^#####[^#]', 'bW')
+            let header_lines[4] = line('.')
+            call cursor(start_line, 1)
+        endif
+
+        if search('^######[^#]', 'bW')
+            let header_lines[5] = line('.')
+        endif
+
+        call winrestview(save_view)
+        let closest_header = max(header_lines)
+        if closest_header
+            normal! m'
+            call cursor(closest_header, 1)
+        endif
+    endfunction
+    noremap [[ :call MoveToHeader()<CR>
 augroup END
+
 " }}}
 
 " Bash File Settings {{{
