@@ -5631,6 +5631,9 @@ onoremap <leader>k 3k
 onoremap <leader>J 4j
 onoremap <leader>K 4k
 
+" Reselect the last changed/yanked text
+nnoremap gV `[v`]
+
 " This is easier to type than :j<CR>
 nnoremap <leader>J J
 " So apparently \r in a substitute command will insert an actual newline:
@@ -6088,7 +6091,7 @@ command! -nargs=* -range Boxify call SurroundWithBox(<f-args>)
 " TODO: Looks like these don't repeat correctly when doing the 'last'
 " mappings.
 " Mappings for the next/previous pair of '"` characters.
-function! NextAndPrevQuoteTextObj(char, backward_p, around_p, last_p)
+function! NextAndPrevQuoteTextObj(char, backward_p, modifier, last_p)
     " if no a:char before the cursor, go four char's ahead.
     if a:last_p
         normal! $
@@ -6097,8 +6100,8 @@ function! NextAndPrevQuoteTextObj(char, backward_p, around_p, last_p)
     for i in range(1, num_loops)
         call search(a:char, a:backward_p ? 'b':'')
     endfor
-    execute "normal! v".(a:around_p ? 'a':'i').a:char
-    " Adding these two lines into this function makes this operator-pending
+    execute "normal! v".a:modifier.a:char
+    " Adding these lines into this function makes this operator-pending
     " mapping repeatable!!!! I think the way it works is that this function is
     " being called in operator-pending mode, so the v:operator is
     " appropriately set by the time we enter this function. The line above
@@ -6113,7 +6116,13 @@ function! NextAndPrevQuoteTextObj(char, backward_p, around_p, last_p)
     " have that then repeat.vim would just repeat the cin' part which leaves
     " us in insert mode. But adding \<C-r>. inserts the last inserted text
     " while \<ESC> puts us back in normal mode.
-    let cmd = v:operator.(a:around_p ? 'a':'i')."n".a:char.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
+    let dir = 'n'
+    if a:backward_p
+        let dir = 'l'
+    elseif a:last_p
+        let dir = 'L'
+    endif
+    let cmd = v:operator.a:modifier.dir.a:char.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
     silent! call repeat#set(cmd, v:count)
 endfunction
 " <node actif='false' som='thing' you='buddy'/>
@@ -6125,12 +6134,12 @@ endfunction
 for char in ["'", '"', '`']
     let param = 0
     for modifier in ['i', 'a']
-        execute 'onoremap <silent> '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, '.param.', 0)<CR>'
-        execute 'vnoremap <silent> '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, '.param.', 0)<CR>'
-        execute 'onoremap <silent> '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 0)<CR>'
-        execute 'vnoremap <silent> '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 0)<CR>'
-        execute 'onoremap <silent> '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 1)<CR>'
-        execute 'vnoremap <silent> '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, '.param.', 1)<CR>'
+        execute 'onoremap <silent> '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, "'.modifier.'", 0)<CR>'
+        execute 'vnoremap <silent> '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, "'.modifier.'", 0)<CR>'
+        execute 'onoremap <silent> '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, "'.modifier.'", 0)<CR>'
+        execute 'vnoremap <silent> '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, "'.modifier.'", 0)<CR>'
+        execute 'onoremap <silent> '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, "'.modifier.'", 1)<CR>'
+        execute 'vnoremap <silent> '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, "'.modifier.'", 1)<CR>'
         let param = 1
     endfor
 endfor
@@ -6153,9 +6162,15 @@ endfor
 " onoremap <silent> in' :<C-u>call MakeSingleQuoteMappingRepeatable()<CR>
 
 " Mappings for the next/previous pair of ([{ characters.
-function! NextAndPrevBracket(char, search_char, backwards_p, around_p)
+function! NextAndPrevBracket(char, search_char, backwards_p, modifier)
     call search(a:search_char, a:backwards_p ? 'b':'')
-    execute "normal! v".(a:around_p ? 'a':'i').a:char
+    execute "normal! v".a:modifier.a:char
+    let dir = 'n'
+    if a:backwards_p
+        let dir = 'l'
+    endif
+    let cmd = v:operator.a:modifier.dir.a:char.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
+    silent! call repeat#set(cmd, v:count)
 endfunction
 " <node actif=(false) som=(thing) you=(buddy)/>
 " <node actif={false} som={thing} you={buddy}/>
@@ -6166,10 +6181,10 @@ for map_chars in [[['(', ')', 'b'], "()"], [['{', '}', 'B'], "{}"], [['[', ']'],
     let param = 0
     for modifier in ['i', 'a']
         for map_char in map_chars[0]
-            execute 'onoremap <silent> '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, '.param.')<CR>'
-            execute 'vnoremap <silent> '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, '.param.')<CR>'
-            execute 'onoremap <silent> '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, '.param.')<CR>'
-            execute 'vnoremap <silent> '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, '.param.')<CR>'
+            execute 'onoremap <silent> '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, "'.modifier.'")<CR>'
+            execute 'vnoremap <silent> '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, "'.modifier.'")<CR>'
+            execute 'onoremap <silent> '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, "'.modifier.'")<CR>'
+            execute 'vnoremap <silent> '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, "'.modifier.'")<CR>'
         endfor
         let param = 1
     endfor
@@ -6206,10 +6221,10 @@ vnoremap <silent> ie :<C-u>call TextObjInnerBuffer()<CR>
 " text-object talked about in Practical Vim. This text object operates on the
 " current search pattern. In trying to implement it I learned about the gn
 " operator which behaves like i/ and is built into vim version 7.4.110!! So I
-" decided to implement my own gn. Now if gn is NOT mapped then I use my
-" defined gn mapping. I was trying to find a way to detect if a key sequence
-" is already mapped and I could for user defined mappings but not for built in
-" ones. So I check the version to see whether to define this operator or not.
+" decided to implement my own gn. I was trying to find a way to detect if a
+" key sequence is already mapped and I could for user defined mappings but not
+" for built in ones. So I check the version to see whether to define this
+" operator or not.
 function! TextObjSearchMatch(forward_p, visual_mode)
     if search(@/, 'ce' . (a:forward_p ? '' : 'b')) ==# 0
         return 0
@@ -6217,11 +6232,16 @@ function! TextObjSearchMatch(forward_p, visual_mode)
     let end_pos = getpos('.')
     call search(@/, 'cb')
     execute 'normal! '(a:visual_mode ? 'g':'').'v'.end_pos[1].'G'.end_pos[2].'|'
+    let text_obj = 'gN'
+    if a:forward_p
+        let text_obj = 'gn'
+    endif
+    let cmd = v:operator.text_obj.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
+    silent! call repeat#set(cmd, v:count)
 endfunction
 " I think I could also use the <unique> tag which will only apply the mapping
 " if it isn't already defined.
 if v:version < 704
-    " TODO: Make these commands repeatable with repeat.vim
     noremap  <silent> gn :<C-u>call TextObjSearchMatch(1, 0)<CR>
     xnoremap <silent> gn :<C-u>call TextObjSearchMatch(1, 1)<CR>
     noremap  <silent> gN :<C-u>call TextObjSearchMatch(0, 0)<CR>
