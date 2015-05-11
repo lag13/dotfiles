@@ -294,17 +294,8 @@ augroup END
 " replacing it like :grep would do. I just tried running the command but had
 " to hit enter for EVERY buffer. Try prepending 'silent!' next time.
 
-" I have my command PutActiveBuffers, make another command to 'Put' the active
-" buffers that are in a single tab.
-
-" Could I make mappings <M-x> and <M-a> to add and subtract but look backwards
-" instead of forwards?
-
 " Check out https://github.com/tpope/vim-eunuch, seems like it has some useful
 " stuff.
-
-" Just learned that <C-&> also maximizes a window?? I.e it does the same as
-" <C-w>_. I'll have to look into this.
 
 " Consider making the command g/ comment out things instead of gc. I kind of
 " like that because then in visual mode I could have a text object, gc, for
@@ -378,7 +369,8 @@ augroup END
 " (inserting 3 and 5 lines respectively).
 
 " Look into mapping alt key chords: help map-which-keys. Also help index.txt
-" for some key sequences which are not mapped.
+" for some key sequences which are not mapped. Could I make mappings <M-x> and
+" <M-a> to add and subtract but look backwards instead of forwards?
 
 " There was this little example in the map.txt help page:
 " Here is an example that inserts a list number that increases: >
@@ -5961,8 +5953,8 @@ inoremap JK <ESC>
 " These are nice because those keys are right under my fingers.
 " inoremap <C-j> <C-r><C-p>"
 " inoremap <C-l> <C-r><C-p>0
-noremap! <C-j> <C-r>"
-noremap! <C-l> <C-r>0
+noremap! <C-j> <C-r><C-r>"
+noremap! <C-l> <C-r><C-r>0
 
 " TODO: Makes the current/previous word uppercase
 
@@ -6254,8 +6246,11 @@ function! TextObjRVal()
     normal! 0
     call search('=\s*\zs')
     let start_pos = getpos('.')
-    call search('.\ze;')
-    " execute 'normal! '(a:visual_mode ? 'g':'').'v'.end_pos[1].'G'.end_pos[2].'|'
+    if &filetype ==# 'vim'
+        normal! $
+    else
+        call search('.\ze;')
+    endif
     execute 'normal! '.'v'.start_pos[1].'G'.start_pos[2].'|'
 endfunction
 " $temp = 'Change me!';
@@ -6299,22 +6294,47 @@ command! -nargs=0 Ascii set virtualedit=all
 "     File: fname2
 "     File: fname3
 "
-" So this command writes that for me.
-function! GetListOfActiveBuffers()
+" So this command writes that for me. For more flexibility, I've added the
+" 'which_buffers' argument which lets me control exactly what buffers get
+" written.
+" 0 - All buffers
+" 1 - All Active buffers
+" 2 - Active buffers in the current tab
+function! GetListOfActiveBuffers(which_buffers)
     let buffer_nums = []
-    for tab in range(1, tabpagenr('$'))
-        for buffer in tabpagebuflist(tab) 
-            call add(buffer_nums, buffer)
+    if a:which_buffers ==# 0
+        for buffer in range(1, bufnr('$'))
+            if buflisted(buffer)
+                call add(buffer_nums, buffer)
+            endif
         endfor
-    endfor
+    elseif a:which_buffers ==# 1
+        for tab in range(1, tabpagenr('$'))
+            for buffer in tabpagebuflist(tab) 
+                if buflisted(buffer)
+                    call add(buffer_nums, buffer)
+                endif
+            endfor
+        endfor
+    else
+        for buffer in tabpagebuflist(tabpagenr())
+            if buflisted(buffer)
+                call add(buffer_nums, buffer)
+            endif
+        endfor
+    endif
     " Removes duplicate buffer nums
     return filter(buffer_nums, 'index(buffer_nums, v:val, v:key+1) ==# -1')
 endfunction
-function! WriteActiveBuffers()
-    let string = join(map(GetListOfActiveBuffers(), '"File: ".bufname(v:val)'), "\n")
+function! WriteActiveBuffers(...)
+    let which_buffers = 1
+    if a:0
+        let which_buffers = a:1
+    endif
+    let string = join(map(GetListOfActiveBuffers(which_buffers), '"File: ".bufname(v:val)'), "\n")
     execute "normal! o".string
 endfunction
-command! -nargs=0 PutActiveBuffers call WriteActiveBuffers()
+command! -nargs=* PutBuffers call WriteActiveBuffers(<f-args>)
 
 " Command to remove any lines with trailing whitespace
 command! -nargs=0 ClearTrailingWhitespace %substitute/\s*$//
