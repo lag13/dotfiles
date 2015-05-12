@@ -10,3 +10,9 @@
 [submodule "bundle/vim-repeat"]
 	path = bundle/vim-repeat
 	url = https://github.com/tpope/vim-repeat.git
+[submodule "bundle/vim-indent-object"]
+	path = bundle/vim-indent-object
+	url = git@github.com:michaeljsmith/vim-indent-object.git
+[submodule "bundle/var-case-text-obj"]
+	path = bundle/var-case-text-obj
+	url = git@github.com:bkad/CamelCaseMotion.git

@@ -405,22 +405,6 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 " like that. See https://github.com/terryma/vim-expand-region, it might be my
 " best bet.
 
-" Make indent text objects.
-" 1. ii - Select everything on the current indent level
-" 2. ai - Select everything on the current indent level plus a space
-" 3. iI and aI - Same as above but also select everything at a lower indent level. So if we had code like this:
-"         $this->logger->info(
-"             sprintf(
-"                 'These users were deleted from customer system %s: %s',
-"                 $this->id,
-"                 $responseJson
-"             )
-"         );
-" And we did viI when our cursor was on the first line, then it would select to
-" the last line because that is next line at the same indent level at the first
-" line. Or maybe I just need a text object for function calls and maybe I should
-" try to make iI and aI ignore empty spaces or something like that...
-
 " Make a mapping which will reformat a function call to look like this:
 " $this->abortIf(
 "     $this->connection->getDatabasePlatform()->getName() != 'mysql',
@@ -449,9 +433,6 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 " purposes. Then I could just do something like: ,diw and in the case of php
 " it will insert a new line below the current one with the contents:
 " var_dump(yanked_string);
-
-" Speaking of markdown. Create some text objects and movements (like [[ inner
-" header) for editing markdown files.
 
 " I was having to make an example json string based off columns like this:
  " /**
@@ -493,8 +474,9 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 " it can be done, I just don't how to yank multiple things but still use them in
 " a meaningful way.
 
-" The 'n' and N commands preserving search direction yells at me when there is
-" nothing to find.
+" The 'n' and N commands echo at the previous error message on an error. So if
+" I search for something which cannot be found then execute a non-existing
+" command, typing 'n' will echo out the error about the non-existing command.
 
 " Think about using <C-l> and <C-h> for window movements and bind other
 " Control key chords to switch between tabs.
@@ -5607,9 +5589,11 @@ onoremap k k
 " '<C-d>/<C-u>'. The original J command is sometimes useful but I don't use it
 " too often and I can easily just use :j[oin]<CR> or remap it. And I've almost
 " never used 'K', in fact, I'll usually hit it by accident and scream
-" profanities as I wait for the command to complete.
-noremap J 4gj
-noremap K 4gk
+" profanities as I wait for the command to complete. Originally I had
+" these mappings as 4gj and 4gk respectively but they didn't always work right
+" on wrapped lines which I thought odd. This seems to work fine though.
+noremap J gjgjgjgj
+noremap K gkgkgkgk
 " I've had to delete 3 lines before hence these mappings. The reason I don't
 " have these mappings delete 5 lines (which would match how they move in
 " normal mode) is because I don't trust myself to actually look at 5 lines and
