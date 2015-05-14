@@ -5917,9 +5917,6 @@ nnoremap <silent> <leader>o :call append('.', '')<CR>
 nnoremap <silent> <leader>O :call append(line('.')-1, '')<CR>
             \:silent! call repeat#set("\<leader>O", v:count)<CR>
 
-" A quick way to save
-nnoremap <leader>w :w<CR>
-
 " Run the program given by the makeprg option
 nnoremap <silent><leader>m :w<CR>:make!<CR>
 
