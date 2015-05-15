@@ -493,16 +493,6 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 " Maybe an operator just like 'c' but it also sets paste mode upon deletion
 " and turns off paste mode upon leaving insert mode.
 
-" Create a text object for 'Here document' (heredoc) strings. I'm talking
-" about these constructs:
-"
-" echo <<<EOQ
-" This is a string
-" I can have 'single' quotes
-" I can have "double" quotes
-" Then I end the string like this:
-" EOQ;
-
 " Make a series of mappings to insert 'test' data. So I could have a 'phone
 " number' mapping which could insert the phone number "123-456-7890" or have
 " one that inserts a test email or something like that.
@@ -541,7 +531,7 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 " mirror images of eachother just like '[ and '] are.
 
 " A text object to select a chunk of code stopping before any commented
-" sections.
+" sections. So a code text object.
 
 " TODO: A mapping to type out the previously made auto-completion. This would
 " probably be an insert mapping.
@@ -617,9 +607,6 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 " works so that when you type something like 3R it will allow you to
 " replace 3 characters then exit replace mode.
 
-" Redefine the 'Search' highlighting group or change the group that 'hlsearch'
-" uses so that the highlighted color contrasts better with the cursor.
-
 " Make it so that doing <C-r>/ will NOT include the \<\> surrounding the
 " search text. I think I find myself fairly often using the * and then want to
 " paste that data somewhere but the \<\> is unecesarry.
@@ -638,11 +625,6 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 " make sure to only set the mark when we're leaving insert mode. Is there an
 " autocmd for detecting when we leave insert mode? OHHH yeah check out :h
 " autocmd.txt the event 'InsertLeave'
-
-" Mapping to default the size of the quickview window when you click on a
-" link. Like if you make the quickview max size to see better and then click
-" on a link, you want to see where you end up but the quickview is still
-" really big.
 
 " That code that I wrote to semi-automatically add sertifi email tags was
 " nice. I liked the idea of going around a file and appending some text to a
@@ -679,18 +661,6 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 " Then the only thing I had to do at the end was delete the node?atr
 " attribute. So that macro is nifty but I would like what I mentioned above.
 
-" I have a file that describes some code diving that I did to find a bug in
-" the Luceo source code. In that file I have a 'Summary of Files Involved'
-" section which has headers that look like:
-"                   File: path/to/file/
-" What I want to do is be able to open ALL those files at once. I was thinking
-" about using a global command that looked something like this:
-"                   g/^File:/split | normal Wgf | wincmd p
-" But that doesn't work. Look into this. I read that if you call the :args
-" command with a list of files it will open those files so maybe something
-" with that? Like use a global command to add all file names to an array
-" variable X, and run the command: execute 'args ' . X
-
 " Is it possible to define a new regex atom? That would be cool. This thought
 " was inspired by how I would implement roman numerals into my existing
 " increment vim plugin and I had the thought, if I could turn recognizing
@@ -699,9 +669,6 @@ nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 " for a roman numeral without too much trouble, just something like: [ivcl]*.
 " We could even literally have a list of the first 50 odd roman numerals like
 " this: (i|ii|iii|iv|...). I'll think about it.
-
-" When we open a bunch of files could we make it so the second file will be
-" the alternate file?
 
 " I've already talked about this in some other list I was keeping track of but
 " I'll write it here as well. I want to make a little code analyzer that will
@@ -5612,6 +5579,7 @@ nnoremap gV `[v`]
 
 " This is easier to type than :j<CR>
 nnoremap <leader>J J
+vnoremap <leader>J J
 " So apparently \r in a substitute command will insert an actual newline:
 " http://stackoverflow.com/questions/71323/how-to-replace-a-character-for-a-newline-in-vim
 " Okay, this is super cool. The atom \%# in a search/substitution will match
@@ -6061,8 +6029,6 @@ command! -nargs=* -range Boxify call SurroundWithBox(<f-args>)
 
 " Operator-pending Mappings {{{
 
-" TODO: Looks like these don't repeat correctly when doing the 'last'
-" mappings.
 " Mappings for the next/previous pair of '"` characters.
 function! NextAndPrevQuoteTextObj(char, backward_p, modifier, last_p)
     " if no a:char before the cursor, go four char's ahead.
@@ -6221,22 +6187,74 @@ if v:version < 704
     xnoremap <silent> gN :<C-u>call TextObjSearchMatch(0, 1)<CR>
 endif
 
-" Text-object for an rvalue. As of now this only works for the kind of
-" languages that end in semi-colons.
+" Text-object for an rvalue. At some point I could try to make it more robust
+" but I'm satisfied for now.
 function! TextObjRVal()
     normal! 0
     call search('=\s*\zs')
     let start_pos = getpos('.')
+    " For vim files we just go to the end of the line, so this won't work on
+    " multi-line assignments.
     if &filetype ==# 'vim'
         normal! $
     else
+        " For other files we move to the last character before the ending
+        " semicolon.
         call search('.\ze;')
     endif
+    " Highlight from the end of the assignment to the start of it.
     execute 'normal! '.'v'.start_pos[1].'G'.start_pos[2].'|'
 endfunction
 " $temp = 'Change me!';
 onoremap rv :<C-u>call TextObjRVal()<CR>
 xnoremap rv :<C-u>call TextObjRVal()<CR>
+
+" Text object for a heredoc. I don't really see myself using this much, but I
+" thought it would be fun to make :).
+function! TextObjHereDoc(around_p)
+    let save_unnamed_register = @"
+    let save_pos = getpos('.')
+    let hd_region = GetStartEndHereDocPos(1, a:around_p)
+    let old_hd_region = hd_region
+    if empty(hd_region[0]) || empty(hd_region[0]) || !(hd_region[0][1] - (a:around_p ? 0:1) <=# save_pos[1] && save_pos[1] <=# hd_region[1][1] + (a:around_p ? 0:1))
+        call setpos('.', save_pos)
+        let hd_region = GetStartEndHereDocPos(0, a:around_p)
+        if empty(hd_region[0])
+            let hd_region = old_hd_region
+        endif
+    endif
+    " Mark the visual selection
+    execute 'normal! '.hd_region[0][1]."G".hd_region[0][2]."|".(a:around_p ? 'v':'V').hd_region[1][1]."G".hd_region[1][2]."|"
+endfunction
+function! GetStartEndHereDocPos(backwards_p, around_p)
+    let save_unnamed_register = @"
+    if !search('<<<\?', 'cW' . (a:backwards_p ? 'b':''))
+        return [[], []]
+    endif
+    normal! wyw
+    if a:around_p
+        normal! b
+    else
+        normal! j0
+    endif
+    let start_hd_pos = getpos('.')
+    if !search('^' . @")
+        let @" = save_unnamed_register
+        return [[], []]
+    endif
+    if a:around_p
+        normal! g_
+    else
+        normal! k
+    endif
+    let end_hd_pos = getpos('.')
+    let @" = save_unnamed_register
+    return [start_hd_pos, end_hd_pos]
+endfunction
+onoremap <silent> ihd :<C-u>call TextObjHereDoc(0)<CR>
+xnoremap <silent> ihd :<C-u>call TextObjHereDoc(0)<CR>
+onoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
+xnoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
 
 " }}}
 
