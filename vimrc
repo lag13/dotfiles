@@ -138,10 +138,10 @@ set showbreak=...
 " When joining a line that ends in a '.', '?' and some others only insert one
 " space instead of two.
 set nojoinspaces
-" Configure completion a bit. In particular, the longest common substring will
-" always try to be inserted, the menu will still show for one match, and some
-" information about where the matches are coming from will be in the menu.
-set completeopt=longest,menuone,preview
+" Configure completion a bit. In particular, the menu will still show for one
+" match, and some information about where the matches are coming from will be
+" in the menu.
+set completeopt=menuone,preview
 " When typing text, comments will automatically wrap, when hitting return
 " inside of a comment the 'comments' options wil be inserted at the begginning
 " of the next line, I'm not entirely sure what 'q' does I think it might
@@ -5658,26 +5658,28 @@ noremap <silent><leader>N :set hlsearch \| call PreserveSearchDirection(0, 0, 1)
 xnoremap <silent><leader>n <NOP>
 xnoremap <silent><leader>N <NOP>
 
-" An opearator to resize windows. For example, if I pass this operator the
-" motion 'at' then the current windows will resize to JUST contain the tag
-" selected by the 'at' motion. TODO: Consider making this also adjust
-" horizontal size. There are 3 possibilities I see with this, adjust vertical
-" height, adjust horizontal width, or adjust both. I wonder how I could
-" reconcile those options...
-function! ResizeWindowOperator(type)
-    if a:type ==# 'v' || a:type ==# 'V'
-        let start_line = line("'<")
+" An opearator to resize windows. This is nifty because when I horizontally
+" split a window, I'll oftentimes use one window for text editing and the
+" other to reference a bit of code. Since the referenced code is usually a
+" paragraph or other text object I can quickly resize that window to encompass
+" what I need to see and maximize my screen real estate. TODO: Consider making
+" this also adjust horizontal width. There are 3 possibilities I see with
+" this: adjust vertical height, adjust horizontal width, or adjust both. I
+" wonder how I could reconcile those options or if it's even worth it.
+function! ResizeWindowOperator(type, ...)
+    " After using an operator, the cursor is put at the start of the operated
+    " text, so I think this is okay.
+    let start_line = line('.')
+    if a:0
         let end_line = line("'>")
     else
-        let start_line = line("'[")
         let end_line = line("']")
     endif
-
     execute "resize ".(end_line-start_line+1)
-    execute "keepjumps normal! ".start_line."Gzt"
+    normal! zt
 endfunction
-nnoremap zS :set operatorfunc=ResizeWindowOperator<CR>g@
-vnoremap zS :<C-u>call ResizeWindowOperator(visualmode())<CR>
+nnoremap <silent> zS :set operatorfunc=ResizeWindowOperator<CR>g@
+vnoremap <silent> zS :<C-u>call ResizeWindowOperator(visualmode(), 1)<CR>
 
 " Also for fun, could I make replace operator so to speak? What it would do is
 " replace the text-object with spaces and put me in Replace mode, at the
@@ -5757,9 +5759,41 @@ nnoremap <leader>ff :call FlipStr("false", "true", "cW")<CR>
 " in their own underscore section so to speak. I think it could use a little
 " improvement. For example maybe I want it to turn 'XMLisFun' into
 " 'xml_is_fun', but I'll do that another day.
-nnoremap <leader>fc :s#\v(<\u\l+\|\l+)(\u+)#\l\1_\L\2#g<CR>
-nnoremap <leader>fs :s/_\([a-z]\)/\u\1/g<CR>
-"TODO: Have a flip for public, private, protected
+" Flips case between snake and camel
+function! FlipCase()
+    let save_unnamed_register = @"
+    " I want this to work but it doesn't seem to. I wonder why...
+    " let cur_word = matchstr(getline('.'), '\w*\%#\w*')
+    normal! yiw
+    " It's snake_case
+    if match(@", '_') !=# -1
+        let @" = substitute(@", '_\(\l\)', '\u\1', 'g')
+    " It's camelCase
+    else
+        let @" = substitute(@", '\v(<\u\l+|\l+)(\u+)', '\l\1_\L\2', 'g')
+    endif
+    normal! viwp
+    let @" = save_unnamed_register
+endfunction
+nnoremap <silent><leader>fc :call FlipCase()<CR>
+
+" Flips between 'public', 'private', 'protected' access modifiers.
+function! FlipAccessModifier()
+    let save_unnamed_register = @"
+    normal! yiw
+    if match(@", 'public') ==# 0
+        let @" = 'private'
+        normal! viwp
+    elseif match(@", 'private') ==# 0
+        let @" = 'protected'
+        normal! viwp
+    elseif match(@", 'protected') ==# 0
+        let @" = 'public'
+        normal! viwp
+    endif
+    let @" = save_unnamed_register
+endfunction
+nnoremap <silent><leader>fm :call FlipAccessModifier()<CR>
 
 " Unfortunately vim can't understand some key combinations like <C-=>. As a
 " workaround I'll just use <C-p> because it's close to '='.
