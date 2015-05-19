@@ -104,16 +104,21 @@ set number
 set foldlevelstart=0
 " The status line will always appears in all windows
 set laststatus=2
-" Configure what appears in the status line
-set statusline=%f       " Absolute file path
-set statusline+=%=      " Switch to the right side
-set statusline+=%l/%L   " Current line num out of total
+" Configure the status line
+set statusline=
+set statusline+=[%n]      " Buffer number
+set statusline+=\ [%<%F]  " Absolute file path
+set statusline+=\ %m      " Modified flag
+set statusline+=\ %y      " File type
+set statusline+=\ %{&ff}  " File format
+set statusline+=\ %l/%L   " Current line num out of total
+set statusline+=\ %P      " Top/Bottom and percentage through file
 " Characters which are used to fill empty space in the status line,
 " vertical/horizontal separators, and folded lines
-set fillchars=vert:\|,fold:-,stl:#
+set fillchars=vert:\|,fold:-,stl:\ 
 " TODO: look into setting the 'title' option.
 " Memory is cheap, let's bump up the amount recorded commands.
-set history=1000
+set history=500
 " When tab completing, complete the longest possible prefix and display a list
 " of possible completions.
 set wildmenu
@@ -312,24 +317,6 @@ augroup END
 " spirit of text objects, consider removing my 'iL' text objects. They really
 " aren't that useful in the long run and they just add another mapping for me
 " to practice.
-
-" Ascii diagrams are nice but I would be interseted in being able to type
-" characters like those displayed by the 'tree' command. Look into how I could
-" type those sorts of characters in vim. On a similar note about the 'tree'
-" command. Could I create a 'gf' command of sorts that works with the tree
-" command's output?? So if I had this:
-"
-" web/param/src/
-" ├── model
-"     ├── correspondances
-"         └── correspondanceactions.php
-"
-" And I wanted to open
-" web/param/src/model/correspondances/correspondanceactions.php, I could just
-" put my cursor on that line and hit 'gf' (or something) then that file would
-" be opened. Then again, it would probably be simpler to just use netrw and
-" keep a tree of files open that I want to work with...
-
 
 " I think this could be fun. Create a little mode (or something) where I'll
 " enter a keystroke then I'll be in insert mode and whenever I type a variable
@@ -5921,6 +5908,52 @@ nnoremap <silent> <leader>O :call append(line('.')-1, '')<CR>
 
 " Run the program given by the makeprg option
 nnoremap <silent><leader>m :w<CR>:make!<CR>
+
+" These mappings make more sense to me for the CamelCaseMotion plugin.
+omap <silent>i<leader>w <Plug>CamelCaseMotion_ie
+xmap <silent>i<leader>w <Plug>CamelCaseMotion_ie
+omap <silent>a<leader>w <Plug>CamelCaseMotion_iw
+xmap <silent>a<leader>w <Plug>CamelCaseMotion_iw
+
+" A function which opens up a file using the output of the 'tree' command. So
+" if I had this:
+"
+" web/param/src/
+" ├── model
+"     ├── correspondances
+"         └── correspondanceactions.php
+"
+" And I wanted to open
+" web/param/src/model/correspondances/correspondanceactions.php, I can put my
+" cursor on that line, invoke the function, and the file will be opened. I
+" made this super quick and it is probably full of problems but I'm happy with
+" it. It assumes that the tree command's output starts on the first line of
+" the file. In reality, it would probably be better to use netrw's 'tree' view
+" of files but this was fun to make.
+function! TreeGoToFile(open_tab_p)
+    let save_unnamed_register = @"
+    normal! $F─w
+    let path = ''
+    while line('.') !=# 1
+        normal! y$b
+        let path = @".'/'.path
+        normal! yl
+        while matchstr(@", '\w') ==# ''
+            normal! kyl
+        endwhile
+    endwhile
+    " We're at the top of the file, finish off the path to the file to
+    " open.
+    let path = getline('.') . path[:-2]
+    if a:open_tab_p
+        execute "tabedit " . path
+    else
+        execute "edit " . path
+    endif
+    let @" = save_unnamed_register
+endfunction
+nnoremap gt :call TreeGoToFile(0)<CR>
+nnoremap gT :call TreeGoToFile(1)<CR>
 
 " }}}
 
