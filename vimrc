@@ -292,6 +292,12 @@ augroup END
 
 " }}}
 
+" Consider making the g; command add to the jump list.
+
+" Look into paredit with vim when I, inevitably :), go back to playing around
+" with some lisp code. Check out this for some animated gif's
+" http://danmidwood.com/content/2014/11/21/animated-paredit.html.
+
 " Seems like a way to grep on all buffers is with these 2 commands:
 " 1. call setqflist([]) - Clears the quickfix lists
 " 2. bufdo grepadd! regex % - Goes through each buffer and does a grep for
@@ -376,16 +382,6 @@ augroup END
     " endfunc
 " I kind of like that idea, being able to insert the next increasing number.
 " Maybe I'll implement it at some point.
-
-" I could try to make zt and zb operators! So for example, zt will position
-" the top of the window at the '< or '[ mark (depending), leaving the cursor
-" where it is.
-function! RedrawCursorLineAtTop(type)
-    " Whenever you use an operator, your cursor is positioned at the top of
-    " the operated area. So this operator is extremely trivial.
-    normal! zt
-endfunction
-nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
 
 " Could we make a visual mapping to repeat the last text-object movement? So
 " if I did vi{ and I wanted to repeat i{ I could just hit ',t' or something
@@ -5561,6 +5557,18 @@ onoremap <leader>k 3k
 onoremap <leader>J 4j
 onoremap <leader>K 4k
 
+" When you look at it more, pasting in vim is a little odd. For a
+" character-wise paste the cursor is placed at the end of the paste, which
+" makes sense to me, but for a line-wise paste the cursor is left at the start
+" of the paste. That inconsistancy is odd, so I'm going to fix it and see if I
+" like it. Now the cursor will always be positioned at the end of the pasted
+" text. Also, I don't find gp and gP's functionality useful so I've re-mapped
+" them to leave the cursor at the beginning of the pasted text.
+nnoremap p p:keepjumps normal! `]<CR>
+nnoremap P P:keepjumps normal! `]<CR>
+nnoremap gp p:keepjumps normal! `[<CR>:silent! call repeat#set("gp", v:count)<CR>
+nnoremap gP P:keepjumps normal! `[<CR>:silent! call repeat#set("gP", v:count)<CR>
+
 " Reselect the last changed/yanked text
 nnoremap gV `[v`]
 
@@ -5616,30 +5624,11 @@ noremap <leader>L L
 " Makes it so the n and N commands always go in the same direction, forward
 " and backward respectively, no matter which direction we're actually
 " searching.
-function! PreserveSearchDirection(n_p, visual_p, keepjumps_p)
-    try
-        execute (a:keepjumps_p ? 'keepjumps ':'')."normal! ".(a:visual_p ? 'gv':'').(a:n_p ? '/':'?').@/."\<CR>zv"
-    catch
-        echohl ErrorMsg
-        echo v:errmsg
-        echohl None
-    endtry
-    " I would like to be able to turn on search highlighting inside of this
-    " function but unfortunately this is not possible with vims versions below
-    " 704. For now I just set 'hlsearch' in the mapping when I call this
-    " function. BUT In vim version 704 there is a new defined variable I can
-    " use to turn on/off search highlighting. That will be nice because then
-    " ALL the logic for this mapping will be contained within this function
-    " and we can just call it. let v:hlsearch = 1
-endfunction
-noremap  <silent> n :<C-u>set hlsearch \| call PreserveSearchDirection(1, 0, 0)<CR>
-noremap  <silent> N :<C-u>set hlsearch \| call PreserveSearchDirection(0, 0, 0)<CR>
-xnoremap <silent> n :<C-u>set hlsearch \| call PreserveSearchDirection(1, 1, 0)<CR>
-xnoremap <silent> N :<C-u>set hlsearch \| call PreserveSearchDirection(0, 1, 0)<CR>
+noremap  <silent> n /<C-r>/<CR>zv
+noremap  <silent> N ?<C-r>/<CR>zv
 " Goes to the next/previous search match without changing the jumplist.
-noremap <silent><leader>n :set hlsearch \| call PreserveSearchDirection(1, 0, 1)<CR>
-" I used m rather than N becuase it's easier to type and m is close to n.
-noremap <silent><leader>N :set hlsearch \| call PreserveSearchDirection(0, 0, 1)<CR>
+noremap <silent><leader>n :execute "keepjumps normal! /".@/."\r"<CR>zv
+noremap <silent><leader>N :execute "keepjumps normal! ?".@/."\r"<CR>zv
 " Do I need to remap these to something that works? I don't think the jumplist
 " has the same effect when you're already inside visual mode.
 xnoremap <silent><leader>n <NOP>
@@ -5835,19 +5824,6 @@ noremap <SPACE> %
 " available ctrl mapping.
 nnoremap <C-g> :nohlsearch<CR><C-l>
 
-" gp and gP have uses but I haven't felt the need for to use them as of yet so
-" I'm using their mappings. This will paste text into the last place we were
-" inserting text.  My idea is that you could be typing and want to copy text
-" from somewhere else. So you leave insert mode, find the thing you want to
-" copy and copy it, then just hit 'gp'.
-
-" TODO: Find out if there is a way to make it so I could prefix these commands
-" with a register to paste from a specific register, that would be pretty
-" sweet. Also, maybe change one of them to jump to the last changed location
-" and paste rather than go to the last point we entered insert mode. 
-nnoremap gp `^p
-nnoremap gP `^P
-
 " Puts the top of the paragraph at the top of the screen leaving the cursor
 " where it started.
 nnoremap z{ {jzt``
@@ -5954,6 +5930,25 @@ function! TreeGoToFile(open_tab_p)
 endfunction
 nnoremap gt :call TreeGoToFile(0)<CR>
 nnoremap gT :call TreeGoToFile(1)<CR>
+
+" Operators to put the top/bottom of the screen on a text object.
+function! RedrawCursorLineAtTop(type)
+    " Whenever you use an operator, your cursor is positioned at the top of
+    " the operated area. So this operator is extremely trivial.
+    normal! zt
+endfunction
+nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
+function! RedrawCursorLineAtBottom(type, ...)
+    if a:0
+        let end_line = line("'>")
+    else
+        let end_line = line("']")
+    endif
+    call cursor(end_line, 1)
+    normal! zb
+endfunction
+nnoremap <silent> zB :set operatorfunc=RedrawCursorLineAtBottom<CR>g@
+vnoremap <silent> zB :<C-u>call RedrawCursorLineAtBottom(visualmode(), 1)<CR>
 
 " }}}
 
@@ -6441,30 +6436,31 @@ augroup filetype_markdown
     autocmd Filetype markdown onoremap <buffer> ah :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rg_vk0"<CR>
     autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
     function! MarkdownChangeHeader(header_type)
-        " Remove the existing header.
+        " Normalize cursor position
         if match(getline('.'), '^\(==\|--\)') ==# 0
             normal! k
         endif
+        " Remove the existing header.
         let cur_line = substitute(getline('.'), '^#\+\s*', '', '')
         if match(getline(line('.')+1), '^\(==\|--\)') ==# 0
-            normal! jddk
+            let header_line = line('.')
+            normal! jdd
+            if line('.') !=# header_line
+                normal! k
+            endif
         endif
+        call setline('.', cur_line)
         if a:header_type ==# 1
-            call setline('.', cur_line)
             call append('.', repeat('=', strlen(cur_line)))
         elseif a:header_type ==# 2
-            call setline('.', cur_line)
             call append('.', repeat('-', strlen(cur_line)))
         else
             call setline('.', repeat('#', a:header_type).' '.cur_line)
         endif
     endfunction
-    autocmd Filetype markdown nnoremap <buffer> <localleader>1 :call MarkdownChangeHeader(1)<CR>
-    autocmd Filetype markdown nnoremap <buffer> <localleader>2 :call MarkdownChangeHeader(2)<CR>
-    autocmd Filetype markdown nnoremap <buffer> <localleader>3 :call MarkdownChangeHeader(3)<CR>
-    autocmd Filetype markdown nnoremap <buffer> <localleader>4 :call MarkdownChangeHeader(4)<CR>
-    autocmd Filetype markdown nnoremap <buffer> <localleader>5 :call MarkdownChangeHeader(5)<CR>
-    autocmd Filetype markdown nnoremap <buffer> <localleader>6 :call MarkdownChangeHeader(6)<CR>
+    for i in range(1,6)
+        execute 'autocmd Filetype markdown nnoremap <buffer> <localleader>'.i.' :call MarkdownChangeHeader('.i.')<CR>:silent! call repeat#set("\<localleader>'.i.'", v:count)<CR>'
+    endfor
     " TODO: Make an operator pending mode mapping called 'ih' (inner header)
     " which selects all the text inside the current header (ignoring any child
     " headers). Then formatting could be easier because I could just do
@@ -6477,34 +6473,21 @@ augroup filetype_markdown
         let save_view = winsaveview()
         let header_lines = [0, 0, 0, 0, 0, 0]
         let start_line = line('.')
+
         if search('^==', 'bW')
             let header_lines[0] = line('.') - 1
             call cursor(start_line, 1)
         endif
-
         if search('^--', 'bW')
             let header_lines[1] = line('.') - 1
             call cursor(start_line, 1)
         endif
-
-        if search('^###[^#]', 'bW')
-            let header_lines[2] = line('.')
-            call cursor(start_line, 1)
-        endif
-
-        if search('^####[^#]', 'bW')
-            let header_lines[3] = line('.')
-            call cursor(start_line, 1)
-        endif
-
-        if search('^#####[^#]', 'bW')
-            let header_lines[4] = line('.')
-            call cursor(start_line, 1)
-        endif
-
-        if search('^######[^#]', 'bW')
-            let header_lines[5] = line('.')
-        endif
+        for i in range(2,5)
+            if search('^'.repeat('#', i+1).'[^#]', 'bW')
+                let header_lines[i] = line('.')
+                call cursor(start_line, 1)
+            endif
+        endfor
 
         call winrestview(save_view)
         let closest_header = max(header_lines)
