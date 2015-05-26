@@ -16,3 +16,6 @@
 [submodule "bundle/var-case-text-obj"]
 	path = bundle/var-case-text-obj
 	url = https://github.com/bkad/CamelCaseMotion.git
+[submodule "bundle/targets"]
+	path = bundle/targets
+	url = https://github.com/lag13/targets.vim.git

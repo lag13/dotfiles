@@ -1,8 +1,56 @@
-" Funny vim commands:
+" Timeout Questions:
+" This is a series of questions all related to the 'timeout' and 'ttimeout'
+" options in Vim. I thank you in advance, it is a rather lengthy series of
+" questions.
+
+" 'timeout' vs 'ttimeout':
+" Why do both options 'timeout' and 'ttimeout' exist? Maybe to help answer
+" this question you could also answer what exactly is a key code? I always
+" thought that key codes were keys like <ESC>, CTRL or <F1>. If I created a
+" mapping which used key codes, which option would take effect, 'timeoutlen'
+" or 'ttimeoutlen'?
+
+" Purpose of 'timeout':
+" What would you say is the purpose of the 'timeout' option? My thought is
+" that it exists so if there are two mappings A and B, where A is a prefix of
+" B, then both mappings can still be used. For example, say you have these two
+" mappings:
+"       nnoremap , :echom 'First Mapping'<CR>
+"       nnoremap ,, :echom 'Second Mapping'<CR>
+" Since this option exists, I can invoke the first one by typing ',' and
+" waiting for a bit while the second can be invoked by just typing ',,'. So it
+" makes sense to have this option because there are bound to be mapping
+" conflicts and this helps you utilize as many of those mappings as possbile.
+" But besides aleviating mapping conflicts, are there any other situations
+" where this option comes in handy? There is only one other "use" I see but it
+" seems sort of silly. Say you remapped "i'" in operator-pending mode so it
+" selects all text between single quotes even if the quotes span multiple
+" lines. If you type "di" and wait until 'timeoutlen' ends, your created
+" mapping will time out. Now if you type the final "'" it will use vim's built
+" in "i'" text object rather than your mapping. Do you think there is any use
+" for that sort of thing?
+
+" Follow up question. So if you have all your mappings set up as you like, do
+" you think it would be better to turn 'timeout' off?
+
+" Funny Vim Commands:
 " bad[d] - Adds a file name to the buffer list without loading it.
 " col[der] - Goes to an older quickfix list.
 " nun[map] - Removes the mapping for a normal mode command. A quote from the
 " help pages: 'can also be used outside of a monastery'
+
+" Mapping Information:
+" A mapping enables you to bind a set of *Vim commands* to a sequence of keys.
+" I used to think of pre-defined Vim commands as default mappings but that is
+" not true. A mapping is something a user makes while something like "i'" in
+" operator-pending mode, assuming it has not been mapped, is considered a Vim
+" command. You can view mappings by running the command:
+"     :map {lhs}
+" If {lhs} is given then it will list all mappings that start with it.
+" Otherwise it will list all mappings. There's also a function called
+" maparg({lhs}) which returns the {rhs} of a mapping given the {lhs}. I've
+" also seen the function hasmapto({rhs}) being used. This function returns
+" true of there is a mapping which contains {rhs} in it's {rhs}.
 
 " :[noremap]map	    Normal, Visual and Operator-pending
 " :v[noremap]map    Visual and Select
@@ -13,10 +61,14 @@
 " :i[noremap]map    Insert
 " :c[noremap]map    Command-line
 
+" <expr> in a mapping evaluates the {rhs} as an expression. The return value
+" of that expression is used as the key sequence to execute. It's a pretty
+" interesting option to use.
+
 " Seemed like a nice quick vimscript tutorial
 " http://andrewscala.com/vimscript/
 
-" Creating a text-object:
+" Creating A Text Object:
 " 1. Define the operator-pending mapping so you can operate on the text object
 " when using operators.
 " 2. Define a visual mapping so you can select the text-object in visual mode.
@@ -33,7 +85,7 @@
 " 3. If makes sense to do so, define a normal mapping which will move the
 " cursor in adherance with the text-object.
 
-" Creating operator:
+" Creating An Operator:
 " 1. Define a normal mapping so we can use this mapping from normal mode.
 " 2. Define a visual mapping so we can visually select the exact text we want
 " and have the operator operate on it.
@@ -260,7 +312,7 @@ elseif has('unix')
     if uname !=# "Darwin"
         let g:solarized_termcolors = 256
     endif
-    set background=dark
+    set background=light
     colorscheme solarized
 endif
 
@@ -292,11 +344,26 @@ augroup END
 
 " }}}
 
-" Consider making the g; command add to the jump list.
+" Plugin Related Configuration {{{
 
-" Look into paredit with vim when I, inevitably :), go back to playing around
-" with some lisp code. Check out this for some animated gif's
-" http://danmidwood.com/content/2014/11/21/animated-paredit.html.
+" Remove some separators, which I'll probably never use, to decrease startup
+" time.
+let g:targets_separators = ', : + _ * # /'
+
+" }}}
+
+" Checkout:
+" 1. Viewing man pages inside of vim
+" 2. ctags
+" 3. NERDtree
+" 4. clang complete for autocompleting C/C++ code
+" 5. paredit http://danmidwood.com/content/2014/11/21/animated-paredit.html.
+" 6. https://github.com/tpope/vim-eunuch, seems to have some useful stuff
+" 7. https://github.com/wellle/targets.vim and
+" http://www.reddit.com/r/vim/comments/1x7pfr/targetsvim_plugin_to_add_many_text_objects_in_the/ 
+
+" Consider making a modified g; (g: seems free) command which adds to the jump
+" list.
 
 " Seems like a way to grep on all buffers is with these 2 commands:
 " 1. call setqflist([]) - Clears the quickfix lists
@@ -305,24 +372,11 @@ augroup END
 " replacing it like :grep would do. I just tried running the command but had
 " to hit enter for EVERY buffer. Try prepending 'silent!' next time.
 
-" Check out https://github.com/tpope/vim-eunuch, seems like it has some useful
-" stuff.
-
 " Consider making the command g/ comment out things instead of gc. I kind of
 " like that because then in visual mode I could have a text object, gc, for
 " actually selecting some commented text.
 
 " Really get usr_29.txt into your head. Seems like it has some useful things.
-
-" Check out this guy's text object mapping plugin:
-" https://github.com/wellle/targets.vim. He seems to have been quite thorough
-" with it. Skimming it over, I didn't agree with everything he did but there
-" were definitely some nice ideas. Also look at this
-" http://www.reddit.com/r/vim/comments/1x7pfr/targetsvim_plugin_to_add_many_text_objects_in_the/
-" Actually, just search 'vim argument text object' in google. Actually, in the
-" spirit of text objects, consider removing my 'iL' text objects. They really
-" aren't that useful in the long run and they just add another mapping for me
-" to practice.
 
 " I think this could be fun. Create a little mode (or something) where I'll
 " enter a keystroke then I'll be in insert mode and whenever I type a variable
@@ -5873,6 +5927,7 @@ nnoremap Y y$
 
 " Sometimes I just want to clear the line but keep the space it took up.
 nnoremap dD :call setline('.', '')<CR>
+            \:silent! call repeat#set("dD")<CR>
 
 " Inserts a new line above/below the cursor but remains in normal mode. These
 " changes are also made repeatable thanks to repeat.vim. TODO: These mappings
@@ -6089,107 +6144,7 @@ command! -nargs=* -range Boxify call SurroundWithBox(<f-args>)
 
 " }}}
 
-" Operator-pending Mappings {{{
-
-" Mappings for the next/previous pair of '"` characters.
-function! NextAndPrevQuoteTextObj(char, backward_p, modifier, last_p)
-    " if no a:char before the cursor, go four char's ahead.
-    if a:last_p
-        normal! $
-    endif
-    let num_loops = (col('.') <# stridx(getline('.'), a:char) && !a:backward_p ? 4 : 2)
-    for i in range(1, num_loops)
-        call search(a:char, a:backward_p ? 'b':'')
-    endfor
-    execute "normal! v".a:modifier.a:char
-    " Adding these lines into this function makes this operator-pending
-    " mapping repeatable!!!! I think the way it works is that this function is
-    " being called in operator-pending mode, so the v:operator is
-    " appropriately set by the time we enter this function. The line above
-    " visually selects the area to act on which remains after the function
-    " exits (yeah, I guess running other commands inside of a function doesn't
-    " disturb a visual area). Then we tell repeat.vim to repat the last
-    " command we made (the operator+text-object). I think when we call
-    " repeat#set(cmd) what happens is repeat.vim will literally make the '.'
-    " command act as if we're retyping 'cmd' again. So it just takes what we
-    " typed and shoves it back into vim as user input. That is why we need to
-    " do the extra cajoling to get the 'c'hange command to work. If we didn't
-    " have that then repeat.vim would just repeat the cin' part which leaves
-    " us in insert mode. But adding \<C-r>. inserts the last inserted text
-    " while \<ESC> puts us back in normal mode.
-    let dir = 'n'
-    if a:backward_p
-        let dir = 'l'
-    elseif a:last_p
-        let dir = 'L'
-    endif
-    let cmd = v:operator.a:modifier.dir.a:char.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
-    silent! call repeat#set(cmd, v:count)
-endfunction
-" <node actif='false' som='thing' you='buddy'/>
-" <node actif=`false` som=`thing` you=`buddy`/>
-" <node actif="false" som="thing" you="buddy"/>
-" This loop looks formidable but all it's doing is creating mappings that look
-" like in', an', il', an', etc... There were just so many of these mappings to
-" make and since their structure is so similar I made the loop.
-for char in ["'", '"', '`']
-    let param = 0
-    for modifier in ['i', 'a']
-        execute 'onoremap <silent> '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, "'.modifier.'", 0)<CR>'
-        execute 'vnoremap <silent> '.modifier.'n'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 0, "'.modifier.'", 0)<CR>'
-        execute 'onoremap <silent> '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, "'.modifier.'", 0)<CR>'
-        execute 'vnoremap <silent> '.modifier.'l'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, "'.modifier.'", 0)<CR>'
-        execute 'onoremap <silent> '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, "'.modifier.'", 1)<CR>'
-        execute 'vnoremap <silent> '.modifier.'L'.char.' :<C-u>call NextAndPrevQuoteTextObj("'.escape(char, '"').'", 1, "'.modifier.'", 1)<CR>'
-        let param = 1
-    endfor
-endfor
-" I'm trying to get operator-pending mappings to also be repeatable. I think
-" I'm getting pretty close. This sometimes sort of works?? I think I have to
-" do something similar to this guy:
-" https://github.com/tek/vim-argh/blob/master/autoload/argh.vim#L54
-
-" onoremap <silent> in' :<C-u>call NextAndPrevQuoteTextObj("'", 0, 0, 0) \| silent! call repeat#set(v:operator."in'\<C-r>.", v:count)<CR>
-
-" Oh my god this totally works. I think the key is to have the function calls
-" on separate lines? Then the '.' register will get appropriately updated.
-" I'll look into it more later.
-
-" function! MakeSingleQuoteMappingRepeatable()
-"     call NextAndPrevQuoteTextObj("'", 0, 0, 0)
-"     let cmd = v:operator."in'".(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
-"     silent! call repeat#set(cmd, v:count)
-" endfunction
-" onoremap <silent> in' :<C-u>call MakeSingleQuoteMappingRepeatable()<CR>
-
-" Mappings for the next/previous pair of ([{ characters.
-function! NextAndPrevBracket(char, search_char, backwards_p, modifier)
-    call search(a:search_char, a:backwards_p ? 'b':'')
-    execute "normal! v".a:modifier.a:char
-    let dir = 'n'
-    if a:backwards_p
-        let dir = 'l'
-    endif
-    let cmd = v:operator.a:modifier.dir.a:char.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
-    silent! call repeat#set(cmd, v:count)
-endfunction
-" <node actif=(false) som=(thing) you=(buddy)/>
-" <node actif={false} som={thing} you={buddy}/>
-" <node actif=[false] som=[thing] you=[buddy]/>
-" Another formidable looking loop. There were just a lot of mappings to make
-" for example parentheses have inner next mappings 'in(' 'in)' AND 'inb'.
-for map_chars in [[['(', ')', 'b'], "()"], [['{', '}', 'B'], "{}"], [['[', ']'], "[]"]]
-    let param = 0
-    for modifier in ['i', 'a']
-        for map_char in map_chars[0]
-            execute 'onoremap <silent> '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, "'.modifier.'")<CR>'
-            execute 'vnoremap <silent> '.modifier.'n'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][0].'", 0, "'.modifier.'")<CR>'
-            execute 'onoremap <silent> '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, "'.modifier.'")<CR>'
-            execute 'vnoremap <silent> '.modifier.'l'.map_char.' :<C-u>call NextAndPrevBracket("'.map_chars[1][0].'", "'.map_chars[1][1].'", 1, "'.modifier.'")<CR>'
-        endfor
-        let param = 1
-    endfor
-endfor
+" Operator-Pending Mappings {{{
 
 " Goes to next email address. My regex is probably not perfect but that's
 " fine.
@@ -6232,7 +6187,8 @@ function! TextObjSearchMatch(forward_p, visual_mode)
     endif
     let end_pos = getpos('.')
     call search(@/, 'cb')
-    execute 'normal! '(a:visual_mode ? 'g':'').'v'.end_pos[1].'G'.end_pos[2].'|'
+    execute 'normal! '(a:visual_mode ? 'g':'').'v'
+    call cursor(end_pos[1], end_pos[2])
     let text_obj = 'gN'
     if a:forward_p
         let text_obj = 'gn'
@@ -6265,7 +6221,8 @@ function! TextObjRVal()
         call search('.\ze;')
     endif
     " Highlight from the end of the assignment to the start of it.
-    execute 'normal! '.'v'.start_pos[1].'G'.start_pos[2].'|'
+    execute 'normal! v'
+    call cursor(start_pos[1], start_pos[2])
 endfunction
 " $temp = 'Change me!';
 onoremap rv :<C-u>call TextObjRVal()<CR>
@@ -6286,7 +6243,9 @@ function! TextObjHereDoc(around_p)
         endif
     endif
     " Mark the visual selection
-    execute 'normal! '.hd_region[0][1]."G".hd_region[0][2]."|".(a:around_p ? 'v':'V').hd_region[1][1]."G".hd_region[1][2]."|"
+    call cursor(hd_region[0][1], hd_region[0][2])
+    execute 'normal! '(a:around_p ? 'v':'V')
+    call cursor(hd_region[1][1], hd_region[1][2])
 endfunction
 function! GetStartEndHereDocPos(backwards_p, around_p)
     let save_unnamed_register = @"
@@ -6317,6 +6276,22 @@ onoremap <silent> ihd :<C-u>call TextObjHereDoc(0)<CR>
 xnoremap <silent> ihd :<C-u>call TextObjHereDoc(0)<CR>
 onoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
 xnoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
+
+" Text object for a number. I decided to make this because I was editing some
+" css and had to change some numbers like: '100px'.
+function! TextObjNumber(visual_mode)
+    if search('\d\ze\($\|[^0-9]\)', 'ce') ==# 0
+        return 0
+    endif
+    let end_pos = getpos('.')
+    call search('\(^\|[^0-9]\)\zs\d', 'cb')
+    execute 'normal! '(a:visual_mode ? 'g':'').'v'
+    call cursor(end_pos[1], end_pos[2])
+    let cmd = v:operator.'id'.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
+    silent! call repeat#set(cmd, v:count)
+endfunction
+onoremap <silent> id :<C-u> call TextObjNumber(0)<CR>
+xnoremap <silent> id :<C-u> call TextObjNumber(1)<CR>
 
 " }}}
 
