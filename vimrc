@@ -1,38 +1,3 @@
-" Timeout Questions:
-" This is a series of questions all related to the 'timeout' and 'ttimeout'
-" options in Vim. I thank you in advance, it is a rather lengthy series of
-" questions.
-
-" 'timeout' vs 'ttimeout':
-" Why do both options 'timeout' and 'ttimeout' exist? Maybe to help answer
-" this question you could also answer what exactly is a key code? I always
-" thought that key codes were keys like <ESC>, CTRL or <F1>. If I created a
-" mapping which used key codes, which option would take effect, 'timeoutlen'
-" or 'ttimeoutlen'?
-
-" Purpose of 'timeout':
-" What would you say is the purpose of the 'timeout' option? My thought is
-" that it exists so if there are two mappings A and B, where A is a prefix of
-" B, then both mappings can still be used. For example, say you have these two
-" mappings:
-"       nnoremap , :echom 'First Mapping'<CR>
-"       nnoremap ,, :echom 'Second Mapping'<CR>
-" Since this option exists, I can invoke the first one by typing ',' and
-" waiting for a bit while the second can be invoked by just typing ',,'. So it
-" makes sense to have this option because there are bound to be mapping
-" conflicts and this helps you utilize as many of those mappings as possbile.
-" But besides aleviating mapping conflicts, are there any other situations
-" where this option comes in handy? There is only one other "use" I see but it
-" seems sort of silly. Say you remapped "i'" in operator-pending mode so it
-" selects all text between single quotes even if the quotes span multiple
-" lines. If you type "di" and wait until 'timeoutlen' ends, your created
-" mapping will time out. Now if you type the final "'" it will use vim's built
-" in "i'" text object rather than your mapping. Do you think there is any use
-" for that sort of thing?
-
-" Follow up question. So if you have all your mappings set up as you like, do
-" you think it would be better to turn 'timeout' off?
-
 " Funny Vim Commands:
 " bad[d] - Adds a file name to the buffer list without loading it.
 " col[der] - Goes to an older quickfix list.
@@ -5605,11 +5570,6 @@ noremap K gkgkgkgk
 " eyeball.
 onoremap J 2j
 onoremap K 2k
-" Just for fun, here are some mappings to delete 4 and 5 lines respectively.
-onoremap <leader>j 3j
-onoremap <leader>k 3k
-onoremap <leader>J 4j
-onoremap <leader>K 4k
 
 " When you look at it more, pasting in vim is a little odd. For a
 " character-wise paste the cursor is placed at the end of the paste, which
@@ -5688,17 +5648,18 @@ noremap <silent><leader>N :execute "keepjumps normal! ?".@/."\r"<CR>zv
 xnoremap <silent><leader>n <NOP>
 xnoremap <silent><leader>N <NOP>
 
-" An opearator to resize windows. This is nifty because when I horizontally
-" split a window, I'll oftentimes use one window for text editing and the
-" other to reference a bit of code. Since the referenced code is usually a
-" paragraph or other text object I can quickly resize that window to encompass
-" what I need to see and maximize my screen real estate. TODO: Consider making
-" this also adjust horizontal width. There are 3 possibilities I see with
-" this: adjust vertical height, adjust horizontal width, or adjust both. I
+" An operator to resize windows. This is nifty because when I
+" horizontally split a window, I'll oftentimes use one window for text
+" editing and the other to reference a bit of code. Since the
+" referenced code is usually a paragraph or other text object I can
+" quickly resize that window to encompass what I need to see and
+" maximize my screen real estate. TODO: Consider making this also
+" adjust horizontal width. There are 3 possibilities I see with this:
+" adjust vertical height, adjust horizontal width, or adjust both. I
 " wonder how I could reconcile those options or if it's even worth it.
 function! ResizeWindowOperator(type, ...)
-    " After using an operator, the cursor is put at the start of the operated
-    " text, so I think this is okay.
+    " After using an operator, the cursor is put at the
+    " start of the operated text, so I think this is okay.
     let start_line = line('.')
     if a:0
         let end_line = line("'>")
