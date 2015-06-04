@@ -5,10 +5,10 @@
 " help pages: 'can also be used outside of a monastery'
 
 " Mapping Information:
-" A mapping enables you to bind a set of *Vim commands* to a sequence of keys.
-" I used to think of pre-defined Vim commands as default mappings but that is
-" not true. A mapping is something a user makes while something like "i'" in
-" operator-pending mode, assuming it has not been mapped, is considered a Vim
+" A mapping enables you to bind a set of Vim **commands** to a sequence of
+" keys. I used to think of pre-defined Vim commands as default mappings but
+" that is not true. A mapping is something a user makes while something like
+" "n" in Normal mode, assuming it has not been mapped, is considered a Vim
 " command. You can view mappings by running the command:
 "     :map {lhs}
 " If {lhs} is given then it will list all mappings that start with it.
@@ -56,6 +56,7 @@
 " and have the operator operate on it.
 
 " Basic Settings {{{
+
 let mapleader = ","
 let maplocalleader = '\'
 " We want vim not vi!
@@ -92,6 +93,7 @@ set hidden
 set backspace=indent,eol,start"
 " Can't live without it.
 set showmode
+set ttimeoutlen=30
 set modelines=0
 " Tabs will appear 4 spaces wide.
 set tabstop=4
@@ -185,6 +187,7 @@ set lazyredraw
 set ttyfast
 " Toggle the 'paste' setting.
 set pastetoggle=<F10>
+
 " }}}
 
 " Color Scheme and Terminal Specific Settings {{{
@@ -277,8 +280,8 @@ elseif has('unix')
     if uname !=# "Darwin"
         let g:solarized_termcolors = 256
     endif
-    set background=light
-    colorscheme solarized
+    set background=dark
+    silent! colorscheme solarized
 endif
 
 " }}}
@@ -311,9 +314,15 @@ augroup END
 
 " Plugin Related Configuration {{{
 
-" Remove some separators, which I'll probably never use, to decrease startup
-" time.
-let g:targets_separators = ', : + _ * # /'
+" I like using 'I' and 'A' in visual block mode and I don't see myself really
+" using that functionality so I'm disabling it.
+let g:targets_aiAI = 'ai  '
+
+" These mappings make more sense to me for the CamelCaseMotion plugin.
+omap <silent>i<leader>w <Plug>CamelCaseMotion_ie
+xmap <silent>i<leader>w <Plug>CamelCaseMotion_ie
+omap <silent>a<leader>w <Plug>CamelCaseMotion_iw
+xmap <silent>a<leader>w <Plug>CamelCaseMotion_iw
 
 " }}}
 
@@ -327,8 +336,9 @@ let g:targets_separators = ', : + _ * # /'
 " 7. https://github.com/wellle/targets.vim and
 " http://www.reddit.com/r/vim/comments/1x7pfr/targetsvim_plugin_to_add_many_text_objects_in_the/ 
 
-" Consider making a modified g; (g: seems free) command which adds to the jump
-" list.
+" When visually selecting text that you want an operator to operate on, the
+" last selected text (that you do with the gv command) is changed. Is there
+" any way to stop that from happening?
 
 " Seems like a way to grep on all buffers is with these 2 commands:
 " 1. call setqflist([]) - Clears the quickfix lists
@@ -355,10 +365,6 @@ let g:targets_separators = ', : + _ * # /'
 " use it but I bet there's some good mappings I could take. I found that on
 " this site: http://statico.github.io/vim2.html
 
-" This seems useful:
-" http://vim.wikia.com/wiki/Repeat_last_command_and_put_cursor_at_start_of_change
-" perhaps I will make such a mapping.
-
 " Consider making the 'd' command actually delete text (so no messing with the
 " default register). Actually when I have time look that this plugin:
 " https://github.com/svermeulen/vim-easyclip. Perhaps I'll give it a whirl.
@@ -373,34 +379,9 @@ let g:targets_separators = ', : + _ * # /'
 " being done. Like could I make a recursive vim mapping to keep appending the
 " next fibonacci number to the end of the file or something like that?
 
-" WOAAAAA!!! So I already know that you can precede a command with a number
-" and then the command will be executed that many times. But I didn't know
-" that that functionality automatically works for user defined mappings!! For
-" example I made a mapping <leader>o to insert a line below the current one
-" and stay in normal mode. If I type 3,o or 5,o it works as expected
-" (inserting 3 and 5 lines respectively).
-
 " Look into mapping alt key chords: help map-which-keys. Also help index.txt
 " for some key sequences which are not mapped. Could I make mappings <M-x> and
 " <M-a> to add and subtract but look backwards instead of forwards?
-
-" There was this little example in the map.txt help page:
-" Here is an example that inserts a list number that increases: >
-"     let counter = 0
-"     inoremap <expr> <C-L> ListItem()
-"     inoremap <expr> <C-R> ListReset()
-
-"     func ListItem()
-"       let g:counter += 1
-"       return g:counter . '. '
-"     endfunc
-
-"     func ListReset()
-"       let g:counter = 0
-"       return ''
-    " endfunc
-" I kind of like that idea, being able to insert the next increasing number.
-" Maybe I'll implement it at some point.
 
 " Could we make a visual mapping to repeat the last text-object movement? So
 " if I did vi{ and I wanted to repeat i{ I could just hit ',t' or something
@@ -413,26 +394,15 @@ let g:targets_separators = ', : + _ * # /'
 "     'Migration can only be executed safely on \'mysql\'.'
 " );
 " So imagine that the above function used to be one giant line, this mapping
-" would make it look like it is right now..
+" would make it look like it is right now.
 
 " Make text objects to go to the next occurrence of a comment. The same goes
 " with code.
 
-" Text object for function parameters. Maybe I could have something like you
-" could type c1f (or something like that) and it would change the first
-" function arg. c2f would be the second. etc...
-
-" I think in an older vimrc I mapped F3 and F4 keys to behave like emacs's
-" macros. I must of lost that somewhere. Make those mappings again.
-
-" Maybe make the in" text objects NOT change the next occurrence of double
-" quotes if they occur offscreen. Because that happened to me after a mistype
-" and it threw me off. Chances are you won't be changing quotes offscreen.
-
 " I think I said this before but I don't remember seeing it in my vimrc so
 " I'll say it again. Make an operator (or a series of commands) which will
 " print out the value of a variable. This will be helpful for debugging
-" purposes. Then I could just do something like: ,diw and in the case of php
+" purposes. Then I could just do something like: ,piw and in the case of php
 " it will insert a new line below the current one with the contents:
 " var_dump(yanked_string);
 
@@ -476,24 +446,17 @@ let g:targets_separators = ', : + _ * # /'
 " it can be done, I just don't how to yank multiple things but still use them in
 " a meaningful way.
 
-" The 'n' and N commands echo at the previous error message on an error. So if
-" I search for something which cannot be found then execute a non-existing
-" command, typing 'n' will echo out the error about the non-existing command.
-
 " Think about using <C-l> and <C-h> for window movements and bind other
 " Control key chords to switch between tabs.
-
-" I also could maybe make an autocommand which will turn off paste upon leaving
-" insert mode. I've never needed to paste more than once, so yes I think I'll
-" do that.
 
 " Could we create a paste operator? That sounds like a fun challenge. So
 " something like: ,pi" will paste from the default register into the i" text
 " object. It really probably wouldn't benefit me too much BUT I could make
 " this operator not change the default register, which would be nice.
-
-" Maybe an operator just like 'c' but it also sets paste mode upon deletion
-" and turns off paste mode upon leaving insert mode.
+" Consolidating two of my other ideas: Maybe I could have this operator (if
+" the * or + registers are used) delete the text, turn on 'paste', and enter
+" insert mode. I can also have an autocommand which turns off paste upon
+" leaving insert mode.
 
 " Make a series of mappings to insert 'test' data. So I could have a 'phone
 " number' mapping which could insert the phone number "123-456-7890" or have
@@ -501,9 +464,11 @@ let g:targets_separators = ', : + _ * # /'
 
 " Create a text object for an IP address
 
-" Create text objects to change part of a snake/camel case variables.
+" Create text objects for parts of snake/camel case variables. I currently
+" have the CamelCase plugin but I don't really like it overly much and it
+" would be fun to create it on my own.
 
-" Create a :source operator which can source just the selected lines.
+" Create a :source operator which can source just the visually selected lines.
 
 " Add some function to create class diagrams. I could give it the hierarchy in
 " some form and it will draw a nicely spaced class diagram.
@@ -582,7 +547,7 @@ let g:targets_separators = ', : + _ * # /'
 
 " TODO: Make some sort of notification ability. So like maybe I'll remind
 " myself to delete something in a file. I'll add the message, associate it
-" with a date and when that date comes to pass I'll trigger the notification.
+" with a date and when that date comes to pass the notification will trigger.
 
 " TODO: A bit of a weird request but here goes. So that 'sneak' plugin sounds
 " really cool. A search on just two characters! That would definitely help
@@ -605,13 +570,18 @@ let g:targets_separators = ', : + _ * # /'
 " whitespace. But it looks like trailing whitespace IS being retained. Look
 " into this.
 
-" Just for fun, redefine how a number in front of the 'R' command
-" works so that when you type something like 3R it will allow you to
-" replace 3 characters then exit replace mode.
+" Just for fun, redefine how a number in front of the 'R' command works so
+" that when you type something like 3R it will allow you to replace 3
+" characters then exit replace mode. This will probably involve creating a
+" function to do the work and then remapping R to call that function. We can
+" check if a count was given with v:count and work based off that.
 
-" Make it so that doing <C-r>/ will NOT include the \<\> surrounding the
-" search text. I think I find myself fairly often using the * and then want to
-" paste that data somewhere but the \<\> is unecesarry.
+" Write a command which will do a vertical replacement (R currently does a
+" horizontal replacement) sounds like a fun idea.
+
+" Make it so that doing <C-r>/ in Insert mode will NOT include the \<\>
+" surrounding the search text. I think I find myself fairly often using the *
+" and then want to paste that data somewhere but the \<\> is unecesarry.
 
 " Look up the pattern \%V when searching. Seems pretty cool, we cand search in
 " the last visual selection!
@@ -678,9 +648,6 @@ let g:targets_separators = ', : + _ * # /'
 " picturing this tool would grab all the function names and for each function
 " name, see what function calls them. Then build a little graph based off that
 " knowledge.
-
-" Write a command which will do a vertical replacement (R currently does a
-" horizontal replacement) sounds like a fun idea.
 
 " Luceo Stuff {{{
 
@@ -5609,6 +5576,13 @@ endfunction
 nnoremap <leader>j :call SplitLine()
             \\| silent! call repeat#set("\<leader>j", v:count)<CR>
 
+" An altered version of g; which adds to the jumplist
+nnoremap g: m'g;
+
+" Inspired by this page I made a mapping:
+" http://vim.wikia.com/wiki/Repeat_last_command_and_put_cursor_at_start_of_change
+nnoremap <leader>. .:keepjumps normal! `[<CR>
+
 " Goes to the next and previous number on the current line
 noremap <silent> <leader>d :call search('\v\d+\ze(\D\|$)', '', line('.'))<CR>
 noremap <silent> <leader>D :call search('\v\d+\ze(\D\|$)', 'b', line('.'))<CR>
@@ -5621,8 +5595,10 @@ nnoremap <leader>? ?\V
 nnoremap <leader>sc :source <C-R>% \| nohlsearch<CR>
 " Sources .vimrc
 nnoremap <leader>sv :source $MYVIMRC \| nohlsearch<CR>
-" Edits the .vimrc file in a new window.
+" Edits the .vimrc file in a vertical split.
 nnoremap <leader>ev :vsplit $MYVIMRC<CR>
+" Edits the .vimrc file.
+nnoremap <leader>ee :edit $MYVIMRC<CR>
 " Opens previous buffer in a vertical split
 nnoremap <leader>e# :leftabove vsplit #<CR>
 
@@ -5900,12 +5876,6 @@ nnoremap <silent> <leader>O :call append(line('.')-1, '')<CR>
 
 " Run the program given by the makeprg option
 nnoremap <silent><leader>m :w<CR>:make!<CR>
-
-" These mappings make more sense to me for the CamelCaseMotion plugin.
-omap <silent>i<leader>w <Plug>CamelCaseMotion_ie
-xmap <silent>i<leader>w <Plug>CamelCaseMotion_ie
-omap <silent>a<leader>w <Plug>CamelCaseMotion_iw
-xmap <silent>a<leader>w <Plug>CamelCaseMotion_iw
 
 " A function which opens up a file using the output of the 'tree' command. So
 " if I had this:
@@ -6368,15 +6338,17 @@ augroup filetype_markdown
     autocmd!
     autocmd BufNewFile,BufRead *.md setlocal filetype=markdown
     autocmd Filetype markdown setlocal formatoptions=tcqn
+    autocmd Filetype markdown setlocal tw=78
     autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
     autocmd Filetype markdown onoremap <buffer> ah :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rg_vk0"<CR>
     autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
+    " Adds or Changes a header
     function! MarkdownChangeHeader(header_type)
         " Normalize cursor position
         if match(getline('.'), '^\(==\|--\)') ==# 0
             normal! k
         endif
-        " Remove the existing header.
+        " Remove any existing header.
         let cur_line = substitute(getline('.'), '^#\+\s*', '', '')
         if match(getline(line('.')+1), '^\(==\|--\)') ==# 0
             let header_line = line('.')
@@ -6388,8 +6360,10 @@ augroup filetype_markdown
         call setline('.', cur_line)
         if a:header_type ==# 1
             call append('.', repeat('=', strlen(cur_line)))
+            normal! 0j
         elseif a:header_type ==# 2
             call append('.', repeat('-', strlen(cur_line)))
+            normal! 0j
         else
             call setline('.', repeat('#', a:header_type).' '.cur_line)
         endif
@@ -6401,38 +6375,85 @@ augroup filetype_markdown
     " which selects all the text inside the current header (ignoring any child
     " headers). Then formatting could be easier because I could just do
     " 'gqih'.
-    " TODO: Make section movers [[/]] to move up/down by headers. These will
-    " just go to the first header they encounter. Make these maybe take a
-    " number argument? so 1[ would look for a 1 header, 2[ would look for a 2
-    " header etc...
-    function! MoveToHeader()
+    " TODO: There is a lot of refactoring which could be done here. I should
+    " also make this actually work in visual mode.
+    function! MoveToHeader(backwards)
         let save_view = winsaveview()
-        let header_lines = [0, 0, 0, 0, 0, 0]
+        if a:backwards
+            let header_lines = [0, 0, 0, 0, 0, 0]
+        else
+            let max_line = line('$')+1
+            let header_lines = [max_line, max_line, max_line, max_line, max_line, max_line]
+        endif
         let start_line = line('.')
 
-        if search('^==', 'bW')
+        let flags = 'W' . (a:backwards ? 'b' : '')
+        if search('^==', flags)
             let header_lines[0] = line('.') - 1
+            if header_lines[0] ==# start_line
+                let header_lines[0] = max_line
+                normal! jj
+                if search('^==', flags)
+                    let header_lines[0] = line('.') - 1
+                endif
+            endif
             call cursor(start_line, 1)
         endif
-        if search('^--', 'bW')
+        if search('^--', flags)
             let header_lines[1] = line('.') - 1
+            if header_lines[1] ==# start_line
+                let header_lines[1] = max_line
+                normal! jj
+                if search('^--', flags)
+                    let header_lines[1] = line('.') - 1
+                endif
+            endif
             call cursor(start_line, 1)
         endif
         for i in range(2,5)
-            if search('^'.repeat('#', i+1).'[^#]', 'bW')
+            if search('^'.repeat('#', i+1).'[^#]', flags)
                 let header_lines[i] = line('.')
                 call cursor(start_line, 1)
             endif
         endfor
+        echo header_lines
 
         call winrestview(save_view)
-        let closest_header = max(header_lines)
-        if closest_header
-            normal! m'
-            call cursor(closest_header, 1)
+        if a:backwards
+            let closest_header = max(header_lines)
+            if closest_header
+                normal! m'
+                call cursor(closest_header, 1)
+            endif
+        else
+            let closest_header = min(header_lines)
+            if closest_header <# max_line
+                normal! m'
+                call cursor(closest_header, 1)
+            endif
         endif
     endfunction
-    noremap [[ :call MoveToHeader()<CR>
+    autocmd Filetype markdown noremap <buffer> [[ :<C-u>call MoveToHeader(1)<CR>
+    autocmd Filetype markdown noremap <buffer> ]] :<C-u>call MoveToHeader(0)<CR>
+    autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
+
+    " Moves to a specific header
+    function! MoveToSpecificHeader(header_num, backwards)
+        let to_search = ''
+        if a:header_num ==# 1
+            let to_search = '^=='
+        elseif a:header_num ==# 2
+            let to_search = '^--'
+        else
+            let to_search = '^'.repeat('#', a:header_num).'[^#]'
+        endif
+        call search(to_search, 'Ws'.(a:backwards ? 'b' : ''))
+    endfunction
+    for i in range(1, 6)
+        execute "autocmd Filetype markdown noremap <buffer>".i."[[ :<C-u>call MoveToSpecificHeader(".i.", 1)<CR>"
+        execute "autocmd Filetype markdown noremap <buffer>".i."]] :<C-u>call MoveToSpecificHeader(".i.", 0)<CR>"
+    endfor
+
 augroup END
 
 " }}}
