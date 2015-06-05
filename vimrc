@@ -336,9 +336,9 @@ xmap <silent>a<leader>w <Plug>CamelCaseMotion_iw
 " 7. https://github.com/wellle/targets.vim and
 " http://www.reddit.com/r/vim/comments/1x7pfr/targetsvim_plugin_to_add_many_text_objects_in_the/ 
 
-" When visually selecting text that you want an operator to operate on, the
-" last selected text (that you do with the gv command) is changed. Is there
-" any way to stop that from happening?
+" When visually selecting text for a text object, the last selected text (that
+" you do with the gv command) is changed. Is there any way to stop that from
+" happening?
 
 " Seems like a way to grep on all buffers is with these 2 commands:
 " 1. call setqflist([]) - Clears the quickfix lists
@@ -5550,8 +5550,11 @@ nnoremap P P:keepjumps normal! `]<CR>
 nnoremap gp p:keepjumps normal! `[<CR>:silent! call repeat#set("gp", v:count)<CR>
 nnoremap gP P:keepjumps normal! `[<CR>:silent! call repeat#set("gP", v:count)<CR>
 
-" Reselect the last changed/yanked text
-nnoremap gV `[v`]
+" Reselect the last changed/yanked text. I also made gv and gV text objects
+" because it looks cool :).
+noremap gV :<C-u>normal! `[v`]<CR>
+vnoremap gV <NOP>
+onoremap gv :<C-u>normal! `<v`><CR>
 
 " This is easier to type than :j<CR>
 nnoremap <leader>J J
@@ -5785,7 +5788,6 @@ nnoremap <C-k> <C-w>k
 " <C-h> and <C-w> for switching between tabs.
 nnoremap gh <C-w>h
 nnoremap gl <C-w>l
-nnoremap <C-p> <C-w>p
 
 " Move and maximize a window
 nnoremap <C-w><C-h> <C-w>h<C-w><C-\|>
@@ -6208,21 +6210,51 @@ xnoremap <silent> ihd :<C-u>call TextObjHereDoc(0)<CR>
 onoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
 xnoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
 
-" Text object for a number. I decided to make this because I was editing some
-" css and had to change some numbers like: '100px'.
-function! TextObjNumber(visual_mode)
-    if search('\d\ze\($\|[^0-9]\)', 'ce') ==# 0
-        return 0
+" Text object for a decimal number. I decided to make this because I was
+" editing some css and had to change some numbers like: '100px' and the 'iw'
+" motion would change too much. TODO: Add visual mapping support.
+function! TextObjNumber(modifier, visual_mode)
+    let regex_last_digit_in_num = '\d\ze\($\|[^0-9]\)'
+    let regex_first_digit_in_num = '\(^\|[^0-9]\)\zs\d'
+    if a:modifier !=# 'l'
+        let first_flag = 'e'
+        let second_flag = 'b'
+        let first_regex = regex_last_digit_in_num
+        let second_regex = regex_first_digit_in_num
+    else
+        let first_flag = 'b'
+        let second_flag = 'e'
+        let first_regex = regex_first_digit_in_num
+        let second_regex = regex_last_digit_in_num
     endif
-    let end_pos = getpos('.')
-    call search('\(^\|[^0-9]\)\zs\d', 'cb')
-    execute 'normal! '(a:visual_mode ? 'g':'').'v'
-    call cursor(end_pos[1], end_pos[2])
-    let cmd = v:operator.'id'.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
+
+    if a:modifier ==# 'l'
+        let save_unnamed_register = @@
+        normal! yl
+        if match(@@, '\d') !=# -1
+            call search(first_regex, 'c'.first_flag)
+        endif
+        call search(first_regex, first_flag)
+        let @@ = save_unnamed_register
+    else
+        call search(first_regex, 'c'.first_flag)
+        if a:modifier ==# 'n'
+            call search(first_regex, first_flag)
+        endif
+    endif
+    let first_pos = getpos('.')
+    call search(second_regex, 'c'.second_flag)
+
+    execute 'normal! v'
+    call cursor(first_pos[1], first_pos[2])
+    let cmd = v:operator.'i'.a:modifier.'d'.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
     silent! call repeat#set(cmd, v:count)
 endfunction
-onoremap <silent> id :<C-u> call TextObjNumber(0)<CR>
-xnoremap <silent> id :<C-u> call TextObjNumber(1)<CR>
+"hi 123 are 000 cool 899
+for i in ['', 'n', 'l']
+    execute "onoremap <silent> i".i."d :<C-u> call TextObjNumber('".i."', 0)<CR>"
+    execute "xnoremap <silent> i".i."d :<C-u> call TextObjNumber('".i."', 1)<CR>"
+endfor
 
 " }}}
 
@@ -6342,41 +6374,87 @@ augroup filetype_markdown
     autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
     autocmd Filetype markdown onoremap <buffer> ah :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rg_vk0"<CR>
     autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
-    " Adds or Changes a header
-    function! MarkdownChangeHeader(header_type)
-        " Normalize cursor position
-        if match(getline('.'), '^\(==\|--\)') ==# 0
+    function! GetMarkdownHeaderRegex(header_num)
+        let regex = '^'
+        if a:header_num ==# 1
+            let regex .= '=='
+        elseif a:header_num ==# 2
+            let regex .= '--'
+        else
+            let regex .= repeat('#', a:header_num).'[^#]'
+        endif
+        return regex
+    endfunction
+    " Returns a value depending on if the passed line number is on a header:
+    " - 0 if not on header
+    " - 1 if on 3-4 the header text
+    " - 2 if on 1-2 header text
+    " - 3 if on the header markers ('=' and '-') for 1 and 2 headers
+    function! OnMarkdownHeaderText(line_num)
+        let cur_line = getline(a:line_num)
+        let next_line = getline(a:line_num+1)
+        for i in range(1, 6)
+            let regex = GetMarkdownHeaderRegex(i)
+            if i ==# 1 || i ==# 2
+                if match(cur_line, regex) !=# -1
+                    return 3
+                elseif match(next_line, regex) !=# -1
+                    return 2
+                endif
+            elseif match(cur_line, regex) !=# -1
+                return 1
+            endif
+        endfor
+        return 0
+    endfunction
+    " Searches for the next markdown header of the specified number.
+    function! SearchMarkdownHeader(header_number, flags)
+        if OnMarkdownHeaderText(line('.')) ==# 2
+            normal! j
+        endif
+        let ret = search(GetMarkdownHeaderRegex(a:header_number), a:flags)
+        if a:header_number ==# 1 || a:header_number ==# 2
             normal! k
         endif
-        " Remove any existing header.
-        let cur_line = substitute(getline('.'), '^#\+\s*', '', '')
-        if match(getline(line('.')+1), '^\(==\|--\)') ==# 0
+        return ret
+    endfunction
+    " Adds or Changes a header
+    function! MarkdownChangeHeader(header_num)
+        let which_header = OnMarkdownHeaderText(line('.'))
+        " Remove existing header
+        if which_header ==# 2 || which_header ==# 3
+            if which_header ==# 3
+                normal! k
+            endif
             let header_line = line('.')
             normal! jdd
             if line('.') !=# header_line
                 normal! k
             endif
+        else
+            call setline('.', substitute(getline('.'), '^#\+\s*', '', ''))
         endif
-        call setline('.', cur_line)
-        if a:header_type ==# 1
+
+        " Create new header
+        let cur_line = getline('.')
+        if a:header_num ==# 1
             call append('.', repeat('=', strlen(cur_line)))
             normal! 0j
-        elseif a:header_type ==# 2
+        elseif a:header_num ==# 2
             call append('.', repeat('-', strlen(cur_line)))
             normal! 0j
         else
-            call setline('.', repeat('#', a:header_type).' '.cur_line)
+            call setline('.', repeat('#', a:header_num).' '.cur_line)
         endif
     endfunction
     for i in range(1,6)
-        execute 'autocmd Filetype markdown nnoremap <buffer> <localleader>'.i.' :call MarkdownChangeHeader('.i.')<CR>:silent! call repeat#set("\<localleader>'.i.'", v:count)<CR>'
+        execute 'autocmd Filetype markdown nnoremap <silent><buffer> <localleader>'.i.' :call MarkdownChangeHeader('.i.')<CR>:silent! call repeat#set("\<localleader>'.i.'", v:count)<CR>'
     endfor
     " TODO: Make an operator pending mode mapping called 'ih' (inner header)
     " which selects all the text inside the current header (ignoring any child
     " headers). Then formatting could be easier because I could just do
     " 'gqih'.
-    " TODO: There is a lot of refactoring which could be done here. I should
-    " also make this actually work in visual mode.
+    " TODO: I should also make this actually work in visual mode.
     function! MoveToHeader(backwards)
         let save_view = winsaveview()
         if a:backwards
@@ -6388,35 +6466,12 @@ augroup filetype_markdown
         let start_line = line('.')
 
         let flags = 'W' . (a:backwards ? 'b' : '')
-        if search('^==', flags)
-            let header_lines[0] = line('.') - 1
-            if header_lines[0] ==# start_line
-                let header_lines[0] = max_line
-                normal! jj
-                if search('^==', flags)
-                    let header_lines[0] = line('.') - 1
-                endif
-            endif
-            call cursor(start_line, 1)
-        endif
-        if search('^--', flags)
-            let header_lines[1] = line('.') - 1
-            if header_lines[1] ==# start_line
-                let header_lines[1] = max_line
-                normal! jj
-                if search('^--', flags)
-                    let header_lines[1] = line('.') - 1
-                endif
-            endif
-            call cursor(start_line, 1)
-        endif
-        for i in range(2,5)
-            if search('^'.repeat('#', i+1).'[^#]', flags)
+        for i in range(1, 6)
+            if SearchMarkdownHeader(i, flags)
                 let header_lines[i] = line('.')
-                call cursor(start_line, 1)
             endif
+            call cursor(save_view['lnum'], 1)
         endfor
-        echo header_lines
 
         call winrestview(save_view)
         if a:backwards
@@ -6433,25 +6488,17 @@ augroup filetype_markdown
             endif
         endif
     endfunction
-    autocmd Filetype markdown noremap <buffer> [[ :<C-u>call MoveToHeader(1)<CR>
-    autocmd Filetype markdown noremap <buffer> ]] :<C-u>call MoveToHeader(0)<CR>
+    autocmd Filetype markdown noremap <silent><buffer> [[ :<C-u>call MoveToHeader(1)<CR>
+    autocmd Filetype markdown noremap <silent><buffer> ]] :<C-u>call MoveToHeader(0)<CR>
     autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
 
     " Moves to a specific header
     function! MoveToSpecificHeader(header_num, backwards)
-        let to_search = ''
-        if a:header_num ==# 1
-            let to_search = '^=='
-        elseif a:header_num ==# 2
-            let to_search = '^--'
-        else
-            let to_search = '^'.repeat('#', a:header_num).'[^#]'
-        endif
-        call search(to_search, 'Ws'.(a:backwards ? 'b' : ''))
+        call SearchMarkdownHeader(a:header_num, 'Ws'.(a:backwards ? 'b' : ''))
     endfunction
     for i in range(1, 6)
-        execute "autocmd Filetype markdown noremap <buffer>".i."[[ :<C-u>call MoveToSpecificHeader(".i.", 1)<CR>"
-        execute "autocmd Filetype markdown noremap <buffer>".i."]] :<C-u>call MoveToSpecificHeader(".i.", 0)<CR>"
+        execute "autocmd Filetype markdown noremap <silent><buffer>".i."[[ :<C-u>call MoveToSpecificHeader(".i.", 1)<CR>"
+        execute "autocmd Filetype markdown noremap <silent><buffer>".i."]] :<C-u>call MoveToSpecificHeader(".i.", 0)<CR>"
     endfor
 
 augroup END
