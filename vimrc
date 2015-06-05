@@ -126,7 +126,7 @@ set laststatus=2
 " Configure the status line
 set statusline=
 set statusline+=[%n]      " Buffer number
-set statusline+=\ [%<%F]  " Absolute file path
+set statusline+=\ [%<%f]  " Current file
 set statusline+=\ %m      " Modified flag
 set statusline+=\ %y      " File type
 set statusline+=\ %{&ff}  " File format
