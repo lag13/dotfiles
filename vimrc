@@ -277,10 +277,11 @@ elseif &term ==# 'win32'
     set nocursorline
 elseif has('unix')
     let uname = system('echo -n "$(uname -s)"')
+    set background=light
     if uname !=# "Darwin"
         let g:solarized_termcolors = 256
+        set background=dark
     endif
-    set background=dark
     silent! colorscheme solarized
 endif
 
@@ -307,7 +308,7 @@ augroup general_autocommands
     " Saw this on http://www.bestofvim.com/ (wish there was more on that
     " site...) and thought I'd try it out. So now, whenever I save a vim
     " file, it will automatically source it for me.
-    autocmd BufWritePost *.vim,*vimrc* source %
+    " autocmd BufWritePost *.vim,*vimrc* source %
 augroup END
 
 " }}}
@@ -326,15 +327,31 @@ xmap <silent>a<leader>w <Plug>CamelCaseMotion_iw
 
 " }}}
 
-" Checkout:
+" Plugins To Checkout:
 " 1. Viewing man pages inside of vim
-" 2. ctags
-" 3. NERDtree
+" 2. ctags - Tags
+" 3. NERDtree or vinegar - File explorer
 " 4. clang complete for autocompleting C/C++ code
 " 5. paredit http://danmidwood.com/content/2014/11/21/animated-paredit.html.
 " 6. https://github.com/tpope/vim-eunuch, seems to have some useful stuff
-" 7. https://github.com/wellle/targets.vim and
-" http://www.reddit.com/r/vim/comments/1x7pfr/targetsvim_plugin_to_add_many_text_objects_in_the/ 
+" 7. https://github.com/jeetsukumaran/vim-indentwise - Moving between different indent levels
+" 8. https://github.com/tpope/vim-unimpaired - Many mappings starting with '['
+" for moving around different lists.
+" 9. http://vimawesome.com/plugin/youcompleteme - Code completion
+" 10. http://vimawesome.com/plugin/ultisnips-forever-and-always - Snippets
+" 11. http://vimawesome.com/plugin/syntastic - Syntax checking
+" 12. http://vimawesome.com/plugin/vim-sneak - Searching on 2 letters
+" 13. https://github.com/kien/ctrlp.vim/issues/280 - Delete buffers with ctrlp 
+" 14. https://github.com/junegunn/vim-easy-align - Aligning text 
+" 15. https://github.com/sjl/gundo.vim - Undo tree. I think it requires python
+" to run and the vim version must be 7.3, maybe I'll try making my own version
+" in just vimscript.
+" 16. https://github.com/tommcdo/vim-exchange - Swap regions of text. There is
+" also a vimcast about this one!
+" 17. https://github.com/nelstrom/vim-cutlass - Addressing the issues of vim's
+" registers, unfortunately it is not written... but! I could definitely
+" implement some of his ideas. There is also a plugin already out there which
+" he mentions: https://github.com/svermeulen/vim-easyclip
 
 " When visually selecting text for a text object, the last selected text (that
 " you do with the gv command) is changed. Is there any way to stop that from
@@ -6212,41 +6229,22 @@ xnoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
 
 " Text object for a decimal number. I decided to make this because I was
 " editing some css and had to change some numbers like: '100px' and the 'iw'
-" motion would change too much. TODO: Add visual mapping support.
+" motion would change too much. TODO: Consider making the visual mappings
+" expand the visual region instead of highlighting just the number.
 function! TextObjNumber(modifier, visual_mode)
-    let regex_last_digit_in_num = '\d\ze\($\|[^0-9]\)'
-    let regex_first_digit_in_num = '\(^\|[^0-9]\)\zs\d'
-    if a:modifier !=# 'l'
-        let first_flag = 'e'
-        let second_flag = 'b'
-        let first_regex = regex_last_digit_in_num
-        let second_regex = regex_first_digit_in_num
-    else
-        let first_flag = 'b'
-        let second_flag = 'e'
-        let first_regex = regex_first_digit_in_num
-        let second_regex = regex_last_digit_in_num
-    endif
-
+    let regex = '\d\+'
     if a:modifier ==# 'l'
-        let save_unnamed_register = @@
-        normal! yl
-        if match(@@, '\d') !=# -1
-            call search(first_regex, 'c'.first_flag)
-        endif
-        call search(first_regex, first_flag)
-        let @@ = save_unnamed_register
+        call search(regex, 'be')
     else
-        call search(first_regex, 'c'.first_flag)
+        call search(regex, 'ce')
         if a:modifier ==# 'n'
-            call search(first_regex, first_flag)
+            call search(regex, 'e')
         endif
     endif
-    let first_pos = getpos('.')
-    call search(second_regex, 'c'.second_flag)
-
-    execute 'normal! v'
-    call cursor(first_pos[1], first_pos[2])
+    let num_boundary = getpos('.')
+    call search(regex, 'bc')
+    normal! v
+    call cursor(num_boundary[1], num_boundary[2])
     let cmd = v:operator.'i'.a:modifier.'d'.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
     silent! call repeat#set(cmd, v:count)
 endfunction
@@ -6488,6 +6486,7 @@ augroup filetype_markdown
             endif
         endif
     endfunction
+    " TODO: Make these work with a count, so 3[[ will move us 3 headers back.
     autocmd Filetype markdown noremap <silent><buffer> [[ :<C-u>call MoveToHeader(1)<CR>
     autocmd Filetype markdown noremap <silent><buffer> ]] :<C-u>call MoveToHeader(0)<CR>
     autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
@@ -6497,8 +6496,8 @@ augroup filetype_markdown
         call SearchMarkdownHeader(a:header_num, 'Ws'.(a:backwards ? 'b' : ''))
     endfunction
     for i in range(1, 6)
-        execute "autocmd Filetype markdown noremap <silent><buffer>".i."[[ :<C-u>call MoveToSpecificHeader(".i.", 1)<CR>"
-        execute "autocmd Filetype markdown noremap <silent><buffer>".i."]] :<C-u>call MoveToSpecificHeader(".i.", 0)<CR>"
+        execute "autocmd Filetype markdown noremap <silent><buffer>[".i." :<C-u>call MoveToSpecificHeader(".i.", 1)<CR>"
+        execute "autocmd Filetype markdown noremap <silent><buffer>]".i." :<C-u>call MoveToSpecificHeader(".i.", 0)<CR>"
     endfor
 
 augroup END
