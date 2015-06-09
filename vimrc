@@ -330,11 +330,10 @@ xmap <silent>a<leader>w <Plug>CamelCaseMotion_iw
 " Plugins To Checkout:
 " 1. Viewing man pages inside of vim
 " 2. ctags - Tags
-" 3. NERDtree or vinegar - File explorer
+" 3. NERDtree or vinegar or vimfiler -  File explorer
 " 4. clang complete for autocompleting C/C++ code
 " 5. paredit http://danmidwood.com/content/2014/11/21/animated-paredit.html.
 " 6. https://github.com/tpope/vim-eunuch, seems to have some useful stuff
-" 7. https://github.com/jeetsukumaran/vim-indentwise - Moving between different indent levels
 " 8. https://github.com/tpope/vim-unimpaired - Many mappings starting with '['
 " for moving around different lists.
 " 9. http://vimawesome.com/plugin/youcompleteme - Code completion
@@ -346,12 +345,14 @@ xmap <silent>a<leader>w <Plug>CamelCaseMotion_iw
 " 15. https://github.com/sjl/gundo.vim - Undo tree. I think it requires python
 " to run and the vim version must be 7.3, maybe I'll try making my own version
 " in just vimscript.
-" 16. https://github.com/tommcdo/vim-exchange - Swap regions of text. There is
 " also a vimcast about this one!
 " 17. https://github.com/nelstrom/vim-cutlass - Addressing the issues of vim's
 " registers, unfortunately it is not written... but! I could definitely
 " implement some of his ideas. There is also a plugin already out there which
 " he mentions: https://github.com/svermeulen/vim-easyclip
+" 18. https://github.com/Shougo/unite.vim - Possibley like ctrl-p but can be
+" used for other things.
+" 19. https://github.com/terryma/vim-multiple-cursors - Multiple cursors
 
 " When visually selecting text for a text object, the last selected text (that
 " you do with the gv command) is changed. Is there any way to stop that from
