@@ -28,3 +28,6 @@
 [submodule "bundle/exchange"]
 	path = bundle/exchange
 	url = https://github.com/tommcdo/vim-exchange.git
+[submodule "bundle/easy-align"]
+	path = bundle/easy-align
+	url = https://github.com/junegunn/vim-easy-align.git

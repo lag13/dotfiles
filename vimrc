@@ -315,18 +315,6 @@ augroup END
 
 " Plugin Related Configuration {{{
 
-" I like using 'I' and 'A' in visual block mode and I don't see myself really
-" using that functionality so I'm disabling it.
-let g:targets_aiAI = 'ai  '
-
-" These mappings make more sense to me for the CamelCaseMotion plugin.
-omap <silent>i<leader>w <Plug>CamelCaseMotion_ie
-xmap <silent>i<leader>w <Plug>CamelCaseMotion_ie
-omap <silent>a<leader>w <Plug>CamelCaseMotion_iw
-xmap <silent>a<leader>w <Plug>CamelCaseMotion_iw
-
-" }}}
-
 " Plugins To Checkout:
 " 1. Viewing man pages inside of vim
 " 2. ctags - Tags
@@ -353,6 +341,34 @@ xmap <silent>a<leader>w <Plug>CamelCaseMotion_iw
 " 18. https://github.com/Shougo/unite.vim - Possibley like ctrl-p but can be
 " used for other things.
 " 19. https://github.com/terryma/vim-multiple-cursors - Multiple cursors
+" 20. https://github.com/AndrewRadev/switch.vim - Similar to my 'flip' series
+" of commands. I was reading through the github page and one thing I was kind
+" of bummed about was that the cursor has to be on the item being 'switched'
+" for it to work. I would like it it seek for the next thing that could be
+" switched. It would be nice to be able to seek forward and backwards as well.
+
+" I like using 'I' and 'A' in visual block mode and I don't see myself really
+" using that functionality so I'm disabling it.
+let g:targets_aiAI = 'ai  '
+
+" These mappings make more sense to me for the CamelCaseMotion plugin.
+omap <silent>i<leader>w <Plug>CamelCaseMotion_ie
+xmap <silent>i<leader>w <Plug>CamelCaseMotion_ie
+omap <silent>a<leader>w <Plug>CamelCaseMotion_iw
+xmap <silent>a<leader>w <Plug>CamelCaseMotion_iw
+
+" Start interactive EasyAlign in visual mode
+xmap ga <Plug>(EasyAlign)
+" Start interactive EasyAlign for a motion/text object
+nmap ga <Plug>(EasyAlign)
+let g:easy_align_delimiters = {
+            \ '>': {
+            \ 'pattern':      '=>\|->',
+            \ 'left_margin':  0,
+            \ 'right_margin': 0 },
+            \ }
+
+" }}}
 
 " When visually selecting text for a text object, the last selected text (that
 " you do with the gv command) is changed. Is there any way to stop that from
@@ -5979,45 +5995,25 @@ noremap! <C-l> <C-r><C-r>0
 
 " Visual Mappings {{{
 
-" Writing a bit of code to align a bunch of assignments nicely. There is
-" already a plugin called 'Tabular' that accomplishes this (and a lot more)
-" but I wanted to try my hand at it.
-function! AlignAssignment(str_to_align_on) range
-    " Finds the longest l-value (i.e thing that is being assigned)
-    "let regex = '[^' . a:str_to_align_on . ']*' . a:str_to_align_on
-    let longest_lval_str = 0
-    for line_no in range(a:firstline, a:lastline)
-        let lval_str_len = match(getline(line_no), a:str_to_align_on) + 1
-        " let lval_str_len = len(matchstr(getline(line_no), regex))
-        if lval_str_len > longest_lval_str
-            let longest_lval_str = lval_str_len
-        endif
-    endfor
-    " Adds the appropriate padding to line everything up.
-    for line_no in range(a:firstline, a:lastline)
-        let lval_str = strpart(getline(line_no), 0, match(getline(line_no), a:str_to_align_on))
-        "let lval_str = matchstr(getline(line_no), regex)
-        if lval_str !=# ''
-            let padding = repeat(' ', longest_lval_str - len(lval_str) - 1)
-            let new_str = lval_str . padding . strpart(getline(line_no), len(lval_str))
-            call setline(line_no, new_str)
-        endif
-    endfor
-endfunction
-
 " Copied the code from visual star search plugin mentioned in 'Practical Vim'.
 " Now hitting * or # when visually selecting text will search for the visually
 " selected text.
-function! VGetSearch(cmdtype)
+function! VGetSearch(cmdtype, exact)
     let save_unnamed_register = @"
     normal! gvy
-    let search_pat = '\V' . substitute(escape(@", a:cmdtype . '\'), '\n', '\\n', 'g')
+    let search_pat = substitute(escape(@", a:cmdtype . '\'), '\n', '\\n', 'g')
+    if a:exact
+        let search_pat = '\V\<' . search_pat . '\>'
+    else
+        let search_pat = '\V' . search_pat
+    endif
     let @" = save_unnamed_register
     return search_pat
 endfunction
-" TODO: This doesn't seem to open up folds when searching. Why is this?
-xnoremap * :<C-u>execute 'normal! /' . VGetSearch('/') . "\r"<CR>
-xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>
+xnoremap * :<C-u>execute 'normal! /' . VGetSearch('/', 1) . "\r"<CR>zv
+xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?', 1) . "\r"<CR>zv
+xnoremap g* :<C-u>execute 'normal! /' . VGetSearch('/', 0) . "\r"<CR>zv
+xnoremap g# :<C-u>execute 'normal! ?' . VGetSearch('?', 0) . "\r"<CR>zv
 
 " In this video at 6:49: https://www.youtube.com/watch?v=zIOOLZJb87U he uses a
 " mapping where he visually selects some text and is prompted for a variable
