@@ -368,6 +368,16 @@ let g:easy_align_delimiters = {
             \ 'right_margin': 0 },
             \ }
 
+" I mapped ; to : so I gotta switch it up here.
+map : <Plug>SneakNext
+map ,, <Plug>SneakPrevious
+" Replace 'f' with 1-char Sneak
+map f <Plug>Sneak_f
+map F <Plug>Sneak_F
+" Replace 't' with 1-char Sneak
+map t <Plug>Sneak_t
+map T <Plug>Sneak_T
+
 " }}}
 
 " When visually selecting text for a text object, the last selected text (that
@@ -5539,10 +5549,6 @@ nnoremap <leader>lpm :call RunTranslatorMerge()<CR>
 " he do that'. But I've been thinking lately that it's not a bad idea. I
 " definitely use Ex commands more often than the ';' command.
 noremap ; :
-noremap : ;
-
-" ',' is my leader but I want to keep it's original functionality.
-noremap ,, ,
 
 " Move by screen lines rather than actual lines.
 noremap j gj
@@ -5866,23 +5872,6 @@ xnoremap q; q:
 " ' is easier to reach and it's nice for it to go to the exact spot.
 noremap ' `
 noremap ` '
-
-" TODO: Make a new mapping for 's' and 'S' which will just call the search()
-" function on the next two characters typed. Make this better, it will work in
-" visual mode and be repeatable maybe using the -, and + or maybe I can look
-" into temporarily remapping ; and ,? Both avenues are good to persue I
-" think.
-function! SearchTwo(direction)
-    let char1 = nr2char(getchar())
-    let char2 = nr2char(getchar())
-    call search('\V' . char1 . char2, 'sw' . a:direction)
-endfunction
-nnoremap <silent> s :call SearchTwo('')<CR>
-onoremap <silent> s :call SearchTwo('')<CR>
-"vnoremap <silent> s :<C-u>call SearchTwo('')<CR>
-nnoremap <silent> S :call SearchTwo('b')<CR>
-onoremap <silent> S :call SearchTwo('b')<CR>
-"vnoremap <silent> S :<C-u>call SearchTwo('b')<CR>
 
 nnoremap <silent><leader>gg :grep! -r '<C-r>/' *<CR>
 nnoremap <silent><leader>gf :grep! -r 'function <C-r>/' *<CR>
