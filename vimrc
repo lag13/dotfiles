@@ -121,6 +121,8 @@ set hlsearch
 set number
 " Close all folds when opening a file
 set foldlevelstart=0
+" Always show the tab line
+set showtabline=2
 " The status line will always appears in all windows
 set laststatus=2
 " Configure the status line
@@ -187,6 +189,9 @@ set lazyredraw
 set ttyfast
 " Toggle the 'paste' setting.
 set pastetoggle=<F10>
+" Only create swap files in my home directory. My pessimistic self still wants
+" to keep them around but all they've really done is cause slight annoyances.
+set directory=~/.vim
 
 " }}}
 
@@ -313,7 +318,7 @@ augroup END
 
 " }}}
 
-" Plugin Related Configuration {{{
+" Plugin Configuration {{{
 
 " Plugins To Checkout:
 " 1. Viewing man pages inside of vim
@@ -346,6 +351,15 @@ augroup END
 " of bummed about was that the cursor has to be on the item being 'switched'
 " for it to work. I would like it it seek for the next thing that could be
 " switched. It would be nice to be able to seek forward and backwards as well.
+" 21. https://github.com/justinmk/vim-ipmotion - Configure { and } do behave a
+" bit more intelligently. Seems like a nice little plugin.
+
+" I want to keep the sneak mappings all as 's', which isn't currenlty
+" happening because of the surround plugin. I'm planning on using the 's'
+" mappings with sneak so I gotta find new mappings for surround. Here are some
+" characters which could possibly used: g m o p q r u x z C M O P Q R U X Z.
+" I'm thinking of 'z' as a strong contender, but I want to find a nice
+" mnemonic if possible.
 
 " I like using 'I' and 'A' in visual block mode and I don't see myself really
 " using that functionality so I'm disabling it.
@@ -368,6 +382,8 @@ let g:easy_align_delimiters = {
             \ 'right_margin': 0 },
             \ }
 
+" TODO: Maybe a bug with sneak.vim? If I issue to 's' commands in a row, then
+" the second 's' command won't add to the jumplist.
 " I mapped ; to : so I gotta switch it up here.
 map : <Plug>SneakNext
 map ,, <Plug>SneakPrevious
@@ -379,6 +395,27 @@ map t <Plug>Sneak_t
 map T <Plug>Sneak_T
 
 " }}}
+
+" Learn more about netrw and what it can do.
+
+" Remove camel case plugin, I find I don't really use it enough to be worth
+" it.
+
+" Make <C-w> in command line mode (and maybe insert mode?) delete a '/'. That
+" way it will be easier to delete a filepath.
+
+" Change the headings on tabs to display the current directory for the active
+" file. Some quick research, see :help setting-tabline. 'tabline' is the text
+" that gets displayed across the ENTIRE tab page it uses the same format as
+" 'statusline'. 'showtabline' lets us display the tabline at all times if
+" desired. Use the function getcwd() to get the current directory, to put it
+" in the statusline we'd have to do something like this :set
+" tabline=%!getcwd()
+
+" Is there a text object to change a file name? Also could we have a text
+" object to change between the delimiters in g:targets_separators?
+
+" Command to only list modified buffers
 
 " When visually selecting text for a text object, the last selected text (that
 " you do with the gv command) is changed. Is there any way to stop that from
@@ -694,6 +731,13 @@ map T <Plug>Sneak_T
 " knowledge.
 
 " Luceo Stuff {{{
+
+" That would be really cool if, in the CDATA section of the xml files, I could
+" display the actual label associated with a node. This section wouldn't
+" actually be part of the file, it would just be displayed somehow.
+
+" Look into using the :keepalt command to edit files but not change the
+" alternate file.
 
 " Make an autocommand to run translator:generate everytime we save a
 " php.en.json file. On a similar note, look into what needs to be done so I
@@ -5634,16 +5678,25 @@ noremap <silent> <leader>D :call search('\v\d+\ze(\D\|$)', 'b', line('.'))<CR>
 nnoremap <leader>/ /\V
 nnoremap <leader>? ?\V
 
+" Trigger netrw
+nnoremap - :Explore<CR>
+
 " Sources the current file
 nnoremap <leader>sc :source <C-R>% \| nohlsearch<CR>
 " Sources .vimrc
-nnoremap <leader>sv :source $MYVIMRC \| nohlsearch<CR>
+nnoremap <leader>sV :source $MYVIMRC \| nohlsearch<CR>
 " Edits the .vimrc file in a vertical split.
-nnoremap <leader>ev :vsplit $MYVIMRC<CR>
+nnoremap <leader>eV :vsplit $MYVIMRC<CR>
 " Edits the .vimrc file.
 nnoremap <leader>ee :edit $MYVIMRC<CR>
 " Opens previous buffer in a vertical split
 nnoremap <leader>e# :leftabove vsplit #<CR>
+" Quickly open a file in the same directory as the current file:
+" http://vimcasts.org/episodes/the-edit-command/
+nnoremap <leader>ew :e <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <leader>es :sp <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <leader>ev :vsp <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <leader>et :tabe <C-R>=expand("%:p:h") . "/" <CR>
 
 " H now goes to the first non blank character on the current line.
 noremap H ^
@@ -5886,6 +5939,8 @@ nnoremap <leader>Gc :grep! -r 'class <C-r>/' *<LEFT>
 " Normally Y is a synonym for yy. I think this mapping is more logical because
 " D and C behave in this fashion.
 nnoremap Y y$
+" Yank the entire line characterwise
+nnoremap yY 0y$
 
 " Sometimes I just want to clear the line but keep the space it took up.
 nnoremap dD :call setline('.', '')<CR>
