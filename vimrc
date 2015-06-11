@@ -386,6 +386,18 @@ map F <Plug>Sneak_F
 map t <Plug>Sneak_t
 map T <Plug>Sneak_T
 
+" A bug with ctrlp? It says that <C-h> moves the cursor to the left but if
+" actually deletes characters.
+" When working on a client system, the root is 'bo.php'
+let g:ctrlp_root_markers = ['bo.php']
+" Still open a file inside of these sorts of windows
+let g:ctrlp_reuse_window = 'netrw\|help'
+" Follow symlinks
+let g:ctrlp_follow_symlinks = 1
+" g:ctrlp_custom_ignore - I think ctrlp doesn't show those files in the
+" results, but does it also increase speed when it initially indexes?
+" let g:ctrlp_custom_ignore = ''
+
 " }}}
 
 " Learn more about netrw and what it can do.
