@@ -378,6 +378,9 @@ let g:easy_align_delimiters = {
 
 " TODO: Maybe a bug with sneak.vim? If I issue to 's' commands in a row, then
 " the second 's' command won't add to the jumplist.
+" TODO: After doing f, F, t, or T ';' will continue 'sneaking' in the same
+" direction. Could we make it so ';' always goes forwards and ',' always
+" backwards?
 map ,, <Plug>SneakPrevious
 " Replace 'f' with 1-char Sneak
 map f <Plug>Sneak_f
@@ -388,17 +391,46 @@ map T <Plug>Sneak_T
 
 " A bug with ctrlp? It says that <C-h> moves the cursor to the left but if
 " actually deletes characters.
-" When working on a client system, the root is 'bo.php'
-let g:ctrlp_root_markers = ['bo.php']
+" Need to look into setting this, and what exactly I want ctrlp to do. I'm
+" kind of thinking that I want it to always search from the cwd but I'm
+" not sure.
+" let g:ctrlp_working_path_mode = 'rwa'
+" Client systems have a file named 'web' in the root directory
+let g:ctrlp_root_markers = ['web']
 " Still open a file inside of these sorts of windows
 let g:ctrlp_reuse_window = 'netrw\|help'
 " Follow symlinks
 let g:ctrlp_follow_symlinks = 1
-" g:ctrlp_custom_ignore - I think ctrlp doesn't show those files in the
-" results, but does it also increase speed when it initially indexes?
-" let g:ctrlp_custom_ignore = ''
+" Don't look through these fields when indexing/displaying results. TODO: If
+" I've already got a file in my bufferlist which should be ignored, will ctrlp
+" display it in the list?
+" I used this little bash script to inspect which directories had the most
+" files and set the variable accordingly.
+" #!/bin/bash
+" for i in *
+" do
+"     printf "%-10s" $i
+"     find -L "$i" -type f | wc -l
+" done
+let g:ctrlp_custom_ignore = 'vendor\|memcache\|symfony\|psframeworkfo\|tests\|Zen\|lib\|img'
+" Could using the find command index files faster?
+" let g:ctrlp_user_command = 'find %s -type f'
 
 " }}}
+
+" If I use :cd in a [No Name] buffer it seems it only cd's for that window
+" alone, so cd behaves like lcd. Look into this more. And actually right now
+" I'm cd'ing in a different window and the window on my vimrc buffer is
+" staying in the same cwd... What is going on there? I think that if I issue
+" an :lcd at any time in a window, then that window is no longer taken into
+" account when issuing :cd commands?
+
+" Make the % command ignore commented sections or strings. Look at the
+" easy-align plugin for how to do that.
+
+" Have a visual mapping or something where we can highlight a number and it
+" will tell you how many days, hours etc... make up the number (assuming the
+" number is seconds)
 
 " Learn more about netrw and what it can do.
 
@@ -5621,6 +5653,13 @@ onoremap K 2k
 " Quickly write a file
 nnoremap <leader>w :write<CR>
 
+" = is hard to type so I'm remapping it. 'go' doesn't seem immediately useful
+" and since it has a nice mnemonic, 'organize', I'm mapping it. I also remap
+" 'go' to 'gO' on the offhand chance I want to use it.
+nnoremap go =
+nnoremap goo ==
+nnoremap gO go
+
 " When you look at it more, pasting in vim is a little odd. For a
 " character-wise paste the cursor is placed at the end of the paste, which
 " makes sense to me, but for a line-wise paste the cursor is left at the start
@@ -5690,6 +5729,8 @@ nnoremap <leader>eV :vsplit $MYVIMRC<CR>
 nnoremap <leader>ee :edit $MYVIMRC<CR>
 " Opens previous buffer in a vertical split
 nnoremap <leader>e# :leftabove vsplit #<CR>
+" Opens previous buffer in a horizontal split
+nnoremap <leader>E# :split #<CR>
 " Quickly open a file in the same directory as the current file:
 " http://vimcasts.org/episodes/the-edit-command/
 nnoremap <leader>ew :e <C-R>=expand("%:p:h") . "/" <CR>
@@ -5954,7 +5995,7 @@ nnoremap <silent> <leader>O :call append(line('.')-1, '')<CR>
             \:silent! call repeat#set("\<leader>O", v:count)<CR>
 
 " Run the program given by the makeprg option
-nnoremap <silent><leader>m :w<CR>:make!<CR>
+nnoremap <silent><leader>r :w<CR>:make!<CR>
 
 " A function which opens up a file using the output of the 'tree' command. So
 " if I had this:
@@ -5976,7 +6017,7 @@ function! TreeGoToFile(open_tab_p)
     normal! $F─w
     let path = ''
     while line('.') !=# 1
-        normal! y$b
+        normal! yWb
         let path = @".'/'.path
         normal! yl
         while matchstr(@", '\w') ==# ''
@@ -6297,6 +6338,7 @@ endfor
 " }}}
 
 " Command Mappings {{{
+
 " These commands used to scroll the list up and down but did NOT filter the
 " list as the Up and Down keys would. So we remap them because I like that
 " behavior.
@@ -6321,7 +6363,7 @@ cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h') . '/' : '%%'
 
 " I envision that this command will set a bunch of options or define a bunch
 " of mappings to make it easier to create ascii art.
-command! -nargs=0 Ascii set virtualedit=all
+command! Ascii set virtualedit=all
 
 " Whenever I needed to figure out what some piece of code did, I'd ususally do
 " some code diving, keeping all the pertinent files in active buffers. Then I
@@ -6374,7 +6416,10 @@ endfunction
 command! -nargs=* PutBuffers call WriteActiveBuffers(<f-args>)
 
 " Command to remove any lines with trailing whitespace
-command! -nargs=0 ClearTrailingWhitespace %substitute/\s*$//
+command! ClearTrailingWhitespace %substitute/\s*$//
+
+" Command to count the occurrences of the current search term
+command! SearchCount %substitute///gn
 
 " }}}
 
@@ -6547,6 +6592,7 @@ augroup END
 " Bash File Settings {{{
 augroup filetype_sh
     autocmd!
+    autocmd FileType bash setlocal commentstring=#\ %s
     " Create a command to type out a variable so it adds the dollar sign and
     " quotes and other things for us. Maybe I could even have a separate
     " command to type an array so I don't have to bother with those [] chars.
