@@ -365,12 +365,6 @@ augroup END
 " using that functionality so I'm disabling it.
 let g:targets_aiAI = 'ai  '
 
-" These mappings make more sense to me for the CamelCaseMotion plugin.
-omap <silent>i<leader>w <Plug>CamelCaseMotion_ie
-xmap <silent>i<leader>w <Plug>CamelCaseMotion_ie
-omap <silent>a<leader>w <Plug>CamelCaseMotion_iw
-xmap <silent>a<leader>w <Plug>CamelCaseMotion_iw
-
 " Start interactive EasyAlign in visual mode
 xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object
@@ -384,8 +378,6 @@ let g:easy_align_delimiters = {
 
 " TODO: Maybe a bug with sneak.vim? If I issue to 's' commands in a row, then
 " the second 's' command won't add to the jumplist.
-" I mapped ; to : so I gotta switch it up here.
-map : <Plug>SneakNext
 map ,, <Plug>SneakPrevious
 " Replace 'f' with 1-char Sneak
 map f <Plug>Sneak_f
@@ -397,9 +389,6 @@ map T <Plug>Sneak_T
 " }}}
 
 " Learn more about netrw and what it can do.
-
-" Remove camel case plugin, I find I don't really use it enough to be worth
-" it.
 
 " Make <C-w> in command line mode (and maybe insert mode?) delete a '/'. That
 " way it will be easier to delete a filepath.
@@ -5589,11 +5578,6 @@ nnoremap <leader>lpm :call RunTranslatorMerge()<CR>
 
 " Normal Mappings {{{
 
-" I remember seeing this mapping on a vim talk and thinking 'What?!? How dare
-" he do that'. But I've been thinking lately that it's not a bad idea. I
-" definitely use Ex commands more often than the ';' command.
-noremap ; :
-
 " Move by screen lines rather than actual lines.
 noremap j gj
 noremap k gk
@@ -5621,6 +5605,9 @@ noremap K gkgkgkgk
 " eyeball.
 onoremap J 2j
 onoremap K 2k
+
+" Quickly write a file
+nnoremap <leader>w :write<CR>
 
 " When you look at it more, pasting in vim is a little odd. For a
 " character-wise paste the cursor is placed at the end of the paste, which
@@ -5684,7 +5671,7 @@ nnoremap - :Explore<CR>
 " Sources the current file
 nnoremap <leader>sc :source <C-R>% \| nohlsearch<CR>
 " Sources .vimrc
-nnoremap <leader>sV :source $MYVIMRC \| nohlsearch<CR>
+nnoremap <leader>sv :source $MYVIMRC \| nohlsearch<CR>
 " Edits the .vimrc file in a vertical split.
 nnoremap <leader>eV :vsplit $MYVIMRC<CR>
 " Edits the .vimrc file.
