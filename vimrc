@@ -299,21 +299,34 @@ augroup general_autocommands
     " Makes it so I'll be able to see what text I was editing previously even if
     " it was inside a fold.
     autocmd VimEnter * normal! zv
+
+    " Typically filetype detection happens on the BufNewFile and BufRead
+    " autocommand events, but for bash scripts this isn't good enough because
+    " my bash files usually have no extension. Vim can detect the bash file
+    " type just fine on it's own so I added this autocommand on the BufWrite
+    " event to re-run :filetype detect if the filetype isn't already set.
+    function! DetectScriptFileType()
+        if !did_filetype()
+            filetype detect
+        endif
+    endfunction
+    autocmd BufWrite * call DetectScriptFileType()
+    " Reload file automatically when a file's mode is changed. This is used
+    " so when I make files exectuable within vim I won't get that prompt about
+    " the file changing.
+    autocmd FileChangedShell * if v:fcs_reason ==# 'mode' | let v:fcs_choice = 'reload' | endif
     " Normally, when you execute a :source command it will re-highlight the
     " current search item, assuming that 'hlsearch' is turned on. I don't like
     " this. Originally I thought this autocommand would solve my problem:
-
-    " autocmd SourceCmd * nohlsearch
-
+    "     autocmd SourceCmd * nohlsearch
     " But it turns out that SourceCmd is a special event called a Cmd-event.
     " According to the documentation, if I define an autocommand using this
     " event it is expected that my autocommand will do all the sourcing
-    " functionality. So this definitely does not work.
-
-    " Saw this on http://www.bestofvim.com/ (wish there was more on that
-    " site...) and thought I'd try it out. So now, whenever I save a vim
-    " file, it will automatically source it for me.
-    " autocmd BufWritePost *.vim,*vimrc* source %
+    " functionality. So this definitely does not work. Saw this on
+    " http://www.bestofvim.com/ (wish there was more on that site...) and
+    " thought I'd try it out. So now, whenever I save a vim file, it will
+    " automatically source it for me. autocmd BufWritePost *.vim,*vimrc*
+    " source %
 augroup END
 
 " }}}
@@ -412,11 +425,26 @@ let g:ctrlp_follow_symlinks = 1
 "     printf "%-10s" $i
 "     find -L "$i" -type f | wc -l
 " done
-let g:ctrlp_custom_ignore = 'vendor\|memcache\|symfony\|psframeworkfo\|tests\|Zen\|lib\|img'
+let g:ctrlp_custom_ignore = 'vendor\|lib\|img'
 " Could using the find command index files faster?
 " let g:ctrlp_user_command = 'find %s -type f'
+" TODO: Consider activating the search on filename when looking through
+" buffers rather than the full path, that would narrow down searches quicker.
+nnoremap <leader>b :CtrlPBuffer<CR>
+nnoremap <leader>m :CtrlPMRUFiles<CR>
 
 " }}}
+
+" Customize netrw to delete the buffer associated with a file when deleting a
+" file.
+
+" TODO: I'm thinking about adding a list of buffers at the top of vim. The
+" comments of this reddit post had a plugin which does JUST that, look into
+" it. In preparation I've already made the <C-l> and <C-h> commands switch
+" between buffers when there are no tabs open.
+" http://www.reddit.com/r/vim/comments/382v6q/my_experience_switching_to_buffers/
+
+" Have a visual command to select run the selected text as an Ex command
 
 " If I use :cd in a [No Name] buffer it seems it only cd's for that window
 " alone, so cd behaves like lcd. Look into this more. And actually right now
@@ -5657,6 +5685,7 @@ nnoremap <leader>w :write<CR>
 " and since it has a nice mnemonic, 'organize', I'm mapping it. I also remap
 " 'go' to 'gO' on the offhand chance I want to use it.
 nnoremap go =
+xnoremap go =
 nnoremap goo ==
 nnoremap gO go
 
@@ -5936,9 +5965,24 @@ nnoremap <C-w>j <C-w>J
 nnoremap <C-w>k <C-w>K
 nnoremap <C-w>l <C-w>L
 
-" The gt and gT commands aren't very convenient for switching between tabs.
-nnoremap <C-h> gT
-nnoremap <C-l> gt
+" Switch between tabs if there are multiple and otherwise buffers
+function! SwitchTabsOrBuffers(next)
+    if tabpagenr('$') ==# 1
+        if a:next
+            bnext
+        else
+            bprevious
+        endif
+    else
+        if a:next
+            tabnext
+        else
+            tabprevious
+        endif
+    endif
+endfunction
+nnoremap <C-h> :call SwitchTabsOrBuffers(0)<CR>
+nnoremap <C-l> :call SwitchTabsOrBuffers(1)<CR>
 
 " <CR> already does + so lets make <BS> do the opposite
 nnoremap <BS> -
@@ -6421,6 +6465,10 @@ command! ClearTrailingWhitespace %substitute/\s*$//
 " Command to count the occurrences of the current search term
 command! SearchCount %substitute///gn
 
+" Command to make file executable.
+command! Exeggcute :!chmod u+x %
+command! Exeggutor :!chmod u-x %
+
 " }}}
 
 " Insert Abbreviations {{{
@@ -6592,7 +6640,7 @@ augroup END
 " Bash File Settings {{{
 augroup filetype_sh
     autocmd!
-    autocmd FileType bash setlocal commentstring=#\ %s
+    autocmd FileType sh setlocal makeprg=%:p
     " Create a command to type out a variable so it adds the dollar sign and
     " quotes and other things for us. Maybe I could even have a separate
     " command to type an array so I don't have to bother with those [] chars.
