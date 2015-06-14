@@ -92,7 +92,6 @@ set hidden
 " Let backspace behave 'normally'.
 set backspace=indent,eol,start
 " Can't live without it.
-set showmode
 set ttimeoutlen=30
 set modelines=0
 " Tabs will appear 4 spaces wide.
@@ -134,9 +133,6 @@ set statusline+=\ %y      " File type
 set statusline+=\ %{&ff}  " File format
 set statusline+=\ %l/%L   " Current line num out of total
 set statusline+=\ %P      " Top/Bottom and percentage through file
-" Characters which are used to fill empty space in the status line,
-" vertical/horizontal separators, and folded lines
-set fillchars=vert:\|,fold:-,stl:\ 
 " TODO: look into setting the 'title' option.
 " Memory is cheap, let's bump up the amount recorded commands.
 set history=500
@@ -145,12 +141,6 @@ set history=500
 set wildmenu
 set wildmode=list:full
 set wildignore=""
-" Briefly jump to matching paren, bracket... when it's closing character is
-" inserted. TODO: It seems that when this is enabled vim will beep if we
-" insert an unmatched item. Look into this.
-set showmatch
-" How quickly in tenths of a second the 'showmatch' jump happens.
-set matchtime=2
 " Makes it so commands that move the cursor up and down (like gg and G) try to
 " retain the same column the cursor was originally in.
 set nostartofline
@@ -159,10 +149,10 @@ set wrap
 " Wrapped text will break on a character in 'breakat' rather than at the last
 " character that fits on screen.
 set linebreak
-" Character to display before each broken line.
+" Character to display before each wrapped line.
 set showbreak=...
-" When joining a line that ends in a '.', '?' and some others only insert one
-" space instead of two.
+" When joining a line that ends in a '.', '?' (and some others) only insert
+" one space instead of two.
 set nojoinspaces
 " Configure completion a bit. In particular, the menu will still show for one
 " match, and some information about where the matches are coming from will be
@@ -185,12 +175,13 @@ set lazyredraw
 " Saw it in Steve Losh's .vimrc file. From reading the help doc on this option
 " it says it 'Improves the smoothness of redrawing...' and 'Indicates a fast
 " terminal connection.' I'm not exactly sure how it works but I know I have a
-" fast terminal connection so enabling it shouldn't hurt.
+" fast terminal connection so enabling it shouldn't hurt and maybe help?
 set ttyfast
 " Toggle the 'paste' setting.
 set pastetoggle=<F10>
-" Only create swap files in my home directory. My pessimistic self still wants
-" to keep them around but all they've really done is cause slight annoyances.
+" Only create swap files in my home directory. In my experience swap files
+" have just been annoyances, but my pessimistic self still wants to keep them
+" around just in case something happens.
 set directory=~/.vim
 
 " }}}
@@ -202,7 +193,7 @@ set directory=~/.vim
 " (and still don't) so I never bothered to change it. But I have some friends
 " who use sublime and man does that editor look nice. It got me thinking about
 " altering vim's color scheme, just for a change of pace. This is what I now
-" know of colorscheme's in vim after trying to get the 'solarized' colorscheme
+" know of colorschemes in vim after trying to get the 'solarized' colorscheme
 " to work. 
 
 " The big reason that many graphical editors look so great is because they
@@ -215,26 +206,25 @@ set directory=~/.vim
 
 " At the moment, this what I understand about how terminal colors work. Almost
 " all terminal emulators are capable of displaying 16 different colors at the
-" same time. However, you can configure those 16 colors to be ANY color you
+" same time. However, you can configure those 16 colors to be ANY colors you
 " want. So in a sense, terminal emulators are capable of displaying any color,
 " but only 16 at the same time. Many terminals (probably most) are also
 " capable of displaying 256 colors simultaneously. This will, obviously, make
-" most colorschemes look nicer because there are more available colors. Unlike
-" the 16 base colors for the terminal, I don't believe you are capable of
-" remapping any of these 256 colors. The only web page I could find related to
-" this question was this page:
+" most colorschemes look nicer because there are more available colors. But
+" unlike the 16 base colors for the terminal, I don't believe you are capable
+" of remapping any of these 256 colors. The only web page I could find related
+" to this question was this page:
 " http://stackoverflow.com/questions/25296985/can-i-change-the-256-color-mappings-in-iterm2-or-terminal.
 " If the terminal supports 256 colors, I am currently unsure of how that
-" affects the 16 ansii colors. Do the 16 ansii colors get ignored and the same
-" set of 256 colors are always used (I don't think so)? Are the first 16
-" colors the ansii colors and the other 240 are always be the same (I could
-" see this being true)?
+" affects the 16 ansii colors. Do the 16 ansii colors get ignored completely(I
+" don't think so)? Are the first 16 colors out of 256 the ansii colors and the
+" other 240 are always be the same (I could see this being true)?
 
 " Now onto my setting up the 'solarized' colorscheme. This was a colorscheme
 " that kept popping up in my searches and it looked great. So imagine my
-" confusion when I ran ':colorscheme solarized' and my terminal looked
-" horrendous, it was very dissapointing. This is a nice ST answer I found
-" online regarding this problem and its solution:
+" confusion when, after installing, I ran ':colorscheme solarized' and my
+" terminal looked horrendous, it was very dissapointing. This is a nice answer
+" I found online regarding this problem and its solution:
 " http://superuser.com/questions/423709/vim-how-to-configure-solarized-colorscheme-in-konsole
 " In short, solarized will only 'look good' when you create a terminal theme
 " which defines the 16 ansii terminal colors exactly as specified in the
@@ -260,17 +250,17 @@ set directory=~/.vim
 " harder end of the spectrum, you have to download a new terminal theme along
 " with the colorscheme and whenever you want to use that new colorscheme,
 " you'll have to use the appropriate terminal theme. It's a bit of a pain but
-" that's the price you pay when you rely on another program for your display
-" capabilities.
+" I suppose that is the price you pay when you rely on another program for
+" your display capabilities.
 syntax enable
 
 if has('gui_running')
     set guifont=Courier_New:h10:cANSI
     " Make distance between lines as small as possible.
     set linespace=0
-    " Consider adding these to remove the menu and toolbar when running gvim
-    " set guioptions-=m
-    " set guioptions-=T
+    " No need for the menu or toolbar
+    set guioptions-=m
+    set guioptions-=T
     set background=dark
     colorscheme solarized
 elseif &term ==# 'win32'
@@ -311,22 +301,8 @@ augroup general_autocommands
         endif
     endfunction
     autocmd BufWrite * call DetectScriptFileType()
-    " Reload file automatically when a file's mode is changed. This is used
-    " so when I make files exectuable within vim I won't get that prompt about
-    " the file changing.
+    " Reload file automatically when a file's mode is changed.
     autocmd FileChangedShell * if v:fcs_reason ==# 'mode' | let v:fcs_choice = 'reload' | endif
-    " Normally, when you execute a :source command it will re-highlight the
-    " current search item, assuming that 'hlsearch' is turned on. I don't like
-    " this. Originally I thought this autocommand would solve my problem:
-    "     autocmd SourceCmd * nohlsearch
-    " But it turns out that SourceCmd is a special event called a Cmd-event.
-    " According to the documentation, if I define an autocommand using this
-    " event it is expected that my autocommand will do all the sourcing
-    " functionality. So this definitely does not work. Saw this on
-    " http://www.bestofvim.com/ (wish there was more on that site...) and
-    " thought I'd try it out. So now, whenever I save a vim file, it will
-    " automatically source it for me. autocmd BufWritePost *.vim,*vimrc*
-    " source %
 augroup END
 
 " }}}
@@ -345,13 +321,10 @@ augroup END
 " 9. http://vimawesome.com/plugin/youcompleteme - Code completion
 " 10. http://vimawesome.com/plugin/ultisnips-forever-and-always - Snippets
 " 11. http://vimawesome.com/plugin/syntastic - Syntax checking
-" 12. http://vimawesome.com/plugin/vim-sneak - Searching on 2 letters
 " 13. https://github.com/kien/ctrlp.vim/issues/280 - Delete buffers with ctrlp 
-" 14. https://github.com/junegunn/vim-easy-align - Aligning text 
 " 15. https://github.com/sjl/gundo.vim - Undo tree. I think it requires python
 " to run and the vim version must be 7.3, maybe I'll try making my own version
 " in just vimscript.
-" also a vimcast about this one!
 " 17. https://github.com/nelstrom/vim-cutlass - Addressing the issues of vim's
 " registers, unfortunately it is not written... but! I could definitely
 " implement some of his ideas. There is also a plugin already out there which
@@ -362,9 +335,10 @@ augroup END
 " 20. https://github.com/AndrewRadev/switch.vim - Similar to my 'flip' series
 " of commands. I was reading through the github page and one thing I was kind
 " of bummed about was that the cursor has to be on the item being 'switched'
-" for it to work. I would like it it seek for the next thing that could be
+" for it to work. I would like it to seek for the next thing that could be
 " switched. It would be nice to be able to seek forward and backwards as well.
-" 21. https://github.com/justinmk/vim-ipmotion - Configure { and } do behave a
+" And have the ability to switch specific things.
+" 21. https://github.com/justinmk/vim-ipmotion - Configure { and } to behave a
 " bit more intelligently. Seems like a nice little plugin.
 
 " I want to keep the sneak mappings all as 's', which isn't currenlty
@@ -398,7 +372,7 @@ let g:easy_align_delimiters = {
 " TODO: After doing f, F, t, or T ';' will continue 'sneaking' in the same
 " direction. Could we make it so ';' always goes forwards and ',' always
 " backwards?
-map ,, <Plug>SneakPrevious
+map <SPACE> <Plug>SneakPrevious
 " Replace 'f' with 1-char Sneak
 map f <Plug>Sneak_f
 map F <Plug>Sneak_F
@@ -418,9 +392,8 @@ let g:ctrlp_root_markers = ['web']
 let g:ctrlp_reuse_window = 'netrw\|help'
 " Follow symlinks
 let g:ctrlp_follow_symlinks = 1
-" Don't look through these fields when indexing/displaying results. TODO: If
-" I've already got a file in my bufferlist which should be ignored, will ctrlp
-" display it in the list?
+" TODO: If I've already got a file in my bufferlist which should be ignored,
+" will ctrlp display it in the list?
 " I used this little bash script to inspect which directories had the most
 " files and set the variable accordingly.
 " #!/bin/bash
@@ -430,7 +403,7 @@ let g:ctrlp_follow_symlinks = 1
 "     find -L "$i" -type f | wc -l
 " done
 let g:ctrlp_custom_ignore = 'vendor\|lib\|img'
-" Could using the find command index files faster?
+" TODO: Could using the find command index files faster?
 " let g:ctrlp_user_command = 'find %s -type f'
 " TODO: Consider activating the search on filename when looking through
 " buffers rather than the full path, that would narrow down searches quicker.
@@ -439,8 +412,8 @@ nnoremap <leader>m :CtrlPMRUFiles<CR>
 
 " }}}
 
-" I should not be using 'make' and 'makeprg' to execute files. That piece of
-" functionality is meant to be used with the quickfix list in some manner.
+" I should probably not be using 'make' and 'makeprg' to execute files. That
+" piece of functionality is, I think, meant to be used with the quickfix list.
 
 " Customize netrw to delete the buffer associated with a file when deleting a
 " file.
@@ -5668,17 +5641,13 @@ noremap gk k
 " part of both lines.
 onoremap j j
 onoremap k k
-" Quickly scroll up and down the file. Sort of in between a 'j/k' and a
-" '<C-d>/<C-u>'. The original J command is sometimes useful but I don't use it
-" too often and I can easily just use :j[oin]<CR> or remap it. And I've almost
-" never used 'K', in fact, I'll usually hit it by accident and scream
-" profanities as I wait for the command to complete. Originally I had
-" these mappings as 4gj and 4gk respectively but they didn't always work right
-" on wrapped lines which I thought odd. This seems to work fine though.
+" Quickly scroll up and down the file. Originally I had these mappings as 4gj
+" and 4gk respectively but they didn't always work right on wrapped lines
+" which I thought odd. This seems to work fine though.
 noremap J gjgjgjgj
 noremap K gkgkgkgk
 " I've had to delete 3 lines before hence these mappings. The reason I don't
-" have these mappings delete 5 lines (which would match how they move in
+" have these mappings delete 4 lines (which would match how they move in
 " normal mode) is because I don't trust myself to actually look at 5 lines and
 " say 'hey there are 5 lines there to delete', but 3 lines I can definitely
 " eyeball.
@@ -5688,9 +5657,9 @@ onoremap K 2k
 " Quickly write a file
 nnoremap <leader>w :write<CR>
 
-" = is hard to type so I'm remapping it. 'go' doesn't seem immediately useful
-" and since it has a nice mnemonic, 'organize', I'm mapping it. I also remap
-" 'go' to 'gO' on the offhand chance I want to use it.
+" = is hard to type so I'm remapping it to 'go', which doesn't seem
+" immediately useful and has a nice mnemonic 'organize'. I also remapped 'go'
+" to 'gO' on the offhand chance I want to use it.
 nnoremap go =
 xnoremap go =
 nnoremap goo ==
@@ -5717,13 +5686,6 @@ onoremap gv :<C-u>normal! `<v`><CR>
 " This is easier to type than :j<CR>
 nnoremap <leader>J J
 vnoremap <leader>J J
-" So apparently \r in a substitute command will insert an actual newline:
-" http://stackoverflow.com/questions/71323/how-to-replace-a-character-for-a-newline-in-vim
-" Okay, this is super cool. The atom \%# in a search/substitution will match
-" the cursor position. So if I search for this '\%#\S*\zs\s*' then as I move
-" the cursor, all the space AFTER the current word I'm on will be highlighted.
-" Or, looking at there example, this highlights the current word that the
-" cursor is on: '\k*\%#\k*'. Damn that's cool.
 
 " Splits a line at the next occurrence of whitespace or at the cursor position
 " if there is no whitespace. So this essentially does the opposite of the J
@@ -5748,17 +5710,14 @@ nnoremap <leader>. .:keepjumps normal! `[<CR>
 noremap <silent> <leader>d :call search('\v\d+\ze(\D\|$)', '', line('.'))<CR>
 noremap <silent> <leader>D :call search('\v\d+\ze(\D\|$)', 'b', line('.'))<CR>
 
-" Mapping to do a literal search (except for the / and ? characters of course)
-nnoremap <leader>/ /\V
-nnoremap <leader>? ?\V
-
 " Trigger netrw
 nnoremap - :Explore<CR>
 
 " Sources the current file
-nnoremap <leader>sc :source <C-R>% \| nohlsearch<CR>
+nnoremap <leader>sc :source % \| nohlsearch<CR>
 " Sources .vimrc
 nnoremap <leader>sv :source $MYVIMRC \| nohlsearch<CR>
+
 " Edits the .vimrc file in a vertical split.
 nnoremap <leader>eV :vsplit $MYVIMRC<CR>
 " Edits the .vimrc file.
@@ -5835,9 +5794,10 @@ vnoremap <silent> zS :<C-u>call ResizeWindowOperator(visualmode(), 1)<CR>
 " I'll want to keep the parentheses aligned. If I replaced a 'voyagecare' with
 " whitespace and then just started Replace mode, the parentheses will stay
 " aligned (assuming that the new name isn't longer than voyagecare). This
-" probably wouldn't something terribly useful at all. If I wanted to keep the
-" parentheses aligned, I could just use a plugin like Tabular after changing
-" all the 'voyagecares'. But I thought this could be fun if anything else.
+" probably wouldn't be useful at all, just one of those things it would be
+" interesting to implement. If I really wanted to keep the parentheses
+" aligned, that job might be better handled by and aligning plugin like
+" easy-align. Maybe the only way to do this is with autocommands?
 function! ReplaceOperator(type)
     let start_pos = getpos("'[")
     let end_pos = getpos("']")
@@ -5856,31 +5816,15 @@ endfunction
 vnoremap <silent> gr r<SPACE>R
 
 " Create command to add a space before or after the cursor in insert mode.
-"
+
 " Could I make something that moves me 10 lines then 5 then 2... (as I
 " continue the command). Feel like that might be a quick way to get around
 " sometimes, you start off "coarse" but then get finer until you can just get
 " there with a couple of line movements. Could you even do a binary search
 " sort of thing??? Like you start in the middle and if no you can choose up or
 " down and the process repeats. That would be kind of cool.
-"
-" Make commands to jump to a function definition given the name.
 
-nnoremap <leader>co :copen<CR>
-nnoremap <leader>cc :cclose<CR>
-nnoremap <leader>cn :cnext<CR>
-nnoremap <leader>cp :cprevious<CR>
-
-" TODO: I'll have to look into that 'switch' plugin, which resides here:
-" https://github.com/AndrewRadev/switch.vim. That plugin is exactly what I was
-" trying to do with these 'flip' functions. I don't exactly know how it works
-" but I bet if I leave the cursor in one place and run the command, it will
-" keep switching the same item back and forth. If that is the case, one
-" thought I had for a modification is to have it keep track of where the last
-" switch was made and, if the second consecutive command after the first
-" switch is another switch, then switch the next furthest thing we can find.
-
-" Figure out how to make this work with the '.' command.
+" TODO: Configure this to work with the '.' command.
 " "Flips" a string to a different one
 function! FlipStr(str,flipped,flags)
     call search(a:str,a:flags)
@@ -5889,16 +5833,7 @@ endfunction
 nnoremap <leader>ft :call FlipStr("true", "false", "cW")<CR>
 nnoremap <leader>ff :call FlipStr("false", "true", "cW")<CR>
 
-" Mappings to switch between camelCase and snake_case. I got these substitutes
-" from the bottom of this page:
-" http://vim.wikia.com/wiki/Converting_variables_to_or_from_camel_case. I
-" modified the first one slightly and the second was left unchanged. In
-" particular I changed the flip camelCase one so that a string like this
-" 'clientID' would change to this 'client_id'. So consecutive capitals get put
-" in their own underscore section so to speak. I think it could use a little
-" improvement. For example maybe I want it to turn 'XMLisFun' into
-" 'xml_is_fun', but I'll do that another day.
-" Flips case between snake and camel
+" Mappings to switch between camelCase and snake_case.
 function! FlipCase()
     let save_unnamed_register = @"
     " I want this to work but it doesn't seem to. I wonder why...
@@ -5934,38 +5869,19 @@ function! FlipAccessModifier()
 endfunction
 nnoremap <silent><leader>fm :call FlipAccessModifier()<CR>
 
-" Unfortunately vim can't understand some key combinations like <C-=>. As a
-" workaround I'll just use <C-p> because it's close to '='.
-
-" TODO: Consider making some different mappings altogether. Turns out that
-" <C-w>w and <C-w>W cycle through the windows backwards and forwards. For most
-" cases those could remove the need for some of the <C-hjkl> mappings I've
-" made. There's also a <C-w>t and <C-w>b command to go to the top(lowest
-" numbered)/bottom(hightest numbered) window. And there's <C-w>r and <C-w>R
-" commands which switch a window with it's neighbor. Those might be better to
-" map than the <C-w><C-h> mappings I have now.
-
-" TODO: try to find another mapping to get the windows equal size.
-nnoremap <C-_> <C-w>_
-nnoremap <C-\> <C-w>\|
-" I don't think I ever need <C-c> when in normal mode. I guess we'll find out.
+" I don't think I ever needed <C-c> when in normal mode. I guess we'll find
+" out.
 nnoremap <C-c> <C-w>c
-" Quickly move between windows
+" Move between windows
+nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
-" This is a bit incosistent with the window movements but I wanted to the
-" <C-h> and <C-w> for switching between tabs.
-nnoremap gh <C-w>h
-nnoremap gl <C-w>l
-
+nnoremap <C-l> <C-w>l
 " Move and maximize a window
-nnoremap <C-w><C-h> <C-w>h<C-w><C-\|>
+nnoremap <C-w><C-h> <C-w>h<C-w><BAR>
 nnoremap <C-w><C-j> <C-w>j<C-w><C-_>
 nnoremap <C-w><C-k> <C-w>k<C-w><C-_>
-nnoremap <C-w><C-l> <C-w>l<C-w><C-\|>
-nnoremap <C-w><C-t> <C-w>t<C-w><C-_>
-nnoremap <C-w><C-b> <C-w>b<C-w><C-_>
-nnoremap <C-w><C-p> <C-w>p<C-w><C-_>
+nnoremap <C-w><C-l> <C-w>l<C-w><BAR>
 " Move the windows
 nnoremap <C-w>h <C-w>H
 nnoremap <C-w>j <C-w>J
@@ -5988,44 +5904,22 @@ function! SwitchTabsOrBuffers(next)
         endif
     endif
 endfunction
-nnoremap <C-h> :call SwitchTabsOrBuffers(0)<CR>
-nnoremap <C-l> :call SwitchTabsOrBuffers(1)<CR>
+nnoremap <silent> <C-p> :call SwitchTabsOrBuffers(0)<CR>
+nnoremap <silent> <C-n> :call SwitchTabsOrBuffers(1)<CR>
 
 " <CR> already does + so lets make <BS> do the opposite
 nnoremap <BS> -
-" % has always been a little too inconvenient for my taste.
-noremap <SPACE> %
-" Keep the redrawing screen functionality that <C-l> gives us. I tried to map
-" <C-m> but that seems like it might be connected somehow with <CR>?? I picked
-" <C-g> because I don't use it much and I couldn't find another readily
-" available ctrl mapping.
+" Keep the redrawing screen functionality that <C-l> gives us. I used <C-g>
+" because I don't really see the use for it.
 nnoremap <C-g> :nohlsearch<CR><C-l>
-
-" Puts the top of the paragraph at the top of the screen leaving the cursor
-" where it started.
-nnoremap z{ {jzt``
-" Puts the bottom of the paragraph at the bottom of the screen leaving the cursor
-" where it started.
-nnoremap z} }kzb``
-" TODO: Make the same mappings for z[[ and stuff like that.
 
 " Slightly easier to type and it wasn't being used!
 nnoremap q; q:
 xnoremap q; q:
 
-" ' is easier to reach and it's nice for it to go to the exact spot.
+" ' is easier to reach.
 noremap ' `
 noremap ` '
-
-nnoremap <silent><leader>gg :grep! -r '<C-r>/' *<CR>
-nnoremap <silent><leader>gf :grep! -r 'function <C-r>/' *<CR>
-nnoremap <silent><leader>gd :grep! -r 'define.*<C-r>/' *<CR>
-nnoremap <silent><leader>gc :grep! -r 'class <C-r>/' *<CR>
-
-nnoremap <leader>Gg :grep! -r '<C-r>/' *<LEFT>
-nnoremap <leader>Gf :grep! -r 'function <C-r>/' *<LEFT>
-nnoremap <leader>Gd :grep! -r 'define.*<C-r>/' *<LEFT>
-nnoremap <leader>Gc :grep! -r 'class <C-r>/' *<LEFT>
 
 " Normally Y is a synonym for yy. I think this mapping is more logical because
 " D and C behave in this fashion.
@@ -6061,8 +5955,8 @@ nnoremap <silent><leader>r :w<CR>:make!<CR>
 " cursor on that line, invoke the function, and the file will be opened. I
 " made this super quick and it is probably full of problems but I'm happy with
 " it. It assumes that the tree command's output starts on the first line of
-" the file. In reality, it would probably be better to use netrw's 'tree' view
-" of files but this was fun to make.
+" the file. In reality, it would probably be better to use some sort of file
+" explorer but this was fun to make.
 function! TreeGoToFile(open_tab_p)
     let save_unnamed_register = @"
     normal! $F─w
@@ -6123,8 +6017,6 @@ inoremap JK <ESC>
 " inoremap <C-l> <C-r><C-p>0
 noremap! <C-j> <C-r><C-r>"
 noremap! <C-l> <C-r><C-r>0
-
-" TODO: Makes the current/previous word uppercase
 
 " }}}
 
@@ -6232,9 +6124,6 @@ command! -nargs=* -range Boxify call SurroundWithBox(<f-args>)
 " fine.
 onoremap i@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvE"<CR>
 onoremap a@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvEl"<CR>
-" Yanks the next chunck of code surrounded in '{ }'
-" onoremap in{ :<C-U>execute "normal! /{\r:nohlsearch\rvi{"<CR>
-" onoremap an{ :<C-U>execute "normal! /{\r:nohlsearch\rva{"<CR>
 
 " A text object for the entire buffer
 onoremap <silent> ae :<C-u>normal! ggVG<CR>
@@ -6255,14 +6144,11 @@ endfunction
 onoremap <silent> ie :<C-u>call TextObjInnerBuffer()<CR>
 vnoremap <silent> ie :<C-u>call TextObjInnerBuffer()<CR>
 
-" Text-object for a search pattern. So I wanted to implement or install the i/
-" text-object talked about in Practical Vim. This text object operates on the
-" current search pattern. In trying to implement it I learned about the gn
-" operator which behaves like i/ and is built into vim version 7.4.110!! So I
-" decided to implement my own gn. I was trying to find a way to detect if a
-" key sequence is already mapped and I could for user defined mappings but not
-" for built in ones. So I check the version to see whether to define this
-" operator or not.
+" Text-object for a search pattern. I originally wanted to implement or
+" install the i/ text-object talked about in Practical Vim, but in trying to
+" implement it I learned about the gn operator which behaves like i/ and is
+" built into vim version 7.4.110!! So I decided to implement my own gn. So I
+" check the version to see whether to define this operator or not.
 function! TextObjSearchMatch(forward_p, visual_mode)
     if search(@/, 'ce' . (a:forward_p ? '' : 'b')) ==# 0
         return 0
@@ -6278,8 +6164,6 @@ function! TextObjSearchMatch(forward_p, visual_mode)
     let cmd = v:operator.text_obj.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
     silent! call repeat#set(cmd, v:count)
 endfunction
-" I think I could also use the <unique> tag which will only apply the mapping
-" if it isn't already defined.
 if v:version < 704
     noremap  <silent> gn :<C-u>call TextObjSearchMatch(1, 0)<CR>
     xnoremap <silent> gn :<C-u>call TextObjSearchMatch(1, 1)<CR>
@@ -6306,7 +6190,6 @@ function! TextObjRVal()
     execute 'normal! v'
     call cursor(start_pos[1], start_pos[2])
 endfunction
-" $temp = 'Change me!';
 onoremap rv :<C-u>call TextObjRVal()<CR>
 xnoremap rv :<C-u>call TextObjRVal()<CR>
 
@@ -6359,10 +6242,10 @@ xnoremap <silent> ihd :<C-u>call TextObjHereDoc(0)<CR>
 onoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
 xnoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
 
-" Text object for a decimal number. I decided to make this because I was
-" editing some css and had to change some numbers like: '100px' and the 'iw'
-" motion would change too much. TODO: Consider making the visual mappings
-" expand the visual region instead of highlighting just the number.
+" Text object for a number. I decided to make this because I was editing some
+" css and had to change some numbers like: '100px' and the 'iw' motion would
+" change too much. TODO: Consider making the visual mappings expand the visual
+" region instead of highlighting just the number.
 function! TextObjNumber(modifier, visual_mode)
     let regex = '\d\+'
     if a:modifier ==# 'l'
@@ -6380,7 +6263,6 @@ function! TextObjNumber(modifier, visual_mode)
     let cmd = v:operator.'i'.a:modifier.'d'.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
     silent! call repeat#set(cmd, v:count)
 endfunction
-"hi 123 are 000 cool 899
 for i in ['', 'n', 'l']
     execute "onoremap <silent> i".i."d :<C-u> call TextObjNumber('".i."', 0)<CR>"
     execute "xnoremap <silent> i".i."d :<C-u> call TextObjNumber('".i."', 1)<CR>"
@@ -6390,30 +6272,17 @@ endfor
 
 " Command Mappings {{{
 
-" These commands used to scroll the list up and down but did NOT filter the
-" list as the Up and Down keys would. So we remap them because I like that
-" behavior.
+" Filter the list rather than proceed sequentially through the command
+" history.
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
-
-" What <expr> does is evaluate the expression (i.e a bit of vimscript,
-" probably a function call) and inserts the result of that expression where
-" you are typing the command. This is probably very powerful in insert and
-" command line modes because you can have a function's return value be placed
-" in the document. Like if I wanted to be able to insert the current line
-" number in the document, I could make a mapping like this:
-"   inoremap <expr> ln line('.')
-" Actually... couldn't we just use the '=' register instead? I think that
-" could work EVERY time that <expr> flag would. The above line could be
-" written as:
-"   inormap ln <C-r>=line('.')<CR>
-" So maybe that <expr> is just a convenience thing?
 
 " Makes it easier to open files in the same directory as other files.
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h') . '/' : '%%'
 
-" I envision that this command will set a bunch of options or define a bunch
-" of mappings to make it easier to create ascii art.
+" I envision that this command might someday set a bunch of options or define
+" a bunch of mappings to make it easier to create ascii art. For now it just
+" does this one thing though.
 command! Ascii set virtualedit=all
 
 " Whenever I needed to figure out what some piece of code did, I'd ususally do
@@ -6466,26 +6335,13 @@ function! WriteActiveBuffers(...)
 endfunction
 command! -nargs=* PutBuffers call WriteActiveBuffers(<f-args>)
 
-" Command to remove any lines with trailing whitespace
-command! ClearTrailingWhitespace %substitute/\s*$//
-
 " Command to count the occurrences of the current search term
 command! SearchCount %substitute///gn
 
-" Command to make file executable.
+" Command to make file executable or not.
 command! Exeggcute :!chmod u+x %
 command! Exeggutor :!chmod u-x %
 
-" }}}
-
-" Insert Abbreviations {{{
-" *abbrev are similar to mappings. You type the text and if you type a
-" character that is not in 'iskeyword' then the text will expand.
-iabbrev teh the
-iabbrev taht that
-iabbrev waht what
-"iabbrev @@ groenendaal92@gmail.com
-iabbrev ret return
 " }}}
 
 " XML File Settings {{{
@@ -6672,60 +6528,15 @@ augroup filetype_php
 augroup END
 " }}}
 
-" HTML File Settings {{{
-augroup filetype_html
-    autocmd!
-    autocmd FileType html nnoremap <buffer> <localleader>f Vatzf
-augroup END
-" }}}
-
 " Common Lisp File Settings {{{
 augroup filetype_lisp
     autocmd!
 augroup END
 " }}}
 
-" C File Settings {{{
-augroup filetype_c
-    autocmd!
-    "autocmd BufNewFile *.c :normal i#include <stdio.h><CR>Hi
-    autocmd FileType c :iabbrev <buffer> iff if()<CR>{<CR>}
-augroup END
-" }}}
-
 " Vimscript File Settings {{{
 augroup filetype_vim
     autocmd!
-    " Accessing the :help files with 'K' is useful when editing vimscript.
-    " autocmd FileType vim setlocal keywordprg=:help
-    " When foldmethod is "marker", vim will fold the lines starting at the one
-    " containing {{{ and ending with the one containing }}}. See fold-marker
     autocmd FileType vim setlocal foldmethod=marker
-    autocmd FileType vim nnoremap <buffer> <localleader>f O" {{{<ESC>}O" }}}<ESC>
-    autocmd FileType vim iabbrev fu function!<CR><CR>endfunction
-    autocmd FileType vim iabbrev nno nnoremap
-    autocmd FileType vim iabbrev vno vnoremap
-    autocmd FileType vim iabbrev ino inoremap
-    autocmd FileType vim iabbrev iab iabbrev
-    autocmd FileType vim iabbrev ono onoremap
-    autocmd FileType vim iabbrev aut autocmd
-    autocmd FileType vim iabbrev au! autocmd!
-    autocmd FileType vim iabbrev aug augroup
-    autocmd FileType vim iabbrev auE augroup END
-    " How can I get this to actually print out "<leader>"?
-    autocmd FileType vim iabbrev le <leader>
-augroup END
-" }}}
-
-" TXT File Settings {{{
-augroup filetype_txt
-    autocmd!
-    " I noticed that when I edit an xml file, tw=0. If I edit a vim file THEN
-    " edit an xml file, tw is still 0. BUT if I edit a text file then open an
-    " xml file tw=78. So something weird is going on there.
-    setlocal textwidth=78
-    " Still need to figure out how spell chck actually works but this will do for
-    " now.
-    "autocmd BufNewFile,BufRead *.txt setlocal spell
 augroup END
 " }}}
