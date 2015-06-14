@@ -90,7 +90,7 @@ filetype plugin indent on
 " like other editors do.
 set hidden
 " Let backspace behave 'normally'.
-set backspace=indent,eol,start"
+set backspace=indent,eol,start
 " Can't live without it.
 set showmode
 set ttimeoutlen=30
@@ -382,11 +382,15 @@ let g:targets_aiAI = 'ai  '
 xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object
 nmap ga <Plug>(EasyAlign)
+" TODO: Could we configure easy align to format commented text if the ONLY
+" text being operated on are comments?
 let g:easy_align_delimiters = {
             \ '>': {
             \ 'pattern':      '=>\|->',
             \ 'left_margin':  0,
             \ 'right_margin': 0 },
+            \ 'm': {
+            \ 'pattern':      '-' },
             \ }
 
 " TODO: Maybe a bug with sneak.vim? If I issue to 's' commands in a row, then
@@ -434,6 +438,9 @@ nnoremap <leader>b :CtrlPBuffer<CR>
 nnoremap <leader>m :CtrlPMRUFiles<CR>
 
 " }}}
+
+" I should not be using 'make' and 'makeprg' to execute files. That piece of
+" functionality is meant to be used with the quickfix list in some manner.
 
 " Customize netrw to delete the buffer associated with a file when deleting a
 " file.
