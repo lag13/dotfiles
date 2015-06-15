@@ -91,7 +91,6 @@ filetype plugin indent on
 set hidden
 " Let backspace behave 'normally'.
 set backspace=indent,eol,start
-" Can't live without it.
 set ttimeoutlen=30
 set modelines=0
 " Tabs will appear 4 spaces wide.
@@ -114,7 +113,7 @@ set expandtab
 set autoindent
 " A must have, highlight the search as you type.
 set incsearch
-" Also good, necessary in my opinion. It highlights your search results.
+" Also necessary in my opinion. It highlights your search results.
 set hlsearch
 " Numbered lines
 set number
@@ -133,14 +132,12 @@ set statusline+=\ %y      " File type
 set statusline+=\ %{&ff}  " File format
 set statusline+=\ %l/%L   " Current line num out of total
 set statusline+=\ %P      " Top/Bottom and percentage through file
-" TODO: look into setting the 'title' option.
 " Memory is cheap, let's bump up the amount recorded commands.
 set history=500
 " When tab completing, complete the longest possible prefix and display a list
 " of possible completions.
 set wildmenu
 set wildmode=list:full
-set wildignore=""
 " Makes it so commands that move the cursor up and down (like gg and G) try to
 " retain the same column the cursor was originally in.
 set nostartofline
@@ -296,7 +293,11 @@ augroup general_autocommands
     " type just fine on it's own so I added this autocommand on the BufWrite
     " event to re-run :filetype detect if the filetype isn't already set.
     function! DetectScriptFileType()
-        if !did_filetype()
+        " TODO: When editing markdown files it would change the filetype to
+        " modula2 upon saving so did_filetype() must not be doing what I
+        " expect. This is my fix for now.
+        " if !did_filetype()
+        if &filetype ==# ''
             filetype detect
         endif
     endfunction
@@ -367,35 +368,36 @@ let g:easy_align_delimiters = {
             \ 'pattern':      '-' },
             \ }
 
-" TODO: Maybe a bug with sneak.vim? If I issue to 's' commands in a row, then
+" TODO: Maybe a bug with sneak.vim? If I issue two 's' commands in a row, then
 " the second 's' command won't add to the jumplist.
 " TODO: After doing f, F, t, or T ';' will continue 'sneaking' in the same
 " direction. Could we make it so ';' always goes forwards and ',' always
 " backwards?
 map <SPACE> <Plug>SneakPrevious
-" Replace 'f' with 1-char Sneak
 map f <Plug>Sneak_f
 map F <Plug>Sneak_F
-" Replace 't' with 1-char Sneak
 map t <Plug>Sneak_t
 map T <Plug>Sneak_T
 
-" A bug with ctrlp? It says that <C-h> moves the cursor to the left but if
+" TODO: A bug with ctrlp? It says that <C-h> moves the cursor to the left but if
 " actually deletes characters.
+" TODO: Could using the find command index files faster?
+" let g:ctrlp_user_command = 'find %s -type f'
+" TODO: Consider activating the search on filename when looking through
+" buffers rather than the full path, that would narrow down searches quicker.
+" I'm already using <C-p> to switch between tabs/buffers
+
 " Need to look into setting this, and what exactly I want ctrlp to do. I'm
-" kind of thinking that I want it to always search from the cwd but I'm
-" not sure.
+" kind of thinking that I want it to always search from the cwd but I'm not
+" sure.
 " let g:ctrlp_working_path_mode = 'rwa'
-" Client systems have a file named 'web' in the root directory
+" Luceo's client systems have a file named 'web' in their root directory
 let g:ctrlp_root_markers = ['web']
-" Still open a file inside of these sorts of windows
 let g:ctrlp_reuse_window = 'netrw\|help'
-" Follow symlinks
 let g:ctrlp_follow_symlinks = 1
-" TODO: If I've already got a file in my bufferlist which should be ignored,
-" will ctrlp display it in the list?
+let g:ctrlp_by_filename = 1
 " I used this little bash script to inspect which directories had the most
-" files and set the variable accordingly.
+" files and then set the g:ctrlp_custom_ignore variable accordingly.
 " #!/bin/bash
 " for i in *
 " do
@@ -403,14 +405,21 @@ let g:ctrlp_follow_symlinks = 1
 "     find -L "$i" -type f | wc -l
 " done
 let g:ctrlp_custom_ignore = 'vendor\|lib\|img'
-" TODO: Could using the find command index files faster?
-" let g:ctrlp_user_command = 'find %s -type f'
-" TODO: Consider activating the search on filename when looking through
-" buffers rather than the full path, that would narrow down searches quicker.
+let g:ctrlp_map = '<leader>p'
 nnoremap <leader>b :CtrlPBuffer<CR>
 nnoremap <leader>m :CtrlPMRUFiles<CR>
 
 " }}}
+
+" Refine the text object which goes to the end of the current sentence. Also
+" create a text object which goes to the end of the current paragraph. So like
+" { and } but end on the line preceding the empty line that those commands
+" would normally take you to.
+
+" Maybe make commands ,u and ,r to go to the oldest and newest undo state of
+" the file respectively.
+
+" Always highlight the middle of the screen so I know where 'M' will jump to.
 
 " I should probably not be using 'make' and 'makeprg' to execute files. That
 " piece of functionality is, I think, meant to be used with the quickfix list.
@@ -5630,6 +5639,12 @@ nnoremap <leader>lpm :call RunTranslatorMerge()<CR>
 
 " Normal Mappings {{{
 
+" Inspired by cutlass.vim, now 'd' actually deletes while 'x' will cut.
+nnoremap d "_d
+xnoremap d "_d
+nnoremap x d
+nnoremap xx dd
+
 " Move by screen lines rather than actual lines.
 noremap j gj
 noremap k gk
@@ -5672,10 +5687,10 @@ nnoremap gO go
 " like it. Now the cursor will always be positioned at the end of the pasted
 " text. Also, I don't find gp and gP's functionality useful so I've re-mapped
 " them to leave the cursor at the beginning of the pasted text.
-nnoremap p p:keepjumps normal! `]<CR>
-nnoremap P P:keepjumps normal! `]<CR>
-nnoremap gp p:keepjumps normal! `[<CR>:silent! call repeat#set("gp", v:count)<CR>
-nnoremap gP P:keepjumps normal! `[<CR>:silent! call repeat#set("gP", v:count)<CR>
+nnoremap <silent> p p:keepjumps normal! `]<CR>
+nnoremap <silent> P P:keepjumps normal! `]<CR>
+nnoremap <silent> gp p:keepjumps normal! `[<CR>:silent! call repeat#set("gp", v:count)<CR>
+nnoremap <silent> gP P:keepjumps normal! `[<CR>:silent! call repeat#set("gP", v:count)<CR>
 
 " Reselect the last changed/yanked text. I also made gv and gV text objects
 " because it looks cool :).
@@ -5732,6 +5747,15 @@ nnoremap <leader>ew :e <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <leader>es :sp <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <leader>ev :vsp <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <leader>et :tabe <C-R>=expand("%:p:h") . "/" <CR>
+
+" The two notable uses of tabs that I've seen have been for holding specific
+" window layouts or working on a separate project by lcd'ing to a different
+" area of the filesystem. Inspired by that second use of tabs I made this
+" mapping.
+nnoremap <leader>t :tabe <BAR> redraw!<CR>:lcd<SPACE>
+
+" Undo's all changes made since opening the file.
+nnoremap <silent><leader>u :silent! undo 1 <BAR> silent! undo<CR>
 
 " H now goes to the first non blank character on the current line.
 noremap H ^
@@ -6268,6 +6292,18 @@ for i in ['', 'n', 'l']
     execute "xnoremap <silent> i".i."d :<C-u> call TextObjNumber('".i."', 1)<CR>"
 endfor
 
+" Goes to the end of the current sentence
+function! EndOfCurrentSentence(dir, visual_p)
+    if a:visual_p
+        normal! gv
+    endif
+    execute "normal! ".a:dir."ge"
+endfunction
+noremap <leader>( :<C-u>call EndOfCurrentSentence('(', 0)<CR>
+noremap <leader>) :<C-u>call EndOfCurrentSentence(')', 0)<CR>
+xnoremap <leader>( :<C-u>call EndOfCurrentSentence('(', 1)<CR>
+xnoremap <leader>) :<C-u>call EndOfCurrentSentence(')', 1)<CR>
+
 " }}}
 
 " Command Mappings {{{
@@ -6540,3 +6576,4 @@ augroup filetype_vim
     autocmd FileType vim setlocal foldmethod=marker
 augroup END
 " }}}
+
