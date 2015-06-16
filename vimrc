@@ -395,7 +395,6 @@ map T <Plug>Sneak_T
 let g:ctrlp_root_markers = ['web']
 let g:ctrlp_reuse_window = 'netrw\|help'
 let g:ctrlp_follow_symlinks = 1
-let g:ctrlp_by_filename = 1
 " I used this little bash script to inspect which directories had the most
 " files and then set the g:ctrlp_custom_ignore variable accordingly.
 " #!/bin/bash
@@ -406,10 +405,35 @@ let g:ctrlp_by_filename = 1
 " done
 let g:ctrlp_custom_ignore = 'vendor\|lib\|img'
 let g:ctrlp_map = '<leader>p'
+" Does it make sense to include 'a' when you have 'rw'? I feel like not, but
+" am currently not sure.
+let g:ctrlp_working_path_mode = 'rwa'
 nnoremap <leader>b :CtrlPBuffer<CR>
 nnoremap <leader>m :CtrlPMRUFiles<CR>
 
+" TODO: Bug/fix with indentwise? I had this xml in candidat.xml:
+"
+"             <!-- on cr�e plein de transitions bidon en standard pour �viter que la mise en page des xml clients ne soit cass�e -->
+"             <transition24 de="" vers="" icone="" onaction="" libelle-onaction="" visible=""/>
+"             <transition25 de="" vers="" icone="" onaction="" libelle-onaction="" visible=""/>
+"             <transition26 de="" vers="" icone="" onaction="" libelle-onaction="" visible=""/>
+"             <transition27 de="" vers="" icone="" onaction="" libelle-onaction="" visible=""/>
+"             <transition28 de="" vers="" icone="" onaction="" libelle-onaction="" visible=""/>
+"             <transition29 de="" vers="" icone="" onaction="" libelle-onaction="" visible=""/>
+"             <transition30 de="" vers="" icone="" onaction="" libelle-onaction="" visible=""/>
+"         </transitions>
+" So an empty line followed by all that transition stuff. I had my cursor on
+" the empty line and wanted to delete up to </transitions> by typing d]%. But
+" that doesn't work. The ]% motion brings me to the second to last line in the
+" file. This is probably not a bug, that line has 0 indent and the ]% behaves
+" appropriately. But it would make more sense to me that I want ]% to behave
+" based on the next non-empty line we find. I will note that I'm getting some
+" odd behavior with [%. I would expect it to bring me to the second to last
+" line from the top but it is not.
+
 " }}}
+
+" Learn how to better move around/organize split windows.
 
 " Refine the text object which goes to the end of the current sentence. Also
 " create a text object which goes to the end of the current paragraph. So like
@@ -5755,7 +5779,10 @@ nnoremap <leader>et :tabe <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <leader>t :tabe <BAR> redraw!<CR>:lcd<SPACE>
 
 " Undo's all changes made since opening the file.
-nnoremap <silent><leader>u :silent! undo 1 <BAR> silent! undo<CR>
+nnoremap <silent><leader>u :let b:save_undo_nr = changenr() <BAR> silent! undo 1 <BAR> silent! undo<CR>
+" Redo's all changes since the above command was used. I would have tried to
+" redo ALL changes but I don't know of a good way to do that.
+nnoremap <silent><leader>r :if exists('b:save_undo_nr') <BAR> execute "undo ".b:save_undo_nr <BAR> endif<CR>
 
 " H now goes to the first non blank character on the current line.
 noremap H ^
@@ -5964,7 +5991,7 @@ nnoremap <silent> <leader>O :call append(line('.')-1, '')<CR>
             \:silent! call repeat#set("\<leader>O", v:count)<CR>
 
 " Run the program given by the makeprg option
-nnoremap <silent><leader>r :w<CR>:make!<CR>
+nnoremap <silent><leader>x :w<CR>:make!<CR>
 
 " A function which opens up a file using the output of the 'tree' command. So
 " if I had this:
