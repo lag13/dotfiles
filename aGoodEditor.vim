@@ -136,6 +136,9 @@ set statusline=
 set statusline+=%f
 " Poor man's buffer management
 nnoremap <leader>b :buffers<CR>:b<SPACE>
+" It's really convenient and quick and it's already ingrained in my muscle
+" memory at this point.
+inoremap jk <ESC>
 " A lot more convenient
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>

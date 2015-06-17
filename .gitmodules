@@ -28,3 +28,6 @@
 [submodule "bundle/sneak"]
 	path = bundle/sneak
 	url = https://github.com/justinmk/vim-sneak.git
+[submodule "bundle/targets"]
+	path = bundle/targets
+	url = https://github.com/wellle/targets.vim.git

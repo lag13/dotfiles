@@ -5668,6 +5668,9 @@ nnoremap d "_d
 xnoremap d "_d
 nnoremap x d
 nnoremap xx dd
+" Similarly, c will not clobber the default register
+nnoremap c "_c
+nnoremap c "_c
 
 " Move by screen lines rather than actual lines.
 noremap j gj
