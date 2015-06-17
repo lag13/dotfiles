@@ -279,7 +279,7 @@ endif
 
 " }}}
 
-" Autocommands {{{
+" General Autocommands {{{
 
 augroup general_autocommands
     autocmd!
@@ -304,6 +304,9 @@ augroup general_autocommands
     autocmd BufWrite * call DetectScriptFileType()
     " Reload file automatically when a file's mode is changed.
     autocmd FileChangedShell * if v:fcs_reason ==# 'mode' | let v:fcs_choice = 'reload' | endif
+
+    " Rather nifty I think
+    autocmd InsertLeave * set nopaste
 augroup END
 
 " }}}
@@ -373,6 +376,7 @@ let g:easy_align_delimiters = {
 " TODO: After doing f, F, t, or T ';' will continue 'sneaking' in the same
 " direction. Could we make it so ';' always goes forwards and ',' always
 " backwards?
+" TODO: How does preceding a sneak command with a number work?
 map <SPACE> <Plug>SneakPrevious
 map f <Plug>Sneak_f
 map F <Plug>Sneak_F
@@ -404,6 +408,9 @@ let g:ctrlp_follow_symlinks = 1
 "     find -L "$i" -type f | wc -l
 " done
 let g:ctrlp_custom_ignore = 'vendor\|lib\|img'
+" TODO: Create two mappings (if possible) one which will always search for
+" files based off ctrlp_working_path_mode (,p) and another to always search
+" from the cwd (,P)
 let g:ctrlp_map = '<leader>p'
 " Does it make sense to include 'a' when you have 'rw'? I feel like not, but
 " am currently not sure.
@@ -432,6 +439,10 @@ nnoremap <leader>m :CtrlPMRUFiles<CR>
 " line from the top but it is not.
 
 " }}}
+
+" Text object for an xml attribute.
+
+" Look into using vim to browse zip folders
 
 " Learn how to better move around/organize split windows.
 
@@ -5670,7 +5681,7 @@ nnoremap x d
 nnoremap xx dd
 " Similarly, c will not clobber the default register
 nnoremap c "_c
-nnoremap c "_c
+xnoremap c "_c
 
 " Move by screen lines rather than actual lines.
 noremap j gj
