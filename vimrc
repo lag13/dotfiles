@@ -371,17 +371,39 @@ let g:easy_align_delimiters = {
             \ 'pattern':      '-' },
             \ }
 
-" TODO: Maybe a bug with sneak.vim? If I issue two 's' commands in a row, then
-" the second 's' command won't add to the jumplist.
-" TODO: After doing f, F, t, or T ';' will continue 'sneaking' in the same
-" direction. Could we make it so ';' always goes forwards and ',' always
-" backwards?
-" TODO: How does preceding a sneak command with a number work?
-map <SPACE> <Plug>SneakPrevious
-map f <Plug>Sneak_f
-map F <Plug>Sneak_F
-map t <Plug>Sneak_t
-map T <Plug>Sneak_T
+" I prefer it if all the sneak mappings could use 's' so I have changed all
+" the surround mappings to use 'z' instead.
+let g:surround_no_mappings = 1
+nmap dz  <Plug>Dsurround
+nmap cz  <Plug>Csurround
+nmap cZ  <Plug>CSurround
+nmap yz  <Plug>Ysurround
+nmap yZ  <Plug>YSurround
+nmap yzs <Plug>Yssurround
+nmap yZz <Plug>YSsurround
+nmap yZZ <Plug>YSzurround
+xmap Z   <Plug>VSurround
+xmap gZ  <Plug>VgSurround
+" Custom surround object 'c' for comments. TODO: It looks like this can only
+" be used for the 'ys' operator. Is there any way to make it work with ds and
+" cs as well?
+let g:surround_99 = "/* \r */"
+
+let g:sneak#textobject_z = 0
+" Make ; and <SPACE> always repeat the sneak in the same direction
+nnoremap <silent> ;       :<c-u>call sneak#rpt('',           sneak#state().reverse)<CR>
+nnoremap <silent> <SPACE> :<c-u>call sneak#rpt('',           1-sneak#state().reverse)<CR>
+xnoremap <silent> ;       :<c-u>call sneak#rpt(visualmode(), sneak#state().reverse)<CR>
+xnoremap <silent> <SPACE> :<c-u>call sneak#rpt(visualmode(), 1-sneak#state().reverse)<CR>
+onoremap <silent> ;       :<c-u>call sneak#rpt(v:operator,   sneak#state().reverse)<cr>
+onoremap <silent> <SPACE> :<c-u>call sneak#rpt(v:operator,   1-sneak#state().reverse)<cr>
+xmap S       <Plug>Sneak_S
+omap s       <Plug>Sneak_s
+omap S       <Plug>Sneak_S
+map  f       <Plug>Sneak_f
+map  F       <Plug>Sneak_F
+map  t       <Plug>Sneak_t
+map  T       <Plug>Sneak_T
 
 " TODO: A bug with ctrlp? It says that <C-h> moves the cursor to the left but if
 " actually deletes characters.
