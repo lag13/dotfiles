@@ -2,7 +2,9 @@
 " bad[d] - Adds a file name to the buffer list without loading it.
 " col[der] - Goes to an older quickfix list.
 " nun[map] - Removes the mapping for a normal mode command. A quote from the
-" help pages: 'can also be used outside of a monastery'
+"            help pages: 'can also be used outside of a monastery'
+" br[ewind] - Goes to the first buffer in the buffer list. You could call it
+"             as :brew
 
 " Mapping Information:
 " A mapping enables you to bind a set of Vim **commands** to a sequence of
@@ -316,7 +318,8 @@ augroup END
 " Plugins To Checkout:
 " 1. Viewing man pages inside of vim
 " 2. ctags - Tags
-" 3. NERDtree or vinegar or vimfiler -  File explorer
+" 3. NERDtree or vinegar or vimfiler or filebeagle or dirvish - File explorer.
+" http://www.reddit.com/r/vim/comments/3a7a6z/netrw_nerdtree/
 " 4. clang complete for autocompleting C/C++ code
 " 5. paredit http://danmidwood.com/content/2014/11/21/animated-paredit.html.
 " 6. https://github.com/tpope/vim-eunuch, seems to have some useful stuff
@@ -352,6 +355,8 @@ augroup END
 " I'm thinking of 'z' as a strong contender, but I want to find a nice
 " mnemonic if possible.
 
+" TODO: It would be nice if targets.vim ignored escaped double quotes.
+
 " I like using 'I' and 'A' in visual block mode and I don't see myself really
 " using that functionality so I'm disabling it.
 let g:targets_aiAI = 'ai  '
@@ -379,7 +384,7 @@ nmap cz  <Plug>Csurround
 nmap cZ  <Plug>CSurround
 nmap yz  <Plug>Ysurround
 nmap yZ  <Plug>YSurround
-nmap yzs <Plug>Yssurround
+nmap yzz <Plug>Yssurround
 nmap yZz <Plug>YSsurround
 nmap yZZ <Plug>YSzurround
 xmap Z   <Plug>VSurround
@@ -389,6 +394,8 @@ xmap gZ  <Plug>VgSurround
 " cs as well?
 let g:surround_99 = "/* \r */"
 
+" TODO: This plugin still makes a '\' mapping and maybe more. Try to configure
+" it in such a way that it doesn't create any unwanted mappings.
 let g:sneak#textobject_z = 0
 " Make ; and <SPACE> always repeat the sneak in the same direction
 nnoremap <silent> ;       :<c-u>call sneak#rpt('',           sneak#state().reverse)<CR>
@@ -461,8 +468,6 @@ nnoremap <leader>m :CtrlPMRUFiles<CR>
 " line from the top but it is not.
 
 " }}}
-
-" Text object for an xml attribute.
 
 " Look into using vim to browse zip folders
 
@@ -6354,6 +6359,16 @@ for i in ['', 'n', 'l']
     execute "onoremap <silent> i".i."d :<C-u> call TextObjNumber('".i."', 0)<CR>"
     execute "xnoremap <silent> i".i."d :<C-u> call TextObjNumber('".i."', 1)<CR>"
 endfor
+
+" Text object for an xml attribute.
+function! TextObjXmlAttr()
+    let regex = '\v(''|")(\s|/|\>)'
+    call search(regex, 'c')
+endfunction
+onoremap ix :<C-u>call TextObjXmlAttr()<CR>
+xnoremap ix :<C-u>call TextObjXmlAttr()<CR>
+onoremap ax :<C-u>call TextObjXmlAttr()<CR>
+xnoremap ax :<C-u>call TextObjXmlAttr()<CR>
 
 " Goes to the end of the current sentence
 function! EndOfCurrentSentence(dir, visual_p)
