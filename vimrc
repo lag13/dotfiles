@@ -6361,14 +6361,40 @@ for i in ['', 'n', 'l']
 endfor
 
 " Text object for an xml attribute.
-function! TextObjXmlAttr()
-    let regex = '\v(''|")(\s|/|\>)'
-    call search(regex, 'c')
+function! TextObjXmlAttr(around)
+    let end_of_attr_regex = '\v(''|")(\s|/|\>)'
+    call search(end_of_attr_regex, 'c', line('.'))
+    let save_unnamed_register = @@
+    normal! yl
+    let quote_type = @@
+    if a:around
+        normal! lyl
+        if @@ ==# ' '
+            let space_after_attr = 1
+        else
+            let space_after_attr = 0
+            normal! h
+        endif
+    endif
+    normal! v
+    " Go to start of attribute value
+    call search(quote_type, 'b')
+    " Go to assignment operator
+    call search('=', 'b')
+    if a:around
+        let start_of_attr_regex = '\s'.(space_after_attr ? '\zs':'').'\S'
+    else
+        let start_of_attr_regex = '\s\zs\S'
+    endif
+    " Go to beginning of attribute
+    call search(start_of_attr_regex, 'b')
+    let @@ = save_unnamed_register
 endfunction
-onoremap ix :<C-u>call TextObjXmlAttr()<CR>
-xnoremap ix :<C-u>call TextObjXmlAttr()<CR>
-onoremap ax :<C-u>call TextObjXmlAttr()<CR>
-xnoremap ax :<C-u>call TextObjXmlAttr()<CR>
+" <concours actif="true" obligatoire="false" liste="true"/>
+onoremap <silent> ix :<C-u>call TextObjXmlAttr(0)<CR>
+xnoremap <silent> ix :<C-u>call TextObjXmlAttr(0)<CR>
+onoremap <silent> ax :<C-u>call TextObjXmlAttr(1)<CR>
+xnoremap <silent> ax :<C-u>call TextObjXmlAttr(1)<CR>
 
 " Goes to the end of the current sentence
 function! EndOfCurrentSentence(dir, visual_p)
