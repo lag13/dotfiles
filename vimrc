@@ -1643,7 +1643,7 @@ function CreateAndSaveDirectory()
   endif
   write
 endfunction
-command! Write :call CreateAndSaveDirectory()<CR>
+command! Write call CreateAndSaveDirectory()
 
 " }}}
 
