@@ -1,6 +1,8 @@
 " Some vimscript I wrote to help configure luceo systems.
 " By Lucas Groenendaal
 
+" TODO: Make mapping to go directly to a CDATA/xml node's json label.
+
 " TODO: Add highlighting for CDATA lines which are sections. Make a command to
 " automatically add commented strings to all lines in CDATA. This would negate
 " the need for the GetLabelNameWrapper() function.
@@ -592,7 +594,7 @@ function! GetSearchPathAndOpenSplit2(path_to_node, cand_or_poste)
     let node_name = GetNodeName()
     let json_constant = GetNodeAttribute('libelle')
     if a:cand_or_poste
-        split recherche.xml
+        execute "split ".GetXmlFileLocation()."recherche.xml"
         let result = GetSearchPathCand(node_name, json_constant) 
     else
         " TODO: I added this code which splits to poste.xml 'cause I had other
@@ -3604,7 +3606,7 @@ function! GetSearchPathAndOpenSplit(path_to_node, cand_or_poste)
     let search_path = ""
     if a:cand_or_poste
         let search_path = GetSearchPath(g:candidat_nodes, a:path_to_node)
-        split recherche.xml
+        execute "split ".GetXmlFileLocation()."recherche.xml"
     else
         let search_path = GetSearchPath(g:poste_nodes, a:path_to_node)
         split
@@ -4841,6 +4843,9 @@ function! SetLibelleNoeudListe()
         call ChangeNodeAttribute('type-liste', @z)
     endif
 endfunction
+
+" Highlight the section boundaries a little differently
+autocmd BufWinEnter *.xml match Underlined '\[section.*'
 
 " }}}
 

@@ -1,6 +1,7 @@
 " Funny Vim Commands:
 " bad[d] - Adds a file name to the buffer list without loading it.
 " col[der] - Goes to an older quickfix list.
+" lol[der] - Same as above but goes to an older location in the location list.
 " nun[map] - Removes the mapping for a normal mode command. A quote from the
 "            help pages: 'can also be used outside of a monastery'
 " br[ewind] - Goes to the first buffer in the buffer list. You could call it
@@ -356,10 +357,16 @@ augroup END
 " mnemonic if possible.
 
 " TODO: It would be nice if targets.vim ignored escaped double quotes.
+" TODO: the 'it' text-object doesn't work correctly on something like this:
+" <form name="MainForm" id="MainForm" method="post" action="<?php echo $oPage->getUrlNoParams()?>">
+"     <p>hello</p>
+" </form>
 
-" I like using 'I' and 'A' in visual block mode and I don't see myself really
-" using that functionality so I'm disabling it.
-let g:targets_aiAI = 'ai  '
+" getchar() in expression mappings don't work below version 704 (technically
+" 7.3.338)
+if v:version < 704
+    let g:targets_aiAI = 'ai  '
+endif
 
 " Start interactive EasyAlign in visual mode
 xmap ga <Plug>(EasyAlign)
@@ -396,6 +403,8 @@ let g:surround_99 = "/* \r */"
 
 " TODO: This plugin still makes a '\' mapping and maybe more. Try to configure
 " it in such a way that it doesn't create any unwanted mappings.
+" TODO: Bug? If I use 't' of 'f' in operator-pending mode and there is no
+" character to delete then it still deletes the next character.
 let g:sneak#textobject_z = 0
 " Make ; and <SPACE> always repeat the sneak in the same direction
 nnoremap <silent> ;       :<c-u>call sneak#rpt('',           sneak#state().reverse)<CR>
@@ -420,12 +429,7 @@ map  T       <Plug>Sneak_T
 " buffers rather than the full path, that would narrow down searches quicker.
 " I'm already using <C-p> to switch between tabs/buffers
 
-" Need to look into setting this, and what exactly I want ctrlp to do. I'm
-" kind of thinking that I want it to always search from the cwd but I'm not
-" sure.
-" let g:ctrlp_working_path_mode = 'rwa'
-" Luceo's client systems have a file named 'web' in their root directory
-let g:ctrlp_root_markers = ['web']
+let g:ctrlp_root_markers = ['web', 'app']
 let g:ctrlp_reuse_window = 'netrw\|help'
 let g:ctrlp_follow_symlinks = 1
 " I used this little bash script to inspect which directories had the most
@@ -437,15 +441,20 @@ let g:ctrlp_follow_symlinks = 1
 "     find -L "$i" -type f | wc -l
 " done
 let g:ctrlp_custom_ignore = 'vendor\|lib\|img'
-" TODO: Create two mappings (if possible) one which will always search for
-" files based off ctrlp_working_path_mode (,p) and another to always search
-" from the cwd (,P)
+" To me it makes more sense to search for files based on cwd. <leader>p will
+" now do this and <leader>P will try to search for files based on the root for
+" the file being edited (just in case we want it).
+let g:ctrlp_working_path_mode = 'rw'
 let g:ctrlp_map = '<leader>p'
-" Does it make sense to include 'a' when you have 'rw'? I feel like not, but
-" am currently not sure.
-let g:ctrlp_working_path_mode = 'rwa'
+nnoremap <leader>P :CtrlPRoot<CR>
+" Always try to work from the cwd
 nnoremap <leader>b :CtrlPBuffer<CR>
-nnoremap <leader>m :CtrlPMRUFiles<CR>
+" I liked the idea of setting g:ctrlp_mruf_relative = 1 because then different
+" tab'bed workspaces could feel like they each contained their own files. But
+" I also wanted to keep the default functionality of CtrlPMRUFiles as well so
+" I made the second mapping. Is this overkill? Possibly.
+nnoremap <leader>m :let g:ctrlp_mruf_relative = 1 <BAR> CtrlPMRUFiles<CR>
+nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 
 " TODO: Bug/fix with indentwise? I had this xml in candidat.xml:
 "
@@ -468,6 +477,9 @@ nnoremap <leader>m :CtrlPMRUFiles<CR>
 " line from the top but it is not.
 
 " }}}
+
+" Look into running vim as a daemon.
+" http://www.reddit.com/r/vim/comments/3ayhdx/a_quick_question_about_vim_server/
 
 " Look into using vim to browse zip folders
 
@@ -976,6 +988,9 @@ noremap H ^
 " L now goes to last character on the current line.
 noremap L $
 vnoremap L g_
+" For consistancy
+noremap gH g^
+noremap gL g$
 " We maintain the original H and L functionality.
 noremap <leader>H H
 noremap <leader>L L
@@ -1511,6 +1526,9 @@ endfor
 
 " Text object for an xml attribute.
 function! TextObjXmlAttr(around)
+    " TODO: This does not work if there are single quotes within double quotes
+    " or vice versa. Perhaps a quick fix would be to search for the = sign and
+    " find the nearest quote.
     let end_of_attr_regex = '\v(''|")(\s|/|\>)'
     call search(end_of_attr_regex, 'c', line('.'))
     let save_unnamed_register = @@
@@ -1636,7 +1654,7 @@ command! Exeggutor :!chmod u-x %
 " BufWritePre,FileWritePre that creates any directories that don't exist. I
 " decided I don't like having that autocommand so I created a dedicated
 " command which does the same thing.
-function CreateAndSaveDirectory()
+function! CreateAndSaveDirectory()
   let s:directory = expand('%:p:h')
   if !isdirectory(s:directory)
     call mkdir(s:directory, 'p')
