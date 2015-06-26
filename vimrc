@@ -478,6 +478,10 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 
 " }}}
 
+" TODO: Look into changing the prompt of the shell used after invoking :sh. I
+" could say something like 'VIM SHELL' in the prompt just to emphasize the
+" fact that this shell was started from vim.
+
 " Look into running vim as a daemon.
 " http://www.reddit.com/r/vim/comments/3ayhdx/a_quick_question_about_vim_server/
 

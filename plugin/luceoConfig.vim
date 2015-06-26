@@ -1,6 +1,9 @@
 " Some vimscript I wrote to help configure luceo systems.
 " By Lucas Groenendaal
 
+" TODO: Seems like I might not have nodes in the data structure for <agence>
+" and some others in that hierarchy.
+
 " TODO: Make mapping to go directly to a CDATA/xml node's json label.
 
 " TODO: Add highlighting for CDATA lines which are sections. Make a command to
@@ -177,6 +180,14 @@ function! RunTranslatorGenerate()
 endfunction
 
 " Runs psf translator:dedupe.
+" TODO: So I needed to change a label which was not in the json file. I ran
+" merge and the label appeared. Then I changed the label and ran this command
+" below. After doing that, the label I changed disappeared?!?! I have no idea
+" why this is happening. If I start a shell in vim and manually run the
+" command it works as expected. Actually I just did this again and didn't run
+" into any issue. Maybe I just forgot to save? I also noticed some weirdness
+" with dedupe and merge. When I ran dedupe it deleted the TXT_AGENCE constant
+" even though it was changed.
 function! RunTranslatorDedupe()
     execute "silent !php ".GetPsfFile()." translator:dedupe"
     redraw!
