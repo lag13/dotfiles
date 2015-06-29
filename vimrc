@@ -349,12 +349,18 @@ augroup END
 " 21. https://github.com/justinmk/vim-ipmotion - Configure { and } to behave a
 " bit more intelligently. Seems like a nice little plugin.
 
-" I want to keep the sneak mappings all as 's', which isn't currenlty
-" happening because of the surround plugin. I'm planning on using the 's'
-" mappings with sneak so I gotta find new mappings for surround. Here are some
-" characters which could possibly used: g m o p q r u x z C M O P Q R U X Z.
-" I'm thinking of 'z' as a strong contender, but I want to find a nice
-" mnemonic if possible.
+" TODO: In making a PR for sneak.vim I learned about vader.vim, which is a
+" testing framework for vim. vader.vim will output information about the test
+" data (what failed, what passed). It seems that that output cannot be
+" redirected to a file/command though which I feel is a shame especially if a
+" lot of test data is being outputted. See if that can be fixed.
+
+" Trigger netrw
+nnoremap - :Explore<CR>
+" No banner at the top of the netrw buffer
+let g:netrw_banner = 0
+" Tree directory view
+let g:netrw_liststyle = 3
 
 " TODO: It would be nice if targets.vim ignored escaped double quotes.
 " TODO: the 'it' text-object doesn't work correctly on something like this:
@@ -383,8 +389,8 @@ let g:easy_align_delimiters = {
             \ 'pattern':      '-' },
             \ }
 
-" I prefer it if all the sneak mappings could use 's' so I have changed all
-" the surround mappings to use 'z' instead.
+" I prefer that all my sneak mappings use 's' so I changed all the surround
+" mappings to use 'z' instead.
 let g:surround_no_mappings = 1
 nmap dz  <Plug>Dsurround
 nmap cz  <Plug>Csurround
@@ -408,11 +414,11 @@ let g:surround_99 = "/* \r */"
 let g:sneak#textobject_z = 0
 " Make ; and <SPACE> always repeat the sneak in the same direction
 nnoremap <silent> ;       :<c-u>call sneak#rpt('',           sneak#state().reverse)<CR>
-nnoremap <silent> <SPACE> :<c-u>call sneak#rpt('',           1-sneak#state().reverse)<CR>
+nnoremap <silent> <SPACE> :<c-u>call sneak#rpt('',           1 - sneak#state().reverse)<CR>
 xnoremap <silent> ;       :<c-u>call sneak#rpt(visualmode(), sneak#state().reverse)<CR>
-xnoremap <silent> <SPACE> :<c-u>call sneak#rpt(visualmode(), 1-sneak#state().reverse)<CR>
-onoremap <silent> ;       :<c-u>call sneak#rpt(v:operator,   sneak#state().reverse)<cr>
-onoremap <silent> <SPACE> :<c-u>call sneak#rpt(v:operator,   1-sneak#state().reverse)<cr>
+xnoremap <silent> <SPACE> :<c-u>call sneak#rpt(visualmode(), 1 - sneak#state().reverse)<CR>
+onoremap <silent> ;       :<c-u>call sneak#rpt(v:operator,   sneak#state().reverse)<CR>
+onoremap <silent> <SPACE> :<c-u>call sneak#rpt(v:operator,   1 - sneak#state().reverse)<CR>
 xmap S       <Plug>Sneak_S
 omap s       <Plug>Sneak_s
 omap S       <Plug>Sneak_S
@@ -478,6 +484,12 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 
 " }}}
 
+" Create the Game of Life and have it trigger at a certain time. Perhaps I can
+" trigger it when:
+" 1. vim is started with no buffers
+" 2. The CursorHold event (I like this one)
+" 3. The FocusLost event
+
 " TODO: Look into changing the prompt of the shell used after invoking :sh. I
 " could say something like 'VIM SHELL' in the prompt just to emphasize the
 " fact that this shell was started from vim.
@@ -510,6 +522,7 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 " it. In preparation I've already made the <C-l> and <C-h> commands switch
 " between buffers when there are no tabs open.
 " http://www.reddit.com/r/vim/comments/382v6q/my_experience_switching_to_buffers/
+" https://github.com/ap/vim-buftabline
 
 " Have a visual command to select run the selected text as an Ex command
 
@@ -951,9 +964,6 @@ nnoremap <leader>. .:keepjumps normal! `[<CR>
 " Goes to the next and previous number on the current line
 noremap <silent> <leader>d :call search('\v\d+\ze(\D\|$)', '', line('.'))<CR>
 noremap <silent> <leader>D :call search('\v\d+\ze(\D\|$)', 'b', line('.'))<CR>
-
-" Trigger netrw
-nnoremap - :Explore<CR>
 
 " Sources the current file
 nnoremap <leader>sc :source % \| nohlsearch<CR>
