@@ -355,6 +355,10 @@ augroup END
 " redirected to a file/command though which I feel is a shame especially if a
 " lot of test data is being outputted. See if that can be fixed.
 
+" TODO: I would like it if the [% mapping goes to the location where [% would
+" take you if you were on the previous level of indentation currently, if
+" you're already on the line that [% would take you, you'll stay on that line.
+
 " Trigger netrw
 nnoremap - :Explore<CR>
 " No banner at the top of the netrw buffer
@@ -407,18 +411,11 @@ xmap gZ  <Plug>VgSurround
 " cs as well?
 let g:surround_99 = "/* \r */"
 
-" TODO: This plugin still makes a '\' mapping and maybe more. Try to configure
-" it in such a way that it doesn't create any unwanted mappings.
 " TODO: Bug? If I use 't' of 'f' in operator-pending mode and there is no
 " character to delete then it still deletes the next character.
 let g:sneak#textobject_z = 0
-" Make ; and <SPACE> always repeat the sneak in the same direction
-nnoremap <silent> ;       :<c-u>call sneak#rpt('',           sneak#state().reverse)<CR>
-nnoremap <silent> <SPACE> :<c-u>call sneak#rpt('',           1 - sneak#state().reverse)<CR>
-xnoremap <silent> ;       :<c-u>call sneak#rpt(visualmode(), sneak#state().reverse)<CR>
-xnoremap <silent> <SPACE> :<c-u>call sneak#rpt(visualmode(), 1 - sneak#state().reverse)<CR>
-onoremap <silent> ;       :<c-u>call sneak#rpt(v:operator,   sneak#state().reverse)<CR>
-onoremap <silent> <SPACE> :<c-u>call sneak#rpt(v:operator,   1 - sneak#state().reverse)<CR>
+let g:sneak#absolute_dir = 1
+map  <SPACE> <Plug>SneakPrevious
 xmap S       <Plug>Sneak_S
 omap s       <Plug>Sneak_s
 omap S       <Plug>Sneak_S
@@ -483,6 +480,27 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 " line from the top but it is not.
 
 " }}}
+
+" Is there a simple way in vim to delete from the cursor position to a closing
+" brace or any sort of 'end of construct' syntax item while retaining the
+" appropriate indent for the syntax item? For braces, a quick way to do it is
+" d]} but it doesn't retain indent. Maybe also check out vim-pasta:
+" https://github.com/sickill/vim-pasta
+
+" Surround mapping to delete the surrounding spaces.
+
+" Make mappings >p and >P which paste code and then auto indent it. Actually
+" maybe =p and =P or gop and goP would be a better choice.
+
+" Have a command to go back to the previous save state. I'm picturing that if
+" you save at point A then make changes and don't save, running this command
+" will take you back to point A. It you save at point A, make changes and save
+" at point B and run this command (so the buffer is not modified) it will take
+" you back to point A.
+
+" TODO: Make a zZ operator to center cursor in the middle of a text object?
+
+" Text object for inside the <?php ?> tags?
 
 " Create the Game of Life and have it trigger at a certain time. Perhaps I can
 " trigger it when:
@@ -883,6 +901,7 @@ nnoremap X D
 xnoremap x d
 " Similarly, c will not clobber the default register
 nnoremap c "_c
+nnoremap C "_C
 xnoremap c "_c
 
 " Move by screen lines rather than actual lines.
@@ -1385,6 +1404,10 @@ function! SurroundWithBox(...) range
     let @" = save_unnamed_register
 endfunction
 command! -nargs=* -range Boxify call SurroundWithBox(<f-args>)
+
+" Quickly run a macro or the '.' command on a range of lines
+xnoremap @ :normal @
+xnoremap . :normal .<CR>
 
 " }}}
 
