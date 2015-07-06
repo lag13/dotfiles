@@ -348,6 +348,10 @@ augroup END
 " And have the ability to switch specific things.
 " 21. https://github.com/justinmk/vim-ipmotion - Configure { and } to behave a
 " bit more intelligently. Seems like a nice little plugin.
+" 22. https://github.com/haya14busa/incsearch.vim/releases/tag/v2.0.0. Don't
+" know too much about it but seems pretty neat. Incrementally highlights ALL
+" search matches while typing. It also seems pretty extensible, it looked like
+" there was a fuzzy search extension, very cool.
 
 " TODO: In making a PR for sneak.vim I learned about vader.vim, which is a
 " testing framework for vim. vader.vim will output information about the test
@@ -367,6 +371,19 @@ let g:netrw_banner = 0
 let g:netrw_liststyle = 3
 
 " TODO: It would be nice if targets.vim ignored escaped double quotes.
+" TODO: I think it would be nice if targets.vim only added to the jumplist if
+" we are not already inside the text object. So if we are inside the text
+" object, don't add to the jump list.
+" TODO: Make 'o_v' mappings work for targets.vim
+" TODO: It would be nice if the quote text objects would select only 'proper'
+" quotes. So it will only operate on acutal pairs of quotes. Right now I'm
+" imagaining a setting g:targets_proper option which will only work on quote
+" paris. I feel like there was an issue placed about this already but I can't
+" find it at the moment.
+" TODO: Could we adjust the code in the visual mappings so that when we're in
+" visual block mode they just exit out? That way, even if I have a version
+" below 704 I can still use the I and A mappings AND be able to use I and A in
+" visual block mode. I feel like this is definitely possible.
 " TODO: the 'it' text-object doesn't work correctly on something like this:
 " <form name="MainForm" id="MainForm" method="post" action="<?php echo $oPage->getUrlNoParams()?>">
 "     <p>hello</p>
@@ -406,16 +423,24 @@ nmap yZz <Plug>YSsurround
 nmap yZZ <Plug>YSzurround
 xmap Z   <Plug>VSurround
 xmap gZ  <Plug>VgSurround
-" Custom surround object 'c' for comments. TODO: It looks like this can only
-" be used for the 'ys' operator. Is there any way to make it work with ds and
-" cs as well?
-let g:surround_99 = "/* \r */"
+" TODO: It looks like custom surround objects can 'ys' operator. Is there any
+" way to make them work with ds and cs as well?
+" 'c' to surround selection in comment characters.
+let g:surround_99  = "/* \r */"
+" 'x' to more easily make a search on eXact word boundaries
+let g:surround_120 = "\\<\r\\>"
 
 " TODO: Bug? If I use 't' of 'f' in operator-pending mode and there is no
 " character to delete then it still deletes the next character.
 let g:sneak#textobject_z = 0
 let g:sneak#absolute_dir = 1
-map  <SPACE> <Plug>SneakPrevious
+" If I ever want to try out streak mode, I think these labels will not
+" conflict with potential actions I want to take.
+" let g:sneak#streak = 1
+" let g:sneak#target_labels = "sfjkqtun/SFGJKQTUZNM?"
+" Giving this a try. It seems nice because ; and : are on the same key just
+" like n and N. <SPACE> is now my ':' key
+map  :       <Plug>SneakPrevious
 xmap S       <Plug>Sneak_S
 omap s       <Plug>Sneak_s
 omap S       <Plug>Sneak_S
@@ -479,7 +504,27 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 " odd behavior with [%. I would expect it to bring me to the second to last
 " line from the top but it is not.
 
+" Not really a mapping to a plugin but since it makes use of the
+" commentary.vim plugin I thought I'd add it here.
+nmap <silent> gcp yypkgccj
+
 " }}}
+
+" I'm thinking about using capital letter marks as a way to trace the call
+" stack when I'm hunting down a bug or a way to improve a program. So I will
+" make consecutive capital letter marks at all the 'key' locations in the code
+" and execute a mapping which will loop through each mark and produce a series
+" of paragraphs of this form:
+"
+"   file_name line_num
+"   getline(line_num)
+"   getline(line_num)
+"
+" I will edit the second getline(line_num) myself, replacing variable names
+" with the actual values. I will also indent each of theses paragraphs
+" appropriately to reflect how deep in the call stack they are. On a related
+" note look into :help debug-mode it seems that vim might have some built in
+" debugging capabilities.
 
 " Is there a simple way in vim to delete from the cursor position to a closing
 " brace or any sort of 'end of construct' syntax item while retaining the
@@ -535,10 +580,14 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 " Customize netrw to delete the buffer associated with a file when deleting a
 " file.
 
-" TODO: I'm thinking about adding a list of buffers at the top of vim. The
+" TODO: I'm thinking about adding a list of buffers on vim's tabline. The
 " comments of this reddit post had a plugin which does JUST that, look into
-" it. In preparation I've already made the <C-l> and <C-h> commands switch
-" between buffers when there are no tabs open.
+" it. In preparation I've already made the <C-p> and <C-n> commands switch
+" between buffers when there are no tabs open. I'm picturing that if I have
+" one tab then I'll display the buffer list, but if I have multiple tabs and
+" each tab has a different cwd() then I'll display the cwd() of each tab. Or
+" maybe if I have multiple tabs I'll disply the cwd() of each tab (regardless
+" whether they have the same cwd() or not).
 " http://www.reddit.com/r/vim/comments/382v6q/my_experience_switching_to_buffers/
 " https://github.com/ap/vim-buftabline
 
@@ -891,6 +940,13 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 
 " Normal Mappings {{{
 
+" Sneak is using : as <Plug>SneakPrevious so I'm trying out using <SPACE> as
+" it's replacement.
+noremap <SPACE> :
+
+" Inserts one space on either side of the character under the cursor.
+nnoremap <leader><SPACE> i<SPACE><RIGHT><SPACE><LEFT><ESC>
+
 " Inspired by cutlass.vim, now 'd' actually deletes while 'x' will cut.
 nnoremap d "_d
 nnoremap D "_D
@@ -903,6 +959,21 @@ xnoremap x d
 nnoremap c "_c
 nnoremap C "_C
 xnoremap c "_c
+
+" Tries to delete your typical function call
+function! DeleteFuncCall()
+    if search(')', 'c')
+        keepjumps normal! %
+    elseif !search('(', 'c')
+        return
+    endif
+    " On opening parentheses
+    let openp_pos = getpos('.')
+    keepjumps normal! %
+    normal! "_x
+    call setpos('.', openp_pos)
+    normal! vb"_d
+endfunction
 
 " Move by screen lines rather than actual lines.
 noremap j gj
@@ -1198,9 +1269,8 @@ nnoremap <silent> <C-n> :call SwitchTabsOrBuffers(1)<CR>
 
 " <CR> already does + so lets make <BS> do the opposite
 nnoremap <BS> -
-" Keep the redrawing screen functionality that <C-l> gives us. I used <C-g>
-" because I don't really see the use for it.
-nnoremap <C-g> :nohlsearch<CR><C-l>
+" Redraw the screen and remove any search and/or sneak highlighting.
+nnoremap <C-g> :nohlsearch <BAR> silent! call sneak#cancel()<CR><C-l>
 
 " Slightly easier to type and it wasn't being used!
 nnoremap q; q:
