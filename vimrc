@@ -352,6 +352,8 @@ augroup END
 " know too much about it but seems pretty neat. Incrementally highlights ALL
 " search matches while typing. It also seems pretty extensible, it looked like
 " there was a fuzzy search extension, very cool.
+" 23. http://stackoverflow.com/questions/13406751/vim-completion-based-on-buffer-name
+" autocompletion based on buffer name.
 
 " TODO: In making a PR for sneak.vim I learned about vader.vim, which is a
 " testing framework for vim. vader.vim will output information about the test
@@ -504,11 +506,21 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 " odd behavior with [%. I would expect it to bring me to the second to last
 " line from the top but it is not.
 
-" Not really a mapping to a plugin but since it makes use of the
-" commentary.vim plugin I thought I'd add it here.
-nmap <silent> gcp yypkgccj
+" Comment the current line and paste the uncommented line below.
+nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj"<CR>
 
 " }}}
+
+" Not a huge deal but what about making an improvement to the gf family of
+" commands where gf will scan ahead until it is on a character that could be
+" considered a valid file name. Or does it already do that?
+
+" Make a mapping to store the file name followed by the line number the cursor
+" is on in the default register.
+
+" Make a mapping for g;. g; will be called as normal and then check if the
+" position has actually moved. If it hasn't then call g; again. So a bit of a
+" smarter g;. I think I could make my g: mapping also follow this behavior.
 
 " I'm thinking about using capital letter marks as a way to trace the call
 " stack when I'm hunting down a bug or a way to improve a program. So I will
@@ -944,10 +956,25 @@ nmap <silent> gcp yypkgccj
 " it's replacement.
 noremap <SPACE> :
 
+" TODO: Make these repeatable. Also, ':' can normally be used in operator
+" pending mode, since (at the time of this writing) space is bound to ':' that
+" means we can't use it with the 'd' operator. I've never needed to use ':' in
+" operator pending mode but keep it in mind anyway.
 " Inserts one space on either side of the character under the cursor.
 nnoremap <leader><SPACE> i<SPACE><RIGHT><SPACE><LEFT><ESC>
+" Deletes one character from either side of the character under the cursor.
+nnoremap d<SPACE> i<BS><RIGHT><RIGHT><BS><ESC>
 
-" Inspired by cutlass.vim, now 'd' actually deletes while 'x' will cut.
+" To get a good understanding for how a piece of code works I'll document the
+" important function calls and what they do, essentially writing down the
+" important parts of the callstack. In doing that I record file names and line
+" numbers. To get the file name quicker I'll run this command :let @@ = @%,
+" paste it into my document, and append the line number. I've done that a lot
+" so I made this command to do it for me. Mnemonic - Get Buffer name.
+nnoremap <silent> gb :let @@ = @% . ' ' . line('.')<CR>
+
+" Inspired by cutlass.vim, now 'd' actually deletes while 'x' will cut. And
+" 'c' doesn't cut text either.
 nnoremap d "_d
 nnoremap D "_D
 xnoremap d "_d
@@ -955,7 +982,6 @@ nnoremap x d
 nnoremap xx dd
 nnoremap X D
 xnoremap x d
-" Similarly, c will not clobber the default register
 nnoremap c "_c
 nnoremap C "_C
 xnoremap c "_c
