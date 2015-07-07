@@ -507,16 +507,13 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 " line from the top but it is not.
 
 " Comment the current line and paste the uncommented line below.
-nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj"<CR>
+nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " }}}
 
 " Not a huge deal but what about making an improvement to the gf family of
 " commands where gf will scan ahead until it is on a character that could be
 " considered a valid file name. Or does it already do that?
-
-" Make a mapping to store the file name followed by the line number the cursor
-" is on in the default register.
 
 " Make a mapping for g;. g; will be called as normal and then check if the
 " position has actually moved. If it hasn't then call g; again. So a bit of a
@@ -543,11 +540,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj"<CR>
 " appropriate indent for the syntax item? For braces, a quick way to do it is
 " d]} but it doesn't retain indent. Maybe also check out vim-pasta:
 " https://github.com/sickill/vim-pasta
-
-" Surround mapping to delete the surrounding spaces.
-
-" Make mappings >p and >P which paste code and then auto indent it. Actually
-" maybe =p and =P or gop and goP would be a better choice.
 
 " Have a command to go back to the previous save state. I'm picturing that if
 " you save at point A then make changes and don't save, running this command
@@ -581,10 +573,9 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj"<CR>
 " { and } but end on the line preceding the empty line that those commands
 " would normally take you to.
 
-" Maybe make commands ,u and ,r to go to the oldest and newest undo state of
-" the file respectively.
-
 " Always highlight the middle of the screen so I know where 'M' will jump to.
+" Is it possible to highlight a specific line in the number column? Then I
+" could just highlight that middle number.
 
 " I should probably not be using 'make' and 'makeprg' to execute files. That
 " piece of functionality is, I think, meant to be used with the quickfix list.
@@ -618,8 +609,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj"<CR>
 " Have a visual mapping or something where we can highlight a number and it
 " will tell you how many days, hours etc... make up the number (assuming the
 " number is seconds)
-
-" Learn more about netrw and what it can do.
 
 " Make <C-w> in command line mode (and maybe insert mode?) delete a '/'. That
 " way it will be easier to delete a filepath.
@@ -956,14 +945,22 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj"<CR>
 " it's replacement.
 noremap <SPACE> :
 
-" TODO: Make these repeatable. Also, ':' can normally be used in operator
-" pending mode, since (at the time of this writing) space is bound to ':' that
-" means we can't use it with the 'd' operator. I've never needed to use ':' in
-" operator pending mode but keep it in mind anyway.
 " Inserts one space on either side of the character under the cursor.
-nnoremap <leader><SPACE> i<SPACE><RIGHT><SPACE><LEFT><ESC>
+" Overcomplicated? Possibly, but I got to play with regex's and have a
+" function with a cool name so I say it's worth it. All this function does is
+" surround the current character with spaces. TODO: Surround.vim can surround
+" a text object with spaces but for some reason when I exexcute 'yzl ' it
+" waits for me to enter another character. Until I figure that out, I'll keep
+" this.
+function! SplitKick()
+    let pat = '^\(.\{'.(col('.')-1).'\}\)\(.\)'
+    let sub = '\1 \2 '
+    call setline('.', substitute(getline('.'), pat, sub, ''))
+    normal! l
+endfunction
+nnoremap <leader><SPACE> :call SplitKick() <BAR> call repeat#set("\<leader> ", v:count)<CR>
 " Deletes one character from either side of the character under the cursor.
-nnoremap d<SPACE> i<BS><RIGHT><RIGHT><BS><ESC>
+nnoremap d<SPACE> i<BS><RIGHT><RIGHT><BS><ESC>:call repeat#set("d ", v:count)<CR>
 
 " To get a good understanding for how a piece of code works I'll document the
 " important function calls and what they do, essentially writing down the
@@ -1035,6 +1032,12 @@ nnoremap go =
 xnoremap go =
 nnoremap goo ==
 nnoremap gO go
+" Pastes code and auto indents it with =
+function! PasteAndIndent(paste_cmd)
+    execute "keepjumps normal! ".a:paste_cmd."'[v']="
+endfunction
+nnoremap gop :call PasteAndIndent('p')<CR>
+nnoremap goP :call PasteAndIndent('P')<CR>
 
 " When you look at it more, pasting in vim is a little odd. For a
 " character-wise paste the cursor is placed at the end of the paste, which
