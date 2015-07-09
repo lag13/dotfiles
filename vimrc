@@ -354,6 +354,9 @@ augroup END
 " there was a fuzzy search extension, very cool.
 " 23. http://stackoverflow.com/questions/13406751/vim-completion-based-on-buffer-name
 " autocompletion based on buffer name.
+" 24. Plugins that 'close' programming structures for you:
+" https://github.com/rstacruz/vim-closer and
+" https://github.com/tpope/vim-endwise.
 
 " TODO: In making a PR for sneak.vim I learned about vader.vim, which is a
 " testing framework for vim. vader.vim will output information about the test
@@ -422,7 +425,7 @@ nmap yz  <Plug>Ysurround
 nmap yZ  <Plug>YSurround
 nmap yzz <Plug>Yssurround
 nmap yZz <Plug>YSsurround
-nmap yZZ <Plug>YSzurround
+nmap yZZ <Plug>YSsurround
 xmap Z   <Plug>VSurround
 xmap gZ  <Plug>VgSurround
 " TODO: It looks like custom surround objects can 'ys' operator. Is there any
@@ -432,6 +435,9 @@ let g:surround_99  = "/* \r */"
 " 'x' to more easily make a search on eXact word boundaries
 let g:surround_120 = "\\<\r\\>"
 
+" TODO: If I hit <BS> when being prompted to sneak, I think it would be nice
+" if it actually just did a <BS> then let me continue typing. As of now it
+" stops the sneak.
 " TODO: Bug? If I use 't' of 'f' in operator-pending mode and there is no
 " character to delete then it still deletes the next character.
 let g:sneak#textobject_z = 0
@@ -510,6 +516,23 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " }}}
+
+" Forget if I wrote a todo for this or not. Make a command which will delete a
+" 'statement' but leave the statement's content. So it could delete an if
+" statement but leave it's contents. Similarly it would be nice to have a
+" command which does the reverse (i.e take a range of lines and insert them
+" into a statement).
+
+" Make a mark (or find out if there already is one) which will be set
+" everytime you first enter a file. So the first location you enter in a file
+" will be stored in a mark.
+
+" I feel like it would be nice to have a command which only sets the search
+" register. So it will be like '*' but doesn't actually search.
+
+" Sounds kind of ridiculous but what about a text object for colors? Like the
+" word 'red' and 'blue' would be considered text objects. So would hexadecimal
+" colors and any other sort you can imagine.
 
 " Not a huge deal but what about making an improvement to the gf family of
 " commands where gf will scan ahead until it is on a character that could be
@@ -1314,6 +1337,8 @@ noremap ` '
 nnoremap Y y$
 " Yank the entire line characterwise
 nnoremap yY 0y$
+" Because I can
+nnoremap yp yyp
 
 " Sometimes I just want to clear the line but keep the space it took up.
 nnoremap dD :call setline('.', '')<CR>
@@ -1586,26 +1611,47 @@ onoremap rv :<C-u>call TextObjRVal()<CR>
 xnoremap rv :<C-u>call TextObjRVal()<CR>
 
 " Text object for a heredoc. I don't really see myself using this much, but I
-" thought it would be fun to make :).
+" thought it would be fun to make :). This seeks for the next here doc to
+" find, searching forwards first. TODO: Make explicite next and last here doc
+" objects. Still a bit of refactoring to do with the boolean logic and there
+" could be a bug. I think I notice that if there is no heredoc to find, then
+" my repeat command gets clobberred. Is there a way to fix this? Look at
+" targets.vim for tips on how to go about making a text object when you could
+" be inside a multi-line text object.
 function! TextObjHereDoc(around_p)
-    let save_unnamed_register = @"
-    let save_pos = getpos('.')
+    let w = winsaveview()
     let hd_region = GetStartEndHereDocPos(1, a:around_p)
-    let old_hd_region = hd_region
-    if empty(hd_region[0]) || empty(hd_region[0]) || !(hd_region[0][1] - (a:around_p ? 0:1) <=# save_pos[1] && save_pos[1] <=# hd_region[1][1] + (a:around_p ? 0:1))
-        call setpos('.', save_pos)
-        let hd_region = GetStartEndHereDocPos(0, a:around_p)
-        if empty(hd_region[0])
-            let hd_region = old_hd_region
+    let next_hd_region = GetStartEndHereDocPos(0, a:around_p)
+    if NoHereDocFound(hd_region) || CursorNotInsideHereDoc(hd_region, a:around_p)
+        if NoHereDocFound(hd_region) && NoHereDocFound(next_hd_region)
+            call winrestview(w)
+            return
+        elseif NoHereDocFound(hd_region)
+            let hd_region = next_hd_region
         endif
     endif
-    " Mark the visual selection
-    call cursor(hd_region[0][1], hd_region[0][2])
+
+    " Found a here doc, highlight it.
+    call setpos('.', hd_region[0])
     execute 'normal! '(a:around_p ? 'v':'V')
-    call cursor(hd_region[1][1], hd_region[1][2])
+    call setpos('.', hd_region[1])
 endfunction
+" Convenience function
+function! CursorNotInsideHereDoc(hd_textobject, around_p)
+    let pos = getpos('.')
+    let hd_start_line = a:hd_textobject[0][1] - (a:around_p ? 0:1)
+    let hd_end_line = a:hd_textobject[1][1] - (a:around_p ? 0:1)
+    return !(hd_start_line <=# pos[1] && pos[1] <=# hd_end_line)
+endfunction
+" hd_textobject is the start and end position of the heredoc.
+function! NoHereDocFound(hd_textobject)
+    return empty(a:hd_textobject[0])
+endfunction
+" Returns a list of two tuples which are the start and end position of the
+" heredoc.
 function! GetStartEndHereDocPos(backwards_p, around_p)
     let save_unnamed_register = @"
+    let save_pos = getpos('.')
     if !search('<<<\?', 'cW' . (a:backwards_p ? 'b':''))
         return [[], []]
     endif
@@ -1627,8 +1673,24 @@ function! GetStartEndHereDocPos(backwards_p, around_p)
     endif
     let end_hd_pos = getpos('.')
     let @" = save_unnamed_register
+    call setpos('.', save_pos)
     return [start_hd_pos, end_hd_pos]
 endfunction
+" TODO: Just ran into an error when trying to select this heredoc. Look into
+" what's causing the error.
+"  // This would be the correct query if $ACTIVE_STATE was defined. It's different per system and cannot be
+"  // defined until we have access to the configuration API. Until then, this will always be reported as null.
+" //      $query = <<<EOQ
+" //    SELECT COUNT(*) AS numActiveJobPostings
+" //    FROM `publication`
+" //    AND publication.iActif = 1
+" //    AND NOW() >= dtDebut
+" //    AND NOW() <= dtFin
+" //    AND `publication`.`iSuppr` <> 1
+" //EOQ;
+" //
+" //        return $this->getIntQueryResult($query);
+
 onoremap <silent> ihd :<C-u>call TextObjHereDoc(0)<CR>
 xnoremap <silent> ihd :<C-u>call TextObjHereDoc(0)<CR>
 onoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
@@ -1787,17 +1849,27 @@ command! Exeggutor :!chmod u-x %
 
 " At some point I had installed a plugin called easydir
 " (https://github.com/duggiefresh/vim-easydir) which created an autocommand on
-" BufWritePre,FileWritePre that creates any directories that don't exist. I
+" BufWritePre,FileWritePre that creates any non-existant directories. That way
+" you could write a file even if the directory in question didn't exist. I
 " decided I don't like having that autocommand so I created a dedicated
-" command which does the same thing.
-function! CreateAndSaveDirectory()
-  let s:directory = expand('%:p:h')
-  if !isdirectory(s:directory)
-    call mkdir(s:directory, 'p')
-  endif
-  write
+" command which does the same thing. TODO: Make this command auto-complete on
+" file paths.
+function! CreateAndSaveDirectory(...)
+    if a:0
+        let l:directory = fnamemodify(a:1, ':p:h')
+    else
+        let l:directory = expand('%:p:h')
+    endif
+    if !isdirectory(l:directory)
+        call mkdir(l:directory, 'p')
+    endif
+    if a:0
+        execute "write ".a:1
+    else
+        write
+    endif
 endfunction
-command! Write call CreateAndSaveDirectory()
+command! -nargs=1 Write call CreateAndSaveDirectory(<f-args>)
 
 " }}}
 
