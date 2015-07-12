@@ -1,23 +1,23 @@
 [submodule "bundle/vim-colors-solarized"]
-	path = bundle/vim-colors-solarized
+	path = bundle/solarized
 	url = https://github.com/altercation/vim-colors-solarized.git
 [submodule "bundle/vim-surround"]
-	path = bundle/vim-surround
+	path = bundle/surround
 	url = https://github.com/tpope/vim-surround.git
 [submodule "bundle/vim-commentary"]
-	path = bundle/vim-commentary
+	path = bundle/commentary
 	url = https://github.com/tpope/vim-commentary.git
 [submodule "bundle/vim-repeat"]
-	path = bundle/vim-repeat
+	path = bundle/repeat
 	url = https://github.com/tpope/vim-repeat.git
 [submodule "bundle/vim-indent-object"]
-	path = bundle/vim-indent-object
+	path = bundle/indent-object
 	url = https://github.com/michaeljsmith/vim-indent-object.git
 [submodule "bundle/ctrlp"]
 	path = bundle/ctrlp
 	url = https://github.com/ctrlpvim/ctrlp.vim.git
 [submodule "bundle/vim-indentwise"]
-	path = bundle/vim-indentwise
+	path = bundle/indentwise
 	url = https://github.com/jeetsukumaran/vim-indentwise.git
 [submodule "bundle/exchange"]
 	path = bundle/exchange
@@ -31,3 +31,6 @@
 [submodule "bundle/targets"]
 	path = bundle/targets
 	url = https://github.com/wellle/targets.vim.git
+[submodule "bundle/nerdree"]
+	path = bundle/nerdtree
+	url = https://github.com/scrooloose/nerdtree.git

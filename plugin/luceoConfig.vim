@@ -4830,6 +4830,9 @@ endfunction
 
 " Miscellaneous {{{
 
+" Sometimes the source code directly references files in this directory
+set path+=src/view
+
 " I found myself needing to copy the attributes 'libelle' and ('type-noeud' or
 " 'type-liste') a lot, like when putting fields in the filter, so I thought
 " I'd make a mapping to do it for me.

@@ -158,16 +158,6 @@ set nojoinspaces
 " match, and some information about where the matches are coming from will be
 " in the menu.
 set completeopt=menuone,preview
-" When typing text, comments will automatically wrap, when hitting return
-" inside of a comment the 'comments' options wil be inserted at the begginning
-" of the next line, I'm not entirely sure what 'q' does I think it might
-" format comments separately, and correctly format numbered lists.
-" nqrowcb - seems to be happening in the php files.
-
-" TODO: I noticed that on the work computer this was getting set to
-" something else when editing my vimrc. Does file-type related code run
-" after the normal vimrc stuff?
-set formatoptions=crqn
 " Highlights the current line of the cursor.
 set cursorline
 " Don't update the screen while executing macros and a couple other things
@@ -183,6 +173,10 @@ set pastetoggle=<F10>
 " have just been annoyances, but my pessimistic self still wants to keep them
 " around just in case something happens.
 set directory=~/.vim
+" Some code here and in the bashrc and now when I invoke :sh from within vim,
+" that shell will have a modified prompt.
+let $PS1_VIM = 'yep'
+let $PS1 = 'VIM SHELL' . $PS1
 
 " }}}
 
@@ -305,9 +299,12 @@ augroup general_autocommands
         endif
     endfunction
     autocmd BufWrite * call DetectScriptFileType()
-    " Reload file automatically when a file's mode is changed.
+    " Reload file automatically when a file's mode is changed. This was made
+    " after I made the :Exeggcute command.
     autocmd FileChangedShell * if v:fcs_reason ==# 'mode' | let v:fcs_choice = 'reload' | endif
-
+    " Mark the position where you last left the buffer. Thought it could come
+    " in handy, I guess we'll find out.
+    autocmd BufLeave * normal! ml
     " Rather nifty I think
     autocmd InsertLeave * set nopaste
 augroup END
@@ -363,19 +360,6 @@ augroup END
 " data (what failed, what passed). It seems that that output cannot be
 " redirected to a file/command though which I feel is a shame especially if a
 " lot of test data is being outputted. See if that can be fixed.
-
-" TODO: I would like it if the [% mapping goes to the location where [% would
-" take you if you were on the previous level of indentation currently, if
-" you're already on the line that [% would take you, you'll stay on that line.
-
-" Trigger netrw
-nnoremap - :Explore<CR>
-" No banner at the top of the netrw buffer
-let g:netrw_banner = 0
-" Tree directory view
-let g:netrw_liststyle = 3
-
-" TODO: It would be nice if targets.vim ignored escaped double quotes.
 " TODO: I think it would be nice if targets.vim only added to the jumplist if
 " we are not already inside the text object. So if we are inside the text
 " object, don't add to the jump list.
@@ -393,6 +377,11 @@ let g:netrw_liststyle = 3
 " <form name="MainForm" id="MainForm" method="post" action="<?php echo $oPage->getUrlNoParams()?>">
 "     <p>hello</p>
 " </form>
+
+" Use nice arrows when displaying the tree
+let g:NERDTreeDirArrows=1
+" Close nerdtree after opening a file
+let g:NERDTreeQuitOnOpen=1
 
 " getchar() in expression mappings don't work below version 704 (technically
 " 7.3.338)
@@ -523,13 +512,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " command which does the reverse (i.e take a range of lines and insert them
 " into a statement).
 
-" Make a mark (or find out if there already is one) which will be set
-" everytime you first enter a file. So the first location you enter in a file
-" will be stored in a mark.
-
-" I feel like it would be nice to have a command which only sets the search
-" register. So it will be like '*' but doesn't actually search.
-
 " Sounds kind of ridiculous but what about a text object for colors? Like the
 " word 'red' and 'blue' would be considered text objects. So would hexadecimal
 " colors and any other sort you can imagine.
@@ -537,10 +519,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " Not a huge deal but what about making an improvement to the gf family of
 " commands where gf will scan ahead until it is on a character that could be
 " considered a valid file name. Or does it already do that?
-
-" Make a mapping for g;. g; will be called as normal and then check if the
-" position has actually moved. If it hasn't then call g; again. So a bit of a
-" smarter g;. I think I could make my g: mapping also follow this behavior.
 
 " I'm thinking about using capital letter marks as a way to trace the call
 " stack when I'm hunting down a bug or a way to improve a program. So I will
@@ -580,10 +558,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " 2. The CursorHold event (I like this one)
 " 3. The FocusLost event
 
-" TODO: Look into changing the prompt of the shell used after invoking :sh. I
-" could say something like 'VIM SHELL' in the prompt just to emphasize the
-" fact that this shell was started from vim.
-
 " Look into running vim as a daemon.
 " http://www.reddit.com/r/vim/comments/3ayhdx/a_quick_question_about_vim_server/
 
@@ -603,9 +577,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " I should probably not be using 'make' and 'makeprg' to execute files. That
 " piece of functionality is, I think, meant to be used with the quickfix list.
 
-" Customize netrw to delete the buffer associated with a file when deleting a
-" file.
-
 " TODO: I'm thinking about adding a list of buffers on vim's tabline. The
 " comments of this reddit post had a plugin which does JUST that, look into
 " it. In preparation I've already made the <C-p> and <C-n> commands switch
@@ -616,6 +587,13 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " whether they have the same cwd() or not).
 " http://www.reddit.com/r/vim/comments/382v6q/my_experience_switching_to_buffers/
 " https://github.com/ap/vim-buftabline
+" Change the headings on tabs to display the current directory for the active
+" file. Some quick research, see :help setting-tabline. 'tabline' is the text
+" that gets displayed across the ENTIRE tab page it uses the same format as
+" 'statusline'. 'showtabline' lets us display the tabline at all times if
+" desired. Use the function getcwd() to get the current directory, to put it
+" in the statusline we'd have to do something like this :set
+" tabline=%!getcwd()
 
 " Have a visual command to select run the selected text as an Ex command
 
@@ -635,14 +613,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " Make <C-w> in command line mode (and maybe insert mode?) delete a '/'. That
 " way it will be easier to delete a filepath.
-
-" Change the headings on tabs to display the current directory for the active
-" file. Some quick research, see :help setting-tabline. 'tabline' is the text
-" that gets displayed across the ENTIRE tab page it uses the same format as
-" 'statusline'. 'showtabline' lets us display the tabline at all times if
-" desired. Use the function getcwd() to get the current directory, to put it
-" in the statusline we'd have to do something like this :set
-" tabline=%!getcwd()
 
 " Is there a text object to change a file name? Also could we have a text
 " object to change between the delimiters in g:targets_separators?
@@ -759,9 +729,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " it can be done, I just don't how to yank multiple things but still use them in
 " a meaningful way.
 
-" Think about using <C-l> and <C-h> for window movements and bind other
-" Control key chords to switch between tabs.
-
 " Could we create a paste operator? That sounds like a fun challenge. So
 " something like: ,pi" will paste from the default register into the i" text
 " object. It really probably wouldn't benefit me too much BUT I could make
@@ -786,13 +753,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " Add some function to create class diagrams. I could give it the hierarchy in
 " some form and it will draw a nicely spaced class diagram.
 
-" I had to do a lot of yanks which were repetative. In particular I kept
-" running this yank: "*yi", so yank inside quotes into the clipboard. Turns
-" out that you can add a flag 'y' to the 'cpoptions' setting and then the '.'
-" command will repeat the last yank!!! Super cool. I don't know if I'd keep it
-" on all of the time but I could defeinitely see myself turning it on in
-" specific situations like this. See repeat.txt for more information.
-
 " I liked this article:
 " http://viming.blogspot.com/2008/09/conditionally-applying-macro-recordings.html
 " I think I could make good use of it because sometimes I have a macro that I
@@ -806,29 +766,11 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " totally work. Alternatively, I think setting the 'wrapscan' option would
 " help me accomplish what I want.
 
-" Automatically set marks 'w and 'm to match the marks '[ and '] respectively.
-" I chose 'w and 'm because those are easier to type and they are sort of
-" mirror images of eachother just like '[ and '] are.
-
 " A text object to select a chunk of code stopping before any commented
 " sections. So a code text object.
 
 " TODO: A mapping to type out the previously made auto-completion. This would
 " probably be an insert mapping.
-
-" TODO: I just started actively using capital letter marks to help with code
-" diving expeditions. Maybe write some little plugin which prints the name of
-" the next capital mark I have available, it could be printed in the status
-" line. OR I could also come up with a mapping to just use the next unused
-" capital mark automatically. That way I wouldn't have to worry about it at
-" all. The marks available for that wrapper would probably be some subset of
-" them all (like J-Q) or something like that. I could also print out which
-" marks are used in the current file, i.e if mark 'A is in file 'file1' and
-" I'm editing file1 then that mark will be displayed in the status line. I
-" could also incorporate this mark stuff in my documenting of source code. I
-" could print out a list of all files attached to a capital letter mark as
-" well as the line of code attached to that mark or something like that. Hmmm
-" yeah, I like that idea.
 
 " TODO: Could we have automatic completion on whole strings? Right now we can
 " do words and whole lines and some other things I think but I don't know
@@ -895,10 +837,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " Make it so that doing <C-r>/ in Insert mode will NOT include the \<\>
 " surrounding the search text. I think I find myself fairly often using the *
 " and then want to paste that data somewhere but the \<\> is unecesarry.
-
-" Look up the pattern \%V when searching. Seems pretty cool, we cand search in
-" the last visual selection!
-" http://vim.wikia.com/wiki/Search_only_over_a_visual_range
 
 " Could we configure vim so every time we leave insert mode we leave a mark?
 " I'm picturing an improvement for those gp and gP commands where it will set
@@ -1096,8 +1034,19 @@ endfunction
 nnoremap <leader>j :call SplitLine()
             \\| silent! call repeat#set("\<leader>j", v:count)<CR>
 
+" Slightly 'smarter' g; command where if the cursor doesn't move after issuing
+" a g; then it will issue it again.
+function! SmartOlderChange()
+    let save_pos = getpos('.')
+    normal! g;
+    if getpos('.') ==# save_pos
+        normal! g;
+    endif
+endfunction
+nnoremap <silent> g; :call SmartOlderChange()<CR>
 " An altered version of g; which adds to the jumplist
-nnoremap g: m'g;
+nnoremap <silent> g: m':call SmartOlderChange<CR>
+
 
 " Inspired by this page I made a mapping:
 " http://vim.wikia.com/wiki/Repeat_last_command_and_put_cursor_at_start_of_change
@@ -1414,6 +1363,24 @@ endfunction
 nnoremap <silent> zB :set operatorfunc=RedrawCursorLineAtBottom<CR>g@
 vnoremap <silent> zB :<C-u>call RedrawCursorLineAtBottom(visualmode(), 1)<CR>
 
+" Taken from Steve Losh's vimscript tutorial
+function! GrepOperator(type)
+    let saved_unnamed_register = @@
+    if a:type ==# 'v'
+        normal! `<v`>y
+    elseif a:type ==# 'char'
+        normal! `[v`]y
+    else
+        return
+    endif
+    silent execute "grep! -R " . shellescape(@@) . " ."
+    copen
+    redraw!
+    let @@ = saved_unnamed_register
+endfunction
+nnoremap <leader>g :set operatorfunc=GrepOperator<CR>g@
+vnoremap <leader>g :<C-U>call GrepOperator(visualmode())<CR>
+
 " }}}
 
 " Insert Mappings {{{
@@ -1438,22 +1405,28 @@ noremap! <C-l> <C-r><C-r>0
 " Copied the code from visual star search plugin mentioned in 'Practical Vim'.
 " Now hitting * or # when visually selecting text will search for the visually
 " selected text.
-function! VGetSearch(cmdtype, exact)
+function! VGetSearch(cmdtype)
     let save_unnamed_register = @"
     normal! gvy
     let search_pat = substitute(escape(@", a:cmdtype . '\'), '\n', '\\n', 'g')
-    if a:exact
-        let search_pat = '\V\<' . search_pat . '\>'
-    else
-        let search_pat = '\V' . search_pat
-    endif
+    let search_pat = '\V' . search_pat
     let @" = save_unnamed_register
     return search_pat
 endfunction
-xnoremap * :<C-u>execute 'normal! /' . VGetSearch('/', 1) . "\r"<CR>zv
-xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?', 1) . "\r"<CR>zv
-xnoremap g* :<C-u>execute 'normal! /' . VGetSearch('/', 0) . "\r"<CR>zv
-xnoremap g# :<C-u>execute 'normal! ?' . VGetSearch('?', 0) . "\r"<CR>zv
+xnoremap * :<C-u>execute 'normal! /' . VGetSearch('/') . "\r"<CR>zv
+xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>zv
+
+" When configuring I often search for the definition of a constant. So I put
+" my cursor of the constant, hit '*', then navigate to that file to search for
+" the constant's definition. But it's annoying that when I return to the file
+" I hit '*' my cursor typically changes position. This is meant to stop that.
+function! StarSetSearch()
+    let save_unnamed_register = @"
+    normal! yiw
+    let @/ = @"
+    let @" = save_unnamed_register
+endfunction
+nnoremap <leader>* :call StarSetSearch()<CR>
 
 " In this video at 6:49: https://www.youtube.com/watch?v=zIOOLZJb87U he uses a
 " mapping where he visually selects some text and is prompted for a variable
