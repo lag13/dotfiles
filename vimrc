@@ -1045,8 +1045,7 @@ function! SmartOlderChange()
 endfunction
 nnoremap <silent> g; :call SmartOlderChange()<CR>
 " An altered version of g; which adds to the jumplist
-nnoremap <silent> g: m':call SmartOlderChange<CR>
-
+nnoremap <silent> g: m':call SmartOlderChange()<CR>
 
 " Inspired by this page I made a mapping:
 " http://vim.wikia.com/wiki/Repeat_last_command_and_put_cursor_at_start_of_change
@@ -1170,11 +1169,6 @@ function! ReplaceOperator(type)
 endfunction
 " nnoremap <silent> gr :set operatorfunc=ReplaceOperator<CR>g@
 " vnoremap <silent> gr :<C-u>call ReplaceOperator(visualmode())<CR>
-" I'm unsure how to make an operator for the above request but I made this
-" super simple solution for visual mode. I'll just stick with this for now
-" because it does do what I want. In doing this, I wonder if it would be worth
-" it to create an operator to replace a text-object with a specfic character.
-vnoremap <silent> gr r<SPACE>R
 
 " Create command to add a space before or after the cursor in insert mode.
 

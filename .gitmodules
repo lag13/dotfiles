@@ -34,3 +34,6 @@
 [submodule "bundle/nerdree"]
 	path = bundle/nerdtree
 	url = https://github.com/scrooloose/nerdtree.git
+[submodule "bundle/replace-with-register"]
+	path = bundle/replace-with-register
+	url = https://github.com/vim-scripts/ReplaceWithRegister.git
