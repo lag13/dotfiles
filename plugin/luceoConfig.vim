@@ -2409,6 +2409,8 @@ let g:candidat_nodes =
 "            \ "obj" : "",
 "        \ },
 
+" TODO: I don't have any entries here for referentiel nodes. Like descriptif/departement_geo. Add those in somehow.
+
 let g:poste_nodes =
 \ {
     \ "date" :
@@ -4829,6 +4831,14 @@ endfunction
 " }}}
 
 " Miscellaneous {{{
+
+" TODO: Also add: set path+=src/profilsoft to the path and configure gf in
+" such a way that 'use' statements like this:
+"       use Profilsearch\Enum\CandidateTransferPart;
+" Actually go to the file in question. If I cchanged that use statement to
+" look like this:
+"       use Profilsearch/Enum/CandidateTransferPart.php;
+" Then it works.
 
 " Sometimes the source code directly references files in this directory
 set path+=src/view

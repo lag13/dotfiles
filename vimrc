@@ -378,10 +378,15 @@ augroup END
 "     <p>hello</p>
 " </form>
 
-" Use nice arrows when displaying the tree
-let g:NERDTreeDirArrows=1
-" Close nerdtree after opening a file
-let g:NERDTreeQuitOnOpen=1
+" Use plain characters to display the tree
+let g:NERDTreeDirArrows = 0
+" Launch NERDTree
+nnoremap - :edit .<CR>
+" Because my q; mapping causes the default 'q' mapping to hang
+let g:NERDTreeMapQuit = 'Q'
+let g:NERDTreeMinimalUI = 1
+" So the 'C' mapping doesn't hang
+let g:NERDTreeMapCWD = 'cD'
 
 " getchar() in expression mappings don't work below version 704 (technically
 " 7.3.338)
@@ -546,7 +551,12 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " you save at point A then make changes and don't save, running this command
 " will take you back to point A. It you save at point A, make changes and save
 " at point B and run this command (so the buffer is not modified) it will take
-" you back to point A.
+" you back to point A. Maybe even make a command to save a save state. For
+" example, if I was making a bunch of changes to a file (testing out different
+" ways of implementing the same thing for instance) then each time I get
+" something working I can remember a save state. In all reality it would
+" probably just be an undo number. Then I could scan through this list and
+" pick which save state I'd like to go to.
 
 " TODO: Make a zZ operator to center cursor in the middle of a text object?
 
@@ -905,6 +915,9 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " Sneak is using : as <Plug>SneakPrevious so I'm trying out using <SPACE> as
 " it's replacement.
 noremap <SPACE> :
+
+" Just in case we want the original functionality
+nnoremap gA ga
 
 " Inserts one space on either side of the character under the cursor.
 " Overcomplicated? Possibly, but I got to play with regex's and have a
@@ -1315,6 +1328,7 @@ nnoremap <silent><leader>x :w<CR>:make!<CR>
 " explorer but this was fun to make.
 function! TreeGoToFile(open_tab_p)
     let save_unnamed_register = @"
+    let w = winsaveview()
     normal! $F─w
     let path = ''
     while line('.') !=# 1
@@ -1328,6 +1342,7 @@ function! TreeGoToFile(open_tab_p)
     " We're at the top of the file, finish off the path to the file to
     " open.
     let path = getline('.') . path[:-2]
+    call winrestview(w)
     if a:open_tab_p
         execute "tabedit " . path
     else
@@ -1836,7 +1851,7 @@ function! CreateAndSaveDirectory(...)
         write
     endif
 endfunction
-command! -nargs=1 Write call CreateAndSaveDirectory(<f-args>)
+command! -nargs=? Write call CreateAndSaveDirectory(<f-args>)
 
 " }}}
 
