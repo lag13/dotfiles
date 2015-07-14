@@ -378,6 +378,17 @@ augroup END
 "     <p>hello</p>
 " </form>
 
+" TODO: NERD, I'm getting errors when I run the default 'gs' and 'gi'
+" commands. I have no idea why this is? Could there be something in my vimrc
+" which conflicts? Investigate this.
+
+" TODO: How can I make nerdtree remember they layout of the tree (which
+" directories I left open and such)? It seems that each time nerdtree is
+" invoked, it creates another buffer named 'NERD_tree_n' with n >= 1. If I
+" return to a buffer it retains the state I had. Also check out the
+" NERDTreeFocus command, seemed sort of promising? Unfortunately it is not
+" documented. Welcome to the world of open source I suppose!
+
 " Use plain characters to display the tree
 let g:NERDTreeDirArrows = 0
 " Launch NERDTree
@@ -387,6 +398,12 @@ let g:NERDTreeMapQuit = 'Q'
 let g:NERDTreeMinimalUI = 1
 " So the 'C' mapping doesn't hang
 let g:NERDTreeMapCWD = 'cD'
+" To have similar mappings between nerdtree and ctrlp
+let g:NERDTreeMapOpenSplit = 'x'
+let g:NERDTreeMapOpenVSplit = 'v'
+" Because 'x' is taken. 'l' stands for 'level' in my mind.
+let g:NERDTreeMapCloseDir = 'l'
+let g:NERDTreeMapCloseChildren = 'L'
 
 " getchar() in expression mappings don't work below version 704 (technically
 " 7.3.338)
