@@ -387,14 +387,24 @@ augroup END
 " invoked, it creates another buffer named 'NERD_tree_n' with n >= 1. If I
 " return to a buffer it retains the state I had. Also check out the
 " NERDTreeFocus command, seemed sort of promising? Unfortunately it is not
-" documented. Welcome to the world of open source I suppose!
+" documented. Welcome to the world of open source I suppose! I was thinking
+" about how I could make NERDTree behave like I want (this is assuming that
+" nerdtree can't do it natively). When I invoke nerdtree for the first time, I
+" could create a tab local variable storing the buffer number of that tree.
+" The next time I invoke nerdtree, if it finds that variable then switch to
+" that buffer. A wrench in this idea is what if I change directories in a
+" given tab? Then I would want to use a different nerd tree. Maybe a better
+" idea would be to keep a global dictionary of buffers indexed by cwd, yeah I
+" think I like that better. Other commands to read about are NERDTreeToggle
+" and NERDTreeFind which seem to retain the state of the tree.
 
 " Use plain characters to display the tree
 let g:NERDTreeDirArrows = 0
 " Launch NERDTree
 nnoremap - :edit .<CR>
-" Because my q; mapping causes the default 'q' mapping to hang
-let g:NERDTreeMapQuit = 'Q'
+" Because my q; mapping causes the default 'q' mapping to hang and now '-'
+" effectively toggles the nerd tree.
+let g:NERDTreeMapQuit = '-'
 let g:NERDTreeMinimalUI = 1
 " So the 'C' mapping doesn't hang
 let g:NERDTreeMapCWD = 'cD'
@@ -451,6 +461,10 @@ let g:surround_120 = "\\<\r\\>"
 " stops the sneak.
 " TODO: Bug? If I use 't' of 'f' in operator-pending mode and there is no
 " character to delete then it still deletes the next character.
+" TODO: Bug? I sneaked with f then did some other stuff. I repeated my sneak
+" with ';' but the jump list didn't get set. i.e when I hit '' after ; I
+" didn't end up where I invoked ;. Actually this was probably because 'f'
+" doesn't add to the jump list (I think).
 let g:sneak#textobject_z = 0
 let g:sneak#absolute_dir = 1
 " If I ever want to try out streak mode, I think these labels will not
@@ -527,6 +541,17 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " }}}
+
+" I wonder if there is sort of an 'optimal' distance the cursor moves before
+" it would be nice to add an entry to the jump list. I'm picturing that the
+" start and end coordinates would go through a function and the function would
+" spit out some number X. If X is bigger than some magical number Y then we
+" want to add to the jump list. I could imagine this mystical function could
+" be something like: 3.5*(row-difference) + col-difference. Then maybe this
+" magical number Y could be 20 or something. I bet the interplay between X and
+" Y could be a lot more complicated to. Like if the ending position fell at
+" the end of a line or on some other text object boundary that was 'easy' to
+" reach then maybe no entry would be added to the jump list.
 
 " Forget if I wrote a todo for this or not. Make a command which will delete a
 " 'statement' but leave the statement's content. So it could delete an if
