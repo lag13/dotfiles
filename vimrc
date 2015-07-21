@@ -382,29 +382,38 @@ augroup END
 " commands. I have no idea why this is? Could there be something in my vimrc
 " which conflicts? Investigate this.
 
-" TODO: How can I make nerdtree remember they layout of the tree (which
-" directories I left open and such)? It seems that each time nerdtree is
-" invoked, it creates another buffer named 'NERD_tree_n' with n >= 1. If I
-" return to a buffer it retains the state I had. Also check out the
-" NERDTreeFocus command, seemed sort of promising? Unfortunately it is not
-" documented. Welcome to the world of open source I suppose! I was thinking
-" about how I could make NERDTree behave like I want (this is assuming that
-" nerdtree can't do it natively). When I invoke nerdtree for the first time, I
-" could create a tab local variable storing the buffer number of that tree.
-" The next time I invoke nerdtree, if it finds that variable then switch to
-" that buffer. A wrench in this idea is what if I change directories in a
-" given tab? Then I would want to use a different nerd tree. Maybe a better
-" idea would be to keep a global dictionary of buffers indexed by cwd, yeah I
-" think I like that better. Other commands to read about are NERDTreeToggle
-" and NERDTreeFind which seem to retain the state of the tree.
-
 " Use plain characters to display the tree
 let g:NERDTreeDirArrows = 0
-" Launch NERDTree
-nnoremap - :edit .<CR>
-" Because my q; mapping causes the default 'q' mapping to hang and now '-'
-" effectively toggles the nerd tree.
-let g:NERDTreeMapQuit = '-'
+" Launches and quits the NERDTree. I wrote this code to make nerdtree behave
+" more like a 'split explorer' rather than a 'project drawer'. In doing this I
+" also created my own nerdtree quit mapping because nerdtree's default wasn't
+" able to retain the alternate file.
+let g:nerdtrees = {}
+function! MyNerdTreeToggle(toggle)
+    " Launch NERDTree
+    if a:toggle
+        let cwd = getcwd()
+        let cur_bnr = bufnr("%")
+        if has_key(g:nerdtrees, cwd)
+            let g:nerdtrees[cwd]["nerd_alt"] = cur_bnr
+            execute "keepalt buffer ".g:nerdtrees[cwd]["nerd_buf"]
+        else
+            keepalt edit .
+            let g:nerdtrees[cwd] = {"nerd_buf" : bufnr("%"), "nerd_alt" : cur_bnr}
+        endif
+    " Quit NERDTree
+    else
+        execute "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"]
+    endif
+endfunction
+function! MyNerdTreeQuit()
+    execute "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"]
+endfunction
+nnoremap - :call MyNerdTreeToggle(1)<CR>
+augroup filetype_nerdtree
+    autocmd!
+    autocmd Filetype nerdtree nnoremap <buffer> - :call MyNerdTreeToggle(0)<CR>
+augroup END
 let g:NERDTreeMinimalUI = 1
 " So the 'C' mapping doesn't hang
 let g:NERDTreeMapCWD = 'cD'
@@ -491,7 +500,7 @@ map  T       <Plug>Sneak_T
 " I'm already using <C-p> to switch between tabs/buffers
 
 let g:ctrlp_root_markers = ['web', 'app']
-let g:ctrlp_reuse_window = 'netrw\|help'
+let g:ctrlp_reuse_window = 'netrw\|help\|nerdtree'
 let g:ctrlp_follow_symlinks = 1
 " I used this little bash script to inspect which directories had the most
 " files and then set the g:ctrlp_custom_ignore variable accordingly.
@@ -541,6 +550,24 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " }}}
+
+" Now that I have <SPACE> as my : I noticed an issue. On all of the "Press
+" ENTER or type command to continue" prompts (like after using :ls), pressing
+" <SPACE> doesn't let me start a command. See if there's a way to fix this or
+" if it's a bug.
+
+" I had to do some grepping for John, looking for all the clients who have v1,
+" v2, and v3 fos. According to Olivier we have a total of 1381 clients (my
+" 'filter_clients_by' script returns 1399 but no matter). When I ran my script
+" for v1s, v2s, and v3s I got these counts: v1 = 208, v2 = 129, v3 = 511.
+" Adding 79 for the 4.0 sites (which my script doesn't acocunt for) gives a
+" total client count of 927. So that means around 460 are not accounted for.
+" Anyway, in trying to find out who those 460 clients are, I got a list of all
+" clients and a list of all clients who have some FO. I did a vim diff on
+" those two files and used this command to grab all the clients who were in
+" the file of all clients but not in the FO file. Note that 21 is the highlight
+" group ID for the DiffAdd hilight group. Just thought it could be useful to
+" notate: g/^/if diff_hlID(line('.'), col('.')) == 21 | normal! "Qyy | endif
 
 " I wonder if there is sort of an 'optimal' distance the cursor moves before
 " it would be nice to add an entry to the jump list. I'm picturing that the
@@ -1435,6 +1462,15 @@ vnoremap <leader>g :<C-U>call GrepOperator(visualmode())<CR>
 " }}}
 
 " Insert Mappings {{{
+
+" Adds another newline but keeps the cursor in it's current position. It's
+" basically the <C-o> mapping from emacs. I'm not sure how it works exactly
+" but it seems that using \<ESC> in a function which is used in an expression
+" mapping doesn't break the undo sequence.
+function! NewlineSameCursorPosition()
+    return "\<CR>\<ESC>kA"
+endfunction
+inoremap <S-CR> <C-r>=NewlineSameCursorPosition()<CR>
 
 " Another way to get out of insert mode. I cover all my bases by including
 " mappings for every capitalization possibility.

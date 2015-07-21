@@ -37,3 +37,12 @@
 [submodule "bundle/replace-with-register"]
 	path = bundle/replace-with-register
 	url = https://github.com/vim-scripts/ReplaceWithRegister.git
+[submodule "bundle/closer"]
+	path = bundle/closer
+	url = https://github.com/rstacruz/vim-closer.git
+[submodule "bundle/endwise"]
+	path = bundle/endwise
+	url = https://github.com/tpope/vim-endwise.git
+[submodule "bundle/eunuch"]
+	path = bundle/eunuch
+	url = https://github.com/tpope/vim-eunuch.git
