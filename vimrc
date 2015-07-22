@@ -62,8 +62,12 @@
 
 let mapleader = ","
 let maplocalleader = '\'
-" We want vim not vi!
+" In case we start vim with the -u option
 set nocompatible
+" Setting the above options also resets 'fo' to the default of tcq which
+" is annoying because everytime I source my vimrc this happens. So I try to
+" remedy that here.
+set formatoptions=croql
 " This exists so the .vim/ directory can still be named 'vim' even on a
 " windows machine. The 'exists' check is so I can re-source my .vimrc and not
 " mess up 'runtimepath'.
@@ -252,9 +256,13 @@ if has('gui_running')
     set guifont=Courier_New:h10:cANSI
     " Make distance between lines as small as possible.
     set linespace=0
-    " No need for the menu or toolbar
+    " No need for the menu, toolbar, or scrollbars
+    set guioptions-=r
     set guioptions-=m
     set guioptions-=T
+    set guioptions-=L
+    " Use console dialogs instead of popups
+    set guioptions+=c
     set background=dark
     colorscheme solarized
 elseif &term ==# 'win32'
@@ -311,7 +319,7 @@ augroup END
 
 " }}}
 
-" Plugin Configuration {{{
+" Plugin and Plugin Related Configuration {{{
 
 " Plugins To Checkout:
 " 1. Viewing man pages inside of vim
@@ -354,6 +362,13 @@ augroup END
 " 24. Plugins that 'close' programming structures for you:
 " https://github.com/rstacruz/vim-closer and
 " https://github.com/tpope/vim-endwise.
+" 25. Plugins that can shift function arguments:
+" https://github.com/PeterRincker/vim-argumentative
+" https://github.com/AndrewRadev/sideways.vim
+" 26. Highlilght css color codes: https://github.com/ap/vim-css-color
+" 27. Highlight 'interesting words'. Seems really nifty for reading through
+" code because you can just run <leader>k to highlight words of interest.
+" https://github.com/vasconcelloslf/vim-interestingwords
 
 " TODO: In making a PR for sneak.vim I learned about vader.vim, which is a
 " testing framework for vim. vader.vim will output information about the test
@@ -378,8 +393,25 @@ augroup END
 "     <p>hello</p>
 " </form>
 
+" TODO: Look into how to configure endwise so that it could auto-close tags or
+" if that is even possible.
+
+" TODO: See if endwise could also be triggered on the 'o' mapping.
+
+" Customizing closer.vim
+augroup custom_closer
+    autocmd!
+    autocmd FileType php
+                \ let b:closer = 1 |
+                \ let b:closer_flags = '([{'
+    autocmd FileType sh
+                \ let b:closer = 1 |
+                \ let b:closer_flags = '{'
+augroup END
+
 " TODO: NERD, I'm getting errors when I run the default 'gs' and 'gi'
-" commands. I have no idea why this is? Could there be something in my vimrc
+" commands. I have no idea why this is? I'm not actively using the commands
+" but I just want to know what's wrong. Could there be something in my vimrc
 " which conflicts? Investigate this.
 
 " Use plain characters to display the tree
@@ -387,7 +419,24 @@ let g:NERDTreeDirArrows = 0
 " Launches and quits the NERDTree. I wrote this code to make nerdtree behave
 " more like a 'split explorer' rather than a 'project drawer'. In doing this I
 " also created my own nerdtree quit mapping because nerdtree's default wasn't
-" able to retain the alternate file.
+" able to retain the alternate file. TODO: Ran into this error when I launched
+" nerdtree: E716: Key not present in Dictionary:
+" /mnt/vault/www/esa-education.luceosolutions.com E15: Invalid expression:
+" "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"] Error detected while
+" processing function MyNerdTreeToggle. What happened was that I manually
+" invoked NERDTree using :edit on a different directory than the cwd then when
+" I hit '-' to quit it failed because no entry had been added to g:nerdtrees.
+" I'm thinking that to make this more robust I'll need to create an
+" autocommand. I also get an error when I launch it from an empty buffer. It
+" seems that if you have an empty buffer. Looks like there is one more little
+" problem I didn't notice. When opening a file from within nerdtree, the
+" alternate file becomes messed up (i.e the alternate file becomes the nerd
+" tree). This is, unfortunately, probably not possible to fix but I'll look
+" into it anyhow. Maybe I could create my own <CR> mapping which will run
+" nerdtree's <CR> mapping then manually restore the alternate file or
+" something like that. Also check out this
+" https://www.reddit.com/r/vim/comments/3d4cpf/prevent_netrw_or_nerdtree_from_opening_when/
+" it uses that 'FileExplorer' thing again. I want to know what that is.
 let g:nerdtrees = {}
 function! MyNerdTreeToggle(toggle)
     " Launch NERDTree
@@ -420,9 +469,15 @@ let g:NERDTreeMapCWD = 'cD'
 " To have similar mappings between nerdtree and ctrlp
 let g:NERDTreeMapOpenSplit = 'x'
 let g:NERDTreeMapOpenVSplit = 'v'
+" TODO: Do not using 'l', we can copy text from the nerd tree and having 'l'
+" lets me get closer to the text I want to copy.
 " Because 'x' is taken. 'l' stands for 'level' in my mind.
 let g:NERDTreeMapCloseDir = 'l'
 let g:NERDTreeMapCloseChildren = 'L'
+" I don't see myself using NERDTrees 'J' and 'K' mappings and I'd before to
+" scroll with my mappings.
+let g:NERDTreeMapJumpFirstChild = ''
+let g:NERDTreeMapJumpLastChild = ''
 
 " getchar() in expression mappings don't work below version 704 (technically
 " 7.3.338)
@@ -434,6 +489,8 @@ endif
 xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object
 nmap ga <Plug>(EasyAlign)
+" Just in case we want the original functionality
+nnoremap gA ga
 " TODO: Could we configure easy align to format commented text if the ONLY
 " text being operated on are comments?
 let g:easy_align_delimiters = {
@@ -490,6 +547,9 @@ map  f       <Plug>Sneak_f
 map  F       <Plug>Sneak_F
 map  t       <Plug>Sneak_t
 map  T       <Plug>Sneak_T
+" Sneak is using : as <Plug>SneakPrevious so I'm trying out using <SPACE> as
+" it's replacement.
+noremap <SPACE> :
 
 " TODO: A bug with ctrlp? It says that <C-h> moves the cursor to the left but if
 " actually deletes characters.
@@ -551,10 +611,40 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " }}}
 
+" Add 'execute file' command support for C files:
+" http://stackoverflow.com/questions/2627886/how-do-i-run-a-c-program-from-vim.
+" I'm kind of picturing that everytime <leader>x gets called then it could
+" check for a Makefile if one exists then use it, otherwise just gcc all the C
+" fils in the current directory and run a.out. I'll have to look into it.
+" Also, consider having the output of whatever program that gets executed get
+" piped into a 'scratch' buffer. Alternatively I could run the 'clear' command
+" before executing.
+
+" Is there a way to close all windows in the current column or row? Like if I
+" have 4 windows, 3 are in column 1 and 1 is in column 2 I want to remove two
+" of the windows from column 1 but keep the one I'm focused on.
+
+" Mapping to open the current url. Actually, perhaps I could even have a
+" general 'open' operator which could detect the text being operated on and
+" try to run that text through the appropriate program or even open a program
+" that matches the text. So if it detects a url it could launch chrome, or if
+" the text ended in .mp3 it could open it with vlc or the like. I'm pretty
+" sure I remember seeing that netrw did offer this sort of functionality in
+" later versions when using the 'x' command, I'd like to see how that works.
+
+" Look into foldmethod=syntax. It sounds to me like it would automatically
+" create folds based on things like braces and parens. Inspired by:
+" https://www.reddit.com/r/vim/comments/3dmths/vim_unfolding_when_writing/
+
+" Is there any way (there probably is) that you can have your search term be
+" some text followed by nothing followed by more text? So picture the search
+" highlighting getting broken up in the middle.
+
 " Now that I have <SPACE> as my : I noticed an issue. On all of the "Press
 " ENTER or type command to continue" prompts (like after using :ls), pressing
-" <SPACE> doesn't let me start a command. See if there's a way to fix this or
-" if it's a bug.
+" <SPACE> doesn't let me start a command. Reading :help hit-enter, there
+" doesn't seem like a way to configure this, but maybe there is? Look into it
+" more.
 
 " I had to do some grepping for John, looking for all the clients who have v1,
 " v2, and v3 fos. According to Olivier we have a total of 1381 clients (my
@@ -615,17 +705,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " appropriate indent for the syntax item? For braces, a quick way to do it is
 " d]} but it doesn't retain indent. Maybe also check out vim-pasta:
 " https://github.com/sickill/vim-pasta
-
-" Have a command to go back to the previous save state. I'm picturing that if
-" you save at point A then make changes and don't save, running this command
-" will take you back to point A. It you save at point A, make changes and save
-" at point B and run this command (so the buffer is not modified) it will take
-" you back to point A. Maybe even make a command to save a save state. For
-" example, if I was making a bunch of changes to a file (testing out different
-" ways of implementing the same thing for instance) then each time I get
-" something working I can remember a save state. In all reality it would
-" probably just be an undo number. Then I could scan through this list and
-" pick which save state I'd like to go to.
 
 " TODO: Make a zZ operator to center cursor in the middle of a text object?
 
@@ -689,9 +768,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " Have a visual mapping or something where we can highlight a number and it
 " will tell you how many days, hours etc... make up the number (assuming the
 " number is seconds)
-
-" Make <C-w> in command line mode (and maybe insert mode?) delete a '/'. That
-" way it will be easier to delete a filepath.
 
 " Is there a text object to change a file name? Also could we have a text
 " object to change between the delimiters in g:targets_separators?
@@ -981,13 +1057,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " Normal Mappings {{{
 
-" Sneak is using : as <Plug>SneakPrevious so I'm trying out using <SPACE> as
-" it's replacement.
-noremap <SPACE> :
-
-" Just in case we want the original functionality
-nnoremap gA ga
-
 " Inserts one space on either side of the character under the cursor.
 " Overcomplicated? Possibly, but I got to play with regex's and have a
 " function with a cool name so I say it's worth it. All this function does is
@@ -1082,18 +1151,6 @@ endfunction
 nnoremap gop :call PasteAndIndent('p')<CR>
 nnoremap goP :call PasteAndIndent('P')<CR>
 
-" When you look at it more, pasting in vim is a little odd. For a
-" character-wise paste the cursor is placed at the end of the paste, which
-" makes sense to me, but for a line-wise paste the cursor is left at the start
-" of the paste. That inconsistancy is odd, so I'm going to fix it and see if I
-" like it. Now the cursor will always be positioned at the end of the pasted
-" text. Also, I don't find gp and gP's functionality useful so I've re-mapped
-" them to leave the cursor at the beginning of the pasted text.
-nnoremap <silent> p p:keepjumps normal! `]<CR>
-nnoremap <silent> P P:keepjumps normal! `]<CR>
-nnoremap <silent> gp p:keepjumps normal! `[<CR>:silent! call repeat#set("gp", v:count)<CR>
-nnoremap <silent> gP P:keepjumps normal! `[<CR>:silent! call repeat#set("gP", v:count)<CR>
-
 " Reselect the last changed/yanked text. I also made gv and gV text objects
 " because it looks cool :).
 noremap gV :<C-u>normal! `[v`]<CR>
@@ -1154,6 +1211,7 @@ nnoremap <leader>E# :split #<CR>
 " http://vimcasts.org/episodes/the-edit-command/
 nnoremap <leader>ew :e <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <leader>es :sp <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <leader>ex :sp <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <leader>ev :vsp <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <leader>et :tabe <C-R>=expand("%:p:h") . "/" <CR>
 
@@ -1163,11 +1221,45 @@ nnoremap <leader>et :tabe <C-R>=expand("%:p:h") . "/" <CR>
 " mapping.
 nnoremap <leader>t :tabe <BAR> redraw!<CR>:lcd<SPACE>
 
-" Undo's all changes made since opening the file.
+" Undo's all changes made since opening the file and saves the current undo state 
 nnoremap <silent><leader>u :let b:save_undo_nr = changenr() <BAR> silent! undo 1 <BAR> silent! undo<CR>
 " Redo's all changes since the above command was used. I would have tried to
 " redo ALL changes but I don't know of a good way to do that.
 nnoremap <silent><leader>r :if exists('b:save_undo_nr') <BAR> execute "undo ".b:save_undo_nr <BAR> endif<CR>
+
+" TODO: This is all still a work in progress. In starting my two ideas (an
+" undo to go to the previous save state and a way to save specific file undo
+" states to return to later) I realized this might be a little tricker than I
+" originally imagined. I'll work on it though. Have a command to go back to
+" the previous save state. I'm picturing that if you save at point A then make
+" changes and don't save, running this command will take you back to point A.
+" It you save at point A, make changes and save at point B and run this
+" command (so the buffer is not modified) it will take you back to point A.
+" Maybe even make a command to save a save state. For example, if I was making
+" a bunch of changes to a file (testing out different ways of implementing the
+" same thing for instance) then each time I get something working I can
+" remember a save state. In all reality it would probably just be an undo
+" number. Then I could scan through this list and pick which save state I'd
+" like to go to.
+
+" " Stores the change number on every save.
+" augroup save_states
+"     autocmd!
+"     autocmd BufEnter * if !exists('b:save_change_nums') | let b:save_change_nums = [] | endif
+"     autocmd BufWrite * call add(b:save_change_nums, changenr()) | let b:save_change_idx = len(b:save_change_nums - 1)
+" augroup END
+" function! GoToPreviousSaveState()
+"     " Need to add checks to make sure the list is non-empty or the index is
+"     " valid.
+"     if &modified
+"         execute 'undo '.b:save_change_nums[b:save_change_idx]
+"         let b:save_change_idx = b:save_change_idx - 1
+"     else
+"         execute 'undo '.b:save_change_nums[b:save_change_idx-1]
+"         let b:save_change_idx = b:save_change_idx - 1
+"     endif
+" endfunction
+" nnoremap U :call GoToPreviousSaveState()<CR>
 
 " H now goes to the first non blank character on the current line.
 noremap H ^
@@ -1364,6 +1456,7 @@ nnoremap Y y$
 nnoremap yY 0y$
 " Because I can
 nnoremap yp yyp
+nnoremap yP yyP
 
 " Sometimes I just want to clear the line but keep the space it took up.
 nnoremap dD :call setline('.', '')<CR>
@@ -1451,7 +1544,13 @@ function! GrepOperator(type)
     else
         return
     endif
-    silent execute "grep! -R " . shellescape(@@) . " ."
+    if has("win32") || has("win64")
+        let cmd = 'noautocmd vimgrep /\V'.escape(@@, '/\').'/gj **'
+    else
+        let cmd = 'silent grep! -R '.shellescape(@@).' .'
+    endif
+    execute cmd
+    call histadd("cmd", cmd)
     copen
     redraw!
     let @@ = saved_unnamed_register
@@ -1470,7 +1569,9 @@ vnoremap <leader>g :<C-U>call GrepOperator(visualmode())<CR>
 function! NewlineSameCursorPosition()
     return "\<CR>\<ESC>kA"
 endfunction
-inoremap <S-CR> <C-r>=NewlineSameCursorPosition()<CR>
+" Originally I had a <S-CR> mapping for this but it doesn't work on terminals
+" so I changed it.
+inoremap <C-d> <C-r>=NewlineSameCursorPosition()<CR>
 
 " Another way to get out of insert mode. I cover all my bases by including
 " mappings for every capitalization possibility.
@@ -1507,6 +1608,8 @@ xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>zv
 " my cursor of the constant, hit '*', then navigate to that file to search for
 " the constant's definition. But it's annoying that when I return to the file
 " I hit '*' my cursor typically changes position. This is meant to stop that.
+" TODO: Make this command actually highlight the search as if we were
+" searching.
 function! StarSetSearch()
     let save_unnamed_register = @"
     normal! yiw
@@ -1836,6 +1939,37 @@ xnoremap <leader>) :<C-u>call EndOfCurrentSentence(')', 1)<CR>
 " }}}
 
 " Command Mappings {{{
+
+" A mapping to delete to the next path seprator.
+function! DeleteBackOnePath(is_cmd_line)
+    if a:is_cmd_line
+        let cur_line = getcmdline()
+        let cursor_pos = getcmdpos() - 1
+    else
+        let cur_line = getline('.')
+        let cursor_pos = col('.') - 1
+    endif
+    if has("win32") || has("win64")
+        let path_separator = '\'
+    else
+        let path_separator = '/'
+    endif
+    let dels = ""
+
+    if cursor_pos > 1
+        if cur_line[cursor_pos - 1] ==# path_separator
+            let dels = dels."\<BS>"
+            let cursor_pos = cursor_pos - 1
+        endif
+        while cursor_pos > 0 && cur_line[cursor_pos-1] !=# path_separator
+            let dels = dels."\<BS>"
+            let cursor_pos = cursor_pos - 1
+        endwhile
+    endif
+    return dels
+endfunction
+cnoremap <expr> <C-b> DeleteBackOnePath(1)
+inoremap <expr> <C-b> DeleteBackOnePath(0)
 
 " Filter the list rather than proceed sequentially through the command
 " history.
