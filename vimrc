@@ -132,13 +132,14 @@ set showtabline=2
 set laststatus=2
 " Configure the status line
 set statusline=
-set statusline+=[%n]      " Buffer number
-set statusline+=\ [%<%f]  " Current file
-set statusline+=\ %m      " Modified flag
-set statusline+=\ %y      " File type
-set statusline+=\ %{&ff}  " File format
-set statusline+=\ %l/%L   " Current line num out of total
-set statusline+=\ %P      " Top/Bottom and percentage through file
+set statusline+=[%n]            " Buffer number
+set statusline+=\ [%<%f]        " Current file
+set statusline+=\ %m            " Modified flag
+set statusline+=\ %y            " File type
+set statusline+=\ %{&ff}        " File format
+set statusline+=\ %l/%L         " Current line num out of total
+set statusline+=\ %P            " Top/Bottom and percentage through file
+set statusline+=\ [%{getcwd()}] " Current working directory
 " Memory is cheap, let's bump up the amount recorded commands.
 set history=500
 " When tab completing, complete the longest possible prefix and display a list
@@ -177,10 +178,9 @@ set pastetoggle=<F10>
 " have just been annoyances, but my pessimistic self still wants to keep them
 " around just in case something happens.
 set directory=~/.vim
-" Some code here and in the bashrc and now when I invoke :sh from within vim,
-" that shell will have a modified prompt.
-let $PS1_VIM = 'yep'
-let $PS1 = 'VIM SHELL' . $PS1
+" Put the approprate code in my bashrc and now when I invoke :sh from within
+" vim, that shell will have a modified prompt.
+let $PS1_VIM = 'VIM SHELL ' . $PS1
 
 " }}}
 
@@ -558,6 +558,10 @@ noremap <SPACE> :
 " TODO: Consider activating the search on filename when looking through
 " buffers rather than the full path, that would narrow down searches quicker.
 " I'm already using <C-p> to switch between tabs/buffers
+" TODO: Possible bug? I opened 125 files in a folder by executing: 'vim
+" migration/*'. When I opened up other files and used my <leader>b mapping, it
+" didn't sort my files in most recently used order. I wonder why that was.
+" Did I just have too many buffers opened?
 
 let g:ctrlp_root_markers = ['web', 'app']
 let g:ctrlp_reuse_window = 'netrw\|help\|nerdtree'
@@ -610,6 +614,18 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " }}}
+
+" Look more into swap file configuration. I think that even after setting the
+" 'directory' option my swap files are still appearing in other places.
+
+" I think I could make my zS and zB text objects not move the cursor to the
+" type of the text object by registering a one time CursorMoved autocommand
+" like repeat.vim does. Look into doing this.
+
+" Create a 'file' text object making use of the 'isfname' setting. See this
+" post:
+" http://stackoverflow.com/questions/23224317/shortcut-to-select-a-file-path-text-object.
+" Perhaps I will install kana's text object utility function.
 
 " Add 'execute file' command support for C files:
 " http://stackoverflow.com/questions/2627886/how-do-i-run-a-c-program-from-vim.
@@ -1560,7 +1576,7 @@ vnoremap <leader>g :<C-U>call GrepOperator(visualmode())<CR>
 
 " }}}
 
-" Insert Mappings {{{
+" Insert Mappings and Abbreviations {{{
 
 " Adds another newline but keeps the cursor in it's current position. It's
 " basically the <C-o> mapping from emacs. I'm not sure how it works exactly
@@ -1585,6 +1601,10 @@ inoremap JK <ESC>
 " inoremap <C-l> <C-r><C-p>0
 noremap! <C-j> <C-r><C-r>"
 noremap! <C-l> <C-r><C-r>0
+
+iabbrev lg Lucas Groenendaal
+iabbrev lge Lucas.Groenendaal@careerbuilder.com
+iabbrev lgE groenendaal92@gmail.com
 
 " }}}
 

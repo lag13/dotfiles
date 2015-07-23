@@ -1,6 +1,9 @@
 " Some vimscript I wrote to help configure luceo systems.
 " By Lucas Groenendaal
 
+" Check out this post for setting up vim as more of an IDE when writing php
+" code: http://blog.joncairns.com/2012/05/using-vim-as-a-php-ide/
+
 " TODO: Seems like I might not have nodes in the data structure for <agence>
 " and some others in that hierarchy.
 
