@@ -165,8 +165,6 @@ set nojoinspaces
 set completeopt=menuone,preview
 " Highlights the current line of the cursor.
 set cursorline
-" Don't update the screen while executing macros and a couple other things
-set lazyredraw
 " Saw it in Steve Losh's .vimrc file. From reading the help doc on this option
 " it says it 'Improves the smoothness of redrawing...' and 'Indicates a fast
 " terminal connection.' I'm not exactly sure how it works but I know I have a
@@ -177,7 +175,7 @@ set pastetoggle=<F10>
 " Only create swap files in my home directory. In my experience swap files
 " have just been annoyances, but my pessimistic self still wants to keep them
 " around just in case something happens.
-set directory=~/.vim
+set directory=~/.vim//
 " Put the approprate code in my bashrc and now when I invoke :sh from within
 " vim, that shell will have a modified prompt.
 let $PS1_VIM = 'VIM SHELL ' . $PS1
@@ -288,10 +286,6 @@ endif
 
 augroup general_autocommands
     autocmd!
-    " Makes it so I'll be able to see what text I was editing previously even if
-    " it was inside a fold.
-    autocmd VimEnter * normal! zv
-
     " Typically filetype detection happens on the BufNewFile and BufRead
     " autocommand events, but for bash scripts this isn't good enough because
     " my bash files usually have no extension. Vim can detect the bash file
@@ -310,9 +304,11 @@ augroup general_autocommands
     " Reload file automatically when a file's mode is changed. This was made
     " after I made the :Exeggcute command.
     autocmd FileChangedShell * if v:fcs_reason ==# 'mode' | let v:fcs_choice = 'reload' | endif
-    " Mark the position where you last left the buffer. Thought it could come
-    " in handy, I guess we'll find out.
-    autocmd BufLeave * normal! ml
+    " Vim returns to the same line when re-opening a file.
+    autocmd BufReadPost *
+            \ if line("'\"") > 0 && line("'\"") <= line("$") |
+            \     execute 'normal! g`"zvzz' |
+            \ endif
     " Rather nifty I think
     autocmd InsertLeave * set nopaste
 augroup END
@@ -323,7 +319,8 @@ augroup END
 
 " Plugins To Checkout:
 " 1. Viewing man pages inside of vim
-" 2. ctags - Tags
+" 2. ctags and cscope and gutentags:
+" https://github.com/ludovicchabant/vim-gutentags - Tags
 " 3. NERDtree or vinegar or vimfiler or filebeagle or dirvish - File explorer.
 " http://www.reddit.com/r/vim/comments/3a7a6z/netrw_nerdtree/
 " 4. clang complete for autocompleting C/C++ code
@@ -369,6 +366,10 @@ augroup END
 " 27. Highlight 'interesting words'. Seems really nifty for reading through
 " code because you can just run <leader>k to highlight words of interest.
 " https://github.com/vasconcelloslf/vim-interestingwords
+" 28. Yank ring: https://github.com/vim-scripts/YankRing.vim
+" 29. Put the output of shell commands into a buffer:
+" https://github.com/sjl/clam.vim
+" 30. Grep operator: https://github.com/inside/vim-grep-operator
 
 " TODO: In making a PR for sneak.vim I learned about vader.vim, which is a
 " testing framework for vim. vader.vim will output information about the test
@@ -398,6 +399,8 @@ augroup END
 
 " TODO: See if endwise could also be triggered on the 'o' mapping.
 
+let g:exchange_indent = 1
+
 " Customizing closer.vim
 augroup custom_closer
     autocmd!
@@ -416,53 +419,58 @@ augroup END
 
 " Use plain characters to display the tree
 let g:NERDTreeDirArrows = 0
-" Launches and quits the NERDTree. I wrote this code to make nerdtree behave
-" more like a 'split explorer' rather than a 'project drawer'. In doing this I
-" also created my own nerdtree quit mapping because nerdtree's default wasn't
-" able to retain the alternate file. TODO: Ran into this error when I launched
-" nerdtree: E716: Key not present in Dictionary:
-" /mnt/vault/www/esa-education.luceosolutions.com E15: Invalid expression:
-" "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"] Error detected while
-" processing function MyNerdTreeToggle. What happened was that I manually
-" invoked NERDTree using :edit on a different directory than the cwd then when
-" I hit '-' to quit it failed because no entry had been added to g:nerdtrees.
-" I'm thinking that to make this more robust I'll need to create an
-" autocommand. I also get an error when I launch it from an empty buffer. It
-" seems that if you have an empty buffer. Looks like there is one more little
-" problem I didn't notice. When opening a file from within nerdtree, the
-" alternate file becomes messed up (i.e the alternate file becomes the nerd
-" tree). This is, unfortunately, probably not possible to fix but I'll look
-" into it anyhow. Maybe I could create my own <CR> mapping which will run
-" nerdtree's <CR> mapping then manually restore the alternate file or
-" something like that. Also check out this
-" https://www.reddit.com/r/vim/comments/3d4cpf/prevent_netrw_or_nerdtree_from_opening_when/
-" it uses that 'FileExplorer' thing again. I want to know what that is.
-let g:nerdtrees = {}
-function! MyNerdTreeToggle(toggle)
-    " Launch NERDTree
-    if a:toggle
-        let cwd = getcwd()
-        let cur_bnr = bufnr("%")
-        if has_key(g:nerdtrees, cwd)
-            let g:nerdtrees[cwd]["nerd_alt"] = cur_bnr
-            execute "keepalt buffer ".g:nerdtrees[cwd]["nerd_buf"]
-        else
-            keepalt edit .
-            let g:nerdtrees[cwd] = {"nerd_buf" : bufnr("%"), "nerd_alt" : cur_bnr}
-        endif
-    " Quit NERDTree
-    else
-        execute "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"]
-    endif
-endfunction
-function! MyNerdTreeQuit()
-    execute "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"]
-endfunction
-nnoremap - :call MyNerdTreeToggle(1)<CR>
-augroup filetype_nerdtree
-    autocmd!
-    autocmd Filetype nerdtree nnoremap <buffer> - :call MyNerdTreeToggle(0)<CR>
-augroup END
+
+" " Launches and quits the NERDTree. I wrote this code to make nerdtree behave
+" " more like a 'split explorer' rather than a 'project drawer'. In doing this I
+" " also created my own nerdtree quit mapping because nerdtree's default wasn't
+" " able to retain the alternate file. TODO: Ran into this error when I launched
+" " nerdtree: E716: Key not present in Dictionary:
+" " /mnt/vault/www/esa-education.luceosolutions.com E15: Invalid expression:
+" " "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"] Error detected while
+" " processing function MyNerdTreeToggle. What happened was that I manually
+" " invoked NERDTree using :edit on a different directory than the cwd then when
+" " I hit '-' to quit it failed because no entry had been added to g:nerdtrees.
+" " I'm thinking that to make this more robust I'll need to create an
+" " autocommand. I also get an error when I launch it from an empty buffer. It
+" " seems that if you have an empty buffer. Looks like there is one more little
+" " problem I didn't notice. When opening a file from within nerdtree, the
+" " alternate file becomes messed up (i.e the alternate file becomes the nerd
+" " tree buffer). This is, unfortunately, probably not possible to fix but I'll
+" " look into it anyhow. Maybe I could create my own <CR> mapping which will run
+" " nerdtree's <CR> mapping then manually restore the alternate file or
+" " something like that. Also check out this
+" " https://www.reddit.com/r/vim/comments/3d4cpf/prevent_netrw_or_nerdtree_from_opening_when/
+" " it uses that 'FileExplorer' thing again. I want to know what that is.
+" let g:nerdtrees = {}
+" function! MyNerdTreeToggle(toggle)
+"     " Launch NERDTree
+"     if a:toggle
+"         let cwd = getcwd()
+"         let cur_bnr = bufnr("%")
+"         if has_key(g:nerdtrees, cwd)
+"             let g:nerdtrees[cwd]["nerd_alt"] = cur_bnr
+"             execute "keepalt buffer ".g:nerdtrees[cwd]["nerd_buf"]
+"         else
+"             keepalt edit .
+"             let g:nerdtrees[cwd] = {"nerd_buf" : bufnr("%"), "nerd_alt" : cur_bnr}
+"         endif
+"     " Quit NERDTree
+"     else
+"         execute "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"]
+"     endif
+" endfunction
+" function! MyNerdTreeQuit()
+"     execute "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"]
+" endfunction
+" nnoremap - :call MyNerdTreeToggle(1)<CR>
+" augroup filetype_nerdtree
+"     autocmd!
+"     autocmd Filetype nerdtree nnoremap <buffer> - :call MyNerdTreeToggle(0)<CR>
+" augroup END
+
+" Until I have time/motivation to deal with my above attempts, I'll just use
+" nerdtree as a project drawer.
+nnoremap - :NERDTreeToggle<CR>
 let g:NERDTreeMinimalUI = 1
 " So the 'C' mapping doesn't hang
 let g:NERDTreeMapCWD = 'cD'
@@ -500,6 +508,10 @@ let g:easy_align_delimiters = {
             \ 'right_margin': 0 },
             \ 'm': {
             \ 'pattern':      '-' },
+            \ '[': {
+            \ 'pattern':      ']',
+            \ 'left_margin':  0,
+            \ 'right_margin': 0 },
             \ }
 
 " I prefer that all my sneak mappings use 's' so I changed all the surround
@@ -615,26 +627,21 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " }}}
 
+" Looks like steve losh makes use of an auto-html closing function and created
+" a mapping using it:
+" https://bitbucket.org/sjl/dotfiles/src/d607caaf596b951d14f58d0a8342d2c2462372f6/vim/bundle/closetags-custom/ftplugin/html/closetags.vim?at=default
+
+" Look at this for more ideas for configuring vim
+" https://www.reddit.com/r/vim/comments/3ecu46/large_codebase_editing_in_vim/
+" https://www.reddit.com/r/vim/comments/3egaqw/spacebar_backspace_and_enter_are_all_fairly/
+
 " Look more into swap file configuration. I think that even after setting the
 " 'directory' option my swap files are still appearing in other places.
-
-" I think I could make my zS and zB text objects not move the cursor to the
-" type of the text object by registering a one time CursorMoved autocommand
-" like repeat.vim does. Look into doing this.
 
 " Create a 'file' text object making use of the 'isfname' setting. See this
 " post:
 " http://stackoverflow.com/questions/23224317/shortcut-to-select-a-file-path-text-object.
 " Perhaps I will install kana's text object utility function.
-
-" Add 'execute file' command support for C files:
-" http://stackoverflow.com/questions/2627886/how-do-i-run-a-c-program-from-vim.
-" I'm kind of picturing that everytime <leader>x gets called then it could
-" check for a Makefile if one exists then use it, otherwise just gcc all the C
-" fils in the current directory and run a.out. I'll have to look into it.
-" Also, consider having the output of whatever program that gets executed get
-" piped into a 'scratch' buffer. Alternatively I could run the 'clear' command
-" before executing.
 
 " Is there a way to close all windows in the current column or row? Like if I
 " have 4 windows, 3 are in column 1 and 1 is in column 2 I want to remove two
@@ -1202,10 +1209,6 @@ nnoremap <silent> g; :call SmartOlderChange()<CR>
 " An altered version of g; which adds to the jumplist
 nnoremap <silent> g: m':call SmartOlderChange()<CR>
 
-" Inspired by this page I made a mapping:
-" http://vim.wikia.com/wiki/Repeat_last_command_and_put_cursor_at_start_of_change
-nnoremap <leader>. .:keepjumps normal! `[<CR>
-
 " Goes to the next and previous number on the current line
 noremap <silent> <leader>d :call search('\v\d+\ze(\D\|$)', '', line('.'))<CR>
 noremap <silent> <leader>D :call search('\v\d+\ze(\D\|$)', 'b', line('.'))<CR>
@@ -1352,15 +1355,17 @@ function! ReplaceOperator(type)
     let start_pos = getpos("'[")
     let end_pos = getpos("']")
     execute 'normal! '.start_pos[1].'G'.start_pos[2].'|v'.end_pos[1].'G'.end_pos[2].'|r '
+    augroup exit_operator_in_replace_mode
+        autocmd!
+        autocmd CursorMoved <buffer> normal! R
+    augroup END
 
     " echom a:type
     " How do I exit a function in a different mode?
     " normal! R
 endfunction
-" nnoremap <silent> gr :set operatorfunc=ReplaceOperator<CR>g@
-" vnoremap <silent> gr :<C-u>call ReplaceOperator(visualmode())<CR>
-
-" Create command to add a space before or after the cursor in insert mode.
+" nnoremap <silent> gR :set operatorfunc=ReplaceOperator<CR>g@
+" vnoremap <silent> gR :<C-u>call ReplaceOperator(visualmode())<CR>
 
 " Could I make something that moves me 10 lines then 5 then 2... (as I
 " continue the command). Feel like that might be a quick way to get around
@@ -1486,8 +1491,8 @@ nnoremap <silent> <leader>o :call append('.', '')<CR>
 nnoremap <silent> <leader>O :call append(line('.')-1, '')<CR>
             \:silent! call repeat#set("\<leader>O", v:count)<CR>
 
-" Run the program given by the makeprg option
-nnoremap <silent><leader>x :w<CR>:make!<CR>
+" Run/Compile the program using the makeprg option
+nnoremap <silent> <localleader>x :w<CR>:silent! make<CR>:copen <BAR> redraw!<CR>
 
 " A function which opens up a file using the output of the 'tree' command. So
 " if I had this:
@@ -1531,13 +1536,19 @@ endfunction
 nnoremap gt :call TreeGoToFile(0)<CR>
 nnoremap gT :call TreeGoToFile(1)<CR>
 
-" Operators to put the top/bottom of the screen on a text object.
+" Operators to put the top/bottom of the screen on a text object. The one time
+" CursorMoved autocommand makes it so the cursor remains in the same position
+" after the operator is done.
 function! RedrawCursorLineAtTop(type)
     " Whenever you use an operator, your cursor is positioned at the top of
     " the operated area. So this operator is extremely trivial.
     normal! zt
+    augroup z_operator_position_cursor
+        autocmd!
+        autocmd CursorMoved <buffer> call setpos('.', g:z_operator_cursorpos) | autocmd! z_operator_position_cursor
+    augroup END
 endfunction
-nnoremap zT :set operatorfunc=RedrawCursorLineAtTop<CR>g@
+nnoremap <silent> zT :let g:z_operator_cursorpos = getpos('.') <BAR> set operatorfunc=RedrawCursorLineAtTop<CR>g@
 function! RedrawCursorLineAtBottom(type, ...)
     if a:0
         let end_line = line("'>")
@@ -1546,9 +1557,13 @@ function! RedrawCursorLineAtBottom(type, ...)
     endif
     call cursor(end_line, 1)
     normal! zb
+    augroup z_operator_position_cursor
+        autocmd!
+        autocmd CursorMoved <buffer> call setpos('.', g:z_operator_cursorpos) | autocmd! z_operator_position_cursor
+    augroup END
 endfunction
-nnoremap <silent> zB :set operatorfunc=RedrawCursorLineAtBottom<CR>g@
-vnoremap <silent> zB :<C-u>call RedrawCursorLineAtBottom(visualmode(), 1)<CR>
+nnoremap <silent> zB :let g:z_operator_cursorpos = getpos('.') <BAR> set operatorfunc=RedrawCursorLineAtBottom<CR>g@
+vnoremap <silent> zB :let g:z_operator_cursorpos = getpos('.') <BAR> <C-u>call RedrawCursorLineAtBottom(visualmode(), 1)<CR>
 
 " Taken from Steve Losh's vimscript tutorial
 function! GrepOperator(type)
@@ -1628,15 +1643,7 @@ xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>zv
 " my cursor of the constant, hit '*', then navigate to that file to search for
 " the constant's definition. But it's annoying that when I return to the file
 " I hit '*' my cursor typically changes position. This is meant to stop that.
-" TODO: Make this command actually highlight the search as if we were
-" searching.
-function! StarSetSearch()
-    let save_unnamed_register = @"
-    normal! yiw
-    let @/ = @"
-    let @" = save_unnamed_register
-endfunction
-nnoremap <leader>* :call StarSetSearch()<CR>
+nnoremap <silent> <leader>* :let w = winsaveview()<CR>:silent! keepjumps normal! *<CR>:call winrestview(w)<CR>
 
 " In this video at 6:49: https://www.youtube.com/watch?v=zIOOLZJb87U he uses a
 " mapping where he visually selects some text and is prompted for a variable
@@ -2274,6 +2281,42 @@ augroup END
 " Common Lisp File Settings {{{
 augroup filetype_lisp
     autocmd!
+augroup END
+" }}}
+
+" C File Settings {{{
+augroup filetype_c
+    autocmd!
+    " Improve 'execute file' command support for C files when needed.:
+    " http://stackoverflow.com/questions/2627886/how-do-i-run-a-c-program-from-vim.
+    " I'm kind of picturing that everytime <leader>x gets called then it could
+    " check for a Makefile if one exists then use it, otherwise just gcc all the C
+    " fils in the current directory and run a.out. I'll have to look into it.
+    " Also, consider having the output of whatever program that gets executed get
+    " piped into a 'scratch' buffer. Alternatively I could run the 'clear' command
+    " before executing.
+    autocmd FileType c setlocal commentstring=//\ %s
+    autocmd FileType c setlocal makeprg=gcc\ %
+    function! RunCProgram()
+        if &modified
+            write
+            silent! make
+            let qfl = getqflist()
+            if len(qfl)
+                copen
+                wincmd p
+                redraw!
+            else
+                " So we don't accumulate a bunch of empty qf lists
+                colder
+                cclose
+                !./a.out
+            endif
+        else
+            !./a.out
+        endif
+    endfunction
+    autocmd FileType c nnoremap <silent><buffer> <localleader>x :call RunCProgram()<CR>
 augroup END
 " }}}
 
