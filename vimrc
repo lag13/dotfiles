@@ -163,8 +163,6 @@ set nojoinspaces
 " match, and some information about where the matches are coming from will be
 " in the menu.
 set completeopt=menuone,preview
-" Highlights the current line of the cursor.
-set cursorline
 " Saw it in Steve Losh's .vimrc file. From reading the help doc on this option
 " it says it 'Improves the smoothness of redrawing...' and 'Indicates a fast
 " terminal connection.' I'm not exactly sure how it works but I know I have a
@@ -269,7 +267,6 @@ elseif &term ==# 'win32'
     " irritating. By adding 'silent!' it won't bother me with that error
     " message.
     silent! colorscheme shine
-    set nocursorline
 elseif has('unix')
     let uname = system('echo -n "$(uname -s)"')
     set background=light
@@ -340,7 +337,8 @@ augroup END
 " implement some of his ideas. There is also a plugin already out there which
 " he mentions: https://github.com/svermeulen/vim-easyclip
 " 18. https://github.com/Shougo/unite.vim - Possibley like ctrl-p but can be
-" used for other things.
+" used for other things. Also see
+" https://www.reddit.com/r/vim/comments/1fpti5/unitevim_the_plugin_you_didnt_know_you_need/
 " 19. https://github.com/terryma/vim-multiple-cursors - Multiple cursors
 " 20. https://github.com/AndrewRadev/switch.vim - Similar to my 'flip' series
 " of commands. I was reading through the github page and one thing I was kind
@@ -534,6 +532,13 @@ let g:surround_99  = "/* \r */"
 " 'x' to more easily make a search on eXact word boundaries
 let g:surround_120 = "\\<\r\\>"
 
+" TODO: Could we add numbers to the highlighting to represent how many times
+" we have to hit ';' to get to that destination? This would in practice be a
+" compromise between the default sneak functionality and streak mode. The
+" benefit to me seems that if you immediately get to where you want to (which
+" should happen more often than not) then you don't have to escape streak mode
+" to take action but if you don't get where you want you know exactly how many
+" ';' invocations to spam to get to your destination. Just a thought.
 " TODO: If I hit <BS> when being prompted to sneak, I think it would be nice
 " if it actually just did a <BS> then let me continue typing. As of now it
 " stops the sneak.
@@ -542,7 +547,7 @@ let g:surround_120 = "\\<\r\\>"
 " TODO: Bug? I sneaked with f then did some other stuff. I repeated my sneak
 " with ';' but the jump list didn't get set. i.e when I hit '' after ; I
 " didn't end up where I invoked ;. Actually this was probably because 'f'
-" doesn't add to the jump list (I think).
+" doesn't add to the jump list (I think). Look into this.
 let g:sneak#textobject_z = 0
 let g:sneak#absolute_dir = 1
 " If I ever want to try out streak mode, I think these labels will not
@@ -563,13 +568,9 @@ map  T       <Plug>Sneak_T
 " it's replacement.
 noremap <SPACE> :
 
-" TODO: A bug with ctrlp? It says that <C-h> moves the cursor to the left but if
-" actually deletes characters.
-" TODO: Could using the find command index files faster?
-" let g:ctrlp_user_command = 'find %s -type f'
-" TODO: Consider activating the search on filename when looking through
-" buffers rather than the full path, that would narrow down searches quicker.
-" I'm already using <C-p> to switch between tabs/buffers
+" TODO: Experiment with g:ctrlp_user_command to try improving the speed of ctrlp
+" let g:ctrlp_user_command = 'find -L %s -type f | grep -v "vendor\|lib\|img\|ps2\|cache\|js"'
+
 " TODO: Possible bug? I opened 125 files in a folder by executing: 'vim
 " migration/*'. When I opened up other files and used my <leader>b mapping, it
 " didn't sort my files in most recently used order. I wonder why that was.
@@ -578,15 +579,8 @@ noremap <SPACE> :
 let g:ctrlp_root_markers = ['web', 'app']
 let g:ctrlp_reuse_window = 'netrw\|help\|nerdtree'
 let g:ctrlp_follow_symlinks = 1
-" I used this little bash script to inspect which directories had the most
-" files and then set the g:ctrlp_custom_ignore variable accordingly.
-" #!/bin/bash
-" for i in *
-" do
-"     printf "%-10s" $i
-"     find -L "$i" -type f | wc -l
-" done
-let g:ctrlp_custom_ignore = 'vendor\|lib\|img'
+let g:ctrlp_custom_ignore = 'vendor\|lib\|img\|ps2\|cache'
+let g:ctrlp_switch_buffer = 'e'
 " To me it makes more sense to search for files based on cwd. <leader>p will
 " now do this and <leader>P will try to search for files based on the root for
 " the file being edited (just in case we want it).
@@ -626,6 +620,80 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " }}}
+
+" The next set of plugins/functionality I would like is:
+" 0. kana's 'inner line' text object.
+" 1. Auto indentation when pasting with 'p' and 'P'. Perhaps this would only
+" auto-indent when the paste is linewise. This does this and more so I could
+" consider it but I don't think I need anything so fancy:
+" https://github.com/sickill/vim-pasta
+" 2. Make it so the replace-with-register plugin auto-indents when the
+" replacement is line-wise. I think I would have to make this adjustment
+" myself. Look at exchange.vim and it's g:exchange_indent option for ideas on
+" this.
+" 3. Try out the YankRing plugin so I don't have to use registers as much:
+" https://github.com/vim-scripts/YankRing.vim. If I try the yankring plugin
+" and like it, I suspect that it wouldn't work when using the replace with
+" register plugin. It would be nice if those two plugins could have be
+" integrated with eachother.
+" 4. Write a 'move-text' operator which is essentially a cut followed by a
+" paste with the only benefit being that it will be undoable in one go. We'll
+" need two mappings for this (for pasting before and after the cursor
+" position). I'm thinking gm and gM or mt and mT. Actually maybe even a third
+" mapping which will be used to abandon the current move. Perphaps I could
+" just make that third mapping a command... I kind of like mt and mT for their
+" mnemonic. I wonder if we could also get some integration with this and the
+" replace-with-register command. Maybe we could temporarily hijack the
+" replace-with-register mapping when the 'move-text' operation is in progress?
+" So we could make the 'gr' command register a CursorMoved autocommand and
+" then after the 'gr' command completes the autocommand will fire and the
+" autocommand will remove the text that was being moved and clean up anything
+" else that needs cleaning up.
+
+" Change rv mapping to start with 'i' or 'a'. Also make a 'left val' mapping
+" (so it would change the variable name).
+
+" Text object for all search terms on the screen? Then I could do things like
+" gc{this_text_object} and it could comment all the highlighted search terms.
+" Like I could search for "echom" and then run this and it will comment them
+" out. A better/different alternative to this might be multiple cursors.
+
+" See this for improving speed when working on large files:
+" https://www.reddit.com/r/vim/comments/3gpfo7/thank_you_vim/
+
+" Can I do a diff on a range of text? Like diff two visually selected areas?
+
+" Make my source command only work for vim files. Maybe even think of using
+" <localleader>x to source vim stuff just so it will be consistant with other
+" languages.
+
+" <C-6> goes to the 'allternate' buffer. Maybe define <DEL> to go to the
+" 'buffer before the alternate buffer'. So the second most recently used
+" buffer rather than the first most recently used.
+
+" My ie text object dosn't seem to quite work. It will omit the last line from
+" the operation if that line has indent. Fix this.
+
+" Try playing with the 'scrolljump' option sometime. I remember that when I
+" sat next to that emacs coder on the train when his cursor would scroll
+" offscreen it would jump a certain number of lines down. Seemed like it could
+" be nice to have.
+
+" Right now 'cursorline' seems to be the culprit in making vim slow when
+" scrolling through code and so for the time being I've turned it off. But I
+" was playing around with it and found that setting the 'lazyredraw' option
+" ALSO seems to fix the issue. But I had turned option off not too long ago so
+" operating on code with the 'sneak' motion and the repeat operator would work
+" correctly. If this option was turned on, those plugins would look like they
+" are waiting for input when in actuality the screen is just being lazy and
+" not redrawing. I kind of like having the cursorline option set so maybe the
+" only option would be turning lazyredraw back on? But try to see if there's
+" anything else I can do to make ths scrolling faster. Speaking of fater
+" cursor movement I wonder if disabling 'matchparen' which is a standard
+" plugin which highlights a matching parentheses will speed up performance?
+" OR! Consider turning off syntax highlighting altogether. That would
+" definitely speed up performance and I'd get to keep my cursorline!
+" http://www.linusakesson.net/programming/syntaxhighlighting/
 
 " Looks like steve losh makes use of an auto-html closing function and created
 " a mapping using it:
@@ -865,7 +933,8 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " print out the value of a variable. This will be helpful for debugging
 " purposes. Then I could just do something like: ,piw and in the case of php
 " it will insert a new line below the current one with the contents:
-" var_dump(yanked_string);
+" var_dump(yanked_string); See this as well:
+" https://www.reddit.com/r/vim/comments/3i11ie/i_made_my_first_vim_plugin_consolationvim/
 
 " I was having to make an example json string based off columns like this:
  " /**
@@ -1196,6 +1265,9 @@ endfunction
 nnoremap <leader>j :call SplitLine()
             \\| silent! call repeat#set("\<leader>j", v:count)<CR>
 
+" TODO: Maybe try to make this g; command a little 'smarter' where if our
+" cursor is ANWYWHERE inside the last change (so between '[ and ']) then we
+" try jumping again.
 " Slightly 'smarter' g; command where if the cursor doesn't move after issuing
 " a g; then it will issue it again.
 function! SmartOlderChange()
@@ -1254,12 +1326,12 @@ nnoremap <silent><leader>r :if exists('b:save_undo_nr') <BAR> execute "undo ".b:
 " changes and don't save, running this command will take you back to point A.
 " It you save at point A, make changes and save at point B and run this
 " command (so the buffer is not modified) it will take you back to point A.
-" Maybe even make a command to save a save state. For example, if I was making
-" a bunch of changes to a file (testing out different ways of implementing the
-" same thing for instance) then each time I get something working I can
-" remember a save state. In all reality it would probably just be an undo
-" number. Then I could scan through this list and pick which save state I'd
-" like to go to.
+" Maybe even make a command to save a save state, like a mark for a undo
+" state. For example, if I was making a bunch of changes to a file (testing
+" out different ways of implementing the same thing for instance) then each
+" time I get something working I can remember a save state. In all reality it
+" would probably just be an undo number. Then I could scan through this list
+" and pick which save state I'd like to go to.
 
 " " Stores the change number on every save.
 " augroup save_states
@@ -1289,8 +1361,8 @@ vnoremap L g_
 noremap gH g^
 noremap gL g$
 " We maintain the original H and L functionality.
-noremap <leader>H H
-noremap <leader>L L
+noremap gh H
+noremap gl L
 
 " Makes it so the n and N commands always go in the same direction, forward
 " and backward respectively, no matter which direction we're actually
