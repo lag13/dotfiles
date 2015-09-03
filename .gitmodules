@@ -46,3 +46,9 @@
 [submodule "bundle/eunuch"]
 	path = bundle/eunuch
 	url = https://github.com/tpope/vim-eunuch.git
+[submodule "bundle/larval"]
+	path = bundle/larval
+	url = https://github.com/lag13/vim-larval.git
+[submodule "bundle/create-variable"]
+	path = bundle/create-variable
+	url = https://github.com/lag13/vim-create-variable.git

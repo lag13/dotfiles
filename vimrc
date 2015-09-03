@@ -650,9 +650,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " autocommand will remove the text that was being moved and clean up anything
 " else that needs cleaning up.
 
-" Change rv mapping to start with 'i' or 'a'. Also make a 'left val' mapping
-" (so it would change the variable name).
-
 " Text object for all search terms on the screen? Then I could do things like
 " gc{this_text_object} and it could comment all the highlighted search terms.
 " Like I could search for "echom" and then run this and it will comment them
@@ -1236,12 +1233,10 @@ nnoremap go =
 xnoremap go =
 nnoremap goo ==
 nnoremap gO go
-" Pastes code and auto indents it with =
-function! PasteAndIndent(paste_cmd)
-    execute "keepjumps normal! ".a:paste_cmd."'[v']="
-endfunction
-nnoremap gop :call PasteAndIndent('p')<CR>
-nnoremap goP :call PasteAndIndent('P')<CR>
+
+" Pastes code and auto-indents it
+nnoremap p p`[`]v=
+nnoremap P P`[`]v=
 
 " Reselect the last changed/yanked text. I also made gv and gV text objects
 " because it looks cool :).
@@ -1717,33 +1712,6 @@ xnoremap # :<C-u>execute 'normal! ?' . VGetSearch('?') . "\r"<CR>zv
 " I hit '*' my cursor typically changes position. This is meant to stop that.
 nnoremap <silent> <leader>* :let w = winsaveview()<CR>:silent! keepjumps normal! *<CR>:call winrestview(w)<CR>
 
-" In this video at 6:49: https://www.youtube.com/watch?v=zIOOLZJb87U he uses a
-" mapping where he visually selects some text and is prompted for a variable
-" name. Once he entered the variable name 'tmp', 'tmp' got assigned the value
-" of the visual selection and the variable name was pasted where the visual
-" selection was. For example say I have this line of code:
-
-"   $this->getDoctrine()->getEntityManager()->remove($row);
-
-" If I highlight this portion: $this->getDoctrine()->getEntityManager(),
-" call this mapping and type the variable name $em then the result would be:
-"
-"   $em = $this->getDoctrine()->getEntityManager();
-"   $em->remove($row);
-function! CreateVariableFromSelection()
-    let save_unnamed_register = @"
-    normal! gvy
-    let var_name = input("Variable Name: ")
-    " Insert new line above cursor position and put: 
-    " 'variable_name = yanked_value'
-    execute 'normal! O'.var_name." = \<C-r>".'";'
-    " Put 'variable_name' in place of the visual selection
-    let @" = var_name
-    normal! gvp
-    let @" = save_unnamed_register
-endfunction
-xnoremap <leader>v :<C-u>call CreateVariableFromSelection()<CR>
-
 " A mapping/command that surrounds a selection with an ascii text box like
 " this:
 " Other text SELECTED_TEXT Other text
@@ -1799,35 +1767,18 @@ xnoremap . :normal .<CR>
 
 " Operator-Pending Mappings {{{
 
-" Goes to next email address. My regex is probably not perfect but that's
-" fine.
+" Email address text object
 onoremap i@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvE"<CR>
 onoremap a@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvEl"<CR>
 
 " A text object for the entire buffer
 onoremap <silent> ae :<C-u>normal! ggVG<CR>
 vnoremap <silent> ae :<C-u>normal! ggVG<CR>
-" The InnerBuffer text-object will ignore any leading and trailing whitespace.
-function! TextObjInnerBuffer()
-    let save_pos = getpos('.')
-    call cursor(1, 1)
-    let start_line = search('\S', 'c')
-    call cursor('$', 1)
-    let end_line = search('\S', 'bc')
-    if start_line && start_line <=# end_line
-        execute 'normal! '.start_line.'GV'.end_line.'G'
-    else
-        call setpos('.', save_pos)
-    endif
-endfunction
-onoremap <silent> ie :<C-u>call TextObjInnerBuffer()<CR>
-vnoremap <silent> ie :<C-u>call TextObjInnerBuffer()<CR>
 
-" Text-object for a search pattern. I originally wanted to implement or
-" install the i/ text-object talked about in Practical Vim, but in trying to
-" implement it I learned about the gn operator which behaves like i/ and is
-" built into vim version 7.4.110!! So I decided to implement my own gn. So I
-" check the version to see whether to define this operator or not.
+" A text object for character-wise selection of current line
+onoremap <silent> ill :<C-u>normal! ^vg_<CR>
+
+" Text-object for a search pattern
 function! TextObjSearchMatch(forward_p, visual_mode)
     if search(@/, 'ce' . (a:forward_p ? '' : 'b')) ==# 0
         return 0
@@ -1849,28 +1800,6 @@ if v:version < 704
     noremap  <silent> gN :<C-u>call TextObjSearchMatch(0, 0)<CR>
     xnoremap <silent> gN :<C-u>call TextObjSearchMatch(0, 1)<CR>
 endif
-
-" Text-object for an rvalue. At some point I could try to make it more robust
-" but I'm satisfied for now.
-function! TextObjRVal()
-    normal! 0
-    call search('=\s*\zs')
-    let start_pos = getpos('.')
-    " For vim files we just go to the end of the line, so this won't work on
-    " multi-line assignments.
-    if &filetype ==# 'vim'
-        normal! $
-    else
-        " For other files we move to the last character before the ending
-        " semicolon.
-        call search('.\ze;')
-    endif
-    " Highlight from the end of the assignment to the start of it.
-    execute 'normal! v'
-    call cursor(start_pos[1], start_pos[2])
-endfunction
-onoremap rv :<C-u>call TextObjRVal()<CR>
-xnoremap rv :<C-u>call TextObjRVal()<CR>
 
 " Text object for a heredoc. I don't really see myself using this much, but I
 " thought it would be fun to make :). This seeks for the next here doc to
