@@ -622,15 +622,10 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " }}}
 
 " The next set of plugins/functionality I would like is:
-" 0. kana's 'inner line' text object.
 " 1. Auto indentation when pasting with 'p' and 'P'. Perhaps this would only
 " auto-indent when the paste is linewise. This does this and more so I could
 " consider it but I don't think I need anything so fancy:
 " https://github.com/sickill/vim-pasta
-" 2. Make it so the replace-with-register plugin auto-indents when the
-" replacement is line-wise. I think I would have to make this adjustment
-" myself. Look at exchange.vim and it's g:exchange_indent option for ideas on
-" this.
 " 3. Try out the YankRing plugin so I don't have to use registers as much:
 " https://github.com/vim-scripts/YankRing.vim. If I try the yankring plugin
 " and like it, I suspect that it wouldn't work when using the replace with
@@ -668,9 +663,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " 'buffer before the alternate buffer'. So the second most recently used
 " buffer rather than the first most recently used.
 
-" My ie text object dosn't seem to quite work. It will omit the last line from
-" the operation if that line has indent. Fix this.
-
 " Try playing with the 'scrolljump' option sometime. I remember that when I
 " sat next to that emacs coder on the train when his cursor would scroll
 " offscreen it would jump a certain number of lines down. Seemed like it could
@@ -699,9 +691,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " Look at this for more ideas for configuring vim
 " https://www.reddit.com/r/vim/comments/3ecu46/large_codebase_editing_in_vim/
 " https://www.reddit.com/r/vim/comments/3egaqw/spacebar_backspace_and_enter_are_all_fairly/
-
-" Look more into swap file configuration. I think that even after setting the
-" 'directory' option my swap files are still appearing in other places.
 
 " Create a 'file' text object making use of the 'isfname' setting. See this
 " post:
@@ -733,19 +722,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " <SPACE> doesn't let me start a command. Reading :help hit-enter, there
 " doesn't seem like a way to configure this, but maybe there is? Look into it
 " more.
-
-" I had to do some grepping for John, looking for all the clients who have v1,
-" v2, and v3 fos. According to Olivier we have a total of 1381 clients (my
-" 'filter_clients_by' script returns 1399 but no matter). When I ran my script
-" for v1s, v2s, and v3s I got these counts: v1 = 208, v2 = 129, v3 = 511.
-" Adding 79 for the 4.0 sites (which my script doesn't acocunt for) gives a
-" total client count of 927. So that means around 460 are not accounted for.
-" Anyway, in trying to find out who those 460 clients are, I got a list of all
-" clients and a list of all clients who have some FO. I did a vim diff on
-" those two files and used this command to grab all the clients who were in
-" the file of all clients but not in the FO file. Note that 21 is the highlight
-" group ID for the DiffAdd hilight group. Just thought it could be useful to
-" notate: g/^/if diff_hlID(line('.'), col('.')) == 21 | normal! "Qyy | endif
 
 " I wonder if there is sort of an 'optimal' distance the cursor moves before
 " it would be nice to add an entry to the jump list. I'm picturing that the
@@ -788,16 +764,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " note look into :help debug-mode it seems that vim might have some built in
 " debugging capabilities.
 
-" Is there a simple way in vim to delete from the cursor position to a closing
-" brace or any sort of 'end of construct' syntax item while retaining the
-" appropriate indent for the syntax item? For braces, a quick way to do it is
-" d]} but it doesn't retain indent. Maybe also check out vim-pasta:
-" https://github.com/sickill/vim-pasta
-
-" TODO: Make a zZ operator to center cursor in the middle of a text object?
-
-" Text object for inside the <?php ?> tags?
-
 " Create the Game of Life and have it trigger at a certain time. Perhaps I can
 " trigger it when:
 " 1. vim is started with no buffers
@@ -808,8 +774,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " http://www.reddit.com/r/vim/comments/3ayhdx/a_quick_question_about_vim_server/
 
 " Look into using vim to browse zip folders
-
-" Learn how to better move around/organize split windows.
 
 " Refine the text object which goes to the end of the current sentence. Also
 " create a text object which goes to the end of the current paragraph. So like
@@ -850,13 +814,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " an :lcd at any time in a window, then that window is no longer taken into
 " account when issuing :cd commands?
 
-" Make the % command ignore commented sections or strings. Look at the
-" easy-align plugin for how to do that.
-
-" Have a visual mapping or something where we can highlight a number and it
-" will tell you how many days, hours etc... make up the number (assuming the
-" number is seconds)
-
 " Is there a text object to change a file name? Also could we have a text
 " object to change between the delimiters in g:targets_separators?
 
@@ -891,12 +848,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " use it but I bet there's some good mappings I could take. I found that on
 " this site: http://statico.github.io/vim2.html
 
-" Consider making the 'd' command actually delete text (so no messing with the
-" default register). Actually when I have time look that this plugin:
-" https://github.com/svermeulen/vim-easyclip. Perhaps I'll give it a whirl.
-
-" Could we configure the % command to work on pairs of quotes as well?
-
 " So I remember that this guy made a brainfuck interpreter using only the
 " C-preprocessor: https://github.com/orangeduck/CPP_COMPLETE (amazing, I'll
 " have to look through that one day). I wonder if something similar could be
@@ -922,9 +873,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " So imagine that the above function used to be one giant line, this mapping
 " would make it look like it is right now.
 
-" Make text objects to go to the next occurrence of a comment. The same goes
-" with code.
-
 " I think I said this before but I don't remember seeing it in my vimrc so
 " I'll say it again. Make an operator (or a series of commands) which will
 " print out the value of a variable. This will be helpful for debugging
@@ -933,64 +881,11 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " var_dump(yanked_string); See this as well:
 " https://www.reddit.com/r/vim/comments/3i11ie/i_made_my_first_vim_plugin_consolationvim/
 
-" I was having to make an example json string based off columns like this:
- " /**
-   "   * @var \DateTime
-   "   *
-   "   * @ORM\Column(name="most_recent_mass_email_sent", type="datetime", nullable=true)
-   "   * @Serializer\Expose
-   "   */
-   "  private $mostRecentMassEmailSent;
-
-   "  /**
-   "   * @var integer
-   "   *
-   "   * @ORM\Column(name="candidate_emails_sent", type="integer", nullable=true)
-   "   * @Serializer\Expose
-   "   */
-   "  private $candidateEmailsSent;
-
-   "  /**
-   "   * @var \DateTime
-   "   *
-   "   * @ORM\Column(name="most_recent_candidate_email_sent", type="datetime", nullable=true)
-   "   * @Serializer\Expose
-   "   */
-   "  private $mostRecentCandidateEmailSent;
-
-   "  /**
-   "   * @var \DateTime
-   "   *
-   "   * @ORM\Column(name="last_connection", type="datetime", nullable=true)
-   "   * @Serializer\Expose
-   "   */
-   "  private $lastConnection;
-" So for the above data, the json string could look like this:
-"
-" {"most_recent_mass_email_sent":"DATE", "candidate_emails_sent":8, "most_recent_candidate_email_sent":"DATE", "last_connection":"DATE}
-"
-" I was doing it semi-manually. Think about a way to automate this more. I know
-" it can be done, I just don't how to yank multiple things but still use them in
-" a meaningful way.
-
-" Could we create a paste operator? That sounds like a fun challenge. So
-" something like: ,pi" will paste from the default register into the i" text
-" object. It really probably wouldn't benefit me too much BUT I could make
-" this operator not change the default register, which would be nice.
-" Consolidating two of my other ideas: Maybe I could have this operator (if
-" the * or + registers are used) delete the text, turn on 'paste', and enter
-" insert mode. I can also have an autocommand which turns off paste upon
-" leaving insert mode.
-
 " Make a series of mappings to insert 'test' data. So I could have a 'phone
 " number' mapping which could insert the phone number "123-456-7890" or have
 " one that inserts a test email or something like that.
 
 " Create a text object for an IP address
-
-" Create text objects for parts of snake/camel case variables. I currently
-" have the CamelCase plugin but I don't really like it overly much and it
-" would be fun to create it on my own.
 
 " Create a :source operator which can source just the visually selected lines.
 
@@ -1009,9 +904,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " macro on each of those matches that 'g' found then I think my idea could
 " totally work. Alternatively, I think setting the 'wrapscan' option would
 " help me accomplish what I want.
-
-" A text object to select a chunk of code stopping before any commented
-" sections. So a code text object.
 
 " TODO: A mapping to type out the previously made auto-completion. This would
 " probably be an insert mapping.
@@ -1037,9 +929,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 "  /      \
 "  In adition make other commands to rotate, resize, etc...
 
-" TODO: Read about how settings are transferred/inherited from window to
-" window, buffer to buffer etc...
-
 " TODO: Make it so that when you exit command mode it doesn't add the command
 " to the history list. Also try to make it so that any duplicate commands in
 " the history list are removed.
@@ -1047,16 +936,6 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " TODO: Make some sort of notification ability. So like maybe I'll remind
 " myself to delete something in a file. I'll add the message, associate it
 " with a date and when that date comes to pass the notification will trigger.
-
-" TODO: A bit of a weird request but here goes. So that 'sneak' plugin sounds
-" really cool. A search on just two characters! That would definitely help
-" with moving around. But I just had a situation where I was at the top of the
-" candidat.xml file and I wanted to go to <etat1. To jump right there I had to
-" do a search which involves a lot of typing. The sneak plugin wouldn't have
-" helped me either. So what about a mapping where you can type 3 characters
-" and it will do a search for: 'c1c2\S*c3' i.e it searches for the first two
-" characters followed by any amount of whitespace and then the 3rd character.
-" Running this command and typing <e1 would find my etat1 right away.
 
 " TODO: The 10th user manual talks about visual block mode. I notice that when
 " making changes using 'I', I can't delete any space and have that change be
@@ -1276,10 +1155,6 @@ nnoremap <silent> g; :call SmartOlderChange()<CR>
 " An altered version of g; which adds to the jumplist
 nnoremap <silent> g: m':call SmartOlderChange()<CR>
 
-" Goes to the next and previous number on the current line
-noremap <silent> <leader>d :call search('\v\d+\ze(\D\|$)', '', line('.'))<CR>
-noremap <silent> <leader>D :call search('\v\d+\ze(\D\|$)', 'b', line('.'))<CR>
-
 " Sources the current file
 nnoremap <leader>sc :source % \| nohlsearch<CR>
 " Sources .vimrc
@@ -1364,26 +1239,14 @@ noremap gl L
 " searching.
 noremap  <silent> n /<C-r>/<CR>zv
 noremap  <silent> N ?<C-r>/<CR>zv
-" So the 'c' command works correctly
+" Removing those zv's above so the 'c' operator works correctly
 onoremap  <silent> n /<C-r>/<CR>
 onoremap  <silent> N ?<C-r>/<CR>
-" Goes to the next/previous search match without changing the jumplist.
-noremap <silent><leader>n :execute "keepjumps normal! /".@/."\r"<CR>zv
-noremap <silent><leader>N :execute "keepjumps normal! ?".@/."\r"<CR>zv
-" Do I need to remap these to something that works? I don't think the jumplist
-" has the same effect when you're already inside visual mode.
-xnoremap <silent><leader>n <NOP>
-xnoremap <silent><leader>N <NOP>
 
-" An operator to resize windows. This is nifty because when I
-" horizontally split a window, I'll oftentimes use one window for text
-" editing and the other to reference a bit of code. Since the
-" referenced code is usually a paragraph or other text object I can
-" quickly resize that window to encompass what I need to see and
-" maximize my screen real estate. TODO: Consider making this also
-" adjust horizontal width. There are 3 possibilities I see with this:
-" adjust vertical height, adjust horizontal width, or adjust both. I
-" wonder how I could reconcile those options or if it's even worth it.
+" An operator to horizontally resize windows. TODO: Consider making this also
+" adjust horizontal width. There are 3 possibilities I see with this: adjust
+" vertical height, adjust horizontal width, or adjust both. I wonder how I
+" could reconcile those options or if it's even worth it.
 function! ResizeWindowOperator(type, ...)
     " After using an operator, the cursor is put at the
     " start of the operated text, so I think this is okay.
@@ -1486,8 +1349,7 @@ function! FlipAccessModifier()
 endfunction
 nnoremap <silent><leader>fm :call FlipAccessModifier()<CR>
 
-" I don't think I ever needed <C-c> when in normal mode. I guess we'll find
-" out.
+" Quickly close windows
 nnoremap <C-c> <C-w>c
 " Move between windows
 nnoremap <C-h> <C-w>h
@@ -1524,8 +1386,6 @@ endfunction
 nnoremap <silent> <C-p> :call SwitchTabsOrBuffers(0)<CR>
 nnoremap <silent> <C-n> :call SwitchTabsOrBuffers(1)<CR>
 
-" <CR> already does + so lets make <BS> do the opposite
-nnoremap <BS> -
 " Redraw the screen and remove any search and/or sneak highlighting.
 nnoremap <C-g> :nohlsearch <BAR> silent! call sneak#cancel()<CR><C-l>
 
@@ -1540,19 +1400,11 @@ noremap ` '
 " Normally Y is a synonym for yy. I think this mapping is more logical because
 " D and C behave in this fashion.
 nnoremap Y y$
-" Yank the entire line characterwise
-nnoremap yY 0y$
 " Because I can
 nnoremap yp yyp
 nnoremap yP yyP
 
-" Sometimes I just want to clear the line but keep the space it took up.
-nnoremap dD :call setline('.', '')<CR>
-            \:silent! call repeat#set("dD")<CR>
-
-" Inserts a new line above/below the cursor but remains in normal mode. These
-" changes are also made repeatable thanks to repeat.vim. TODO: These mappings
-" don't repeat correctly with a count, look into this.
+" Inserts a new line above/below the cursor but remains in normal mode.
 nnoremap <silent> <leader>o :call append('.', '')<CR>
             \:silent! call repeat#set("\<leader>o", v:count)<CR>
 nnoremap <silent> <leader>O :call append(line('.')-1, '')<CR>
@@ -1667,8 +1519,6 @@ vnoremap <leader>g :<C-U>call GrepOperator(visualmode())<CR>
 function! NewlineSameCursorPosition()
     return "\<CR>\<ESC>kA"
 endfunction
-" Originally I had a <S-CR> mapping for this but it doesn't work on terminals
-" so I changed it.
 inoremap <C-d> <C-r>=NewlineSameCursorPosition()<CR>
 
 " Another way to get out of insert mode. I cover all my bases by including
@@ -1679,8 +1529,6 @@ inoremap jK <ESC>
 inoremap JK <ESC>
 
 " These are nice because those keys are right under my fingers.
-" inoremap <C-j> <C-r><C-p>"
-" inoremap <C-l> <C-r><C-p>0
 noremap! <C-j> <C-r><C-r>"
 noremap! <C-l> <C-r><C-r>0
 
@@ -2007,61 +1855,6 @@ cnoremap <C-n> <Down>
 " Makes it easier to open files in the same directory as other files.
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h') . '/' : '%%'
 
-" I envision that this command might someday set a bunch of options or define
-" a bunch of mappings to make it easier to create ascii art. For now it just
-" does this one thing though.
-command! Ascii set virtualedit=all
-
-" Whenever I needed to figure out what some piece of code did, I'd ususally do
-" some code diving, keeping all the pertinent files in active buffers. Then I
-" would write what each file helped accomplish in a format like this:
-"
-"     File: fname1
-"     File: fname2
-"     File: fname3
-"
-" So this command writes that for me. For more flexibility, I've added the
-" 'which_buffers' argument which lets me control exactly what buffers get
-" written.
-" 0 - All buffers
-" 1 - All Active buffers
-" 2 - Active buffers in the current tab
-function! GetListOfActiveBuffers(which_buffers)
-    let buffer_nums = []
-    if a:which_buffers ==# 0
-        for buffer in range(1, bufnr('$'))
-            if buflisted(buffer)
-                call add(buffer_nums, buffer)
-            endif
-        endfor
-    elseif a:which_buffers ==# 1
-        for tab in range(1, tabpagenr('$'))
-            for buffer in tabpagebuflist(tab) 
-                if buflisted(buffer)
-                    call add(buffer_nums, buffer)
-                endif
-            endfor
-        endfor
-    else
-        for buffer in tabpagebuflist(tabpagenr())
-            if buflisted(buffer)
-                call add(buffer_nums, buffer)
-            endif
-        endfor
-    endif
-    " Removes duplicate buffer nums
-    return filter(buffer_nums, 'index(buffer_nums, v:val, v:key+1) ==# -1')
-endfunction
-function! WriteActiveBuffers(...)
-    let which_buffers = 1
-    if a:0
-        let which_buffers = a:1
-    endif
-    let string = join(map(GetListOfActiveBuffers(which_buffers), '"File: ".bufname(v:val)'), "\n")
-    execute "normal! o".string
-endfunction
-command! -nargs=* PutBuffers call WriteActiveBuffers(<f-args>)
-
 " Command to count the occurrences of the current search term
 command! SearchCount %substitute///gn
 
@@ -2091,7 +1884,7 @@ function! CreateAndSaveDirectory(...)
         write
     endif
 endfunction
-command! -nargs=? Write call CreateAndSaveDirectory(<f-args>)
+command! -complete=file -nargs=? Write call CreateAndSaveDirectory(<f-args>)
 
 " }}}
 
@@ -2101,12 +1894,6 @@ augroup filetype_xml
     autocmd Filetype xml setlocal iskeyword+=-
     autocmd Filetype xml setlocal breakat-=-
     autocmd Filetype xml noremap <silent> [[ :call GoToParentNode()<CR>
-augroup END 
-" }}}
-
-" Haskell File Settings {{{
-augroup filetype_haskell
-    autocmd! 
 augroup END 
 " }}}
 
@@ -2276,12 +2063,6 @@ augroup filetype_php
     autocmd FileType php iabbrev dv var_dump(<C-r>");
     autocmd FileType php setlocal matchpairs-=<:>
     " autocmd Filetype php setlocal iskeyword+=$
-augroup END
-" }}}
-
-" Common Lisp File Settings {{{
-augroup filetype_lisp
-    autocmd!
 augroup END
 " }}}
 
