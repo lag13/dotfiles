@@ -52,3 +52,9 @@
 [submodule "bundle/replace-with-register"]
 	path = bundle/replace-with-register
 	url = https://github.com/lag13/ReplaceWithRegister.git
+[submodule "bundle/games"]
+	path = bundle/games
+	url = https://github.com/lag13/vim-games.git
+[submodule "bundle/screensavers"]
+	path = bundle/screensavers
+	url = https://github.com/lag13/vim-screensavers.git

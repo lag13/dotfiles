@@ -775,8 +775,7 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " Look into using vim to browse zip folders
 
-" Refine the text object which goes to the end of the current sentence. Also
-" create a text object which goes to the end of the current paragraph. So like
+" Create a text object which goes to the end of the current paragraph. So like
 " { and } but end on the line preceding the empty line that those commands
 " would normally take you to.
 
@@ -1114,8 +1113,8 @@ nnoremap goo ==
 nnoremap gO go
 
 " Pastes code and auto-indents it
-nnoremap p p`[`]v=
-nnoremap P P`[`]v=
+nnoremap p p`[v`]=
+nnoremap P P`[v`]=
 
 " Reselect the last changed/yanked text. I also made gv and gV text objects
 " because it looks cool :).
@@ -1735,24 +1734,21 @@ xnoremap <silent> ihd :<C-u>call TextObjHereDoc(0)<CR>
 onoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
 xnoremap <silent> ahd :<C-u>call TextObjHereDoc(1)<CR>
 
-" Text object for a number. I decided to make this because I was editing some
-" css and had to change some numbers like: '100px' and the 'iw' motion would
-" change too much. TODO: Consider making the visual mappings expand the visual
-" region instead of highlighting just the number.
+" Text object for a number
 function! TextObjNumber(modifier, visual_mode)
     let regex = '\d\+'
     if a:modifier ==# 'l'
         call search(regex, 'be')
     else
-        call search(regex, 'ce')
-        if a:modifier ==# 'n'
-            call search(regex, 'e')
+        if a:modifier ==# 'n' && match(getline('.')[col('.')-1], regex) != -1
+            call search(regex, '')
         endif
+        call search(regex, 'ec')
     endif
-    let num_boundary = getpos('.')
+    let end_of_num = [line('.'), col('.')]
     call search(regex, 'bc')
     normal! v
-    call cursor(num_boundary[1], num_boundary[2])
+    call cursor(end_of_num)
     let cmd = v:operator.'i'.a:modifier.'d'.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
     silent! call repeat#set(cmd, v:count)
 endfunction
@@ -1761,56 +1757,10 @@ for i in ['', 'n', 'l']
     execute "xnoremap <silent> i".i."d :<C-u> call TextObjNumber('".i."', 1)<CR>"
 endfor
 
-" Text object for an xml attribute.
-function! TextObjXmlAttr(around)
-    " TODO: This does not work if there are single quotes within double quotes
-    " or vice versa. Perhaps a quick fix would be to search for the = sign and
-    " find the nearest quote.
-    let end_of_attr_regex = '\v(''|")(\s|/|\>)'
-    call search(end_of_attr_regex, 'c', line('.'))
-    let save_unnamed_register = @@
-    normal! yl
-    let quote_type = @@
-    if a:around
-        normal! lyl
-        if @@ ==# ' '
-            let space_after_attr = 1
-        else
-            let space_after_attr = 0
-            normal! h
-        endif
-    endif
-    normal! v
-    " Go to start of attribute value
-    call search(quote_type, 'b')
-    " Go to assignment operator
-    call search('=', 'b')
-    if a:around
-        let start_of_attr_regex = '\s'.(space_after_attr ? '\zs':'').'\S'
-    else
-        let start_of_attr_regex = '\s\zs\S'
-    endif
-    " Go to beginning of attribute
-    call search(start_of_attr_regex, 'b')
-    let @@ = save_unnamed_register
-endfunction
-" <concours actif="true" obligatoire="false" liste="true"/>
-onoremap <silent> ix :<C-u>call TextObjXmlAttr(0)<CR>
-xnoremap <silent> ix :<C-u>call TextObjXmlAttr(0)<CR>
-onoremap <silent> ax :<C-u>call TextObjXmlAttr(1)<CR>
-xnoremap <silent> ax :<C-u>call TextObjXmlAttr(1)<CR>
-
-" Goes to the end of the current sentence
-function! EndOfCurrentSentence(dir, visual_p)
-    if a:visual_p
-        normal! gv
-    endif
-    execute "normal! ".a:dir."ge"
-endfunction
-noremap <leader>( :<C-u>call EndOfCurrentSentence('(', 0)<CR>
-noremap <leader>) :<C-u>call EndOfCurrentSentence(')', 0)<CR>
-xnoremap <leader>( :<C-u>call EndOfCurrentSentence('(', 1)<CR>
-xnoremap <leader>) :<C-u>call EndOfCurrentSentence(')', 1)<CR>
+" Used to operate on a variable for languages whose variables start with '$'
+" signs
+onoremap <silent><buffer> iv :<C-u>normal! viwoh<CR>
+xnoremap <silent><buffer> iv :<C-u>normal! viwoh<CR>
 
 " }}}
 
@@ -2062,7 +2012,6 @@ augroup filetype_php
     " Does a var_dump of whatever is in the unnamed register.
     autocmd FileType php iabbrev dv var_dump(<C-r>");
     autocmd FileType php setlocal matchpairs-=<:>
-    " autocmd Filetype php setlocal iskeyword+=$
 augroup END
 " }}}
 
