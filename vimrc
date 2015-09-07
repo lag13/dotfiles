@@ -415,68 +415,117 @@ augroup END
 " but I just want to know what's wrong. Could there be something in my vimrc
 " which conflicts? Investigate this.
 
+" The main reason I wanted nerdtree was to have a way to visualize a project
+" as a tree so I could get a feel for it's layout. My one problem with
+" nerdtree is it is primarily designed to be a 'project drawer' style file
+" explorer. It can be used as a split explorer but it's not very good because
+" everytime you invoke it, a completely new nerdtree instance is started. This
+" new instance has 'forgetten' which folders you had open and such which is a
+" shame because that's what I wanted it for!!. Below is my attempt to make
+" NERDTree behave a little better with regards to that. I've made a bunch of
+" wrapper functionality which remembers the nerdtree buffers we have opened
+" and switches to them when possible rather then creating a new one. When
+" opening files from nerdtree it will even set the alternate buffer to be the
+" file we were previously editing! It's all a bit hacky right now but it gets
+" the job done. Something else I was trying to do in this process was to not
+" add positions in nerdtree buffers to the jump list. Unfortunately this does
+" not seem to be possible, my best bet would be forking and modifying the
+" plugin myself which I might very well do.
+let g:nerdtrees = {}
+let g:NERDTreeHijackNetrw = 0
+augroup MyNERDTreeHijackNetrw
+    autocmd VimEnter * silent! autocmd! FileExplorer
+    au BufEnter,VimEnter * call MyCheckForBrowse(expand("<amatch>"))
+augroup END
+" Keeps track of the alternate and 2nd alternate (so third most recently used)
+" files.
+augroup SecondAlternateBuffer
+    autocmd!
+    autocmd BufEnter * call UpdateSecondAlternateBuffer(expand("<amatch>"))
+augroup END
+
+function! UpdateSecondAlternateBuffer(dir)
+    if !exists('w:secondAltBuffer')
+        let w:secondAltBuffer = {}
+    endif
+    if !isdirectory(a:dir)
+        if bufnr('%') != get(w:secondAltBuffer, '#', bufnr('%'))
+            let w:secondAltBuffer['@'] = w:secondAltBuffer['#']
+        endif
+        let w:secondAltBuffer['#'] = bufnr('#')
+    endif
+endfunction
+
+function! MyCheckForBrowse(dir)
+    " By the time this function fires we'll be in a different buffer so the
+    " alternate buffer is the one we just came from.
+    let cur_bnr = bufnr("#")
+    if a:dir != '' && isdirectory(a:dir)
+        if has_key(g:nerdtrees, a:dir)
+            " Wipe out the buffer that gets created whenever a directory is
+            " edited.
+            setlocal bufhidden=wipe
+            let g:nerdtrees[a:dir]["nerd_alt"] = cur_bnr
+            " Don't fire the SecondAlternateBuffer group of autocommands when
+            " going back to a nerdtree buffer.
+            execute "noautocmd keepjumps buffer " . g:nerdtrees[a:dir]["nerd_buf"]
+        else
+            " Launch nerdtree for the first time.
+            call nerdtree#checkForBrowse(a:dir)
+            let g:nerdtrees[a:dir] = {"nerd_buf" : bufnr("%"), "nerd_alt" : cur_bnr}
+        endif
+    endif
+endfunction
+
+" Quits out of nerdtree, restoring the alternate buffer before nerdtree was
+" launched.
+function! MyNerdTreeQuit()
+    " Got the b:NERDTreeRoot.path.str() code from line 87 of
+    " plugin/NERD_tree.vim
+    let nerd_tree_root = b:NERDTreeRoot.path.str()
+    if bufexists(g:nerdtrees[nerd_tree_root]["nerd_alt"])
+        execute "noautocmd keepjumps buffer ".g:nerdtrees[nerd_tree_root]["nerd_alt"]
+        let @# = bufname(w:secondAltBuffer['#'])
+    endif
+endfunction
+
+" Some cleanup code which fires after trying to open a file from nerdtree.
+" Does things like sets the alternate buffer.
+function! MyNerdTreePostOpenFile(original_command)
+    autocmd! SecondAlternateBuffer
+    let nerd_tree_root = b:NERDTreeRoot.path.str()
+    execute a:original_command
+    if &filetype !=# 'nerdtree'
+        if bufexists(g:nerdtrees[nerd_tree_root]["nerd_alt"])
+            let @# = g:nerdtrees[nerd_tree_root]["nerd_alt"]
+        endif
+        let w:secondAltBuffer['@'] = get(w:secondAltBuffer, '#')
+        let w:secondAltBuffer['#'] = bufnr('#')
+        augroup SecondAlternateBuffer
+            autocmd!
+            autocmd BufEnter * call UpdateSecondAlternateBuffer(expand("<amatch>"))
+        augroup END
+    endif
+endfunction
+nnoremap - :e .<CR>
+augroup filetype_nerdtree
+    autocmd!
+    autocmd Filetype nerdtree nnoremap <buffer> - :call MyNerdTreeQuit()<CR>
+    " I made my own mappings for nerdtree's <CR> and g:NERDTreeMapActivateNode
+    " mappings. These new mappings run the original mapping and do some extra
+    " stuff to restore alternate files.
+    autocmd Filetype nerdtree execute "nnoremap <buffer> <CR> :call MyNerdTreePostOpenFile('".substitute(maparg('<CR>', 'n'), '<CR>', '', 'g')."')\<CR>"
+    autocmd Filetype nerdtree execute "nnoremap <buffer> ".g:NERDTreeMapActivateNode." :call MyNerdTreePostOpenFile('".substitute(maparg(g:NERDTreeMapActivateNode, 'n'), '<CR>', '', 'g')."')\<CR>"
+augroup END
+
 " Use plain characters to display the tree
 let g:NERDTreeDirArrows = 0
-
-" " Launches and quits the NERDTree. I wrote this code to make nerdtree behave
-" " more like a 'split explorer' rather than a 'project drawer'. In doing this I
-" " also created my own nerdtree quit mapping because nerdtree's default wasn't
-" " able to retain the alternate file. TODO: Ran into this error when I launched
-" " nerdtree: E716: Key not present in Dictionary:
-" " /mnt/vault/www/esa-education.luceosolutions.com E15: Invalid expression:
-" " "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"] Error detected while
-" " processing function MyNerdTreeToggle. What happened was that I manually
-" " invoked NERDTree using :edit on a different directory than the cwd then when
-" " I hit '-' to quit it failed because no entry had been added to g:nerdtrees.
-" " I'm thinking that to make this more robust I'll need to create an
-" " autocommand. I also get an error when I launch it from an empty buffer. It
-" " seems that if you have an empty buffer. Looks like there is one more little
-" " problem I didn't notice. When opening a file from within nerdtree, the
-" " alternate file becomes messed up (i.e the alternate file becomes the nerd
-" " tree buffer). This is, unfortunately, probably not possible to fix but I'll
-" " look into it anyhow. Maybe I could create my own <CR> mapping which will run
-" " nerdtree's <CR> mapping then manually restore the alternate file or
-" " something like that. Also check out this
-" " https://www.reddit.com/r/vim/comments/3d4cpf/prevent_netrw_or_nerdtree_from_opening_when/
-" " it uses that 'FileExplorer' thing again. I want to know what that is.
-" let g:nerdtrees = {}
-" function! MyNerdTreeToggle(toggle)
-"     " Launch NERDTree
-"     if a:toggle
-"         let cwd = getcwd()
-"         let cur_bnr = bufnr("%")
-"         if has_key(g:nerdtrees, cwd)
-"             let g:nerdtrees[cwd]["nerd_alt"] = cur_bnr
-"             execute "keepalt buffer ".g:nerdtrees[cwd]["nerd_buf"]
-"         else
-"             keepalt edit .
-"             let g:nerdtrees[cwd] = {"nerd_buf" : bufnr("%"), "nerd_alt" : cur_bnr}
-"         endif
-"     " Quit NERDTree
-"     else
-"         execute "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"]
-"     endif
-" endfunction
-" function! MyNerdTreeQuit()
-"     execute "keepalt buffer ".g:nerdtrees[getcwd()]["nerd_alt"]
-" endfunction
-" nnoremap - :call MyNerdTreeToggle(1)<CR>
-" augroup filetype_nerdtree
-"     autocmd!
-"     autocmd Filetype nerdtree nnoremap <buffer> - :call MyNerdTreeToggle(0)<CR>
-" augroup END
-
-" Until I have time/motivation to deal with my above attempts, I'll just use
-" nerdtree as a project drawer.
-nnoremap - :NERDTreeToggle<CR>
 let g:NERDTreeMinimalUI = 1
 " So the 'C' mapping doesn't hang
 let g:NERDTreeMapCWD = 'cD'
 " To have similar mappings between nerdtree and ctrlp
 let g:NERDTreeMapOpenSplit = 'x'
 let g:NERDTreeMapOpenVSplit = 'v'
-" TODO: Do not using 'l', we can copy text from the nerd tree and having 'l'
-" lets me get closer to the text I want to copy.
 " Because 'x' is taken. 'l' stands for 'level' in my mind.
 let g:NERDTreeMapCloseDir = 'l'
 let g:NERDTreeMapCloseChildren = 'L'
@@ -592,9 +641,12 @@ nnoremap <leader>b :CtrlPBuffer<CR>
 " I liked the idea of setting g:ctrlp_mruf_relative = 1 because then different
 " tab'bed workspaces could feel like they each contained their own files. But
 " I also wanted to keep the default functionality of CtrlPMRUFiles as well so
-" I made the second mapping. Is this overkill? Possibly.
+" I made the second mapping.
 nnoremap <leader>m :let g:ctrlp_mruf_relative = 1 <BAR> CtrlPMRUFiles<CR>
 nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
+
+" Comment the current line and paste the uncommented line below.
+nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " TODO: Bug/fix with indentwise? I had this xml in candidat.xml:
 "
@@ -616,34 +668,27 @@ nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
 " odd behavior with [%. I would expect it to bring me to the second to last
 " line from the top but it is not.
 
-" Comment the current line and paste the uncommented line below.
-nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
+" The default indentwise mappings are a bit inconvenient so I remapped them
+" allowing me to use two hands.
+" mnemonic = reduced indent
+map [r <Plug>(IndentWisePreviousLesserIndent)
+map [e <Plug>(IndentWisePreviousEqualIndent)
+map [g <Plug>(IndentWisePreviousGreaterIndent)
+map ]r <Plug>(IndentWiseNextLesserIndent)
+map ]e <Plug>(IndentWiseNextEqualIndent)
+map ]g <Plug>(IndentWiseNextGreaterIndent)
+" mnemonic = block boundary
+map [b <Plug>(IndentWiseBlockScopeBoundaryBegin)
+map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 
 " }}}
 
 " The next set of plugins/functionality I would like is:
-" 1. Auto indentation when pasting with 'p' and 'P'. Perhaps this would only
-" auto-indent when the paste is linewise. This does this and more so I could
-" consider it but I don't think I need anything so fancy:
-" https://github.com/sickill/vim-pasta
 " 3. Try out the YankRing plugin so I don't have to use registers as much:
 " https://github.com/vim-scripts/YankRing.vim. If I try the yankring plugin
 " and like it, I suspect that it wouldn't work when using the replace with
 " register plugin. It would be nice if those two plugins could have be
 " integrated with eachother.
-" 4. Write a 'move-text' operator which is essentially a cut followed by a
-" paste with the only benefit being that it will be undoable in one go. We'll
-" need two mappings for this (for pasting before and after the cursor
-" position). I'm thinking gm and gM or mt and mT. Actually maybe even a third
-" mapping which will be used to abandon the current move. Perphaps I could
-" just make that third mapping a command... I kind of like mt and mT for their
-" mnemonic. I wonder if we could also get some integration with this and the
-" replace-with-register command. Maybe we could temporarily hijack the
-" replace-with-register mapping when the 'move-text' operation is in progress?
-" So we could make the 'gr' command register a CursorMoved autocommand and
-" then after the 'gr' command completes the autocommand will fire and the
-" autocommand will remove the text that was being moved and clean up anything
-" else that needs cleaning up.
 
 " Text object for all search terms on the screen? Then I could do things like
 " gc{this_text_object} and it could comment all the highlighted search terms.
@@ -1047,7 +1092,10 @@ nnoremap d<SPACE> i<BS><RIGHT><RIGHT><BS><ESC>:call repeat#set("d ", v:count)<CR
 " numbers. To get the file name quicker I'll run this command :let @@ = @%,
 " paste it into my document, and append the line number. I've done that a lot
 " so I made this command to do it for me. Mnemonic - Get Buffer name.
-nnoremap <silent> gb :let @@ = @% . ' ' . line('.')<CR>
+nnoremap <silent> gB :let @@ = @% . ' ' . line('.')<CR>
+" Dual purpose of quickly doing an ls with the added bonus of being able to
+" switch to a particular buffer.
+nnoremap gb :ls<CR>:b<SPACE>
 
 " Inspired by cutlass.vim, now 'd' actually deletes while 'x' will cut. And
 " 'c' doesn't cut text either.
@@ -1622,8 +1670,12 @@ onoremap a@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvEl"<CR>
 onoremap <silent> ae :<C-u>normal! ggVG<CR>
 vnoremap <silent> ae :<C-u>normal! ggVG<CR>
 
-" A text object for character-wise selection of current line
-onoremap <silent> ill :<C-u>normal! ^vg_<CR>
+" A text object for character-wise selection of current line. Originally was
+" 'ill' but I like 'c' better. Mnemonic could be character select of current
+" line.
+onoremap <silent> c :<C-u>normal! ^vg_<CR>
+nnoremap <silent> cc "_cc
+nnoremap <silent> dc "_cc<ESC>
 
 " Text-object for a search pattern
 function! TextObjSearchMatch(forward_p, visual_mode)
