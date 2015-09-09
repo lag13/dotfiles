@@ -283,24 +283,6 @@ endif
 
 augroup general_autocommands
     autocmd!
-    " Typically filetype detection happens on the BufNewFile and BufRead
-    " autocommand events, but for bash scripts this isn't good enough because
-    " my bash files usually have no extension. Vim can detect the bash file
-    " type just fine on it's own so I added this autocommand on the BufWrite
-    " event to re-run :filetype detect if the filetype isn't already set.
-    function! DetectScriptFileType()
-        " TODO: When editing markdown files it would change the filetype to
-        " modula2 upon saving so did_filetype() must not be doing what I
-        " expect. This is my fix for now.
-        " if !did_filetype()
-        if &filetype ==# ''
-            filetype detect
-        endif
-    endfunction
-    autocmd BufWrite * call DetectScriptFileType()
-    " Reload file automatically when a file's mode is changed. This was made
-    " after I made the :Exeggcute command.
-    autocmd FileChangedShell * if v:fcs_reason ==# 'mode' | let v:fcs_choice = 'reload' | endif
     " Vim returns to the same line when re-opening a file.
     autocmd BufReadPost *
             \ if line("'\"") > 0 && line("'\"") <= line("$") |
@@ -397,8 +379,6 @@ augroup END
 
 " TODO: See if endwise could also be triggered on the 'o' mapping.
 
-let g:exchange_indent = 1
-
 " Customizing closer.vim
 augroup custom_closer
     autocmd!
@@ -409,6 +389,21 @@ augroup custom_closer
                 \ let b:closer = 1 |
                 \ let b:closer_flags = '{'
 augroup END
+
+" TODO: At some point I need to inestigate the order plugins get loaded. I
+" think it might be alphabetical? Anyway, letting the larval plugin try to
+" create the mappings caused problems because it got loaded before targets.vim
+" and took some mappings that targets.vim wanted to create. Creating them
+" manually like this is just better for me.
+let g:larval_no_mappings = 1
+omap alv <Plug>LarvalAroundLval
+xmap alv <Plug>LarvalAroundLval
+omap ilv <Plug>LarvalInnerLval
+xmap ilv <Plug>LarvalInnerLval
+omap ar <Plug>LarvalAroundRval
+xmap ar <Plug>LarvalAroundRval
+omap ir <Plug>LarvalInnerRval
+xmap ir <Plug>LarvalInnerRval
 
 " TODO: NERD, I'm getting errors when I run the default 'gs' and 'gi'
 " commands. I have no idea why this is? I'm not actively using the commands
@@ -1859,10 +1854,6 @@ cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h') . '/' : '%%'
 
 " Command to count the occurrences of the current search term
 command! SearchCount %substitute///gn
-
-" Command to make file executable and not.
-command! Exeggcute :!chmod u+x %
-command! Exeggutor :!chmod u-x %
 
 " At some point I had installed a plugin called easydir
 " (https://github.com/duggiefresh/vim-easydir) which created an autocommand on
