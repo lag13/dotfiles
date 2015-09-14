@@ -390,21 +390,6 @@ augroup custom_closer
                 \ let b:closer_flags = '{'
 augroup END
 
-" TODO: At some point I need to inestigate the order plugins get loaded. I
-" think it might be alphabetical? Anyway, letting the larval plugin try to
-" create the mappings caused problems because it got loaded before targets.vim
-" and took some mappings that targets.vim wanted to create. Creating them
-" manually like this is just better for me.
-let g:larval_no_mappings = 1
-omap alv <Plug>LarvalAroundLval
-xmap alv <Plug>LarvalAroundLval
-omap ilv <Plug>LarvalInnerLval
-xmap ilv <Plug>LarvalInnerLval
-omap ar <Plug>LarvalAroundRval
-xmap ar <Plug>LarvalAroundRval
-omap ir <Plug>LarvalInnerRval
-xmap ir <Plug>LarvalInnerRval
-
 " TODO: NERD, I'm getting errors when I run the default 'gs' and 'gi'
 " commands. I have no idea why this is? I'm not actively using the commands
 " but I just want to know what's wrong. Could there be something in my vimrc
@@ -1154,10 +1139,6 @@ nnoremap go =
 xnoremap go =
 nnoremap goo ==
 nnoremap gO go
-
-" Pastes code and auto-indents it
-nnoremap p p`[v`]=
-nnoremap P P`[v`]=
 
 " Reselect the last changed/yanked text. I also made gv and gV text objects
 " because it looks cool :).

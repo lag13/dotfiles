@@ -58,3 +58,9 @@
 [submodule "bundle/screensavers"]
 	path = bundle/screensavers
 	url = https://github.com/lag13/vim-screensavers.git
+[submodule "bundle/pasta"]
+	path = bundle/pasta
+	url = https://github.com/sickill/vim-pasta.git
+[submodule "bundle/fugitive"]
+	path = bundle/fugitive
+	url = https://github.com/tpope/vim-fugitive.git
