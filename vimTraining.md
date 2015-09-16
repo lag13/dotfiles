@@ -3,27 +3,39 @@ Vim Training
 Lucas Groenendaal
 
 I think this is more of a reference document or something I would use if I was
-giving a talk on vim. For a complete tutorial, I would recommend vimtutor.
-Just type 'vimtutor' on the command line and the tutorial will start. You
-could even type 'vimtutor fr' if you want the tutorial in French :). Having
+giving a talk on vim. For a tutorial, I would recommend vimtutor.
+Just type 
+
+```shell
+vimtutor
+```
+
+on the command line and the tutorial will start. You
+could even type
+
+```shell
+vimtutor fr
+```
+if you want the tutorial in French :). Having
 said that though, I would still recommend reading through this document. It
 has some general vim knowlege which is nice to know and will make learning the
 editor a lot more enjoyable.
 
 And of course the internet is full of resources. These are not all tutorials
 per se, but I think I've learned something from every one:
-    - http://www.viemu.com/a-why-vi-vim.html
-    - http://yannesposito.com/Scratch/en/blog/Learn-Vim-Progressively/
-    - http://stackoverflow.com/questions/1218390/what-is-your-most-productive-shortcut-with-vim
-      (read the first guy's answer, you can't miss it)
-    - http://rc3.org/2012/05/12/the-grammar-of-vim/
-    - http://stackoverflow.com/questions/726894/what-are-the-dark-corners-of-vim-your-mom-never-told-you-about
-    - https://medium.com/@cole_peters/writing-better-code-with-vim-7c43877ad208
-    - http://xn--h4hg.ws/2013/12/19/how-to-learn-vim/
+
+- http://www.viemu.com/a-why-vi-vim.html
+- http://yannesposito.com/Scratch/en/blog/Learn-Vim-Progressively/
+- http://stackoverflow.com/questions/1218390/what-is-your-most-productive-shortcut-with-vim (read the first guy's answer, you can't miss it)
+- http://rc3.org/2012/05/12/the-grammar-of-vim/
+- http://stackoverflow.com/questions/726894/what-are-the-dark-corners-of-vim-your-mom-never-told-you-about
+- https://medium.com/@cole_peters/writing-better-code-with-vim-7c43877ad208
+- http://xn--h4hg.ws/2013/12/19/how-to-learn-vim/
 
 Read this if you want to try extending/customizing vim. The first part of it
-is super fun and easy to follow. Really though, you should read this.
-    - http://learnvimscriptthehardway.stevelosh.com/
+is super fun and easy to follow. Really though, you should read it.
+
+- http://learnvimscriptthehardway.stevelosh.com/
 
 
 What is Vim?
@@ -61,7 +73,7 @@ understandable. When we type keys in a text editor we expect them to show up
 in the document! Having to continually switch from mode to mode might seem
 like too much work. I've seen many vim supporters counter this complaint by
 comparing vim's way of editing to painting. I rather like that analogy and
-since I couldn't say it better myself, I'll take a quote from Drew Neil's book
+since I couldn't say it better myself, I'll take a quote from Drew Neil's wonderful book
 "Practical Vim":
 
     How much time do you reckon artists spend with their paint brushes in
@@ -97,31 +109,50 @@ that she spends more time planning and thinking rather than actually putting
 brush to canvas.
 
 ### Vim Editing in a Nutshell
+
 1. Get to where you want in normal mode.
 2. Enter insert mode to make the changes.
 3. Go back to normal mode and repeat.
 
-         ---> Normal --
-        /              \
-  ESC  |                |  a,A,i,I,...
-        \              /
-         --- Insert <--
+               +--> Normal -+
+              /              \
+        ESC  |                |  a,A,i,I,...
+              \              /
+               +-- Insert <-+
 
 
 Starting/Saving/Exiting Vim
 ---------------------------
 ### Start Editing
-    from command line, vim <file_name> - Opens the file from the command line
-    within vim,  :edit <file_name>     - Opens the file inside of vim. Can be
-                                         shortened to just :e <file_name>
+
+From the command line:
+
+```shell
+# Starts vim with the file <file_name> loaded
+vim <file_name>
+```    
+
+Within vim:
+
+```vim
+" Opens a file inside of vim. Can be shortened to just :e <file_name>
+:edit <file_name>
+```
 
 ### Saving
-    :write - Saves changes. Can be shortened to just :w
+```vim
+" Saves the current file. Can be shortened to just :w
+:write
+```
 
 ### Exiting
-    :quit - Exits vim. Can be shortened to just :q
-    :wq   - Shorthand for saving then quiting out of vim
 
+```vim
+" Exits vim. Can be shortened to just :q
+:quit
+" Shorthand for saving then quiting out of vim
+:wq
+```
 
 Entering Insert Mode (Brush to the canvas)
 -----------------------------------------
@@ -167,6 +198,7 @@ the keyboard) is historic:
 
 word = a squence of letters, digits, and underscores (think your average
        variable name)
+       
 WORD = a squence of non whitespace characters
 
 ### Cooler Motions
@@ -189,6 +221,7 @@ WORD = a squence of non whitespace characters
 
 ### Scrolling
 All the above commands directly move the cursor. These scroll the screen:
+
     <C-d> - Scroll the window down half a page
     <C-f> - Scroll the window down a full a page
     <C-u> - Scroll the window up half a page
@@ -198,7 +231,7 @@ All the above commands directly move the cursor. These scroll the screen:
 Undoing/Redoing Changes
 ---------------
     u     - Undo the last change
-    <C-r> - Redo the last change
+    <C-r> - Redo the last undo
 
 
 Core Editing Commands (Copy/Paste/Delete)
@@ -217,12 +250,12 @@ Core Editing Commands (Copy/Paste/Delete)
     dd        - Deletes the entire line
     yy        - Copies the entire line
 
-<motion> = Any of the motions we have discussed! i.e w,W,h,j,k,l,f<c>...
+\<motion\> = Any of the motions we have discussed! i.e w,W,h,j,k,l,f<c>...
 
 
 The Beauty Of Vim
 -----------------
-The commands you type are sort of like a little language unto themselves, what
+The commands you type are sort of like a little language unto themselves. What
 you type when editing often corresponds to what you're thinking.
 
 ### Beauty Level = 1
@@ -231,23 +264,23 @@ that many times.
 
     [n]command - Where n is a number.
 
-So 10j will move you down 10 lines, 3w will move you forward 3 words, 2ft will
-move you to the second occurrence of the letter t, etc... In all honesty this
+So ```10j``` will move you down 10 lines, ```3w``` will move you forward 3 words, ```2ft``` will
+move you to the second occurrence of the letter 't', etc... In all honesty this
 feature is not so useful in practice but it has it's moments and it's nice
 that almost all commands adhere to this pattern. Something pretty neat is that
 this also works for commands that put you into insert mode! So:
 
     40ia<ESC>
 
-(where <ESC> means actually hitting the escape character) will insert 40 a's
+(where \<ESC\> means actually hitting the escape character) will insert 40 a's
 into the document.
 
 ### Beauty Level = 2
-The commands d, y, and c in the "Core Editing Commands" section are
-technically called operators. After you type, say d, it will wait for you to
-enter a motion. The operator will then act on said motion.  So typing dw
-deletes the next word, yfx yanks from the cursor to the x character including
-x, dt. deletes until the '.' character (not including the '.' character).
+The commands ```d```, ```y```, and ```c``` in the "Core Editing Commands" section are
+technically called operators. After you type, say ```d```, it will wait for you to
+enter a motion. The operator will then act on said motion.  So typing ```dw```
+deletes the next word, ```yfx``` yanks from the cursor to the 'x' character including
+'x', ```dt.``` deletes until the '.' character (not including the '.' character).
 Isn't that cool???
 
 Commands such as this is where the real idea of an editing language comes in.
@@ -255,7 +288,7 @@ Just look at a command like:
 
     dt,
 
-The 'd' in dt, serves as the verb and the 't,' serves as the noun. If you put
+The ```d``` in ```dt,``` serves as the verb and the ```t,``` serves as the noun. If you put
 them together it reads: 
 
     Delete Till the character ,
@@ -263,8 +296,8 @@ them together it reads:
 The above command is terse as well as mnemonic, it's quite elegant. This
 command structure is even more powerful when you realize that any operator can
 be used with any motion.  So, if instead of deleting, you want to yank (copy)
-until the next ',' then the command is yt,. If you want to change the text
-until the next ',' then the command is ct,. Realizing this makes learning vim
+until the next ',' then the command is ```yt,```. If you want to change the text
+until the next ',' then the command is ```ct,```. Realizing this makes learning vim
 a lot easier. You're no longer learning a series of disjoint commands, you're
 learning a language.
 
@@ -276,18 +309,13 @@ Pretty much everything in this document covers just the basics of vim so you
 can *start* editing text. Since you have to learn so much before you can even
 start editing you might wonder, "Why would anyone go to the trouble to learn
 this editor?". That is a very fair statement. Many vim users claim that you'll
-gain speed, which I agree with to some extent. If you have some repetative
-edit to make, vim can make short work of it. But the reason I use vim is
-because it makes text editing more fun/less tedious. This article sums it up
-nicely:
-
-    https://wrongsideofmemphis.wordpress.com/2013/03/27/vim-speed-is-not-really-the-point/
+gain speed, which I agree with to some extent. But the reason I use vim is
+because it makes text editing more fun/less tedious. [This article](https://wrongsideofmemphis.wordpress.com/2013/03/27/vim-speed-is-not-really-the-point/) sums it up
+nicely.
 
 A couple other reasons to learn at least the basics:
 
-    1. It is literally everywhere and chances are you will have to use it at
-       some point.
-    2. Other programs like 'less' and the 'man' pages use similar keybindings.
-    3. In general, it's just fun to learn new things and as far as text
-       editing goes, vim is pretty 'new'.
+1. vim is literally everywhere and chances are you will have to use it at some point.
+2. Other programs like 'less' and the 'man' pages use similar keybindings.
+3. In general, it's just fun to learn new things and as far as text editing goes, vim is pretty 'new'.
 
