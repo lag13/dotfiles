@@ -18,7 +18,7 @@
 " any good text editor should have those three capabilities. If such an editor
 " handles those three tasks well, it should be considered good. If it is also
 " extensible then I would consider it great, or at least having the potential
-" to be great, because it can be molded to the task at hand.
+" to become great because it can be molded to the task at hand.
 
 " How Vim Stacks Up:
 
@@ -39,7 +39,7 @@
 " Vim's default mode is called 'Normal' mode and in that mode most key presses
 " represent a different movement. This makes for quick file navigation because
 " we can press single keys to move. For people accustomed to mouse based
-" movement, using soley the keyboard can feel restrictive, but getting used to
+" movement using soley the keyboard can feel restrictive, but getting used to
 " it is worth it. Oftentimes a quick search gets you right where you need to
 " go just as quickly as a mouse would and when you get to your desired
 " location you're ready to type. Even when you miss your mark and take longer
@@ -116,29 +116,30 @@
 " Minmal Vim Config:
 " What follows is my minamal vim configuration which makes vim more usable.
 
-let mapleader = ","
 " Starting vim with the -u flag will start up vim instead of vi
 set nocompatible
+" File type detection, load file-type plugins, and load file-type indent files
 filetype plugin indent on
+" Turn on syntax highlighting
 syntax enable
 " Keep non-visible buffers loaded
 set hidden
 " Backspace behaves as you would expect
 set backspace=indent,eol,start
-" Seems to just be a better number for making files look more aligned.
+" 8 spaces per tab is a bit too much in my opinion
 set tabstop=4
-" Highlight searches
+" Highlight search matches
 set hlsearch
+" Highlight the search match as you type
 set incsearch
 " Show current file in status line
 set laststatus=2
 set statusline=
 set statusline+=%f
 " Poor man's buffer management
-nnoremap <leader>b :buffers<CR>:b<SPACE>
-" It's really convenient and quick and it's already ingrained in my muscle
-" memory at this point.
+nnoremap gb :buffers<CR>:b<SPACE>
+" Leave insert mode while keeping your hands on home row
 inoremap jk <ESC>
-" A lot more convenient
+" Recall previous commands but filter based on what you've typed so far
 cnoremap <C-p> <Up>
 cnoremap <C-n> <Down>
