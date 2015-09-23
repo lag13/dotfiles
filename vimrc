@@ -140,6 +140,7 @@ set statusline+=\ %{&ff}        " File format
 set statusline+=\ %l/%L         " Current line num out of total
 set statusline+=\ %P            " Top/Bottom and percentage through file
 set statusline+=\ [%{getcwd()}] " Current working directory
+set statusline+=\ %{fugitive#statusline()} " Current working directory
 " Memory is cheap, let's bump up the amount recorded commands.
 set history=500
 " When tab completing, complete the longest possible prefix and display a list
@@ -378,6 +379,13 @@ augroup END
 " if that is even possible.
 
 " TODO: See if endwise could also be triggered on the 'o' mapping.
+
+" TODO: Add mappings for impaired like the yo and yO mappings but enter insert
+" mode with 'paste' set at and after the cursor. Basically a yi and a ya
+" mapping but, for obvious reasons, I cannot use those mappings. Maybe add [E
+" and ]E mappings to exchange characters? Maybe add [F and ]F mappings to
+" rotate between files but remain in the current directory? So they would just
+" cycle between files in that directory.
 
 " Customizing closer.vim
 augroup custom_closer
@@ -650,14 +658,12 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 
 " The default indentwise mappings are a bit inconvenient so I remapped them
 " allowing me to use two hands.
-" mnemonic = reduced indent
 map [r <Plug>(IndentWisePreviousLesserIndent)
-map [e <Plug>(IndentWisePreviousEqualIndent)
+map [s <Plug>(IndentWisePreviousEqualIndent)
 map [g <Plug>(IndentWisePreviousGreaterIndent)
 map ]r <Plug>(IndentWiseNextLesserIndent)
-map ]e <Plug>(IndentWiseNextEqualIndent)
+map ]s <Plug>(IndentWiseNextEqualIndent)
 map ]g <Plug>(IndentWiseNextGreaterIndent)
-" mnemonic = block boundary
 map [b <Plug>(IndentWiseBlockScopeBoundaryBegin)
 map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 
@@ -1427,12 +1433,6 @@ nnoremap Y y$
 nnoremap yp yyp
 nnoremap yP yyP
 
-" Inserts a new line above/below the cursor but remains in normal mode.
-nnoremap <silent> <leader>o :call append('.', '')<CR>
-            \:silent! call repeat#set("\<leader>o", v:count)<CR>
-nnoremap <silent> <leader>O :call append(line('.')-1, '')<CR>
-            \:silent! call repeat#set("\<leader>O", v:count)<CR>
-
 " Run/Compile the program using the makeprg option
 nnoremap <silent> <localleader>x :w<CR>:silent! make<CR>:copen <BAR> redraw!<CR>
 
@@ -1551,9 +1551,8 @@ inoremap Jk <ESC>
 inoremap jK <ESC>
 inoremap JK <ESC>
 
-" These are nice because those keys are right under my fingers.
-noremap! <C-j> <C-r><C-r>"
-noremap! <C-l> <C-r><C-r>0
+" Quickly paste from the default register in insert mode
+noremap! <C-j> <C-r><C-p>"
 
 iabbrev lg Lucas Groenendaal
 iabbrev lge Lucas.Groenendaal@careerbuilder.com
