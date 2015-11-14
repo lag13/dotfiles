@@ -102,20 +102,6 @@ set ttimeoutlen=30
 set modelines=0
 " Tabs will appear 4 spaces wide.
 set tabstop=4
-" The > and < commands will add 4 spaces.
-set shiftwidth=4
-" > and < operators will round their indent to a multiple of 'shiftwidth'. So
-" this setting makes these operators behave just like when you insert a Tab
-" character in insert mode.
-set shiftround
-" When in insert mode <BS> will delete 4 spaces and Tab will insert 4 spaces.
-" If expandtab is NOT enabled then inserted Tab characters will be converted
-" to an actual Tab character, instead of spaces, when the number of spaces
-" equals 'tabstop'. This setting helps make it feel as if we're working with
-" actual tabs even if it is only spaces.
-set softtabstop=4
-" Insert spaces instead of tabs.
-set expandtab
 " Copies the indent from the previous line when using o, O, or <CR>.
 set autoindent
 " A must have, highlight the search as you type.
@@ -269,12 +255,8 @@ elseif &term ==# 'win32'
     " message.
     silent! colorscheme shine
 elseif has('unix')
-    let uname = system('echo -n "$(uname -s)"')
-    set background=light
-    if uname !=# "Darwin"
-        let g:solarized_termcolors = 256
-        set background=dark
-    endif
+    let g:solarized_termcolors = 256
+    set background=dark
     silent! colorscheme solarized
 endif
 
@@ -398,114 +380,7 @@ augroup custom_closer
                 \ let b:closer_flags = '{'
 augroup END
 
-" TODO: NERD, I'm getting errors when I run the default 'gs' and 'gi'
-" commands. I have no idea why this is? I'm not actively using the commands
-" but I just want to know what's wrong. Could there be something in my vimrc
-" which conflicts? Investigate this.
-
-" The main reason I wanted nerdtree was to have a way to visualize a project
-" as a tree so I could get a feel for it's layout. My one problem with
-" nerdtree is it is primarily designed to be a 'project drawer' style file
-" explorer. It can be used as a split explorer but it's not very good because
-" everytime you invoke it, a completely new nerdtree instance is started. This
-" new instance has 'forgetten' which folders you had open and such which is a
-" shame because that's what I wanted it for!!. Below is my attempt to make
-" NERDTree behave a little better with regards to that. I've made a bunch of
-" wrapper functionality which remembers the nerdtree buffers we have opened
-" and switches to them when possible rather then creating a new one. When
-" opening files from nerdtree it will even set the alternate buffer to be the
-" file we were previously editing! It's all a bit hacky right now but it gets
-" the job done. Something else I was trying to do in this process was to not
-" add positions in nerdtree buffers to the jump list. Unfortunately this does
-" not seem to be possible, my best bet would be forking and modifying the
-" plugin myself which I might very well do.
-let g:nerdtrees = {}
-let g:NERDTreeHijackNetrw = 0
-augroup MyNERDTreeHijackNetrw
-    autocmd VimEnter * silent! autocmd! FileExplorer
-    au BufEnter,VimEnter * call MyCheckForBrowse(expand("<amatch>"))
-augroup END
-" Keeps track of the alternate and 2nd alternate (so third most recently used)
-" files.
-augroup SecondAlternateBuffer
-    autocmd!
-    autocmd BufEnter * call UpdateSecondAlternateBuffer(expand("<amatch>"))
-augroup END
-
-function! UpdateSecondAlternateBuffer(dir)
-    if !exists('w:secondAltBuffer')
-        let w:secondAltBuffer = {}
-    endif
-    if !isdirectory(a:dir)
-        if bufnr('%') != get(w:secondAltBuffer, '#', bufnr('%'))
-            let w:secondAltBuffer['@'] = w:secondAltBuffer['#']
-        endif
-        let w:secondAltBuffer['#'] = bufnr('#')
-    endif
-endfunction
-
-function! MyCheckForBrowse(dir)
-    " By the time this function fires we'll be in a different buffer so the
-    " alternate buffer is the one we just came from.
-    let cur_bnr = bufnr("#")
-    if a:dir != '' && isdirectory(a:dir)
-        if has_key(g:nerdtrees, a:dir)
-            " Wipe out the buffer that gets created whenever a directory is
-            " edited.
-            setlocal bufhidden=wipe
-            let g:nerdtrees[a:dir]["nerd_alt"] = cur_bnr
-            " Don't fire the SecondAlternateBuffer group of autocommands when
-            " going back to a nerdtree buffer.
-            execute "noautocmd keepjumps buffer " . g:nerdtrees[a:dir]["nerd_buf"]
-        else
-            " Launch nerdtree for the first time.
-            call nerdtree#checkForBrowse(a:dir)
-            let g:nerdtrees[a:dir] = {"nerd_buf" : bufnr("%"), "nerd_alt" : cur_bnr}
-        endif
-    endif
-endfunction
-
-" Quits out of nerdtree, restoring the alternate buffer before nerdtree was
-" launched.
-function! MyNerdTreeQuit()
-    " Got the b:NERDTreeRoot.path.str() code from line 87 of
-    " plugin/NERD_tree.vim
-    let nerd_tree_root = b:NERDTreeRoot.path.str()
-    if bufexists(g:nerdtrees[nerd_tree_root]["nerd_alt"])
-        execute "noautocmd keepjumps buffer ".g:nerdtrees[nerd_tree_root]["nerd_alt"]
-        let @# = bufname(w:secondAltBuffer['#'])
-    endif
-endfunction
-
-" Some cleanup code which fires after trying to open a file from nerdtree.
-" Does things like sets the alternate buffer.
-function! MyNerdTreePostOpenFile(original_command)
-    autocmd! SecondAlternateBuffer
-    let nerd_tree_root = b:NERDTreeRoot.path.str()
-    execute a:original_command
-    if &filetype !=# 'nerdtree'
-        if bufexists(g:nerdtrees[nerd_tree_root]["nerd_alt"])
-            let @# = g:nerdtrees[nerd_tree_root]["nerd_alt"]
-        endif
-        let w:secondAltBuffer['@'] = get(w:secondAltBuffer, '#')
-        let w:secondAltBuffer['#'] = bufnr('#')
-        augroup SecondAlternateBuffer
-            autocmd!
-            autocmd BufEnter * call UpdateSecondAlternateBuffer(expand("<amatch>"))
-        augroup END
-    endif
-endfunction
-nnoremap - :e .<CR>
-augroup filetype_nerdtree
-    autocmd!
-    autocmd Filetype nerdtree nnoremap <buffer> - :call MyNerdTreeQuit()<CR>
-    " I made my own mappings for nerdtree's <CR> and g:NERDTreeMapActivateNode
-    " mappings. These new mappings run the original mapping and do some extra
-    " stuff to restore alternate files.
-    autocmd Filetype nerdtree execute "nnoremap <buffer> <CR> :call MyNerdTreePostOpenFile('".substitute(maparg('<CR>', 'n'), '<CR>', '', 'g')."')\<CR>"
-    autocmd Filetype nerdtree execute "nnoremap <buffer> ".g:NERDTreeMapActivateNode." :call MyNerdTreePostOpenFile('".substitute(maparg(g:NERDTreeMapActivateNode, 'n'), '<CR>', '', 'g')."')\<CR>"
-augroup END
-
+nnoremap - :NERDTreeToggle<CR>
 " Use plain characters to display the tree
 let g:NERDTreeDirArrows = 0
 let g:NERDTreeMinimalUI = 1
@@ -616,7 +491,7 @@ noremap <SPACE> :
 let g:ctrlp_root_markers = ['web', 'app']
 let g:ctrlp_reuse_window = 'netrw\|help\|nerdtree'
 let g:ctrlp_follow_symlinks = 1
-let g:ctrlp_custom_ignore = 'vendor\|lib\|img\|ps2\|cache'
+let g:ctrlp_custom_ignore = 'vendor\|img\|ps2\|cache'
 let g:ctrlp_switch_buffer = 'e'
 " To me it makes more sense to search for files based on cwd. <leader>p will
 " now do this and <leader>P will try to search for files based on the root for
