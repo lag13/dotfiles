@@ -30,11 +30,7 @@
 " :c[noremap]map    Command-line
 
 " <expr> in a mapping evaluates the {rhs} as an expression. The return value
-" of that expression is used as the key sequence to execute. It's a pretty
-" interesting option to use.
-
-" Seemed like a nice quick vimscript tutorial
-" http://andrewscala.com/vimscript/
+" of that expression is used as the key sequence to execute.
 
 " Creating A Text Object:
 " 1. Define the operator-pending mapping so you can operate on the text object
@@ -118,13 +114,11 @@ set showtabline=2
 set laststatus=2
 " Configure the status line
 set statusline=
-set statusline+=[%n]            " Buffer number
 set statusline+=\ [%<%f]        " Current file
 set statusline+=\ %m            " Modified flag
 set statusline+=\ %y            " File type
 set statusline+=\ %{&ff}        " File format
 set statusline+=\ %l/%L         " Current line num out of total
-set statusline+=\ %P            " Top/Bottom and percentage through file
 set statusline+=\ [%{getcwd()}] " Current working directory
 set statusline+=\ %{fugitive#statusline()} " Current working directory
 " Memory is cheap, let's bump up the amount recorded commands.
@@ -175,7 +169,7 @@ let $PS1_VIM = 'VIM SHELL ' . $PS1
 " who use sublime and man does that editor look nice. It got me thinking about
 " altering vim's color scheme, just for a change of pace. This is what I now
 " know of colorschemes in vim after trying to get the 'solarized' colorscheme
-" to work. 
+" to work.
 
 " The big reason that many graphical editors look so great is because they
 " support millions of colors. Graphical implementations of vim (gvim and
@@ -287,16 +281,10 @@ augroup END
 " http://www.reddit.com/r/vim/comments/3a7a6z/netrw_nerdtree/
 " 4. clang complete for autocompleting C/C++ code
 " 5. paredit http://danmidwood.com/content/2014/11/21/animated-paredit.html.
-" 6. https://github.com/tpope/vim-eunuch, seems to have some useful stuff
-" 8. https://github.com/tpope/vim-unimpaired - Many mappings starting with '['
-" for moving around different lists.
 " 9. http://vimawesome.com/plugin/youcompleteme - Code completion
 " 10. http://vimawesome.com/plugin/ultisnips-forever-and-always - Snippets
 " 11. http://vimawesome.com/plugin/syntastic - Syntax checking
-" 13. https://github.com/kien/ctrlp.vim/issues/280 - Delete buffers with ctrlp 
-" 15. https://github.com/sjl/gundo.vim - Undo tree. I think it requires python
-" to run and the vim version must be 7.3, maybe I'll try making my own version
-" in just vimscript.
+" 13. https://github.com/kien/ctrlp.vim/issues/280 - Delete buffers with ctrlp
 " 17. https://github.com/nelstrom/vim-cutlass - Addressing the issues of vim's
 " registers, unfortunately it is not written... but! I could definitely
 " implement some of his ideas. There is also a plugin already out there which
@@ -311,17 +299,12 @@ augroup END
 " for it to work. I would like it to seek for the next thing that could be
 " switched. It would be nice to be able to seek forward and backwards as well.
 " And have the ability to switch specific things.
-" 21. https://github.com/justinmk/vim-ipmotion - Configure { and } to behave a
-" bit more intelligently. Seems like a nice little plugin.
 " 22. https://github.com/haya14busa/incsearch.vim/releases/tag/v2.0.0. Don't
 " know too much about it but seems pretty neat. Incrementally highlights ALL
 " search matches while typing. It also seems pretty extensible, it looked like
 " there was a fuzzy search extension, very cool.
 " 23. http://stackoverflow.com/questions/13406751/vim-completion-based-on-buffer-name
 " autocompletion based on buffer name.
-" 24. Plugins that 'close' programming structures for you:
-" https://github.com/rstacruz/vim-closer and
-" https://github.com/tpope/vim-endwise.
 " 25. Plugins that can shift function arguments:
 " https://github.com/PeterRincker/vim-argumentative
 " https://github.com/AndrewRadev/sideways.vim
@@ -384,15 +367,10 @@ nnoremap - :NERDTreeToggle<CR>
 " Use plain characters to display the tree
 let g:NERDTreeDirArrows = 0
 let g:NERDTreeMinimalUI = 1
-" So the 'C' mapping doesn't hang
-let g:NERDTreeMapCWD = 'cD'
 " To have similar mappings between nerdtree and ctrlp
 let g:NERDTreeMapOpenSplit = 'x'
 let g:NERDTreeMapOpenVSplit = 'v'
-" Because 'x' is taken. 'l' stands for 'level' in my mind.
-let g:NERDTreeMapCloseDir = 'l'
-let g:NERDTreeMapCloseChildren = 'L'
-" I don't see myself using NERDTrees 'J' and 'K' mappings and I'd before to
+" I don't see myself using NERDTrees 'J' and 'K' mappings and I'd prefer to
 " scroll with my mappings.
 let g:NERDTreeMapJumpFirstChild = ''
 let g:NERDTreeMapJumpLastChild = ''
@@ -501,6 +479,10 @@ let g:ctrlp_map = '<leader>p'
 nnoremap <leader>P :CtrlPRoot<CR>
 " Always try to work from the cwd
 nnoremap <leader>b :CtrlPBuffer<CR>
+" Originally made so when there are only 2 files in the same directory you can
+" switch between them quickly.
+nnoremap <leader>d :execute "CtrlP ".expand('%:h')<CR>
+nnoremap <leader>D :execute "CtrlP ".expand('#:h')<CR>
 " I liked the idea of setting g:ctrlp_mruf_relative = 1 because then different
 " tab'bed workspaces could feel like they each contained their own files. But
 " I also wanted to keep the default functionality of CtrlPMRUFiles as well so
@@ -930,6 +912,27 @@ map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 
 " Normal Mappings {{{
 
+" Trying it out
+nnoremap <BS> <C-^>
+
+" Thanks
+" https://www.reddit.com/r/vim/comments/3n97ug/its_been_a_long_while_since_ive_discovered/
+inoremap <expr> <C-y> pumvisible() ? "\<C-y>" : matchstr(getline(line('.')-1), '\%' . virtcol('.') . 'v\%(\k\+\\|.\)')
+inoremap <expr> <C-e> pumvisible() ? "\<C-e>" : matchstr(getline(line('.')+1), '\%' . virtcol('.') . 'v\%(\k\+\\|.\)')
+
+" Easier to type. The autocmd stuff just makes it so we get the normal <CR>
+" behavior in the quickfix and command line windows.
+noremap <CR> %
+augroup map_return_key
+    autocmd!
+    autocmd CmdwinEnter * nnoremap <buffer> <CR> <CR>
+    autocmd BufReadPost quickfix nnoremap <buffer> <CR> <CR>
+augroup END
+
+" There's a lot of mappings that have capital letter counterparts which do the
+" opposite and I'd like 'u' and 'U' to adhere to that pattern.
+nnoremap U <C-r>
+
 " Inserts one space on either side of the character under the cursor.
 " Overcomplicated? Possibly, but I got to play with regex's and have a
 " function with a cool name so I say it's worth it. All this function does is
@@ -1086,7 +1089,7 @@ nnoremap <leader>et :tabe <C-R>=expand("%:p:h") . "/" <CR>
 " mapping.
 nnoremap <leader>t :tabe <BAR> redraw!<CR>:lcd<SPACE>
 
-" Undo's all changes made since opening the file and saves the current undo state 
+" Undo's all changes made since opening the file and saves the current undo state
 nnoremap <silent><leader>u :let b:save_undo_nr = changenr() <BAR> silent! undo 1 <BAR> silent! undo<CR>
 " Redo's all changes since the above command was used. I would have tried to
 " redo ALL changes but I don't know of a good way to do that.
@@ -1141,11 +1144,64 @@ noremap gl L
 " Makes it so the n and N commands always go in the same direction, forward
 " and backward respectively, no matter which direction we're actually
 " searching.
-noremap  <silent> n /<C-r>/<CR>zv
-noremap  <silent> N ?<C-r>/<CR>zv
+noremap <silent> n /<CR>zv
+noremap <silent> N ?<CR>zv
 " Removing those zv's above so the 'c' operator works correctly
-onoremap  <silent> n /<C-r>/<CR>
-onoremap  <silent> N ?<C-r>/<CR>
+onoremap <silent> n /<CR>
+onoremap <silent> N ?<CR>
+
+" TODO: I'm starting to learn about tmux and have experimented with sending
+" code from vim to another tmux pane running a repl, like clisp, which is
+" pretty damn cool if you ask me. So it seems that with tmux you can make vim
+" a bit more IDE like because you can:
+"
+" - Send code from vim to another pane containing a repl to incrementally test
+"   your code
+" - Compile code asynchronously
+" - Run tests asynchronously
+" - Run code in a separate pane
+"
+" Looking into it more, there seem to be a lot of plugins to choose from which
+" maybe accomplish the same thing? More specifically I've seen these plugins
+" and threads:
+"
+" - https://github.com/tpope/vim-dispatch
+" - https://github.com/jpalardy/vim-slime
+" - https://github.com/christoomey/vim-tmux-runner
+" - https://github.com/benmills/vimux
+" - https://www.reddit.com/r/vim/comments/27m0ep/vim_repl_for_python/
+" - https://github.com/Shougo/vimshell.vim
+" 
+" The first 4 seem to be about sending code to a tmux pane while the reddit
+" post lists some plugins which allow you to have a repl right in a vim
+" buffer. The last one is something I've been meaning to check out, it's a
+" shell implemented in vimscript. Could that sort of thing make tmux
+" irrelevant in some ways? Anyway, this TODO is to figure out exactly what
+" problems these plugins solve. Could some of the above plugins be used in
+" tandem with eachother because they all solve slightly different problems? Or
+" not?
+
+" My quickly hacked together operator to send keys to a tmux pane. Now if I
+" have a repl in pane 1 of the current window, I can send code to it from
+" within vim.
+function! TmuxSendKeys(type, ...)
+    let saved_unnamed_register = @@
+    if a:0
+        silent execute "normal! `<" . a:type . "`>y"
+    elseif a:type == 'line'
+        silent execute "normal! '[V']y"
+    elseif a:type == 'char'
+        silent execute "normal! `[v`]y"
+    else
+        return
+    endif
+    let cmd = shellescape(substitute(substitute(@@, "\n$", '', ''), "\n", "\r", 'g') . "\r")
+    call system('tmux send-keys -t 1 ' . cmd)
+    redraw!
+    let @@ = saved_unnamed_register
+endfunction
+nnoremap gt :set opfunc=TmuxSendKeys<CR>g@
+xnoremap gt :<C-u>call TmuxSendKeys(visualmode(), 1)<CR>
 
 " An operator to horizontally resize windows. TODO: Consider making this also
 " adjust horizontal width. There are 3 possibilities I see with this: adjust
@@ -1271,31 +1327,15 @@ nnoremap <C-w>j <C-w>J
 nnoremap <C-w>k <C-w>K
 nnoremap <C-w>l <C-w>L
 
-" Switch between tabs if there are multiple and otherwise buffers
-function! SwitchTabsOrBuffers(next)
-    if tabpagenr('$') ==# 1
-        if a:next
-            bnext
-        else
-            bprevious
-        endif
-    else
-        if a:next
-            tabnext
-        else
-            tabprevious
-        endif
-    endif
-endfunction
-nnoremap <silent> <C-p> :call SwitchTabsOrBuffers(0)<CR>
-nnoremap <silent> <C-n> :call SwitchTabsOrBuffers(1)<CR>
+" Quickly switch between tabs
+nnoremap <silent> <C-n> gt
+nnoremap <silent> <C-p> gT
 
 " Redraw the screen and remove any search and/or sneak highlighting.
 nnoremap <C-g> :nohlsearch <BAR> silent! call sneak#cancel()<CR><C-l>
 
-" Slightly easier to type and it wasn't being used!
-nnoremap q; q:
-xnoremap q; q:
+" Slightly easier to type and who uses Q anyway.
+nnoremap Q q:
 
 " ' is easier to reach.
 noremap ' `
@@ -1310,48 +1350,6 @@ nnoremap yP yyP
 
 " Run/Compile the program using the makeprg option
 nnoremap <silent> <localleader>x :w<CR>:silent! make<CR>:copen <BAR> redraw!<CR>
-
-" A function which opens up a file using the output of the 'tree' command. So
-" if I had this:
-"
-" web/param/src/
-" ├── model
-"     ├── correspondances
-"         └── correspondanceactions.php
-"
-" And I wanted to open
-" web/param/src/model/correspondances/correspondanceactions.php, I can put my
-" cursor on that line, invoke the function, and the file will be opened. I
-" made this super quick and it is probably full of problems but I'm happy with
-" it. It assumes that the tree command's output starts on the first line of
-" the file. In reality, it would probably be better to use some sort of file
-" explorer but this was fun to make.
-function! TreeGoToFile(open_tab_p)
-    let save_unnamed_register = @"
-    let w = winsaveview()
-    normal! $F─w
-    let path = ''
-    while line('.') !=# 1
-        normal! yWb
-        let path = @".'/'.path
-        normal! yl
-        while matchstr(@", '\w') ==# ''
-            normal! kyl
-        endwhile
-    endwhile
-    " We're at the top of the file, finish off the path to the file to
-    " open.
-    let path = getline('.') . path[:-2]
-    call winrestview(w)
-    if a:open_tab_p
-        execute "tabedit " . path
-    else
-        execute "edit " . path
-    endif
-    let @" = save_unnamed_register
-endfunction
-nnoremap gt :call TreeGoToFile(0)<CR>
-nnoremap gT :call TreeGoToFile(1)<CR>
 
 " Operators to put the top/bottom of the screen on a text object. The one time
 " CursorMoved autocommand makes it so the cursor remains in the same position
@@ -1738,11 +1736,11 @@ command! -complete=file -nargs=? Write call CreateAndSaveDirectory(<f-args>)
 
 " XML File Settings {{{
 augroup filetype_xml
-    autocmd! 
+    autocmd!
     autocmd Filetype xml setlocal iskeyword+=-
     autocmd Filetype xml setlocal breakat-=-
     autocmd Filetype xml noremap <silent> [[ :call GoToParentNode()<CR>
-augroup END 
+augroup END
 " }}}
 
 " Markdown File Settings {{{

@@ -37,6 +37,9 @@ is super fun and easy to follow. Really though, you should read it.
 
 - http://learnvimscriptthehardway.stevelosh.com/
 
+This is a super quick primer on writing vimscript should you ever want to:
+
+- http://andrewscala.com/vimscript/
 
 What is Vim?
 ------------
