@@ -1,3 +1,5 @@
+" Miscelaneous Notes {{{
+
 " Funny Vim Commands:
 " bad[d] - Adds a file name to the buffer list without loading it.
 " col[der] - Goes to an older quickfix list.
@@ -54,6 +56,67 @@
 " 2. Define a visual mapping so we can visually select the exact text we want
 " and have the operator operate on it.
 
+" Macro Insanity:
+" On 01/16/16 I felt like making a colorscheme just to get a better sense
+" about what that entails. Solarized was one that I liked so I decided to base
+" mine off of that one. Solarized is fairly complicated, at least I think so,
+" as far as colorschemes go and since I wanted to get a better sense of the
+" "essence" of a colorscheme my first task was to make the solarized code look
+" more like one of the default colorschemes in $VIMRUNTIME/colors (because
+" those are pretty bare bones). So I started and was building up a LOT of
+" lines that looked like this:
+
+" highlight Normal cterm=NONE ctermfg=244 ctermbg=234
+
+" Solarized builds those lines mostly using variables and since I got tired of
+" repeating those numbers and formats I decided to extract them into variables
+" as well. That lead me to put these lines at the top of my file:
+
+" let s:fmt_none = "NONE"
+" let s:fmt_bold = "NONE,bold"
+" let s:fmt_revr = "NONE,reverse"
+" let s:fmt_stnd = "NONE,standout"
+" let s:vmode   = "cterm"
+" let s:base03  = "234"
+" let s:base02  = "235"
+" let s:base01  = "239"
+" let s:base00  = "240"
+" let s:base0   = "244"
+" let s:base1   = "245"
+" let s:base2   = "187"
+" let s:base3   = "230"
+" let s:yellow  = "136"
+" let s:orange  = "166"
+" let s:red     = "124"
+" let s:magenta = "125"
+" let s:violet  = "61"
+" let s:blue    = "33"
+" let s:cyan    = "37"
+" let s:green   = "64"
+
+" Now of course I had about 30 lines of highlighting code that now needed to
+" to be converted to use variables. I did not feel like doing that manually so
+" I started recording macros. It took me a long time... and I most definitely
+" could have been done sooner if I did it in a more manual fashion but this
+" was fun. Here are the macros:
+
+" Register a - The 'main' program
+" Iexecute '10@b@c@d@e
+" Register b - Replaces the values after equal signs with variables
+"  execute "normal! f=lvEygg/\<C-r>0\r^wyiW`<vEp"
+" Register c - Puts quotes around the values after equal signs
+"  s/=\zs\(\S*\)/'.\1.'/g
+" Register d - changes cterm to s:vmode and adds quotes
+"  s/cterm/'.s:vmode.'/g
+" Register e - Remove the trailing ".'" that appears because of register c
+"  s/\.'$//
+
+" Note that I've mapped space to be ':' which is why you see a space preceding
+" the commands. Once I built these macros, all I had to do was hit @a on every
+" line that needed to be updated. Woo!
+
+" }}}
+
 " Basic Settings {{{
 
 let mapleader = ","
@@ -64,6 +127,9 @@ set nocompatible
 " is annoying because everytime I source my vimrc this happens. So I try to
 " remedy that here.
 set formatoptions=croql
+if v:version + has("patch541") >= 704
+    set formatoptions+=j
+endif
 " This exists so the .vim/ directory can still be named 'vim' even on a
 " windows machine. The 'exists' check is so I can re-source my .vimrc and not
 " mess up 'runtimepath'.
@@ -114,12 +180,10 @@ set showtabline=2
 set laststatus=2
 " Configure the status line
 set statusline=
-set statusline+=\ [%<%f]        " Current file
-set statusline+=\ %m            " Modified flag
-set statusline+=\ %y            " File type
-set statusline+=\ %{&ff}        " File format
-set statusline+=\ %l/%L         " Current line num out of total
-set statusline+=\ [%{getcwd()}] " Current working directory
+set statusline+=\ [%t]            " Current file
+set statusline+=\ %m              " Modified flag
+set statusline+=\ %l/%L           " Current line num out of total
+set statusline+=\ [%<%{getcwd()}] " Current working directory
 set statusline+=\ %{fugitive#statusline()} " Current working directory
 " Memory is cheap, let's bump up the amount recorded commands.
 set history=500
@@ -316,6 +380,26 @@ augroup END
 " 29. Put the output of shell commands into a buffer:
 " https://github.com/sjl/clam.vim
 " 30. Grep operator: https://github.com/inside/vim-grep-operator
+" 31. Check out the quick-scope plugin mentioned here and maybe the other
+" plugins mentioned:
+" https://www.reddit.com/r/vim/comments/3uwm6q/what_are_some_minimalistic_plugins_that_get_the/
+" I think it would be really cool if I could combine the functionalities of
+" the quici-scope plugin and the sneak plugin. That way I could still get
+" multi-line fFtT motions while retaining quick-scope's nice highlighting of
+" the current line.
+" 32. Check out this weather vim plugin someone made :)
+" https://www.reddit.com/r/vim/comments/3vs4mn/vimairline_weather_extension/
+" It adds a little weather status to the airline status bar. More importantly
+" though check out https://github.com/mattn/webapi-vim. Can I use that to send
+" requests from within vim? Are there plugins to send requests from within
+" vim? I know there's that restclient-mode for emacs:
+" https://github.com/pashky/restclient.el. I wonder if there's something
+" similar for vim
+" 33. The plugins listed by NSNO in this post seems nice
+" https://www.reddit.com/r/vim/comments/443fxr/what_am_i_missing_out_on/. In
+" particulart I want to check out this plugin
+" https://github.com/ajh17/VimCompletesMe. Which makes <tab> try to do the
+" appropriate vim native completion depending on context.
 
 " TODO: In making a PR for sneak.vim I learned about vader.vim, which is a
 " testing framework for vim. vader.vim will output information about the test
@@ -469,7 +553,7 @@ noremap <SPACE> :
 let g:ctrlp_root_markers = ['web', 'app']
 let g:ctrlp_reuse_window = 'netrw\|help\|nerdtree'
 let g:ctrlp_follow_symlinks = 1
-let g:ctrlp_custom_ignore = 'vendor\|img\|ps2\|cache'
+let g:ctrlp_custom_ignore = 'vendor\|img\|ps2'
 let g:ctrlp_switch_buffer = 'e'
 " To me it makes more sense to search for files based on cwd. <leader>p will
 " now do this and <leader>P will try to search for files based on the root for
@@ -481,6 +565,7 @@ nnoremap <leader>P :CtrlPRoot<CR>
 nnoremap <leader>b :CtrlPBuffer<CR>
 " Originally made so when there are only 2 files in the same directory you can
 " switch between them quickly.
+" TODO: Order these files by most recently used? Can that be done?
 nnoremap <leader>d :execute "CtrlP ".expand('%:h')<CR>
 nnoremap <leader>D :execute "CtrlP ".expand('#:h')<CR>
 " I liked the idea of setting g:ctrlp_mruf_relative = 1 because then different
@@ -526,6 +611,165 @@ map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 
 " }}}
 
+" Make a command which goes back to the most recently changed file? It could
+" be like a file wide change list I suppose? My use case was that I made a
+" change in a file (added a var_dump) then navigated around a lot of other
+" files for a while. I wanted to quickly return to that file but just couldn't
+" remember what file it was... But this functionality could be nice to have
+" just because you can quickly get back to the file you were editing. Like
+" maybe you navigate away to copy some code or just peruse other files for
+" ideas and when you're ready to code again boom! You instantly return to the
+" file you were working on.
+
+" Plugin ideas which are probably talked about in this document but I'll
+" reiterate:
+" 1. Improved change list. Will contain my implementation where g; jumps back
+" one change further if the initial g; doesn't move the cursor. Keeps track of
+" a change list spanning across files so that you could edit a file for a bit,
+" look around at other code then quickly jump back to that file you were on.
+" Maybe some change movements that go to the last change not visible in the
+" current window
+" 2. Save undo states. My thought here is that sometimes I have a working
+" program want to refactor. So I refactor but maybe want to quickly jump back
+" to see how I did it before. If I saved that undo state when I had my code
+" working I could get there.
+" 3. Ctrlp extension where you assemble a list of "files you're working on".
+" You run a command to add the current file to this list and then ctrlp will
+" just have to filter it.
+
+" http://howivim.com/2016/damian-conway/ Some useful tidbits. I kind of liked
+" his Y mapping actually. Lots of vim resources
+" https://www.reddit.com/r/vim/comments/461y3f/collection_of_80_vim_resources/
+
+" Noticed a bug with my statusline I think where the status bar of all windows
+" in the same tab have the same pwd even if they are in different directories.
+" Fix this.
+
+" Can we have another <C-x><C-f> kind of completion which completes on file
+" names relative to the current buffer/file? That would be nice.
+
+" Make <CR> in nerdtree open the file and close the nerdtree split and 'o'
+" open the file and keep the nerdtree split open. Or vice versa.
+
+" In insert mode I can type <C-x> then <C-e> or <C-y> to scroll up and down.
+" Could I make it so that after typing <C-x> I can switch between tabs with
+" <C-n> and <C-p> or maybe even go to the alternate buffer with <C-6>?
+
+" A course to look into the vim source code!
+" https://www.reddit.com/r/vim/comments/44uqon/learning_vim_from_the_inside_source_code/
+
+" Parinfer has been ported to vimscript!!!!
+" https://www.reddit.com/r/vim/comments/44u67c/parinfer_has_been_ported_to_vimscript/.
+" Check it out and perhaps install it. Heck, I think I'd be a little curious
+" how parinfer works so maybe I could look at the original source code and
+" make my own port. Another day though. Actually it looks like there's another
+" implementation mentioned on the parinfer website:
+" https://shaunlebron.github.io/parinfer/#editor-plugins
+
+" Normally & repeats the last substitution. Normally an equivalent to that
+" would be @: because chances are the last command you ran was the
+" substitution. So why don't we make & do @:? The only scenario where we would
+" lose functionality is when you: do a substitution, run a different command,
+" then you want to do the substitution again but like I said I can't say I've
+" ever run into that scenario as of yet. I suppose I could also map $ % or ^
+" since I'm using those under different mappings, hmm yeah I think I like that
+" better actually.
+
+" Could we configure the sneak plugin so that when an operator pending motion
+" is completed it doesn't change what the last motion used was? So if I did
+" f:dt' I want ; to still take me to the next : instead of the '.
+
+" When writing a file to a directory that doesn't exist doesn't it usually
+" give me some sort of error? Right now I'm doing :w<cr> but it just sort of
+" fails silently then I do my :Write command to make the necessary
+" directories.
+
+" Sometimes I'll do an undo-redo by accident. Is there a way to easily get
+" back to where I just was? Or would I have to set a mark? Do mark's get
+" undone? I feel like I remember reading somewhere that they did.
+
+" Make a function to turn this sort of thing:
+" $emailBody = $this->buildEmailBody($emails, $unableToSave, $postingLocations->getProblemReqs(), $categoryCodes->getProblemReqs());
+" Into this:
+"        $emailBody = $this->buildEmailBody(
+"            $emails,
+"            $unableToSave,
+"            $postingLocations->getProblemReqs(),
+"            $categoryCodes->getProblemReqs()
+"        );
+
+
+" I hope this thread takes off:
+" https://www.reddit.com/r/vim/comments/41wgqf/do_you_regularly_use_manual_marks_if_yes_how_do/
+" I too think like marks could be very useful but I just haven't made good use
+" of them as of yet. Usually I'll edit something and after the fact I think to
+" myself, 'man that could have been accomplished better with marks'. Maybe I
+" should somehow show the active marks in the file? I wonder how I would do
+" that... I could put a string in the status bar with a list of marks? Then
+" maybe I could highlight characters on the screen where the mark is located?
+" I could use a different color for different marks perhaps? And even if I
+" don't know what mark corresponds to what color, I can at least make use of
+" the [' and ]' commands to move between nearby marks.
+
+" Might have found a bug with the exchange lines mappings ([e and ]e) in
+" unimpaired. If I am inside an open fold and issue those commands then the
+" lines do get switched but then the fold closes. Very odd.
+
+" Woa! I was able to do `gf` on a line like this:
+" $VIMRUNTIME/syntax/syntax.vim. I wonder if that applies to all of those
+" variables beginning with a dollar sign?
+
+" Check out the vim libraries this guy mentions:
+" http://stackoverflow.com/a/26314537. vital.vim seems pretty damn cool!
+
+" Make it so the 'join' command will not add a space to the join lines when
+" the first one ends in a special character or if the one below starts with a
+" special character.
+
+" Make it so '.' in operator pending mode repeats the last text object used.
+
+" Make a website. One thing I could do on that website is give a more in depth
+" look at some popular vim plugins. How they work, what they accomplish, and
+" all that sort of stuff. Seems like it would be a fun thing to do.
+
+" Check out the plugins mentioned in this reddit post.
+" https://www.reddit.com/r/vim/comments/3w90sv/taking_advantage_of_sessions_in_vim/
+" Also checkout the ctrlspace plugin mentioned in the README of the
+" 'promiscuous' plugin.
+
+" Make a plugin to change the tabline to display a list of cwd's instead of
+" file names. Also make it so other tabs with the cwd get shortened and put
+" right next to another tab with the same cwd. So something like this:
+" ~/Code/first_game * *
+" So the ~/Code/first_game bit is the directory and the '*'s are two other
+" tabs which are both in the same directory as that first one. Note that I'm
+" assuming that all windows in a single tab will have the same cwd. And
+" actually lets shorten that path to be '~/C/first_game' so it will display
+" the first letter of each directory along the path and the full directory
+" name when we get to the cwd. Each time a new tab is added, even though it
+" might not be added next to a tab in the same directory, display it next to
+" all the tabs with the same cwd. Make mappings which move between tabs
+" reflect the display of the tab line rather than what they are internally. On
+" a related note, maybe we could leverage this tabline to fake vim having
+" separate projects. In my mind a project is a collection of tabs. Tabs are to
+" windows as projects are to tabs. So we could have mappings to switch our
+" current project but really what it would do would be to give us a different
+" tabline. I guess each project would really be just a list of tab numbers.
+" Then a plugin would only choose to display the tabs associated with those
+" numbers.
+
+" Make a ctrlp extension for 'special files'. I figure that whenever we do
+" some programming task we might only be working on a couple files but we'll
+" need to reference many other files in the mean time. Those couple files
+" we're editing would be considered 'special'. We'd add them to some list
+" whenever we wanted and when we run the plugin, we just point ctrlp at that
+" list of files. Then we can quickly get back to the file(s) we were working
+" on.
+
+" Check out mosh, a replacement for ssh which is supposed to be a little
+" nicer:
+" http://stackoverflow.com/questions/10152402/vim-scrolling-slow-on-tmux-over-ssh
+
 " The next set of plugins/functionality I would like is:
 " 3. Try out the YankRing plugin so I don't have to use registers as much:
 " https://github.com/vim-scripts/YankRing.vim. If I try the yankring plugin
@@ -546,10 +790,6 @@ map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 " Make my source command only work for vim files. Maybe even think of using
 " <localleader>x to source vim stuff just so it will be consistant with other
 " languages.
-
-" <C-6> goes to the 'allternate' buffer. Maybe define <DEL> to go to the
-" 'buffer before the alternate buffer'. So the second most recently used
-" buffer rather than the first most recently used.
 
 " Try playing with the 'scrolljump' option sometime. I remember that when I
 " sat next to that emacs coder on the train when his cursor would scroll
@@ -597,13 +837,14 @@ map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 " sure I remember seeing that netrw did offer this sort of functionality in
 " later versions when using the 'x' command, I'd like to see how that works.
 
+" url text object. And related to that, maybe make an 'open' operator which
+" would run the 'open' command. That operator + text object would allow me to
+" open up a url from within vim. On a related note maybe make a nerdtree
+" extension to open a file with it's default program.
+
 " Look into foldmethod=syntax. It sounds to me like it would automatically
 " create folds based on things like braces and parens. Inspired by:
 " https://www.reddit.com/r/vim/comments/3dmths/vim_unfolding_when_writing/
-
-" Is there any way (there probably is) that you can have your search term be
-" some text followed by nothing followed by more text? So picture the search
-" highlighting getting broken up in the middle.
 
 " Now that I have <SPACE> as my : I noticed an issue. On all of the "Press
 " ENTER or type command to continue" prompts (like after using :ls), pressing
@@ -912,6 +1153,80 @@ map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 
 " Normal Mappings {{{
 
+" Naive jumping to the next comment
+function! JumpToComment(direction, visual)
+    if a:visual
+        normal! gv
+    endif
+    if a:direction == -1
+        let flag = 'b'
+        let stopLine = 1
+    elseif a:direction == 1
+        let flag = ''
+        let stopLine = -1
+    else
+        return
+    endif
+    let commentStart = matchstr(&commentstring, '\S\ze%s')
+    let cur_line = line('.')
+    call search(commentStart, 'W' . flag)
+    while line('.') == cur_line + a:direction && line('.') != stopLine
+        " TODO: Check if we are in a comment before proceding
+        " if !synIDattr(synID(line('.'), col('.'), 0), 'name') =~# 'Comment'
+        let cur_line = line('.')
+        call search(commentStart, 'W' . flag)
+    endwhile
+endfunction
+nnoremap <silent> [C :call JumpToComment(-1, 0)<CR>
+nnoremap <silent> ]C :call JumpToComment(1, 0)<CR>
+xnoremap <silent> [C :call JumpToComment(-1, 1)<CR>
+xnoremap <silent> ]C :call JumpToComment(1, 1)<CR>
+
+function! ToggleCharacter(char)
+    let line = getline('.')
+    if line[-1:-1] == a:char
+        let line = line[0:-2]
+    else
+        let line = line . a:char
+    endif
+    call setline('.', line)
+endfunction
+" Toggle commas and semicolons
+nnoremap <silent> <leader>, :call ToggleCharacter(',')<CR>
+nnoremap <silent> <leader>; :call ToggleCharacter(';')<CR>
+" Change a variable assignment to a return
+nnoremap <silent> <leader>r :normal! ^cf=return<ESC>
+" Poor man's zoom on a window
+nnoremap <silent> <leader>z :tab split<CR>
+
+function! SmartGe(e, visual)
+    if a:visual
+        normal! gv
+    endif
+    let col = col('.')
+    execute "normal! g" . a:e
+    if col('.') == col - 1
+        execute "normal! g" . a:e
+    endif
+endfunction
+nnoremap <silent> ge :call SmartGe('e', 0)<CR>
+nnoremap <silent> gE :call SmartGe('E', 0)<CR>
+xnoremap <silent> ge :<C-u>call SmartGe('e', 1)<CR>
+xnoremap <silent> gE :<C-u>call SmartGe('E', 1)<CR>
+
+" Pulled this from the help pages, thought it was nifty.
+function! JumpToKeywordChoice()
+    let num = input("Which one: ")
+    if num !=# ''
+        execute "normal! " . num . "[\<C-i>"
+    endif
+endfunction
+nnoremap [I [I:call JumpToKeywordChoice()<CR>
+nnoremap ]I ]I:call JumpToKeywordChoice()<CR>
+" TODO: It seems there's a visual mode command but like the built in '*' it
+" only does it for the keyword under the cursor, consider making a mapping for
+" visual mode which actually searches for the entire selected word.
+
 " Trying it out
 nnoremap <BS> <C-^>
 
@@ -1046,9 +1361,6 @@ endfunction
 nnoremap <leader>j :call SplitLine()
             \\| silent! call repeat#set("\<leader>j", v:count)<CR>
 
-" TODO: Maybe try to make this g; command a little 'smarter' where if our
-" cursor is ANWYWHERE inside the last change (so between '[ and ']) then we
-" try jumping again.
 " Slightly 'smarter' g; command where if the cursor doesn't move after issuing
 " a g; then it will issue it again.
 function! SmartOlderChange()
@@ -1059,7 +1371,10 @@ function! SmartOlderChange()
     endif
 endfunction
 nnoremap <silent> g; :call SmartOlderChange()<CR>
-" An altered version of g; which adds to the jumplist
+" TODO: Make this command do a 'hard' older change where it moves the cursor
+" to a line different than one of the lines that was changed. Maybe we could
+" even make a family of these commands. One I was just thinking of was having
+" a command which goes to an older change not currently visible onscreen.
 nnoremap <silent> g: m':call SmartOlderChange()<CR>
 
 " Sources the current file
@@ -1067,21 +1382,15 @@ nnoremap <leader>sc :source % \| nohlsearch<CR>
 " Sources .vimrc
 nnoremap <leader>sv :source $MYVIMRC \| nohlsearch<CR>
 
-" Edits the .vimrc file in a vertical split.
-nnoremap <leader>eV :vsplit $MYVIMRC<CR>
 " Edits the .vimrc file.
 nnoremap <leader>ee :edit $MYVIMRC<CR>
-" Opens previous buffer in a vertical split
-nnoremap <leader>e# :leftabove vsplit #<CR>
-" Opens previous buffer in a horizontal split
-nnoremap <leader>E# :split #<CR>
 " Quickly open a file in the same directory as the current file:
 " http://vimcasts.org/episodes/the-edit-command/
-nnoremap <leader>ew :e <C-R>=expand("%:p:h") . "/" <CR>
-nnoremap <leader>es :sp <C-R>=expand("%:p:h") . "/" <CR>
-nnoremap <leader>ex :sp <C-R>=expand("%:p:h") . "/" <CR>
-nnoremap <leader>ev :vsp <C-R>=expand("%:p:h") . "/" <CR>
-nnoremap <leader>et :tabe <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <leader>ew :e <C-R>=escape(expand("%:p:h"), " \t\n") . "/" <CR>
+nnoremap <leader>es :sp <C-R>=escape(expand("%:p:h"), " \t\n") . "/" <CR>
+nnoremap <leader>ex :sp <C-R>=escape(expand("%:p:h"), " \t\n") . "/" <CR>
+nnoremap <leader>ev :vsp <C-R>=escape(expand("%:p:h"), " \t\n") . "/" <CR>
+nnoremap <leader>et :tabe <C-R>=escape(expand("%:p:h"), " \t\n") . "/" <CR>
 
 " The two notable uses of tabs that I've seen have been for holding specific
 " window layouts or working on a separate project by lcd'ing to a different
@@ -1089,11 +1398,11 @@ nnoremap <leader>et :tabe <C-R>=expand("%:p:h") . "/" <CR>
 " mapping.
 nnoremap <leader>t :tabe <BAR> redraw!<CR>:lcd<SPACE>
 
-" Undo's all changes made since opening the file and saves the current undo state
-nnoremap <silent><leader>u :let b:save_undo_nr = changenr() <BAR> silent! undo 1 <BAR> silent! undo<CR>
-" Redo's all changes since the above command was used. I would have tried to
-" redo ALL changes but I don't know of a good way to do that.
-nnoremap <silent><leader>r :if exists('b:save_undo_nr') <BAR> execute "undo ".b:save_undo_nr <BAR> endif<CR>
+" " Undo's all changes made since opening the file and saves the current undo state
+" nnoremap <silent><leader>u :let b:save_undo_nr = changenr() <BAR> silent! undo 1 <BAR> silent! undo<CR>
+" " Redo's all changes since the above command was used. I would have tried to
+" " redo ALL changes but I don't know of a good way to do that.
+" nnoremap <silent><leader>r :if exists('b:save_undo_nr') <BAR> execute "undo ".b:save_undo_nr <BAR> endif<CR>
 
 " TODO: This is all still a work in progress. In starting my two ideas (an
 " undo to go to the previous save state and a way to save specific file undo
@@ -1171,7 +1480,7 @@ onoremap <silent> N ?<CR>
 " - https://github.com/benmills/vimux
 " - https://www.reddit.com/r/vim/comments/27m0ep/vim_repl_for_python/
 " - https://github.com/Shougo/vimshell.vim
-" 
+"
 " The first 4 seem to be about sending code to a tmux pane while the reddit
 " post lists some plugins which allow you to have a repl right in a vim
 " buffer. The last one is something I've been meaning to check out, it's a
@@ -1182,8 +1491,10 @@ onoremap <silent> N ?<CR>
 " not?
 
 " My quickly hacked together operator to send keys to a tmux pane. Now if I
-" have a repl in pane 1 of the current window, I can send code to it from
-" within vim.
+" have a repl in the bottom pane of the current window, I can send code to it
+" from within vim. TODO: Sometimes I'll zoom the vim pane to see as much code
+" as possible but when I try sending the code to the pane it doesn't work. So
+" I need to turn off the zoom state before sending the keys.
 function! TmuxSendKeys(type, ...)
     let saved_unnamed_register = @@
     if a:0
@@ -1196,12 +1507,111 @@ function! TmuxSendKeys(type, ...)
         return
     endif
     let cmd = shellescape(substitute(substitute(@@, "\n$", '', ''), "\n", "\r", 'g') . "\r")
-    call system('tmux send-keys -t 1 ' . cmd)
+    " It would appear that there is no tmux command to deliberately put a pane
+    " into a certain mode which is a shame because that means the best option
+    " is be to to use 'send-keys' and send the key  which is bound to the
+    " 'cancel' command.
+    let is_in_mode = system('tmux display-message -t bottom -p "#{pane_in_mode}"')
+    if is_in_mode
+        call system('tmux send-keys -t bottom C-c')
+    endif
+    " Unzoom so we can send to the pane using the 'bottom' target specifier
+    " and so we can see the results.
+    let is_zoomed = system("tmux display-message -p '#{window_zoomed_flag}'")
+    if is_zoomed
+        call system('tmux resize-pane -Z')
+    endif
+    call system('tmux send-keys -t bottom ' . cmd)
     redraw!
     let @@ = saved_unnamed_register
 endfunction
-nnoremap gt :set opfunc=TmuxSendKeys<CR>g@
-xnoremap gt :<C-u>call TmuxSendKeys(visualmode(), 1)<CR>
+" Mnemonic = 'You Repl'
+nnoremap yr :set opfunc=TmuxSendKeys<CR>g@
+nnoremap yrr V:<C-u>call TmuxSendKeys(visualmode(), 1)<CR>
+xnoremap R :<C-u>call TmuxSendKeys(visualmode(), 1)<CR>
+
+" Experimenting with being able to run the current program from within vim. I
+" know there are some solutions out there like the 3 mentioned in this reddit
+" post:
+" https://www.reddit.com/r/vim/comments/3vk1sg/bexec_is_a_vim_plugin_that_allows_the_user_to/
+" but I wanted to try building a solution myself just to see what it takes. So
+" far my ideas only apply to interpreted languages, haven't tried figuring out
+" compiled languages yet. My ideas at the moment about this:
+
+" Simplest Case:
+" You might want to execute a single file. If that file has the shebang at the
+" top of the file then we just execute that file. I still have to think about
+" whether I want to check if the file is executable first and manually alert
+" the user or if I should just let if fail and the user will quickly realize
+" the error and fix it themselves.
+
+" Slightly More Complicated:
+" Still want to execute the current file but this time the file does not have
+" a shebang at the top. In that case we'll have use an interpreter to run our
+" code. This is slightly more complicated because now we have to pick the
+" right interpreter based on the type of the file. So we set up a bunch
+" Filetype autocommands and use the intrepreter if the shebang falls through.
+" Not too bad but still a bit trickier.
+
+" Just A Tad More Complicated:
+" This time we want to execute a specific command. Perhaps we're writing some
+" new unix utility and it takes a number of parameters and we're testing a new
+" parameter, who knows. I think in these situations where we want to execute
+" something other than the current file, the only solution is to specify the
+" exact command we want to run. So the solution I thought of is that we'd have
+" a bash script sitting in the cwd() which I've named 'vim_run_prg'. All we'd
+" do is edit that file so it runs the command we want and then vim can run
+" that file for us. I was thinking that perhaps sometimes you'd like
+
+" Problems And Things I Still Need To Figure Out Or At Least Make Better:
+" 1. If there is no program output, perhaps we'd like to switch back to the
+" vim instance?
+" 2. When we get problems when trying to run the program inside vagrant. For
+" example. If we just had a plain old php file with the shebang at the top
+" that we wanted to run. Vim will generate the path to that file on the local
+" system when it should be passing the path to the file on the VM.
+" 3. When I'm sending keys to the window pane on the virtual box (C-c clear
+" C-m) the first 'c' in 'clear' does not get sent. Not sure why.
+" 4. Maybe I need to open an external application to test like opening a web
+" browser to display html.
+" 5. Maybe I need to make some sort of POST or GET request to test out the
+" code.
+
+let g:run_program_script_name = 'vim_run_prg'
+augroup tmux_testing
+    autocmd!
+    autocmd Filetype python let b:program_runner = 'python3'
+    autocmd Filetype php let b:program_runner = 'php'
+    autocmd Filetype ruby let b:program_runner = 'ruby'
+augroup END
+" TODO: Have 2 new settings. One controls how to call the command (send it to
+" tmux, just use vim) and the other will be the pane to target (assuming we're
+" going with the tmux approach. That way on the fly I could change where these
+" commands are getting sent to.
+function! ExecuteCommand(cmd)
+    write
+    call system('tmux send-keys -t 1.0 C-c clear C-m ' . shellescape(a:cmd) . ' C-m')
+    call system('tmux select-window -t 1')
+endfunction
+function! GetExecuteCommand(exec_current_filep)
+    let runner = findfile(g:run_program_script_name, getcwd())
+    if !a:exec_current_filep && runner !=# ''
+        let cmd = './' . runner
+    else
+        if getline(1) =~ '^#!'
+            let cmd = expand("%:p")
+        else
+            let cmd = b:program_runner . ' ' . expand("%:p")
+        endif
+    endif
+    return cmd
+endfunction
+function! ExecuteProgram(exec_current_filep)
+    let cmd = GetExecuteCommand(a:exec_current_filep)
+    call ExecuteCommand(cmd)
+endfunction
+nnoremap gx :call ExecuteProgram(0)<CR>
+nnoremap gX :call ExecuteProgram(1)<CR>
 
 " An operator to horizontally resize windows. TODO: Consider making this also
 " adjust horizontal width. There are 3 possibilities I see with this: adjust
@@ -1221,41 +1631,6 @@ function! ResizeWindowOperator(type, ...)
 endfunction
 nnoremap <silent> zS :set operatorfunc=ResizeWindowOperator<CR>g@
 vnoremap <silent> zS :<C-u>call ResizeWindowOperator(visualmode(), 1)<CR>
-
-" Also for fun, could I make replace operator so to speak? What it would do is
-" replace the text-object with spaces and put me in Replace mode, at the
-" beginning of where the text-object was. The inspiration for this idea was
-" making this list:
-"               1. voyagecare (DEV AND PROD)
-"               2. saia       (DEV)
-"               3. voyagecare (DEV)
-"               4. voyagecare (DEV)
-"               5. voyagecare (DEV)
-"               6. voyagecare (DEV)
-"               7. voyagecare (DEV)
-" I was going to update the later 'voyagecare' strings to a different name but
-" I'll want to keep the parentheses aligned. If I replaced a 'voyagecare' with
-" whitespace and then just started Replace mode, the parentheses will stay
-" aligned (assuming that the new name isn't longer than voyagecare). This
-" probably wouldn't be useful at all, just one of those things it would be
-" interesting to implement. If I really wanted to keep the parentheses
-" aligned, that job might be better handled by and aligning plugin like
-" easy-align. Maybe the only way to do this is with autocommands?
-function! ReplaceOperator(type)
-    let start_pos = getpos("'[")
-    let end_pos = getpos("']")
-    execute 'normal! '.start_pos[1].'G'.start_pos[2].'|v'.end_pos[1].'G'.end_pos[2].'|r '
-    augroup exit_operator_in_replace_mode
-        autocmd!
-        autocmd CursorMoved <buffer> normal! R
-    augroup END
-
-    " echom a:type
-    " How do I exit a function in a different mode?
-    " normal! R
-endfunction
-" nnoremap <silent> gR :set operatorfunc=ReplaceOperator<CR>g@
-" vnoremap <silent> gR :<C-u>call ReplaceOperator(visualmode())<CR>
 
 " Could I make something that moves me 10 lines then 5 then 2... (as I
 " continue the command). Feel like that might be a quick way to get around
@@ -1310,7 +1685,19 @@ endfunction
 nnoremap <silent><leader>fm :call FlipAccessModifier()<CR>
 
 " Quickly close windows
-nnoremap <C-c> <C-w>c
+function! SmartCloseWindow()
+    let closeWindow1 = char2nr('y')
+    let closeWindow2 = char2nr("\<CR>")
+    let choice = closeWindow1
+    if len(tabpagebuflist()) == 1
+        echo 'Are you sure you want to close the window? [y/n]: '
+        let choice = getchar()
+    endif
+    if choice ==? closeWindow1 || choice ==? closeWindow2
+        wincmd c
+    endif
+endfunction
+nnoremap <C-c> :call SmartCloseWindow()<CR>
 " Move between windows
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
@@ -1341,8 +1728,7 @@ nnoremap Q q:
 noremap ' `
 noremap ` '
 
-" Normally Y is a synonym for yy. I think this mapping is more logical because
-" D and C behave in this fashion.
+" Make Y behave like D and C
 nnoremap Y y$
 " Because I can
 nnoremap yp yyp
@@ -1425,11 +1811,12 @@ inoremap jK <ESC>
 inoremap JK <ESC>
 
 " Quickly paste from the default register in insert mode
-noremap! <C-j> <C-r><C-p>"
+inoremap <C-j> <C-r><C-p>"
+cnoremap <C-j> <C-r>"
 
 iabbrev lg Lucas Groenendaal
-iabbrev lge Lucas.Groenendaal@careerbuilder.com
-iabbrev lgE groenendaal92@gmail.com
+iabbrev lge groenendaal92@gmail.com
+iabbrev lgE Lucas.Groenendaal@careerbuilder.com
 
 " }}}
 
@@ -1503,8 +1890,8 @@ endfunction
 command! -nargs=* -range Boxify call SurroundWithBox(<f-args>)
 
 " Quickly run a macro or the '.' command on a range of lines
-xnoremap @ :normal @
-xnoremap . :normal .<CR>
+xnoremap @ :g/^/normal @
+xnoremap . :g/^/normal .<CR>
 
 " }}}
 
@@ -1517,13 +1904,6 @@ onoremap a@ :<C-U>execute "normal! /\\S\\+@\\S\\+.com\r:nohlsearch\rvEl"<CR>
 " A text object for the entire buffer
 onoremap <silent> ae :<C-u>normal! ggVG<CR>
 vnoremap <silent> ae :<C-u>normal! ggVG<CR>
-
-" A text object for character-wise selection of current line. Originally was
-" 'ill' but I like 'c' better. Mnemonic could be character select of current
-" line.
-onoremap <silent> c :<C-u>normal! ^vg_<CR>
-nnoremap <silent> cc "_cc
-nnoremap <silent> dc "_cc<ESC>
 
 " Text-object for a search pattern
 function! TextObjSearchMatch(forward_p, visual_mode)
@@ -1652,9 +2032,9 @@ function! TextObjNumber(modifier, visual_mode)
     let cmd = v:operator.'i'.a:modifier.'d'.(v:operator ==# 'c' ? "\<C-r>.\<ESC>" : '')
     silent! call repeat#set(cmd, v:count)
 endfunction
-for i in ['', 'n', 'l']
-    execute "onoremap <silent> i".i."d :<C-u> call TextObjNumber('".i."', 0)<CR>"
-    execute "xnoremap <silent> i".i."d :<C-u> call TextObjNumber('".i."', 1)<CR>"
+for m in ['', 'n', 'l']
+    execute "onoremap <silent> i".m."d :<C-u> call TextObjNumber('".m."', 0)<CR>"
+    execute "xnoremap <silent> i".m."d :<C-u> call TextObjNumber('".m."', 1)<CR>"
 endfor
 
 " Used to operate on a variable for languages whose variables start with '$'
@@ -1867,6 +2247,7 @@ augroup filetype_markdown
         endif
     endfunction
     " TODO: Make these work with a count, so 3[[ will move us 3 headers back.
+    " TODO: Make these work in visual mode as well
     autocmd Filetype markdown noremap <silent><buffer> [[ :<C-u>call MoveToHeader(1)<CR>
     autocmd Filetype markdown noremap <silent><buffer> ]] :<C-u>call MoveToHeader(0)<CR>
     autocmd Filetype markdown onoremap <buffer> ih :<C-U>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<CR>
@@ -1952,5 +2333,39 @@ augroup filetype_vim
     autocmd!
     autocmd FileType vim setlocal foldmethod=marker
 augroup END
+" }}}
+
+" Go File Settings {{{
+
+" TODO: I found another little bug where I had 3 splits on the same file. I
+" saved the file, then if I hit undo the other two non-active splits jump to
+" the bottom of the file.
+
+" Runs goimports on the current file.
+function! GoImports()
+    " TODO: I've already determined that I do not like adding to the undo
+    " history unecessarily. In my case I commented out a line, saved, ran the
+    " program, went to undo my comment and had to hit undo twice because of
+    " gofmt. But I've also determined that using undojoin is a bit
+    " dangerous... I commented out a line, saved, undid, saved, now if I redo
+    " I cannot redo to where I commented out the line because I've started
+    " down a new undo branch. So I think I should only apply the gofmt if the
+    " file has actually been changed by gofmt.
+    let currentBuffer = getline(1, '$')
+    let formattedCode = split(system('goimports ' . expand('%')), "\n")
+    " TODO: If there are errors, add them to location list
+    if v:shell_error == 0 && currentBuffer != formattedCode
+        let w = winsaveview()
+        %delete _
+        call setline(1, formattedCode)
+        call winrestview(w)
+    endif
+endfunction
+
+augroup filetype_go
+    autocmd!
+    autocmd BufWritePost,FileWritePost *.go call GoImports()
+augroup END
+
 " }}}
 
