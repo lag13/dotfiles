@@ -1698,11 +1698,6 @@ function! SmartCloseWindow()
     endif
 endfunction
 nnoremap <C-c> :call SmartCloseWindow()<CR>
-" Move between windows
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
 " Move and maximize a window
 nnoremap <C-w><C-h> <C-w>h<C-w><BAR>
 nnoremap <C-w><C-j> <C-w>j<C-w><C-_>
