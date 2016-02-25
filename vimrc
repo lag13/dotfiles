@@ -1784,15 +1784,6 @@ vnoremap <leader>g :<C-U>call GrepOperator(visualmode())<CR>
 
 " Insert Mappings and Abbreviations {{{
 
-" Adds another newline but keeps the cursor in it's current position. It's
-" basically the <C-o> mapping from emacs. I'm not sure how it works exactly
-" but it seems that using \<ESC> in a function which is used in an expression
-" mapping doesn't break the undo sequence.
-function! NewlineSameCursorPosition()
-    return "\<CR>\<ESC>kA"
-endfunction
-inoremap <C-d> <C-r>=NewlineSameCursorPosition()<CR>
-
 " Another way to get out of insert mode. I cover all my bases by including
 " mappings for every capitalization possibility.
 inoremap jk <ESC>
