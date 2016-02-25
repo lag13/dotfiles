@@ -406,15 +406,7 @@ augroup END
 " data (what failed, what passed). It seems that that output cannot be
 " redirected to a file/command though which I feel is a shame especially if a
 " lot of test data is being outputted. See if that can be fixed.
-" TODO: I think it would be nice if targets.vim only added to the jumplist if
-" we are not already inside the text object. So if we are inside the text
-" object, don't add to the jump list.
 " TODO: Make 'o_v' mappings work for targets.vim
-" TODO: It would be nice if the quote text objects would select only 'proper'
-" quotes. So it will only operate on acutal pairs of quotes. Right now I'm
-" imagaining a setting g:targets_proper option which will only work on quote
-" paris. I feel like there was an issue placed about this already but I can't
-" find it at the moment.
 " TODO: Could we adjust the code in the visual mappings so that when we're in
 " visual block mode they just exit out? That way, even if I have a version
 " below 704 I can still use the I and A mappings AND be able to use I and A in
@@ -448,19 +440,18 @@ augroup custom_closer
 augroup END
 
 nnoremap - :NERDTreeToggle<CR>
-" Use plain characters to display the tree
 let g:NERDTreeDirArrows = 0
 let g:NERDTreeMinimalUI = 1
 " To have similar mappings between nerdtree and ctrlp
 let g:NERDTreeMapOpenSplit = 'x'
 let g:NERDTreeMapOpenVSplit = 'v'
-" I don't see myself using NERDTrees 'J' and 'K' mappings and I'd prefer to
-" scroll with my mappings.
 let g:NERDTreeMapJumpFirstChild = ''
 let g:NERDTreeMapJumpLastChild = ''
+let g:NERDTreeMapHelp = ''
 
-" getchar() in expression mappings don't work below version 704 (technically
-" 7.3.338)
+let g:pasta_disabled_filetypes = ["python", "coffee", "markdown", "yaml", "slim", "nerdtree"]
+
+" getchar() in expression mappings don't work below version 7.3.338
 if v:version < 704
     let g:targets_aiAI = 'ai  '
 endif
@@ -499,12 +490,6 @@ nmap yZz <Plug>YSsurround
 nmap yZZ <Plug>YSsurround
 xmap Z   <Plug>VSurround
 xmap gZ  <Plug>VgSurround
-" TODO: It looks like custom surround objects can 'ys' operator. Is there any
-" way to make them work with ds and cs as well?
-" 'c' to surround selection in comment characters.
-let g:surround_99  = "/* \r */"
-" 'x' to more easily make a search on eXact word boundaries
-let g:surround_120 = "\\<\r\\>"
 
 " TODO: Could we add numbers to the highlighting to represent how many times
 " we have to hit ';' to get to that destination? This would in practice be a
@@ -1153,6 +1138,24 @@ map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 
 " Normal Mappings {{{
 
+" TODO: Consider making a PR to get these mappings into unimpaired.vim
+function! MoveChar(direction)
+    if a:direction == 'h' && col('.') == 'l'
+        return
+    elseif a:direction == 'l' && col('.') == col('$') - 1
+        return
+    endif
+    let saved_unnamed_register = @@
+    let keys = "d" . a:direction . (a:direction ==# 'h' ? 'ph' : 'p')
+    execute "normal! " . keys
+    let @@ = saved_unnamed_register
+    let mapping = (a:direction ==# 'h' ? '[' : ']') . 'E'
+    echom mapping
+    silent! call repeat#set(mapping)
+endfunction
+nnoremap <silent> [E :call MoveChar('h')<CR>
+nnoremap <silent> ]E :call MoveChar('l')<CR>
+
 " Naive jumping to the next comment
 function! JumpToComment(direction, visual)
     if a:visual
@@ -1709,7 +1712,7 @@ nnoremap <silent> <C-n> gt
 nnoremap <silent> <C-p> gT
 
 " Redraw the screen and remove any search and/or sneak highlighting.
-nnoremap <C-r> :nohlsearch <BAR> silent! call sneak#cancel()<CR><C-l>
+nnoremap <silent> <C-r> :nohlsearch <BAR> silent! call sneak#cancel()<CR><C-l>
 
 " Slightly easier to type and who uses Q anyway.
 nnoremap Q q:
