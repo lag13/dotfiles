@@ -1230,11 +1230,6 @@ nnoremap ]I ]I:call JumpToKeywordChoice()<CR>
 " Trying it out
 nnoremap <BS> <C-^>
 
-" Thanks
-" https://www.reddit.com/r/vim/comments/3n97ug/its_been_a_long_while_since_ive_discovered/
-inoremap <expr> <C-y> pumvisible() ? "\<C-y>" : matchstr(getline(line('.')-1), '\%' . virtcol('.') . 'v\%(\k\+\\|.\)')
-inoremap <expr> <C-e> pumvisible() ? "\<C-e>" : matchstr(getline(line('.')+1), '\%' . virtcol('.') . 'v\%(\k\+\\|.\)')
-
 " Easier to type. The autocmd stuff just makes it so we get the normal <CR>
 " behavior in the quickfix and command line windows.
 noremap <CR> %
@@ -1694,7 +1689,7 @@ function! SmartCloseWindow()
         let choice = getchar()
     endif
     if choice ==? closeWindow1 || choice ==? closeWindow2
-        wincmd c
+        execute "normal! \<C-w>c"
     endif
 endfunction
 nnoremap <C-c> :call SmartCloseWindow()<CR>
@@ -1714,7 +1709,7 @@ nnoremap <silent> <C-n> gt
 nnoremap <silent> <C-p> gT
 
 " Redraw the screen and remove any search and/or sneak highlighting.
-nnoremap <C-g> :nohlsearch <BAR> silent! call sneak#cancel()<CR><C-l>
+nnoremap <C-r> :nohlsearch <BAR> silent! call sneak#cancel()<CR><C-l>
 
 " Slightly easier to type and who uses Q anyway.
 nnoremap Q q:
