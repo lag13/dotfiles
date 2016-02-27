@@ -1692,6 +1692,8 @@ function! SmartCloseWindow()
         let choice = getchar()
     endif
     if choice ==? closeWindow1 || choice ==? closeWindow2
+        " TODO: If we are trying to close the very last window then just quit
+        " vim.
         execute "normal! \<C-w>c"
     endif
 endfunction
@@ -2029,37 +2031,6 @@ xnoremap <silent><buffer> iv :<C-u>normal! viwoh<CR>
 " }}}
 
 " Command Mappings {{{
-
-" A mapping to delete to the next path seprator.
-function! DeleteBackOnePath(is_cmd_line)
-    if a:is_cmd_line
-        let cur_line = getcmdline()
-        let cursor_pos = getcmdpos() - 1
-    else
-        let cur_line = getline('.')
-        let cursor_pos = col('.') - 1
-    endif
-    if has("win32") || has("win64")
-        let path_separator = '\'
-    else
-        let path_separator = '/'
-    endif
-    let dels = ""
-
-    if cursor_pos > 1
-        if cur_line[cursor_pos - 1] ==# path_separator
-            let dels = dels."\<BS>"
-            let cursor_pos = cursor_pos - 1
-        endif
-        while cursor_pos > 0 && cur_line[cursor_pos-1] !=# path_separator
-            let dels = dels."\<BS>"
-            let cursor_pos = cursor_pos - 1
-        endwhile
-    endif
-    return dels
-endfunction
-cnoremap <expr> <C-b> DeleteBackOnePath(1)
-inoremap <expr> <C-b> DeleteBackOnePath(0)
 
 " Filter the list rather than proceed sequentially through the command
 " history.
