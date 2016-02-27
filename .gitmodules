@@ -73,3 +73,6 @@
 [submodule "bundle/tmux-navigator"]
 	path = bundle/tmux-navigator
 	url = git@github.com:christoomey/vim-tmux-navigator.git
+[submodule "bundle/indent-object"]
+	path = bundle/indent-object
+	url = git@github.com:lag13/vim-indent-object.git
