@@ -10,9 +10,6 @@
 [submodule "bundle/vim-repeat"]
 	path = bundle/repeat
 	url = https://github.com/tpope/vim-repeat.git
-[submodule "bundle/vim-indent-object"]
-	path = bundle/indent-object
-	url = https://github.com/michaeljsmith/vim-indent-object.git
 [submodule "bundle/ctrlp"]
 	path = bundle/ctrlp
 	url = https://github.com/ctrlpvim/ctrlp.vim.git

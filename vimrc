@@ -449,8 +449,6 @@ let g:NERDTreeMapJumpFirstChild = ''
 let g:NERDTreeMapJumpLastChild = ''
 let g:NERDTreeMapHelp = ''
 
-let g:pasta_disabled_filetypes = ["python", "coffee", "markdown", "yaml", "slim", "nerdtree"]
-
 " getchar() in expression mappings don't work below version 7.3.338
 if v:version < 704
     let g:targets_aiAI = 'ai  '
