@@ -181,7 +181,6 @@ set statusline=
 set statusline+=\ [%t]            " Current file
 set statusline+=\ %m              " Modified flag
 set statusline+=\ %l/%L           " Current line num out of total
-set statusline+=\ [%<%{getcwd()}] " Current working directory
 set statusline+=\ %{fugitive#statusline()} " Current working directory
 " Memory is cheap, let's bump up the amount recorded commands.
 set history=500
