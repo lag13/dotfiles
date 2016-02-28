@@ -174,8 +174,6 @@ set hlsearch
 set number
 " Close all folds when opening a file
 set foldlevelstart=0
-" Always show the tab line
-set showtabline=2
 " The status line will always appears in all windows
 set laststatus=2
 " Configure the status line
@@ -1241,8 +1239,10 @@ augroup map_return_key
 augroup END
 
 " There's a lot of mappings that have capital letter counterparts which do the
-" opposite and I'd like 'u' and 'U' to adhere to that pattern.
-nnoremap U <C-r>
+" opposite and I'd like 'u' and 'U' to adhere to that pattern. I make sure
+nmap U <Plug>(RepeatRedo)
+" Redraw the screen and remove any search and/or sneak highlighting.
+nnoremap <silent> <C-r> :nohlsearch <BAR> silent! call sneak#cancel()<CR><C-l>
 
 " Inserts one space on either side of the character under the cursor.
 " Overcomplicated? Possibly, but I got to play with regex's and have a
@@ -1710,9 +1710,6 @@ nnoremap <C-w>l <C-w>L
 " Quickly switch between tabs
 nnoremap <silent> <C-n> gt
 nnoremap <silent> <C-p> gT
-
-" Redraw the screen and remove any search and/or sneak highlighting.
-nnoremap <silent> <C-r> :nohlsearch <BAR> silent! call sneak#cancel()<CR><C-l>
 
 " Slightly easier to type and who uses Q anyway.
 nnoremap Q q:

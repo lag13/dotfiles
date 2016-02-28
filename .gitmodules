@@ -76,3 +76,6 @@
 [submodule "bundle/indent-object"]
 	path = bundle/indent-object
 	url = git@github.com:lag13/vim-indent-object.git
+[submodule "bundle/cwdtabline"]
+	path = bundle/cwdtabline
+	url = git@github.com:lag13/vim-cwdtabline.git
