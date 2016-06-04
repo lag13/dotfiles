@@ -554,6 +554,8 @@ nnoremap <leader>D :execute "CtrlP ".expand('#:h')<CR>
 " I made the second mapping.
 nnoremap <leader>m :let g:ctrlp_mruf_relative = 1 <BAR> CtrlPMRUFiles<CR>
 nnoremap <leader>M :let g:ctrlp_mruf_relative = 0 <BAR> CtrlPMRUFiles<CR>
+" Go to the second most recently visited buffer
+nmap <C-^> <leader>m<C-k><CR>
 
 " Comment the current line and paste the uncommented line below.
 nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
@@ -579,17 +581,115 @@ nnoremap <silent> gcp :copy . <BAR> execute "normal! k:Commentary\rj^"<CR>
 " line from the top but it is not.
 
 " The default indentwise mappings are a bit inconvenient so I remapped them
-" allowing me to use two hands.
+" allowing me to use two hands. Note that [s and ]s by default move between
+" spelling mistakes.
 map [r <Plug>(IndentWisePreviousLesserIndent)
 map [s <Plug>(IndentWisePreviousEqualIndent)
 map [g <Plug>(IndentWisePreviousGreaterIndent)
 map ]r <Plug>(IndentWiseNextLesserIndent)
 map ]s <Plug>(IndentWiseNextEqualIndent)
 map ]g <Plug>(IndentWiseNextGreaterIndent)
+" [b and ]b are mapped by unimpaired to move between buffers which is why I
+" load it first before making these new mappings
+runtime! plugin/unimpaired.vim
 map [b <Plug>(IndentWiseBlockScopeBoundaryBegin)
 map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 
+nnoremap gs :Gstatus<CR>
+
 " }}}
+
+" https://www.reddit.com/r/vim/comments/4je4oq/vimflow_declarative_devbuildtest_cycles_in_vim/
+" This looks like what I might want/need for running one command which will
+" run or compile or test my code out. We'll see though. Man, I really need to
+" come up with a good workflow for compiling + running the code I create.
+
+" I think I want this vertical movement plugin:
+" https://www.reddit.com/r/vim/comments/4j4duz/vim_how_can_i_jump_to_next_line_containing_a/
+
+" I really want more motions for moving around code, smarter motions. I think
+" I'd really like a motion which looks for a line "similar" to this one and
+" moves to it. Similar is pretty hard to define though. Or maybe bettwer would
+" just be more movements among language constructs like:
+" 1. Go to a function header
+" 2. Go to the parameters of a function
+" 3. Go to the return values of a function (useful for golang)
+" 4. Go to the next "type" that appears in the text
+" 5. Go to the next assignment
+
+" Can we make autocomplete work even after typing a space? So what I wanted to
+" do was autocomplete on a variable name + type that appeared in the function
+" header of another function. I typed the variable name then hit <C-p>. Now I
+" would like to be able to hit <space> and it keeps trying to autocomplete.
+" That would have gotten to my match faster than doing <C-x><C-p> and hitting
+" <C-p> a couple times till I got to my match.
+
+" Make one plugin which encompasses the functionality of buftabline and
+" cwdtabline. In the plugin inlude the functionality to make the <C-p> and
+" <C-n> mappings work correctly depending on whether there are tabs or not.
+" Also include in that plugin a mapping which will make only the buffers that
+" are below the cwd appear on the tabline. I was also thinking that maybe I
+" could have some sort of ability to: start at buffer A, scroll through a
+" couple buffers using <C-p>/<C-n> to get to the buffer I want C, once I get
+" to this buffer, remember that I actually came from A and make this the
+" alternate file. Ideally I'm thinking that the initial invocation of <C-p>/
+" <C-n> will do a normal :bnext and then successive calls will do :keepjumps
+" bnext. When you do ANYTHING besides <C-p>/C-n then the next one will just do
+" another :bnext. But I don't know how to do something like "if you do
+" ANYTHING different that <C-p> then make a change something".
+
+" Vim email client. I'd like to see what code it would take to be able to send
+" emails from within vim. Perhaps the actual code to send the email would be
+" written in go and we just call it from vim? Who knows.
+
+" Add mru buffer mode to buftabline? Then it could only show the buffers
+" underneath the cwd?
+
+" map <C-;> to go to first tab? <C-'> to go to last tab? just like with tmux.
+" I wonder if those are free/they don't actually represent a different
+" character because terminals are weird.
+
+" Work on better integrating this plugin with the buftabline plugin. Consider
+" making that update_tabline function global so if people have a mapping to
+" change directory they can still make it work. Update github with
+" screenshots. Add documentation. Add a couple options, one to always show the
+" tabline, one to maybe show the full path of the active tab?
+
+" Had an instance where only one line was indented with 2 spaces and sleuth
+" decided to set shiftwidth to 2 when everywhere else it was 4. I wonder why.
+
+" Can we make a better "paste from tmux" command? To paste from tmux is prefix
+" C-] but I've had issues where I've accidentally hit that in normal mode
+" which of course means that vim started freaking out.
+
+" Can we make a "window undo" command? So if I accidentally close a window I
+" could do something like <C-w>u and the window would be restored.
+
+" Can tim pope's Remove command not close the window on the buffer that is
+" being removed? That would be nice I think.
+
+" Make bash command to source a file and export any variables defined.
+" Normally to do this I have to set -a, . <file_to_source>, set +a
+
+" Update the nerdtree window whenever I switch buffers. The use case is that
+" when I do unimpaired's ]f mapping I want nerdtree to update to show which
+" file I'm looking at.
+
+" Wrappers around ctrlp where I set the working mode or whatever that variable
+" is called before calling the command. The only use case I want this for is
+" MRU file mode. So when I do ,m It will filter based off the cwd always.
+" Another thing I could do with this is make my ,d mapping actually just run
+" the MRU command with the appropriate root set. Or maybe do the mix of MRU
+" and files? Not really sure but I think there's something there.
+
+" Could we make a ctrlp extension to quickly bring back tabs that we've
+" closed? My use case: I tend to like having one tab for each different
+" project I'm working on even if I'm just referencing a bit of code. Depending
+" on what I'm working on, this can cause the number of tabs to grow pretty
+" quickly. At some point, the tabs are not needed anymore so I close them to
+" reduce clutter. But maybe I'd like to quickly bring that tab back from the
+" dead. So a ctrlp plugin to do this might be nice. So maybe I'd save the tab
+" and the windows that were loaded in that tab.
 
 " Make a command which goes back to the most recently changed file? It could
 " be like a file wide change list I suppose? My use case was that I made a
@@ -620,10 +720,6 @@ map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 " http://howivim.com/2016/damian-conway/ Some useful tidbits. I kind of liked
 " his Y mapping actually. Lots of vim resources
 " https://www.reddit.com/r/vim/comments/461y3f/collection_of_80_vim_resources/
-
-" Noticed a bug with my statusline I think where the status bar of all windows
-" in the same tab have the same pwd even if they are in different directories.
-" Fix this.
 
 " Can we have another <C-x><C-f> kind of completion which completes on file
 " names relative to the current buffer/file? That would be nice.
@@ -1133,6 +1229,39 @@ map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 
 " Normal Mappings {{{
 
+" A documentation plugin for documenting the code constructs of different
+" languages. I'm actually imagining something qutite simple. In the .vim
+" directory we'll have a directory languages/. Inside that directory will be
+" directories who's names are that of file types as vim identifies them (c,
+" go, vim, etc...). In each of those language directories I'll create files
+" for specific language constructs so I might have a slice.go or a map.vim or
+" a map.c or a loop.go. Then when editing a specific langauge and I think to
+" myself, "man how do I write a loop in go again?" I can just search in
+" ~/.vim/languages/go/loop.go to see examples. I would probably create a ctrlp
+" extension to quickly search through this directory. In general I could store
+" entire chunks of code in their which I've found useful making it really easy
+" to look it up again and copy it when needed. Some of these issues of "how do
+" I write this construct in this language" could be solved by snippets and
+" maybe I'll do that but this has some greater potential in that these
+" documentation files will probably have comments explaining things and stuff
+" like that.
+let g:documentation_location = "~/lucas_documentation"
+function! GetDocsRoot()
+    return expand(g:documentation_location)
+endfunction
+function! GetLangDocsDir()
+    return GetDocsRoot()."/".&filetype
+endfunction
+function! SearchLangDocumentation()
+    let langDocs = GetLangDocsDir()
+    if !isdirectory(langDocs)
+        call mkdir(langDocs, "p")
+    endif
+    execute "CtrlP ".langDocs
+endfunction
+nnoremap <leader>L :call SearchLangDocumentation()<CR>
+
+
 " TODO: Consider making a PR to get these mappings into unimpaired.vim
 function! MoveChar(direction)
     if a:direction == 'h' && col('.') == 'l'
@@ -1237,8 +1366,12 @@ augroup map_return_key
     autocmd BufReadPost quickfix nnoremap <buffer> <CR> <CR>
 augroup END
 
-" There's a lot of mappings that have capital letter counterparts which do the
-" opposite and I'd like 'u' and 'U' to adhere to that pattern. I make sure
+" There's a lot of mappings that have capital letter counterparts which do
+" something related and I'd like 'u' and 'U' to adhere to that pattern. I also
+" map <C-r> to redraw the screen since it's free. Note that I have to manually
+" source the autoload/repeat.vim file because the <Plug>(RepeatRedo) mapping
+" is not available when my vimrc is being parsed.
+runtime! autoload/repeat.vim
 nmap U <Plug>(RepeatRedo)
 " Redraw the screen and remove any search and/or sneak highlighting.
 nnoremap <silent> <C-r> :nohlsearch <BAR> silent! call sneak#cancel()<CR><C-l>
@@ -1315,13 +1448,15 @@ onoremap k k
 " which I thought odd. This seems to work fine though.
 noremap J gjgjgjgj
 noremap K gkgkgkgk
-" I've had to delete 3 lines before hence these mappings. The reason I don't
-" have these mappings delete 4 lines (which would match how they move in
-" normal mode) is because I don't trust myself to actually look at 5 lines and
-" say 'hey there are 5 lines there to delete', but 3 lines I can definitely
-" eyeball.
+" Delete 3 lines. The reason I don't have these mappings delete 5 lines (which
+" would match how they move in normal mode) is because I don't trust myself to
+" actually look at 5 lines and say 'hey there are 5 lines there to delete',
+" but 3 lines I can definitely eyeball.
 onoremap J 2j
 onoremap K 2k
+" Delete 4 lines which I think I'm also capable of eyeballing
+onoremap <C-j> 3j
+onoremap <C-k> 3k
 
 " Quickly write a file
 nnoremap <leader>w :write<CR>
@@ -1381,11 +1516,11 @@ nnoremap <leader>sv :source $MYVIMRC \| nohlsearch<CR>
 nnoremap <leader>ee :edit $MYVIMRC<CR>
 " Quickly open a file in the same directory as the current file:
 " http://vimcasts.org/episodes/the-edit-command/
-nnoremap <leader>ew :e <C-R>=escape(expand("%:p:h"), " \t\n") . "/" <CR>
-nnoremap <leader>es :sp <C-R>=escape(expand("%:p:h"), " \t\n") . "/" <CR>
-nnoremap <leader>ex :sp <C-R>=escape(expand("%:p:h"), " \t\n") . "/" <CR>
-nnoremap <leader>ev :vsp <C-R>=escape(expand("%:p:h"), " \t\n") . "/" <CR>
-nnoremap <leader>et :tabe <C-R>=escape(expand("%:p:h"), " \t\n") . "/" <CR>
+nnoremap <leader>ew :e <C-R>=escape(expand("%:.:h"), " \t\n") . "/" <CR>
+nnoremap <leader>es :sp <C-R>=escape(expand("%:.:h"), " \t\n") . "/" <CR>
+nnoremap <leader>ex :sp <C-R>=escape(expand("%:.:h"), " \t\n") . "/" <CR>
+nnoremap <leader>ev :vsp <C-R>=escape(expand("%:.:h"), " \t\n") . "/" <CR>
+nnoremap <leader>et :tabe <C-R>=escape(expand("%:.:h"), " \t\n") . "/" <CR>
 
 " The two notable uses of tabs that I've seen have been for holding specific
 " window layouts or working on a separate project by lcd'ing to a different
@@ -1706,9 +1841,24 @@ nnoremap <C-w>j <C-w>J
 nnoremap <C-w>k <C-w>K
 nnoremap <C-w>l <C-w>L
 
-" Quickly switch between tabs
-nnoremap <silent> <C-n> gt
-nnoremap <silent> <C-p> gT
+" Quickly switch between tabs or buffers
+function! TabOrBufferSwitch(next)
+    if tabpagenr('$') > 1
+        if a:next
+            tabnext
+        else
+            tabprevious
+        endif
+    else
+        if a:next
+            bnext
+        else
+            bprevious
+        endif
+    endif
+endfunction
+nnoremap <silent> <C-n> :call TabOrBufferSwitch(1)<CR>
+nnoremap <silent> <C-p> :call TabOrBufferSwitch(0)<CR>
 
 " Slightly easier to type and who uses Q anyway.
 nnoremap Q q:
@@ -2061,6 +2211,8 @@ function! CreateAndSaveDirectory(...)
 endfunction
 command! -complete=file -nargs=? Write call CreateAndSaveDirectory(<f-args>)
 
+command! JsonPretty %!python -m json.tool
+
 " }}}
 
 " XML File Settings {{{
@@ -2073,6 +2225,9 @@ augroup END
 " }}}
 
 " Markdown File Settings {{{
+" TODO: That would be cool if for a 1 and 2 header when using the underline
+" style, editing the title automatically adjusts the ==='s or ---'s to match
+" the length of the title.
 augroup filetype_markdown
     autocmd!
     autocmd BufNewFile,BufRead *.md setlocal filetype=markdown
