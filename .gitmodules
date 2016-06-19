@@ -1,6 +1,3 @@
 [submodule ".vim/bundle/unimpaired"]
 	path = .vim/bundle/unimpaired
 	url = https://github.com/tpope/vim-unimpaired.git
-[submodule ".vim/bundle/tmux-navigator"]
-	path = .vim/bundle/tmux-navigator
-	url = git@github.com:christoomey/vim-tmux-navigator.git
