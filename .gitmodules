@@ -4,9 +4,6 @@
 [submodule ".vim/bundle/vim-surround"]
 	path = .vim/bundle/surround
 	url = https://github.com/tpope/vim-surround.git
-[submodule ".vim/bundle/vim-repeat"]
-	path = .vim/bundle/repeat
-	url = https://github.com/tpope/vim-repeat.git
 [submodule ".vim/bundle/sneak"]
 	path = .vim/bundle/sneak
 	url = https://github.com/justinmk/vim-sneak.git
