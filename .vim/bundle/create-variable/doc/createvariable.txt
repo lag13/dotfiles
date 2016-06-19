@@ -1,0 +1,112 @@
+*createvariable.txt*	Operator to create variables
+
+Author: Lucas Groenendaal <groenendaal92@gmail.com>
+
+======================================================================================
+INTRODUCTION                                             *createvariable-introduction*
+
+Defines an operator which stores the text being operated on into a variable.
+
+======================================================================================
+EXAMPLE                                                      *createvariable-examples*
+
+Say we write this line of code and our cursor is on the first "e" in "escape":
+
+    let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g') ~
+                               ^
+
+We want to break this line up so it is more readable. With this plugin we can
+type `gC%` and a prompt will appear asking for a variable name. Let's say you
+enter "escaped_str". The result would then look like this:
+
+    let escaped_str = escape(@s, a:cmdtype.'\') ~
+    let @/ = '\V' . substitute(escaped_str, '\n', '\\n', 'g') ~
+
+======================================================================================
+MAPPINGS                                                     *createvariable-mappings*
+
+                                            *gC*
+gC{motion}              Create a variable whose value is the text that {motion} moves over.
+
+                                            *v_gC*
+{Visual}gC              Create a variable whose value is the highlighted text.
+
+======================================================================================
+SETTINGS                                                     *createvariable-settings*
+
+You can customize the mappings to your liking. The default mappings are:
+
+    nmap gC <Plug>Createvariable
+    xmap gC <Plug>Createvariable
+
+For example, these mappings could be defined instead:
+
+    nmap yc <Plug>Createvariable
+    xmap C <Plug>Createvariable
+
+                                                     *createvariable_replace_multiple*
+g:createvariable_replace_multiple ~
+
+By default this variable is 0 (false) which means that only the text that was
+operated on will be replaced with the variable name. If this variable is set to
+true it will replace all occurrences of the operated text with the variable
+name where the operated text occurs on lines of the same indent or more as the
+current line stopping the replacement when a line of lesser indent is reached.
+
+======================================================================================
+TODO/THINGS TO TRY/ISSUES                                      *createvariable-todos*
+
+For rval's that span multiple lines, I don't think it makes sense to just
+insert the assignment on the line directly above the operated text. For example
+say we have this php code:
+
+    $test = 1 + func(
+        func2(
+            something,
+            something2,
+            woooo
+        ),
+        2,
+        3
+    );
+
+If we pull out func2 into a variable "hi" then it will look like this:
+
+    $test = 1 + func(
+        $hi = func2(
+            something,
+            something2,
+            woooo
+        );
+        $hi,
+        2,
+        3
+    );
+
+Which is just wrong. I think the most general approach would be to store the
+assignment in the default register and let the user paste it in the appropriate
+place. Or maybe we could make use of the |User| autocommand so that this
+functionality can be customized?
+
+
+Have the user input the variable directly into to buffer instead of using
+input().
+
+
+Although unlikely, we run the risk of replacing things we don't mean to if the
+rval selected is a substring of another part of the code. For example, say we
+have this php code:
+
+    $test = 1 + func(1, 2, 3) + some_func_name();
+                ^
+
+If we typed `gCiw` and entered "hi" then we'd end up with this:
+
+    $hi = func;
+    $test = 1 + $hi(1, 2, 3) + some_$hi_name();
+
+Which is probably not what we expected. Perhaps I should get rid of the
+g:createvariable_replace_multiple option altogether it would make the code
+simpler and I'm not sure there's a strong need for the functionality it
+provides anyway.
+
