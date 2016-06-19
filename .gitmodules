@@ -13,9 +13,6 @@
 [submodule ".vim/bundle/exchange"]
 	path = .vim/bundle/exchange
 	url = https://github.com/tommcdo/vim-exchange.git
-[submodule ".vim/bundle/easy-align"]
-	path = .vim/bundle/easy-align
-	url = https://github.com/junegunn/vim-easy-align.git
 [submodule ".vim/bundle/sneak"]
 	path = .vim/bundle/sneak
 	url = https://github.com/justinmk/vim-sneak.git
