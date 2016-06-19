@@ -1,81 +1,81 @@
-[submodule "bundle/vim-colors-solarized"]
-	path = bundle/solarized
+[submodule ".vim/bundle/vim-colors-solarized"]
+	path = .vim/bundle/solarized
 	url = https://github.com/altercation/vim-colors-solarized.git
-[submodule "bundle/vim-surround"]
-	path = bundle/surround
+[submodule ".vim/bundle/vim-surround"]
+	path = .vim/bundle/surround
 	url = https://github.com/tpope/vim-surround.git
-[submodule "bundle/vim-commentary"]
-	path = bundle/commentary
+[submodule ".vim/bundle/vim-commentary"]
+	path = .vim/bundle/commentary
 	url = https://github.com/tpope/vim-commentary.git
-[submodule "bundle/vim-repeat"]
-	path = bundle/repeat
+[submodule ".vim/bundle/vim-repeat"]
+	path = .vim/bundle/repeat
 	url = https://github.com/tpope/vim-repeat.git
-[submodule "bundle/ctrlp"]
-	path = bundle/ctrlp
+[submodule ".vim/bundle/ctrlp"]
+	path = .vim/bundle/ctrlp
 	url = https://github.com/ctrlpvim/ctrlp.vim.git
-[submodule "bundle/vim-indentwise"]
-	path = bundle/indentwise
+[submodule ".vim/bundle/vim-indentwise"]
+	path = .vim/bundle/indentwise
 	url = https://github.com/jeetsukumaran/vim-indentwise.git
-[submodule "bundle/exchange"]
-	path = bundle/exchange
+[submodule ".vim/bundle/exchange"]
+	path = .vim/bundle/exchange
 	url = https://github.com/tommcdo/vim-exchange.git
-[submodule "bundle/easy-align"]
-	path = bundle/easy-align
+[submodule ".vim/bundle/easy-align"]
+	path = .vim/bundle/easy-align
 	url = https://github.com/junegunn/vim-easy-align.git
-[submodule "bundle/sneak"]
-	path = bundle/sneak
+[submodule ".vim/bundle/sneak"]
+	path = .vim/bundle/sneak
 	url = https://github.com/justinmk/vim-sneak.git
-[submodule "bundle/targets"]
-	path = bundle/targets
+[submodule ".vim/bundle/targets"]
+	path = .vim/bundle/targets
 	url = https://github.com/wellle/targets.vim.git
-[submodule "bundle/nerdree"]
-	path = bundle/nerdtree
+[submodule ".vim/bundle/nerdree"]
+	path = .vim/bundle/nerdtree
 	url = https://github.com/scrooloose/nerdtree.git
-[submodule "bundle/closer"]
-	path = bundle/closer
+[submodule ".vim/bundle/closer"]
+	path = .vim/bundle/closer
 	url = https://github.com/rstacruz/vim-closer.git
-[submodule "bundle/endwise"]
-	path = bundle/endwise
+[submodule ".vim/bundle/endwise"]
+	path = .vim/bundle/endwise
 	url = https://github.com/tpope/vim-endwise.git
-[submodule "bundle/eunuch"]
-	path = bundle/eunuch
+[submodule ".vim/bundle/eunuch"]
+	path = .vim/bundle/eunuch
 	url = https://github.com/tpope/vim-eunuch.git
-[submodule "bundle/larval"]
-	path = bundle/larval
+[submodule ".vim/bundle/larval"]
+	path = .vim/bundle/larval
 	url = https://github.com/lag13/vim-larval.git
-[submodule "bundle/create-variable"]
-	path = bundle/create-variable
+[submodule ".vim/bundle/create-variable"]
+	path = .vim/bundle/create-variable
 	url = https://github.com/lag13/vim-create-variable.git
-[submodule "bundle/replace-with-register"]
-	path = bundle/replace-with-register
+[submodule ".vim/bundle/replace-with-register"]
+	path = .vim/bundle/replace-with-register
 	url = https://github.com/lag13/ReplaceWithRegister.git
-[submodule "bundle/games"]
-	path = bundle/games
+[submodule ".vim/bundle/games"]
+	path = .vim/bundle/games
 	url = https://github.com/lag13/vim-games.git
-[submodule "bundle/screensavers"]
-	path = bundle/screensavers
+[submodule ".vim/bundle/screensavers"]
+	path = .vim/bundle/screensavers
 	url = https://github.com/lag13/vim-screensavers.git
-[submodule "bundle/pasta"]
-	path = bundle/pasta
+[submodule ".vim/bundle/pasta"]
+	path = .vim/bundle/pasta
 	url = https://github.com/sickill/vim-pasta.git
-[submodule "bundle/fugitive"]
-	path = bundle/fugitive
+[submodule ".vim/bundle/fugitive"]
+	path = .vim/bundle/fugitive
 	url = https://github.com/tpope/vim-fugitive.git
-[submodule "bundle/unimpaired"]
-	path = bundle/unimpaired
+[submodule ".vim/bundle/unimpaired"]
+	path = .vim/bundle/unimpaired
 	url = https://github.com/tpope/vim-unimpaired.git
-[submodule "bundle/sleuth"]
-	path = bundle/sleuth
+[submodule ".vim/bundle/sleuth"]
+	path = .vim/bundle/sleuth
 	url = git@github.com:tpope/vim-sleuth.git
-[submodule "bundle/rsi"]
-	path = bundle/rsi
+[submodule ".vim/bundle/rsi"]
+	path = .vim/bundle/rsi
 	url = git@github.com:tpope/vim-rsi.git
-[submodule "bundle/tmux-navigator"]
-	path = bundle/tmux-navigator
+[submodule ".vim/bundle/tmux-navigator"]
+	path = .vim/bundle/tmux-navigator
 	url = git@github.com:christoomey/vim-tmux-navigator.git
-[submodule "bundle/indent-object"]
-	path = bundle/indent-object
+[submodule ".vim/bundle/indent-object"]
+	path = .vim/bundle/indent-object
 	url = git@github.com:lag13/vim-indent-object.git
-[submodule "bundle/cwdtabline"]
-	path = bundle/cwdtabline
+[submodule ".vim/bundle/cwdtabline"]
+	path = .vim/bundle/cwdtabline
 	url = git@github.com:lag13/vim-cwdtabline.git
