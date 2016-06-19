@@ -22,9 +22,6 @@
 [submodule ".vim/bundle/nerdree"]
 	path = .vim/bundle/nerdtree
 	url = https://github.com/scrooloose/nerdtree.git
-[submodule ".vim/bundle/eunuch"]
-	path = .vim/bundle/eunuch
-	url = https://github.com/tpope/vim-eunuch.git
 [submodule ".vim/bundle/larval"]
 	path = .vim/bundle/larval
 	url = https://github.com/lag13/vim-larval.git
