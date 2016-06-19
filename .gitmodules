@@ -19,9 +19,6 @@
 [submodule ".vim/bundle/screensavers"]
 	path = .vim/bundle/screensavers
 	url = https://github.com/lag13/vim-screensavers.git
-[submodule ".vim/bundle/pasta"]
-	path = .vim/bundle/pasta
-	url = https://github.com/sickill/vim-pasta.git
 [submodule ".vim/bundle/unimpaired"]
 	path = .vim/bundle/unimpaired
 	url = https://github.com/tpope/vim-unimpaired.git
