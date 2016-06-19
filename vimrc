@@ -599,6 +599,20 @@ nnoremap gs :Gstatus<CR>
 
 " }}}
 
+" Noticed potential bug with either me or ctrlp. Ctrlp had set the ignorecase
+" option and it affected my normal buffers.
+" ignorecase
+"       Last set from ~/.vim/bundle/ctrlp/autoload/ctrlp.vim
+
+" Smarter text manipulations would be really nice. I guess something like
+" pairedit. I just had a situation where I wanted to move a line of code below
+" an if statement. That would be cool if I could move a line past a "block" of
+" code.
+
+" A plugin to quickly open dotfiles in my home directory (.vimrc, .bashrc,
+" .bash_profile, .ssh/config, .inputrc, .tmuxconf) perhaps it can be as simple
+" as find all the files starting with '.' and present them to the user.
+
 " https://www.reddit.com/r/vim/comments/4je4oq/vimflow_declarative_devbuildtest_cycles_in_vim/
 " This looks like what I might want/need for running one command which will
 " run or compile or test my code out. We'll see though. Man, I really need to
@@ -616,6 +630,24 @@ nnoremap gs :Gstatus<CR>
 " 3. Go to the return values of a function (useful for golang)
 " 4. Go to the next "type" that appears in the text
 " 5. Go to the next assignment
+" An example of moving to a "similar" line: I had these two bits of notes and
+" I was on the first line starting with "Customer" and I wanted to move to the
+" other line starting with "Customer". Now wouldn't it be cool if I could just
+" say "jump to similar line" and it would have taken me to the other one and
+" maybe even retained the same column position?
+
+" Date: 05/19/2016
+" Customer: viafone.luceosolutions.com
+" ID: 4086
+" Platform: EU
+" Error: Could not delete DNS
+
+" Date: 05/19/2016
+" Customer: iberiaexpress.luceosolutions.com
+" ID: 3634
+" Platform: EU
+" Error: Could not delete DNS
+
 
 " Can we make autocomplete work even after typing a space? So what I wanted to
 " do was autocomplete on a variable name + type that appeared in the function
@@ -1245,7 +1277,7 @@ nnoremap gs :Gstatus<CR>
 " maybe I'll do that but this has some greater potential in that these
 " documentation files will probably have comments explaining things and stuff
 " like that.
-let g:documentation_location = "~/lucas_documentation"
+let g:documentation_location = "~/personal_documentation"
 function! GetDocsRoot()
     return expand(g:documentation_location)
 endfunction
