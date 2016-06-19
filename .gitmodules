@@ -4,9 +4,6 @@
 [submodule ".vim/bundle/vim-surround"]
 	path = .vim/bundle/surround
 	url = https://github.com/tpope/vim-surround.git
-[submodule ".vim/bundle/sneak"]
-	path = .vim/bundle/sneak
-	url = https://github.com/justinmk/vim-sneak.git
 [submodule ".vim/bundle/targets"]
 	path = .vim/bundle/targets
 	url = https://github.com/wellle/targets.vim.git
