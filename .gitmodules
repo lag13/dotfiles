@@ -13,9 +13,6 @@
 [submodule ".vim/bundle/targets"]
 	path = .vim/bundle/targets
 	url = https://github.com/wellle/targets.vim.git
-[submodule ".vim/bundle/nerdree"]
-	path = .vim/bundle/nerdtree
-	url = https://github.com/scrooloose/nerdtree.git
 [submodule ".vim/bundle/replace-with-register"]
 	path = .vim/bundle/replace-with-register
 	url = https://github.com/lag13/ReplaceWithRegister.git
