@@ -1,0 +1,135 @@
+*larval.txt*    Text objects for l and r values.
+
+Author: Lucas Groenendaal <groenendaal92@gmail.com>
+
+==============================================================================
+INTRODUCTION                                             *larval-introduction*
+
+Larval.vim defines two new text objects which operate on the l and r values of
+a variable assignment.
+
+==============================================================================
+TEXT OBJECTS                          *al* *il* *ar* *ir*     *larval-objects*
+
+        Mapping  Description     ~
+>
+        al       (A)round (L)-value
+        il       (I)nner  (L)-value
+        ar       (A)round (R)-value
+        ir       (I)nner  (R)-value
+<
+
+Note that the around and inner versions of these text objects could be the
+same. In the case of vim, the `al` mapping will select the variable name and
+any existing modifier (b:, g:, ...) while the `il` mapping will select just the
+variable's name. The `ar` mapping will include a trailing '|' if it exists
+while `ir` excludes the '|'.
+
+        let b:larval_assignment_regex = '\vlet (%(.:)?(\k+)) \= ((.*))' | ~
+            | |                     |   |                             | |
+            | +-------- il ---------+   +---------- ir ---------------+ |
+            |                       |   |                               |
+            +---------- al ---------+   +---------- ar -----------------+
+
+==============================================================================
+INNER WORKINGS                                         *larval-inner-workings*
+
+Roughly, the way this plugin is able to select lvals and rvals is that two
+regexes are specified for each language which together specify a variable
+assignment. One regex specifies the left hand side of the variable assignment
+and the other specifies the right hand side. For the lval regex the \1
+sub-expression should correspond to the `al` (around) text object and \2 is
+`il` (inner). For the rval, the regex will be used to place the cursor on the
+last character of the rval, this is our `ar` text object. `ir` then comes from
+shrinking `ar`.
+
+Lval's are "easy" because they are generally just plain text which the regex
+handles nicely. Rval's are tricker because we can have strings, line
+continuations, and stuff like that. The best solution I came up with to get the
+inner-rval working properly is to the specify the "around" rval regex and
+shrink the right side of it. I don't think it's possible to specify an inner
+regex and make it work. This is a vimscript example that would mess it up:
+
+          let temp = "hi there"| ~
+
+If we had an "inner" regex (which should, in my mind, exclude the "|") then we
+would land on the closing quote and s:searchpos_ignore_syntax() would interpret
+that as a string and it would try to keep searching. But if we did the rval
+search the cursor would land on the "|" then we can safely shrink it back.
+
+The languages currently supported are:
+
+    - Vim
+    - PHP
+
+==============================================================================
+CONFIGURATION                                           *larval-configuration*
+
+Larval.vim will try to create mappings `al` and `il`. If either of those
+mappings are taken then it tries to create the mappings `alv` and `ilv`. The
+same pattern applies for the creation of the r-value mappings. If those
+defaults don't suit you, you can create your own mappings. For example:
+
+    omap aL <Plug>LarvalAroundLval
+    xmap aL <Plug>LarvalAroundLval
+    omap iL <Plug>LarvalInnerLval
+    xmap iL <Plug>LarvalInnerLval
+    omap aR <Plug>LarvalAroundRval
+    xmap aR <Plug>LarvalAroundRval
+    omap iR <Plug>LarvalInnerRval
+    xmap iR <Plug>LarvalInnerRval
+
+==============================================================================
+TODO/THINGS TO TRY/ISSUES                                       *larval-todos*
+
+In many languages it is possible to have a variable assignment within an
+expression. For example we might have a php loop that looks like this:
+
+    while ($aRow = $db->fetchAssoc($result)) {
+        self::deleteCandidate($aRow['pkCandidat']);
+    }
+
+Currently this plugin would not be able to correctly select the rval
+"$db->fetchAssoc($result)" and I don't think we could create a more general
+regex which also works for this situation so we'll have to try something new. I
+guess we would have to have a separate function which tries to detect what the
+end of an expression is... This most definitely would not be a perfect solution
+(well, none of this stuff is going to be perfect) but maybe we can get some
+common cases. For example, maybe we could try and look for an unmatched
+parenthesis or some other kind of unmatched construct. That would work in the
+above case. More specifically I could imagine searching for the end of the
+b:larval_assignment_regex variable, which puts us at the start of the rval, and
+from there we search for an unmatched construct. If that search succeeds then
+perhaps we deem that the ending of our rval. Even if we did though that we'd
+still probably fail if we encountered something like this:
+
+    $test = 
+    function ()
+    {
+        $thing = 'hey';
+        return $thing;
+    };
+
+But short of making a php parser I don't we can't avoid these kind of issues.
+Actually, I just thought of an algorithm which I think could solve both the
+above issues. It probably still has problems but I thought I'd mention it:
+
+    1. Search for the start of the rval by doing this: searchpos(b:larval_assignment_regex.'\zs')
+    2. Search for the "end" of the rval by doing this:
+        normal! v
+        let end_pos = s:searchpos_ignore(b:larval_rval, 'e')
+        normal! v
+    3. while 1
+        a. Do the '%' command
+        b. If it does not work:
+            i. Move to the beginning of the next line.
+            ii. If the cursor position
+            is less than end_pos then we'll continue through the loop.
+            iii. Otherwise we'll disregard the results of this function and
+            just go with whatever the regex search turns up.
+        c. Otherwise we search for the next character which is not in a string
+        or comment. If that character is one of the characters we deem as the
+        end of an expression which for the above case would probably be ')]};'
+        OR we're at the end of the document then we break out of the loop and
+        consider this is the true end of the rval.
+
