@@ -25,9 +25,6 @@
 [submodule ".vim/bundle/replace-with-register"]
 	path = .vim/bundle/replace-with-register
 	url = https://github.com/lag13/ReplaceWithRegister.git
-[submodule ".vim/bundle/games"]
-	path = .vim/bundle/games
-	url = https://github.com/lag13/vim-games.git
 [submodule ".vim/bundle/screensavers"]
 	path = .vim/bundle/screensavers
 	url = https://github.com/lag13/vim-screensavers.git
