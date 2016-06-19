@@ -1,0 +1,12 @@
+# Because C-l and C-k are taken by tmux
+# TODO: Is there any way we could make the C-xC-l and C-xC-k mappings work? I
+# feel like that would be nice. I guess tmux would have to first pass the C-k
+# to bash and if bash sees that there was a C-x just inputted then bash would
+# use the C-k otherwise it would do the appropriate tmux action.
+"\C-xl": clear-screen
+"\C-xk": kill-line
+# # I like this little command. Makes compiling then running just a tad quicker
+# # because you can recall the compiling command, hit C-o, then hit return again.
+# # But for some reason C-o stops working after a little while editing.
+# "\C-o": operate-and-get-next
+# "\C-xo": operate-and-get-next

@@ -1,0 +1,7 @@
+[user]
+	email = groenendaal92@gmail.com
+[push]
+	default = current
+[core]
+	excludesfile = /Users/lgroenendaal/.gitignore
+	editor = /usr/local/bin/vim
