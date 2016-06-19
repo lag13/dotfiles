@@ -10,9 +10,6 @@
 [submodule ".vim/bundle/vim-indentwise"]
 	path = .vim/bundle/indentwise
 	url = https://github.com/jeetsukumaran/vim-indentwise.git
-[submodule ".vim/bundle/exchange"]
-	path = .vim/bundle/exchange
-	url = https://github.com/tommcdo/vim-exchange.git
 [submodule ".vim/bundle/sneak"]
 	path = .vim/bundle/sneak
 	url = https://github.com/justinmk/vim-sneak.git
