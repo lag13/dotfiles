@@ -1,0 +1,45 @@
+*cwdtabline.txt*        Display cwd's on the tabline
+
+Author: Lucas Groenendaal <groenendaal92@gmail.com>
+
+======================================================================================
+INTRODUCTION                                                        *cwdtabline-intro*
+
+This plugin takes over the 'tabline' and renders each tab as the last
+component of the cwd of the active window in that tab. For example if the cwd
+of the active window in a tab was "~/work/project", then "project" would be
+displayed in that tab.
+
+There are currently no configurable aspects to this plugin, just drop it in
+and you're done. If you want to always display the tabline then you'd have to
+set vim's 'showtabline' to 2.
+
+======================================================================================
+ALTERED CWD DISPLAY                                               *cwdtabline-display*
+
+This plugin will display a tab sitting in your home directory as "~". Also, for
+a string of adjacent tabs which have the same cwd, the leftmost tab will
+display the cwd while the others will display ". The thought behind this was to
+maximize screen space and to be able to tell at a glance that a group of tabs
+are all in the same directory.
+
+======================================================================================
+TODOS                                                               *cwdtabline-todos* 
+
+There is a plugin for displaying buffers on the tabline:
+https://github.com/ap/vim-buftabline. I'd like to modify cwdtabline so these
+two plugins can work nicely together. I'm picturing that when there is one tab
+then buffers get displayed using buftabline but when there are 2 or more tabs
+then cwdtabline takes over. My thought behind this is that for tiny personal
+projects you might only be working on a couple files in a single repository and
+navigating between files with something like `<C-n>` and `<C-p>` (assuming
+they've been remapped to `:bnext` and `:bprev` respectively) might be faster.
+But when multiple tabs get used you'd definitely want to see those tabs instead
+of buffers.
+
+Just shortly after finishing this plugin I was looking at other tabline
+related plugins and learned that tpope's flagship plugin can be used to
+customize the tabline AND has built in functionality to display the cwd for
+each tab. From what I've seen you can't get the last component of the cwd
+which might be fine with me but I wonder what it would take to configure his
+plugin to work exactly like mine does.
