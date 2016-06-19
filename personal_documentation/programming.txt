@@ -1,0 +1,131 @@
+Programming Checklist
+
+1. Testing: Did you test the "0" case? The "1" case? And larger cases?
+
+2. Is there any code that has the same structure? If so can you write a
+function to encompass that structure.
+
+3. Make your PR's as complete as possible before review
+
+4. Always test ALL types of data that you expect to get. If you expect that
+the code you're working on will be tested on a set of data X, then while
+you're developing actually see how your code stands up to elements of X. Don't
+be lazy and set up the code and only test a couple cases that you manually
+created.
+
+5. Test the branch on production before merging the branch and deploying it.
+
+6. When possible, make a function take parameters instead of taking nothing
+because it makes it more flexible. If you want the simplicity of calling a
+function with no parameters that "just works" then create the parameterized
+function first then make the function with no parameters call that function.
+
+7. Before going away for lunch or going on a break think about if you need
+anything from other people that doesn't require your intervention and ask for
+it. For example, maybe you got a PR ready before lunch, ask someone to review
+it before leaving for lunch so by the time you get back there might be
+feedback on it.
+
+8. Do the minimal amount of work first, get the minimum viable product both in
+terms of the code you write and the actual product. In other words, don't try
+to abstract too much from the get go. Even if you think some abstraction might
+be useful later, do not do it until you really need it because there is a good
+chance that you might never need the abstraction and then when people look at
+your code they'll wonder why there is this extra layer.
+
+9. Do a quick mental checklist, and better yet, actually test whether
+"special" characters have the potential to break the program. This is
+especially important for bash commands.
+
+10. Log as much as possible. If there is an error and that error returns
+sensistive information (so we don't want to log it) then instead build as good
+of an error message as possible omitting the sensitive info.
+
+When creating logging messages step back and ask yourself, will there be a way
+to distinguish this log message from all other logs? If you're logging
+something it should have some piece of data associated with it to distinguish
+it. That is the point of logs after all, to be able to see what happened long
+after the code finished running. In short I think you should think very
+carefully before logging any string literals, ALWAYS try to include some piece
+of information to make that log unique.
+
+11. Before rolling out a new change that effects developers (actually anyone I
+suppose) . Send out one more message about what is going on and what they need
+to do.
+
+12. This advice is coming from using Golang but it probably holds up in other
+languages. Never use concrete types inside of a struct/object if you call
+methods on those concrete types because it makes it hard to test things. So
+instead of a concrete type put an interface in there. Then when it comes to
+testing you can make a mock object which satisfies the interface and pass it
+in.
+
+13. Testing is hard, its really hard. When writing non-testing code its kind of
+easy in the sense that you just have to get things working and if it works then
+you're done (barring any refactors and such). But test code is more ambiguous
+because you have to deal with questions like: which parts should I test and
+which should I not? Is it worth my time to test this feature? If external
+services are used, how realistic should the mock be? Then of course there's the
+whole problem of changing the existing program so it is testable. That part
+always seems hardest because it feels like its another level above getting a
+program working. When getting a program working you just really have to worry
+about 1. if it works and 2. is it nicely organized. But writing a program with
+test code you need 1 and 2 while deciding about what should be tested and how
+it should be approached. In short, writing test code seems more of an art than
+a science (at least it is for someone more new to it). As I'm writing this I'm
+doing feature flagging for TSR (I hope it goes well!) and I'm wrestling with
+testing. I think I've pinned down one of the sources of trouble is that when
+writing the test code there are more external calls interspersed with the other
+logic. When I was writing the test code for snake, there was pretty much just
+one external call, which did the drawing. And drawing (at least for snake) had
+very little to do with whether the code was behaving correctly. But with
+feature flags I've got a bunch of external calls which are really involved with
+the surrounding logic. Or maybe its not so much that it is interspersed with
+the surrounding logic but that there is a fair amount of logic, involved with
+getting the external code to tease out the values we need. So how do I deal
+with that? Do I just try to better organize the code so using the external code
+is in one package? Then in that package I can test the logic of using that
+package. Then in other packages that use that package I can just mock the
+overall exported function call in a really simple manner. Yes, I think I like
+this. If there is logic involved with the external call then test that logic in
+its own package, exposing a nice function for other packages to call. Then if
+other packages use that function just mock it and not worry about the internal
+representation because that is handled by the package.
+
+I just wanted to say that my above idea of moving all external calls into a
+dedicated package really did feel like the correct approach. In other words
+when using an external service, put all the external service work in one
+package and expose nice functions for other packages to use.
+
+Another thing I've learned from doing this feature flagging stuff is that if
+you want to be able to test everything, then anything that returns an error
+should be mockable. I guess more generally ANY service you use should be
+mockable. For example, I make a call to json.Marshal() and some other json
+related functions directly in my code. But since I cannot switch those function
+calls out, the logic around them cannot be tested.
+
+I think that when creating interfaces which can be mocked, store those
+interfaces as close to the original struct which satisfies them. So in package
+a/b you want to create test code which involves mocking calls to a package in
+x/y/z. The interface you must satisfy to mock those calls should live in x/y/z
+rather than a/b.
+
+14. Always remember to clean up resources after using them. Seems like a silly
+thing to notate but sometimes we forget to check that no matter what path the
+code takes, that the resource we aquired is cleaned up. Whether it be a socket,
+a file, an SQS queue item, a database connection, ... CLEAN IT UP.
+
+15. Construct as many dependencies as you can and then then do the work needed
+to be done.
+
+16. I'm thinking that to test concurrency in Go, maybe we never directly make
+concurrent requests within the code we test. Maybe we try and treat the
+concurrent code like an external service to be mocked. We just make sure we
+call that external service as we expect to and then separately test that that
+service behaves as we expect it to.
+
+17. Testing is like a rigurous form of documenting how your code is supposed to
+behave.
+
+18. If you can get every conditional statement under test coverage then you
+should be pretty well off.
