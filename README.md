@@ -1,32 +1,25 @@
-My Vim Configuration
-====================
+dotfiles
+========
 
-I started working on multiple machines and wanted to share my vim
-configuration. I saw this video on vimcasts and decided to give it a shot:
-http://vimcasts.org/episodes/synchronizing-plugins-with-git-submodules-and-pathogen/
+I'm using the strategy outlined here to manage my dotfiles:
+https://developer.atlassian.com/blog/2016/02/best-way-to-store-dotfiles-git-bare-repo/
 
-Installation:
--------------
-    
-### Clone The Repository
+New Machine Setup
+-----------------
 
-    git clone https://github.com/lag13/vimconfig.git ~/.vim
+Run these commands to set up a new machine. Note the `dotgit` command is an
+alias in `.bash_profile`:
 
-### Create The symlink
+```
+git clone --bare git@github.com:lag13/dotfiles.git $HOME/.dotgit
+dotgit config --local status.showUntrackedFiles no
+dotgit checkout
+```
 
-    ln -s ~/.vim/vimrc ~/.vimrc (For Unix)
-    mklink .vimrc .vim\vimrc (For Windows)
+Update Dotfiles
+---------------
 
-### Initialize The git-submodules
-
-    cd ~/.vim
-    git submodule init
-    git submodule update
-
-Adding New Plugins
-------------------
-
-    cd ~/.vim
-    git submodule add GIT_URL path/to/plugin
-
-
+The dotfiles are now in the home directory where they should be. Use the
+`dotgit` to check if any files have changed and commit/push/... just like
+normal. New files will not be shown in the output of `dotgit status` because
+of the `showUntrackedFiles` option. This is to reduce clutter.
