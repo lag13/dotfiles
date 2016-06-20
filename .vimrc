@@ -437,19 +437,8 @@ augroup custom_closer
 augroup END
 
 nnoremap - :NERDTreeToggle<CR>
-let g:NERDTreeDirArrows = 0
 let g:NERDTreeMinimalUI = 1
-" To have similar mappings between nerdtree and ctrlp
-let g:NERDTreeMapOpenSplit = 'x'
-let g:NERDTreeMapOpenVSplit = 'v'
-let g:NERDTreeMapJumpFirstChild = ''
-let g:NERDTreeMapJumpLastChild = ''
 let g:NERDTreeMapHelp = ''
-
-" getchar() in expression mappings don't work below version 7.3.338
-if v:version < 704
-    let g:targets_aiAI = 'ai  '
-endif
 
 " Start interactive EasyAlign in visual mode
 xmap ga <Plug>(EasyAlign)
