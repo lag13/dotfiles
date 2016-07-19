@@ -129,3 +129,24 @@ behave.
 
 18. If you can get every conditional statement under test coverage then you
 should be pretty well off.
+
+19. Generally, libraries should be as general as possible. If you're making a
+library for a specific application then do NOT put some constant in the library
+if the application can add it instead.
+
+20. Configuration. The only reasons to make something configurable is:
+
+- You expect it might change at some point.
+- You need multiple instances of the same service doing slightly different
+  things.
+- Its something sensitive like usernames and passwords.
+
+That being said, if you do add something which you then can configure, make its
+default value make sense for what the application is doing. Hopefully by doing
+that you'll never need to use the configuration but if you do, its there.
+
+21. Try to inject behavior you want rather than choose behavior with
+conditionals. For example you have an object with a boolean member variable.
+You pass in that boolean and if its true you do some computation otherwise you
+do different computation. Its better, if possible, to inject the actual
+behavior you want into that object instead of the boolean.

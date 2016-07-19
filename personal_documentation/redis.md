@@ -32,9 +32,34 @@ Starting A Server
 redis-server
 ```
 
-Connecting To the Local Server
-------------------------------
+Connecting to a Server
+----------------------
 
 ```
-redis-cli
+# host:port defaults to 127.0.0.1:6379
+redis-cli [-h host] [-p port]
+```
+
+Databases
+---------
+
+Originally I thought that redis was just one giant pool of key value pairs and
+as a programmer you had to be cautious and come up with good namespacing rules
+so different applications setting values in redis won't step on eachother's
+toes. It turns out that redis has multiple different pools/keyspaces called
+databases where keys can be stored:
+http://www.rediscookbook.org/multiple_databases.html
+
+The two commands you need to know about are:
+
+1. select `<id>` - Start using database `<id>`.
+2. flushdb - Erase all keys in the database the client is currently attached
+   to.
+3. dbsize - Returns the number of keys in the current database.
+
+The number of databases can be configured with the `databases` value.
+
+```
+config set databases 42
+config get databases # returns 42
 ```

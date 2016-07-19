@@ -397,6 +397,8 @@ augroup END
 " particulart I want to check out this plugin
 " https://github.com/ajh17/VimCompletesMe. Which makes <tab> try to do the
 " appropriate vim native completion depending on context.
+" 34. vim-test for quickly running test suites. I first read about it here:
+" https://shyp.github.io/2015/07/13/speed-up-your-javascript-tests.html
 
 " TODO: In making a PR for sneak.vim I learned about vader.vim, which is a
 " testing framework for vim. vader.vim will output information about the test
@@ -587,6 +589,34 @@ map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 nnoremap gs :Gstatus<CR>
 
 " }}}
+
+" It would be nice if we could have different quickfix "views" so to speak.
+" Motivation is that when I'm looking for something in Luceo I do a grep which
+" sometimes returns a massive amount of results (some of which comes from the
+" vendor directory) it would be neat if I could choose to ignore that vendor
+" directory or in general any sub directory. Or maybe I should learn how to
+" use tags better...
+
+" I remember seeing a plugin I wanted to checkout where you could highlight
+" terms with different colors. So you could do something like highlight every
+" word 'two' to be a color. Then the next time you called it on a different
+" word (say 'abc') it would be highlighted in a different color. Then you
+" could quickly scan for those words in the file. I was thinking about
+" something similar. I think it could be neat to just highlight a region of
+" text and give it a different color. My motivation was trying to figure out
+" how to be able to write test code with feature flags. I was looking at an
+" example of someone mocking an external service like that and there were a
+" fair number of files involved. So I ended up with like 8 splits looking at
+" the path the code took. I thought it could be useful if in each of those
+" splits I could highlight the bit of code that actually mattered to me so I
+" could better understand what I needed to do. Making the key parts easily
+" visible if you will.
+
+" I think I've already talked about wanting a good "flip" or "switch" plugin
+" to change words to common alternatives or oppposites. So like flipping true
+" to false and vice versa. I think this plugin should also deal with toggling
+" punctuation at the end of a line. So it could add a comma, or semicolon or
+" period.
 
 " Noticed potential bug with either me or ctrlp. Ctrlp had set the ignorecase
 " option and it affected my normal buffers.
@@ -1378,9 +1408,20 @@ nnoremap ]I ]I:call JumpToKeywordChoice()<CR>
 " Trying it out
 nnoremap <BS> <C-^>
 
-" Easier to type. The autocmd stuff just makes it so we get the normal <CR>
-" behavior in the quickfix and command line windows.
-noremap <CR> %
+" <CR> is easier to type than % and <num><CR> is easier to type than <num>G.
+" The autocmd stuff just makes it so we get the normal <CR> behavior in the
+" quickfix and command line windows.
+noremap <silent> <CR> :<C-u>call PercentOrGotoLine(v:count, visualmode())<CR>
+function! PercentOrGotoLine(count, visual)
+    if a:visual !=# ""
+        normal! gv
+    endif
+    if a:count == 0
+        normal! %
+    else
+        execute "normal! ".a:count."G"
+    endif
+endfunction
 augroup map_return_key
     autocmd!
     autocmd CmdwinEnter * nnoremap <buffer> <CR> <CR>

@@ -198,6 +198,16 @@ composer.json and install it:
 composer require new/package [version_constraint]
 ```
 
+The composer.lock file has two fields "hash" and "content-hash". These are
+apparently used to detect if composer.lock is out of date and should be
+updated or something like that. If you want to update the hash's but not any
+packages you can run
+(https://groups.google.com/forum/#!topic/composer-dev/5xEd3UPIps0):
+
+```
+composer update nothing
+```
+
 Memory
 ------
 
@@ -216,3 +226,31 @@ PSR-0
 
 All it is using namespaces to represent paths on the file system. If you do
 that then classes can be found easily.
+
+ONLY Update Dependencies
+------------------------
+
+When I was working on featureflagging for TSR at careerbuilder sometimes I
+wanted to update a composer dependency. The "problem" was that after an update
+composer was configured to run some scripts. If I ran composer update locally
+those scripts could not run. So the only way I could run composer update was
+to start up the tsr docker container and run composer from there. Not a big
+deal really but I just wanted to do it locally. This command is how I did
+that:
+
+```
+# Updates dependencies and does nothing else
+composer update --no-scripts
+```
+
+composer.lock hash merge conflict
+---------------------------------
+
+I've run into the situation where there is a merge conflict on the hash of the
+composer.lock file. The hash is used to detect if composer.lock is out of date
+(https://groups.google.com/forum/#!topic/composer-dev/5xEd3UPIps0). To update
+the hash (so the correct one is chosen) just run:
+
+```
+composer update nothing
+```

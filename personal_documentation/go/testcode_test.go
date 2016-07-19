@@ -81,4 +81,28 @@ want. It seems that you cannot get coverage for multiple packages at the same
 time. So you cannot do:
 
 	go test -coverprofile=cover.out ./package/to/test1 ./package/to/test2 ... <-- CANNOT DO
+
+But you can always test multiple packages with a little bit of bash. For example:
+
+	#!/bin/bash -e
+	for pkg in $(go list ./... | grep -v vendor)
+	do
+		pkg_name=$(echo "$pkg" | tr / -)
+		pkg_cov="${pkg_name}.cov"
+		go test -v -covermode=count -coverprofile="$pkg_cov" ${pkg}
+		if [ -f "$pkg_cov" ]
+		then
+			go tool cover -html="$pkg_cov" -o $CIRCLE_ARTIFACTS/${pkg_name}.html
+		fi
+	done
+
+You can even combine the different .cov files into one big one as outlined
+here: https://mlafeldt.github.io/blog/test-coverage-in-go/.
+
+ALTERNATE BEHAVIOR BETWEEN REGULAR AND TEST PACKAGE:
+
+You can specify a variable (isTesting or something like that) and set it to
+true in the test code. Maybe this could fix a situation where you need some
+alternate test code to run when testing otherwise run some normal code.
+http://stackoverflow.com/questions/28476307/in-go-how-to-get-test-environment-at-run-time
 */

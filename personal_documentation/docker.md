@@ -48,3 +48,20 @@ You can remove all volumes by doing something like:
 ```
 docker volume ls -qf dangling=true | xargs docker volume rm
 ```
+
+About Images and Containers
+---------------------------
+
+http://merrigrove.blogspot.co.uk/2015/10/visualizing-docker-containers-and-images.html
+
+Echo UDP Server
+---------------
+
+Useful to test that things like Datadog or statsd are actually sending data:
+https://hub.docker.com/r/eexit/dumudp-server/
+
+Volumes
+-------
+
+More information on volumes:
+http://container-solutions.com/understanding-volumes-docker/

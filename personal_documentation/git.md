@@ -28,3 +28,9 @@ Subtrees
 https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec#.e7m0v8t3j
 http://blogs.atlassian.com/2013/05/alternatives-to-git-submodule-git-subtree/
 
+Deleting a Branch
+-----------------
+
+```
+git -d branch-to-delete
+```
