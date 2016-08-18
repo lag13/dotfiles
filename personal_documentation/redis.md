@@ -63,3 +63,19 @@ The number of databases can be configured with the `databases` value.
 config set databases 42
 config get databases # returns 42
 ```
+
+Keep Alive Connections
+----------------------
+
+There are two configuration options which determine whether or not connections
+to redis stay open:
+
+1. tcp-keepalive - If non-zero, send ACKs every given number of seconds.
+2. timeout - Close connection if client is idle for a given number of seconds,
+   or never if 0.
+
+So if timeout is 100 and tcp-keepalive is 50 then every 50 seconds an ACK will
+be sent from redis to the client and if they respond then the connection is
+still open. If two ACK's are sent (so in this example 100 seconds will have
+passed) and there was no response then the timeout will kick in and the
+connection will be closed.

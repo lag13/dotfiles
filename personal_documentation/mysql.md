@@ -55,6 +55,19 @@ CONSTRAINT flag_uq UNIQUE (customerName, flagName)
 );
 ```
 
+### ALTER
+
+```
+ALTER TABLE table_name
+ADD col_name varchar(1000);
+
+ALTER TABLE table_name
+MODIFY col_name INT;
+
+ALTER TABLE table_name
+DROP col_name;
+```
+
 ### INSERT
 
 ```
@@ -115,11 +128,31 @@ City varchar(255),
 CONSTRAINT constraint_name UNIQUE (P_Id,LastName)
 )
 
+-- I don't know what the difference is between these two queries. I just don't
+-- understand what exactly the CONSTRAINT piece does. It appears that both can be
+-- used interchangeably.
 ALTER TABLE Persons
 ADD UNIQUE (P_Id)
 
 ALTER TABLE Persons
 ADD CONSTRAINT constraint_name UNIQUE (P_Id,LastName)
+
+-- MYSQL drop unique constraint:
+ALTER TABLE Persons
+DROP INDEX uc_PersonID
+
+-- Other sql's drop unique constraint:
+ALTER TABLE Persons
+DROP CONSTRAINT uc_PersonID
+```
+
+### DELETE
+
+If you don't have the WHERE clause then everything will be deleted!!!!
+
+```
+DELETE FROM table_name
+WHERE ...
 ```
 
 Modes
@@ -167,3 +200,9 @@ until mysql -u root -p$mysqlRootPassword  -e ";" ; do
 	echo "error connecting to mysql database, retrying..."
 done
 ```
+
+TODO
+----
+
+I guess there's a json datatype now:
+http://dev.mysql.com/doc/refman/5.7/en/json.html

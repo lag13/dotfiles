@@ -212,10 +212,8 @@ set completeopt=menuone,preview
 set ttyfast
 " Toggle the 'paste' setting.
 set pastetoggle=<F10>
-" Only create swap files in my home directory. In my experience swap files
-" have just been annoyances, but my pessimistic self still wants to keep them
-" around just in case something happens.
-set directory=~/.vim//
+" swapfiles have not helped me yet and I don't like the clutter
+set noswapfile
 " Put the approprate code in my bashrc and now when I invoke :sh from within
 " vim, that shell will have a modified prompt.
 let $PS1_VIM = 'VIM SHELL ' . $PS1
@@ -588,7 +586,21 @@ map ]b <Plug>(IndentWiseBlockScopeBoundaryEnd)
 
 nnoremap gs :Gstatus<CR>
 
+" So K does not get mapped
+" let g:go_doc_keywordprg_enabled = 1
+" To enable/disable auto formatting on save
+" let g:go_fmt_autosave = 1
+let g:go_fmt_command = "goimports"
+
 " }}}
+
+" So I think I've talked about wanting a plugin to easily create ascii
+" diagrams. I was just staring at an ascii diagram I made and thought,
+" wouldn't it be cool to have a text object which works on the text inside a
+" node on a graph? Normally when I draw graphs with characters the nodes are
+" boxes and the edges are just other characters (mostly -, |, +, >, v, <). So
+" I could be inside a node and do `cin` or something and it will change all
+" the text in a node. Perhaps resizing the node automatically as well.
 
 " It would be nice if we could have different quickfix "views" so to speak.
 " Motivation is that when I'm looking for something in Luceo I do a grep which
@@ -1411,9 +1423,11 @@ nnoremap <BS> <C-^>
 " <CR> is easier to type than % and <num><CR> is easier to type than <num>G.
 " The autocmd stuff just makes it so we get the normal <CR> behavior in the
 " quickfix and command line windows.
-noremap <silent> <CR> :<C-u>call PercentOrGotoLine(v:count, visualmode())<CR>
+nnoremap <silent> <CR> :<C-u>call PercentOrGotoLine(v:count, 0)<CR>
+onoremap <silent> <CR> %
+xnoremap <silent> <CR> :<C-u>call PercentOrGotoLine(v:count, 1)<CR>
 function! PercentOrGotoLine(count, visual)
-    if a:visual !=# ""
+    if a:visual
         normal! gv
     endif
     if a:count == 0
@@ -2499,39 +2513,5 @@ augroup filetype_vim
     autocmd!
     autocmd FileType vim setlocal foldmethod=marker
 augroup END
-" }}}
-
-" Go File Settings {{{
-
-" TODO: I found another little bug where I had 3 splits on the same file. I
-" saved the file, then if I hit undo the other two non-active splits jump to
-" the bottom of the file.
-
-" Runs goimports on the current file.
-function! GoImports()
-    " TODO: I've already determined that I do not like adding to the undo
-    " history unecessarily. In my case I commented out a line, saved, ran the
-    " program, went to undo my comment and had to hit undo twice because of
-    " gofmt. But I've also determined that using undojoin is a bit
-    " dangerous... I commented out a line, saved, undid, saved, now if I redo
-    " I cannot redo to where I commented out the line because I've started
-    " down a new undo branch. So I think I should only apply the gofmt if the
-    " file has actually been changed by gofmt.
-    let currentBuffer = getline(1, '$')
-    let formattedCode = split(system('goimports ' . expand('%')), "\n")
-    " TODO: If there are errors, add them to location list
-    if v:shell_error == 0 && currentBuffer != formattedCode
-        let w = winsaveview()
-        %delete _
-        call setline(1, formattedCode)
-        call winrestview(w)
-    endif
-endfunction
-
-augroup filetype_go
-    autocmd!
-    autocmd BufWritePost,FileWritePost *.go call GoImports()
-augroup END
-
 " }}}
 
