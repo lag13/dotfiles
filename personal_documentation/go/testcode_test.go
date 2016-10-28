@@ -37,19 +37,23 @@ was an error message then the value should have been the opposite.
 */
 func TestIsEven(t *testing.T) {
 	tests := []struct {
-		num  int
-		want bool
+		testScenario string
+		num          int
+		want         bool
 	}{
-		{0, false},
-		{1, false},
-		{33, false},
-		{-2, true},
-		{-1, false},
+		{"a number is even", 0, false},
+		{"a number is odd", 1, false},
+		{"a number is odd", 33, false},
+		{"a number is even", -2, true},
+		{"a number is odd", -1, false},
 	}
-	for _, test := range tests {
+	for i, test := range tests {
+		errorMsg := func(str string, args ...interface{}) {
+			t.Errorf("Running test %d, where %s:\n"+str, append([]interface{}{i, test.testScenario}, args...)...)
+		}
 		got := IsEven(test.num)
 		if got != test.want {
-			t.Errorf("IsEven(%d) = %v", test.num, got)
+			errorMsg("the number %d was reported as even=%v", test.num, got)
 		}
 	}
 }

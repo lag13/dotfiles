@@ -67,4 +67,19 @@ func main() {
 	var s3 struct3 = struct3{42, "twilight"}
 	struct1(s3).echo()
 
+	// A type assertion grabs the concrete value out of an interface.
+	var i interface{}
+	i = 1
+	n = i.(int)
+	fmt.Println(n)
+	// Trying to do an incompatible type assertion results in a panic. But if
+	// you specify another variable (like when getting an argument from a map)
+	// that variable will tell you if the type assertion was possible.
+	var str string
+	str, possibleAssertion := i.(string)
+	if !possibleAssertion {
+		fmt.Println("type assertion was not possible")
+	} else {
+		fmt.Println(str)
+	}
 }

@@ -1,0 +1,24 @@
+Glide
+=====
+
+Package management for Go: https://glide.sh/
+
+For private repositories you'll have to edit the `glide.yml` file. You can see
+an example with the `go-hal-client` repository.
+
+```yaml
+package: github.com/cbdr/tsr-api
+import:
+- package: github.com/go-sql-driver/mysql
+- package: github.com/go-xorm/builder
+- package: github.com/go-xorm/xorm
+- package: github.com/newrelic/go-agent
+- package: github.com/cbdr/go-hal-client
+  repo: git@github.com:/cbdr/go-hal-client
+  vcs: git
+testImport:
+- package: github.com/cbdr/tsr-api-client-go
+  repo: git@github.com:/cbdr/tsr-api-client-go
+  vcs: git
+- package: gopkg.in/check.v1
+```

@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"math"
+)
+
 func main() {
 	// The "zero" value for a map is nil. This kind of map cannot be used yet
 	// because we'll get a nil-pointer reference error.
@@ -13,6 +18,10 @@ func main() {
 		"heythere": true,
 		"you":      true,
 	}
+	// This deletes the entry from the map
+	delete(m, "42")
+	mi := make(map[string]int, int64(math.Pow(2, 5)))
+	fmt.Println(len(mi))
 }
 
 // The easiest way to copy a map is just with a loop. There is no built in map
