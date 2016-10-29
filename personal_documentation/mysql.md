@@ -173,7 +173,7 @@ non-strict) modes this about sums up the little I know:
 You can see the mode of a server like this:
 
 ```
-show session variables where Variable_name = "sql_mode”;
+show session variables where Variable_name = "sql_mode";
 ```
 
 Basically when the server is in "strict" mode anything "unexpected" will throw

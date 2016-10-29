@@ -23,3 +23,5 @@ Or this will just search for these two strings in the logs.
 ```
 "quay.io/cbone/hotpot-delete-customer-system" and "cleaning hal resources"
 ```
+
+https://help.sumologic.com/Search/Search_Query_Language/Parse_Operators/Parsing_JSON_Logs

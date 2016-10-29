@@ -1,9 +1,10 @@
 AWS
 ===
 
+https://github.com/open-guides/og-aws
+
 I guess the world relies on amazon's AWS services to get there sites working.
 AWS allows you to "rent" servers and provides a lot of other services.
-
 
 SQS
 ---
@@ -30,8 +31,21 @@ these servers.
 S3
 --
 
-Storage. Basically a big file system. "Buckets" are basically the name for
-directories.
+Storage. You can basically think of it as a big file system. In reality though
+I think its just a big key+value store. "Buckets" are basically the name for
+the top level directories.
+
+Inside of buckets you store "objects" which you can think of as being either a
+directory or a file. I think in reality there are no folders, just key names.
+I think folders are just a concept built on top of key+value pairs.
+
+    In Amazon S3, buckets and objects are the primary resources, where objects are
+    stored in buckets. Amazon S3 has a flat structure with no hierarchy like you
+    would see in a typical file system. However, for the sake of organizational
+    simplicity, the Amazon S3 console supports the folder concept as a means of
+    grouping objects. Amazon S3 does this by using key name prefixes for objects.
+
+Folders are just an object that ends with a '/' character.
 
 Lambda
 ------

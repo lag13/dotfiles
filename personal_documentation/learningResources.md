@@ -47,3 +47,15 @@ programming related exercises: http://exercism.io/
 
 A list of math problems that should be solved with programming:
 https://projecteuler.net/
+
+I was able to get through network programming with C because of this man:
+https://beej.us/
+
+Seems to be a guy with a lot of random tutorials:
+http://xahlee.info/index.html
+
+Great talk about language by Guy Steele:
+`https://www.youtube.com/watch?v=_ahvzDzKdB0`
+
+Programming is not important:
+https://www.youtube.com/watch?v=5qkupdkdzAc

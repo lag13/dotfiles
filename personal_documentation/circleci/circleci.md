@@ -103,3 +103,10 @@ http://zsh.sourceforge.net/Doc/Release/Functions.html#Hook-Functions
 Yeah, I don't really know whats going on... I guess its not too important that
 I do understand but I feel like it would be nice to know how they make it so
 each command gets run in a new directory.
+
+Run In The Background
+---------------------
+
+I guess you're not supposed to just put '&' at the end of a command to run it
+in the background, you are supposed to do this:
+https://circleci.com/docs/background-process/

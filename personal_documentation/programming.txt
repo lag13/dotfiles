@@ -371,3 +371,111 @@ Looking through the code I found only one reference to this key and it was a
 hardcoded check to see if the key was equal to 'us', very strange. Anyway, I
 was worried about removing that check because I wasn't sure if there would be
 breaking changes. If there were great tests in place, I wouldn't need to worry.
+
+32. If the code testing the function of some unit is exactly the same (just
+switched out the function call) of another unit, then those two functions are
+probably the SAME. Seems like an obvious thing but I overlooked it when doing
+some feature flagging stuff. I had a Set() and Create() function which we're
+pretty much exactly the same (they called the same function createOrSet()
+passing it in the appropriate function to do the actual create() or set()
+operation. I thought I had it right and then I noticed the tests were exactly
+the same for both those functions. I thought that that was because they both
+relied on the same underlying function but no, it was because I had implemented
+the Create() function to be the exact same as the Set() function by accident.
+
+33. If some entity/object needs to be in a certain state then that entity
+should make sure it is in that good state; it should not rely on external
+objects to enforce the state for it. When writing it out like this it seems
+obvious but I didn't think about it like this before. The inspiration for this
+thought (like the last bunch of thoughts) is feature flagging. The database
+structure I came up with is one where there is a "flag" column (indicating the
+flag name) and a "deleted" column (indicating if the flag was deleted or not).
+There are more columns of course but these are the ones that matter for this
+discussion. So there can be multiple flags in the datbase with the same name
+XYZ iff a maximum of one flag named XYZ has its "deleted" column set to false
+and every other flag named XYZ has their "deleted" column set to true. <<---
+That is the state that must be enforced for things to work properly. But I
+delegated the enforcing of that state to other objects which I think is not the
+right thing to do. Specifically, when creating a flag I would do a
+"FlagExists()" check and if the flag did not exist then I'd make a function
+call which ultimitely ended up making an INSERT statement. I think at the time
+I thought it would be simpler to make that check instead of trying to create
+the flag and then bubbling up a result which indicated whether or not the flag
+already existed before creation. Thinking about it now though it was probably
+not a good choice for two reasons. One reason is more stylistic/good practice
+where you should be able to use an object and have it "just work" instead of
+having to know about its internal details. In this case we have to know to only
+call the "CreateFlag()" method on this database object if the flag does not
+already exist, otherwise we'll get into a bad state. This makes it harder to
+use that object in other contexts. Another reason (in this specific example) is
+that there is, I think, a potential for data races where we create a flag
+twice. Request 1 could come in wanting to create flag XYZ, it checks and see's
+that XYZ doesn't exist then hangs. Then request 2 comes in and also wants to
+create flag XYZ, it makes the check and sees that the flag does not exist so it
+proceeds. We'll end up getting 2 flags XYZ inserted into the database putting
+us into a bad state, not good. But if enforcing the state happened at the
+database query level then I don't think this problem would happen.
+
+34. Code that appears in multiple places is not necessarily a bad thing and
+does not necessarily have to be refactored. Its kind of a tradeoff that you
+need to assess. One trait you get about having code copied in places A B and C
+is that if the code in B needs to change then it is not a big deal, just change
+the code. One trait you get about A, B, and C calling out to a common function
+is that if A, B, and C need to change then you just change that one funciton.
+One basically offers more flexibilty (and potentially readability because the
+variable names can be tailored to the specific use case) and the other offers
+easier maintenance should things need to change.
+
+35. If you need to optimize something, you should really learn how to measure
+the performance of your code. If you learn this skill you can see where the
+actual bottlenecks are and fix them as needed instead of shooting in the dark.
+I just finished solving the "dorsey thief" problem on hackerrank
+(https://www.hackerrank.com/challenges/dorsey-thief) but it took me a long time
+to solve it. I actually got a solution relatively quickly but my solution was
+taking too long to run and it took me a while to make an efficient algorithm.
+Without profiling I pretty much knew where the bottlenecks were (memory
+allocation) but it would have been nice to attach a specific percentage to that
+intuition so I knew exactly.
+
+36. If you ever have the thought "is it worth my time to learn this thing? I'm
+not sure if it will ever be useful". Just stop, stop it, STOP. Its true that
+sometimes your time could be "better" spent (like if you need to finish a
+project) but if you have free time to learn then just learn. I don't think
+there has ever been a situation where I learned something new (even if I never
+directly used it again) where I said, "man I really wish I didn't learn that,
+it was a complete waste of my time". I almost always get something out of it
+whether it is a new concrete skill, a new perspective on things, or something
+fun to mention to co-workers.
+
+37. Sometimes try to inline code instead of create a bunch of little functions
+just for the sake of refactoring a la Jonathan Blow:
+https://www.youtube.com/watch?v=JjDsP5n2kSM. His basic idea is that if some
+function does a large sequence of actions then he would rather see those
+actions listed out one after the other instead of breaking up that function
+into smaller functions and calling those functions one after the other. His
+basic reasoning is that code is easier to understand if there are less parts
+that communicate with each other and he considers a function to be one more
+communicating partner. If a function really does need to be used in multiple
+places then it is okay to make this function, but if you are defining a
+function just for the sake of refactoring and this function only gets used in
+one place, don't do that. Instead, where that function would be called, open up
+a new scope (i.e just put your code inside of curly braces), so variables can
+be declared locally to that block, write your code in that block, and give a
+meaningful comment at the top of this block indicating what it does. He says
+the benefits are basically:
+
+- Reading the code is more straightforward because you just read a sequence of
+  steps one after another and don't have to go hunting for function definitions
+  to figure out what is happening when you reach the function call.
+- When you define a function, even if you only intend to use it in one place,
+  it is now in the global scope meaning that it *could* be used in other places
+  and extra care has to be taken if you want to change how that function
+  operates. Defining this one off function essentially obfuscates whether it
+  was intended to be reusable or if it was just a one off thing.
+
+Like everything, there are probably exceptions to this rule but I've never
+tried it before. I've always been sort of gung-ho about breaking up big
+functions into smaller ones whenever possible so this will be interesting to
+try. One more benefit I can think of is that you have less functions to name.
+Honestly, I think a big chunk of time gets wasted just thinking of a concise
+name for a function but with this approach you wouldn't have that issue.
