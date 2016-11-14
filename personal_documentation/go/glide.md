@@ -4,7 +4,8 @@ Glide
 Package management for Go: https://glide.sh/
 
 For private repositories you'll have to edit the `glide.yml` file. You can see
-an example with the `go-hal-client` repository.
+an example with the `go-hal-client` repository
+(https://github.com/cbdr/go-hal-client):
 
 ```yaml
 package: github.com/cbdr/tsr-api
@@ -21,4 +22,13 @@ testImport:
   repo: git@github.com:/cbdr/tsr-api-client-go
   vcs: git
 - package: gopkg.in/check.v1
+```
+
+So basically I needed to add these lines to the glide.yaml file before I was
+able to get the repository:
+
+```
+- package: github.com/cbdr/go-hal-client
+  repo: git@github.com:/cbdr/go-hal-client
+  vcs: git
 ```

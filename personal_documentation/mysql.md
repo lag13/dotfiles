@@ -66,6 +66,12 @@ MODIFY col_name INT;
 
 ALTER TABLE table_name
 DROP col_name;
+
+ALTER TABLE `mytable`
+ADD `accountDID` varchar(64) DEFAULT "",
+ADD `productInstanceID` varchar(128) DEFAULT "",
+ADD `category` varchar(32) DEFAULT "",
+ADD INDEX `productInstanceID` (`productInstanceID`)
 ```
 
 ### INSERT
@@ -153,6 +159,27 @@ If you don't have the WHERE clause then everything will be deleted!!!!
 ```
 DELETE FROM table_name
 WHERE ...
+```
+
+### Declare Variable
+
+Sometimes when writing a query it can be useful to declare a variable so it
+can get used in a couple places. Here is an example of doing that:
+
+```
+SET @customer = 'sca';
+select pkSite, strLibelle, strAdresse, strBDD, iSuppr,
+case iArchi 
+  when 0 then "dev"
+  when 7 then "us"
+  when 8 then "sg"
+  when 9 then "eu"
+end as datacenter,
+iArchi
+from site
+where strLibelle like concat('%', @customer, '%')
+OR strBDD = LEFT(@customer, 20);
+
 ```
 
 Modes
