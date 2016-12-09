@@ -59,3 +59,10 @@ Great talk about language by Guy Steele:
 
 Programming is not important:
 https://www.youtube.com/watch?v=5qkupdkdzAc
+
+This post lists some nice sounding repositories like
+https://github.com/vhf/free-programming-books:
+https://octoverse.github.com/
+
+I bought some unix programming books from this site:
+https://www.humblebundle.com/. humble92

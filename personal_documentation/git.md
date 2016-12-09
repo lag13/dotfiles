@@ -253,3 +253,26 @@ TOES?
 (commits, branch switching, merges, etc...). So it can be useful if something
 goes wrong and you need to figure out why something went wrong. `git reflog
 show ref` will show all the change relating to the reference `ref`.
+
+Hooks
+-----
+
+- https://git-scm.com/book/en/v2/Customizing-Git-An-Example-Git-Enforced-Policy
+- https://www.digitalocean.com/community/tutorials/how-to-use-git-hooks-to-automate-development-and-deployment-tasks
+
+Here is a simple script I wrote which prevents me from committing a specific
+file. The file is .git/hooks/pre-commit:
+
+```
+#!/usr/bin/env ruby
+
+# Makes it impossible to commit the "devutil/.env" file.
+cannot_commit = "devutil/.env"
+files_modified = `git diff-index --cached --name-only HEAD`.split("\n")
+files_modified.each do |file|
+  if file == cannot_commit
+    puts "[POLICY] You cannot commit the #{cannot_commit} file. If this is a mistake, edit the .git/hooks/pre-commit file."
+    exit 1
+  end
+end
+```

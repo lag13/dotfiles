@@ -439,6 +439,7 @@ augroup END
 nnoremap - :NERDTreeToggle<CR>
 let g:NERDTreeMinimalUI = 1
 let g:NERDTreeMapHelp = ''
+let g:NERDTreeShowHidden = 1
 
 " Start interactive EasyAlign in visual mode
 xmap ga <Plug>(EasyAlign)
@@ -522,13 +523,14 @@ noremap <SPACE> :
 let g:ctrlp_root_markers = ['web', 'app']
 let g:ctrlp_reuse_window = 'netrw\|help\|nerdtree'
 let g:ctrlp_follow_symlinks = 1
-let g:ctrlp_custom_ignore = 'vendor\|img\|ps2'
+let g:ctrlp_custom_ignore = '\v(vendor|img|ps2|\.git)'
 let g:ctrlp_switch_buffer = 'e'
 " To me it makes more sense to search for files based on cwd. <leader>p will
 " now do this and <leader>P will try to search for files based on the root for
 " the file being edited (just in case we want it).
 let g:ctrlp_working_path_mode = 'rw'
 let g:ctrlp_map = '<leader>p'
+let g:ctrlp_show_hidden = 1
 nnoremap <leader>P :CtrlPRoot<CR>
 " Always try to work from the cwd
 nnoremap <leader>b :CtrlPBuffer<CR>
@@ -593,6 +595,55 @@ nnoremap gs :Gstatus<CR>
 let g:go_fmt_command = "goimports"
 
 " }}}
+
+" I just tried to do <C-a> to increase the header number of a markdown header.
+" That could be an interesting ability to have. Reminds me of Tim Pope's speed
+" dating plugin.
+
+" Perhaps I could modify the [f and ]f unimpaired mappings so that when
+" nerdtree is open they cycle through files based on how nerdtree displays
+" them and maybe they also modify the nerd tree to open directories if it
+" brings us to a file in a new directory.
+
+" I've mentioned that I want better tools to analyze code for a while now.
+" Thought of another one (or I think it is a new one). Right now I'm looking
+" through the hal repository (never really looked too much at it before) to
+" figure out how I'm going to make this change. I'm exploring this project
+" using nerdtree so I get a high level overview of where all the pieces are.
+" Maybe it would be cool if in nerdtree I could add highlighting to files I've
+" looked at that I think might be relevant to what I need to do?
+
+" What kind of substitution do I have to write where I change the upper case
+" and lower case versions of a word to a different one but keep the upper and
+" lower cases. For example: "Maintainer maintainer maintainer Maintainer". I
+" want to change that to "Description description description Description"
+" with one substitution.
+
+" Create a operator to count lines and words and such. I'm tired of visually
+" highlighting something then hitting g<C-g><C-g> (have to hit <C-g> twice
+" because it's my tmux leader key).
+
+" Found a bug I think in the exchange operator plugin. I had this code:
+" FlagValue{}. And I wanted to do cx%. But when I did that it highlighted the
+" entire page. I notice that the surround operator is incapable of changing
+" those curly braces to other things. So maybe its a more general problem?
+
+" Plugin or some way to read and quickly navigate RFC documents from within
+" vim. I was reading about the HTTP protocol (fantastic stuff, feel like I
+" learned a lot and should sit down one day and read the whole thing as well
+" as others) and thought it would be really convenient to have this document
+" locally and be able to jump between RFC documents (because sometimes they
+" make reference to others).
+
+" Listing only modified buffers. Better yet, add those modified buffers to the
+" quickfix list or something so we can easily visit each one. Maybe my
+" workflow is just bad but I'll often leave vim open for a looooong time
+" accumulating a bunch of files. Eventually I might want to quit it like if I
+" turn off my computer so I go through modified files and save them or make
+" any changes I forgot. If I could iterate through those modified files faster
+" that would be nice. Perhaps I should just learn how to use sessions though?
+" Like I said, perhaps my workflow should be altered instead of coming up with
+" this other solution.
 
 " So I think I've talked about wanting a plugin to easily create ascii
 " diagrams. I was just staring at an ascii diagram I made and thought,
@@ -2515,3 +2566,7 @@ augroup filetype_vim
 augroup END
 " }}}
 
+augroup filetype_sql
+    autocmd!
+    autocmd FileType sql setlocal commentstring=--\ %s
+augroup END

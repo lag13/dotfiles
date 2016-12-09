@@ -71,3 +71,15 @@ fleetctl destroy hp-run-command@1
 # Remove service file
 fleetctl destroy hp-run-command@.service
 ```
+
+Problems Starting + Stopping Containers
+---------------------------------------
+
+It seems to be a fairly often problem for us where we are unable to start/stop
+containers. Oftentimes I think the issue is that etcd which synchronizes all
+the behavior is broken on one of the clusters. So the solution is to ssh to
+that specific machine and run:
+
+```
+systemctl restart etcd
+```
