@@ -325,7 +325,7 @@ following tasks:
 
 1. Poll an AWS SQS queue for deletion requests.
 2. Get the customer system information from hal.
-3. Send an API reqeust to hal to mark the system as deleted.
+3. Send a HTTP request to hal to mark the system as deleted.
 4. SSH into a server and `rm -rf` the customer system directory.
 5. Contact AWS route53 to delete the DNS for that customer.
 6. Run a mysql command to drop the database.
@@ -455,13 +455,24 @@ Just remember that if you go with this strategy for acceptance testing it is
 *imperative* that you test using the real services before deploying. I guess
 this is always important but it feels a bit more so in this case.
 
-#### One Trick Which I thought Might Be Useful
+#### Recap + One Trick Which I thought Might Be Useful
 
-If you decide to locally use a real instance of a service for acceptance
-testing I think you could still use a mock as well. Just make the mock be a
-middleman between the application and the service. So it would just forward
-the requests you give it unchanged to the service. I think the benefit of
-doing this is that you can check the mock that the requests that flowed
+Rules:
+
+- Never use deployed services in your acceptance testing environment.
+- Use a real service locally for acceptance tests iff creating a mock one is
+  too difficult AND you are able to check in the acceptance test that the
+  application affected the service in the way we expect. 
+- Use a mock service locally for acceptance tests iff the parts of the service
+  you rely on is simple to mock.
+- Inject different functionality into your application to emulate the service
+  iff you cannot have anything resembling the service running locally. 
+
+Trick: If you decide to locally use a real instance of a service for
+acceptance testing I think you could still use a mock as well. Just make the
+mock be a middleman between the application and the service. So it would just
+forward the requests you give it unchanged to the service. I think the benefit
+of doing this is that you can check the mock that the requests that flowed
 through it are what we expected and you could selectively have the mock return
 some "bad" data when given specific inputs to see how your application
 behaves.
