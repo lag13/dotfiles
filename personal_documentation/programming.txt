@@ -114,7 +114,18 @@ I think that when creating interfaces which can be mocked, store those
 interfaces as close to the original struct which satisfies them. So in package
 a/b you want to create test code which involves mocking calls to a package in
 x/y/z. The interface you must satisfy to mock those calls should live in x/y/z
-rather than a/b.
+rather than a/b. EDIT: I think I've changed my mind on this, the interface
+should live next to the piece of code that makes use of it rather than the
+implementation of the interface. My idea there is that if we do this then the
+"higher level" code that uses the interface does not rely other "lower level"
+code, it just expects to be given some code that satisfies the interface. In
+other words it feels more like that "higher level" code is a complete unit with
+a nice little way to plug in different level components. If the interface lived
+with the code that implemented it, then the "higher level" code is still, in
+some ways, relying on the lower level code. Perhaps it is not though. Perhaps
+the "higher level" code only relies on the interface and not anything else in
+that package but I would prefer if the two packages be truly decoupled from one
+another.
 
 14. Always remember to clean up resources after using them. Seems like a silly
 thing to notate but sometimes we forget to check that no matter what path the
@@ -138,7 +149,15 @@ should be pretty well off.
 
 19. Generally, libraries should be as general as possible. If you're making a
 library for a specific application then do NOT put some constant in the library
-if the application can add it instead.
+if the application can add it instead. Another example of this is using
+environment variables in libraries, I think doing so is a silly thing to do. The
+"primative" thought there is that environment variables are only used by running
+programs, a library does not run on it's own therefor it should not have
+environment variables. More practically though, doing this just feels confusing
+to me. Now you've got these environment variables in your main program but you
+don't see them referenced in your code so you start thinking "wait, are these
+even being used?". And the answer very well could be, "oh, yep they are getting
+used by this library over here".
 
 20. Configuration. The only reasons to make something configurable is:
 
@@ -151,14 +170,18 @@ That being said, if you do add something which you then can configure, make its
 default value make sense for what the application is doing. Hopefully by doing
 that you'll never need to use the configuration but if you do, its there.
 
-21. Try to inject behavior you want rather than choose behavior with
-conditionals. For example you have an object with a boolean member variable.
-You pass in that boolean and if its true you do some computation otherwise you
-do different computation. Its better, if possible, to inject the actual
-behavior you want into that object instead of the boolean.
+21. Try to inject behavior you want rather than inject some data and choose
+behavior based on the data. You'll have to have conditionals somewhere but maybe
+some "higher levels" of code could just be computations which are pieced
+together. For example you have an object with a boolean member variable. When
+you pass in that boolean, if its true you do one computation otherwise you do
+different computation. Its better, if possible, to inject the actual behavior
+you want into that object instead of the boolean. EDIT: I still like this idea
+but I can't recall the real life scenario I encountered which lead me to write
+down this thought.
 
-22. If you're ever writing a test of some object A and find that some parameter
-for A is not important for writing the test then probably A does not need that
+22. If you're ever writing a test of some object X and find that some parameter
+for X is not important when writing the test then probably X does not need that
 parameter, it can be put somewhere else.
 
 23. If you're stuck on a problem, sometimes the best way to solve it is to take
@@ -166,15 +189,18 @@ a break from that problem. Sometimes they work themselves out and other times
 you just figure it out the next time you sit down.
 
 24. Software is really complicated and sometimes you have no idea what is going
-wrong so you just restart the system and maybe watch out for it in the future.
-Maybe humans sleep as a sort of "reset". Without sleep our minds would get into
-a bad state so we sleep to put us back into a good state. Interesting thoughts.
+wrong so you just restart the system and watch out for it in the future. Maybe
+for humans, sleep is some sort of "reset" functionality. Without sleep perhaps
+our minds would get into a bad state (since we humans were not "written"
+perfectly) so we sleep to put us back into a good state. Interesting thought.
 
-25. When writing code which seems sort of arbitrary, put a comment on WHY you
-wrote the code a certain way. Inspired by TSR. I wrote a pre-upgrade script to
+25. When writing code which appears sort of arbitrary (many times, as much as we
+want it to be, code is not straightforward), put a comment on WHY you wrote the
+code a certain way. This was inspired by TSR. I wrote a pre-upgrade script to
 check for certain "bad" configurations before upgrading but I did not run this
-script on dev for some reason. I wish I knew the exact reason why we chose to
-do that.
+script on dev for some reason. I wish I knew the exact reason why we chose to do
+that. We're pretty sure we figured it out but a comment confirming this would
+have been nice.
 
 26. After making a new change, always check the logs for any errors. Even if
 you don't log anything, if a language is dynamic (like PHP) then the language
@@ -202,64 +228,64 @@ that a long time ago and addressed it.
 involves more tradeoffs when you are working at a larger scale where you have
 multiple services calling other services etc... The tradeoffs I'm talking about are:
 
-- Getting the "perfect" solution. Where perfect means that the code is abstract
-  and well tested and just broken up very nicely AND maybe the code satisfies
-  some other higher goals like having each datacenter be able to work
-  independently if one goes down.
+- Getting the "perfect" solution. Where perfect means that the code is
+  clear/straightforward and well tested and just broken up very nicely AND maybe
+  the code satisfies some other higher goals like having each datacenter be able
+  to work independently if one goes down.
 - Getting something out there that works even if it is not perfect.
 
-It might be a good idea to accept the fact that a solution you come up with
-will probably never be perfect. Even if you think of the perfect solution, if
-it will be hard to implement/maintain then maybe that is not the solution to go
-with (like maybe the logic is complicated and that makes it hard to change).
-The inspiration for this bullet was the feature flagging service I was building
-for TSR. We were wondering how to architect the solution. Originally we were
-going to have this service called scalp on each of the 4 datacenters which set
-the flags in mysql (which is considered they authoritative source of feature
+It might be a good idea to accept the fact that a solution you come up with will
+probably never be perfect. Even if you think of the perfect solution, if that
+solution will be hard to implement/maintain then maybe that is not the solution
+to go with (like maybe the logic is complicated and that makes it hard to
+change). The inspiration for this bullet was the feature flagging service I was
+building for TSR. We were wondering how to architect the solution. Originally we
+were going to have this service called scalp on each of the 4 datacenters which
+set the flags in mysql (which is considered they authoritative source of feature
 flagging data) and then in redis which the application uses. We realized that
 each of these mysql databases would have the same exact information in them
-which felt weird. It would also be hard to synchronize data between them
-because we now have 4 mysql databases so 4 authoritative sources of data.
-Synchronizing data would involve some other process pinging all the databases
-and determining which values should be the flag values and then telling the 4
-scalp instances what the values should be. This seems complicated to say the
-least. So we thought that moving the database into the UX/API would be the
-right thing to do. Then making sure data is consistant between redis and mysql
-is easier because we only have one source of feature flagging data. But the
-thing that we didn't really like about that design was that the datacenters are
-not independent now. So if the UX/API was on the dev datacenter and dev went
-down somehow then we could not do any feature flagging stuff. I also started
-wondering how companies like facebook and google have a website which is
-accessed globally. There's no way that they have a server in one region which
-serves the website because that would make it slower for that person. Like if
-the server was in the US then someone in Japan would have a tougher time using
-google because it would be slower. Anyway, we decided that the tradeoff of
-being reliant on a single datacenter was a lower cost than developing this
-complicated algorithm/process for making sure the feature flagging data is
-consistant between all datacenters. What we sacrifice is datacenter
-independence but we might not have that anyway so the issue might not be so
-great. I guess the only situation that would be bad is if dev went down (but
-not US or EU) and a feature was misbehaving then we would not be able to turn
-off that feature. Strictly speaking though we could, we'd just have to get into
-the redis instance and manually turn it off. Not a great solution but at least
-we do have some sort of way out in case that happens. But yeah to sum up:
+which felt weird. It would also be hard to synchronize data between them because
+we now have 4 mysql databases so 4 authoritative sources of data. Synchronizing
+data would involve some other process pinging all the databases and determining
+which values should be the flag values and then telling the 4 scalp instances
+what the values should be. This seems complicated to say the least. So we
+thought that moving the database into the UX/API would be the right thing to do.
+Then making sure data is consistant between redis and mysql is easier because we
+only have one source of feature flagging data. But the thing that we didn't
+really like about that design was that the datacenters are not independent now.
+So if the UX/API was on the dev datacenter and dev went down somehow then we
+could not do any feature flagging stuff. I also started wondering how companies
+like facebook and google have a website which is accessed globally. There's no
+way that they have a server in one region which serves the website because that
+would make it slower for that person. Like if the server was in the US then
+someone in Japan would have a tougher time using google because it would be
+slower. Anyway, we decided that the tradeoff of being reliant on a single
+datacenter was a lower cost than developing this complicated algorithm/process
+for making sure the feature flagging data is consistant between all datacenters.
+What we sacrifice is datacenter independence but we might not have that anyway
+so the issue might not be so great. I guess the only situation that would be bad
+is if dev went down (but not US or EU) and a feature was misbehaving then we
+would not be able to turn off that feature. Strictly speaking though we could,
+we'd just have to get into the redis instance and manually turn it off. Not a
+great solution but at least we do have some sort of way out in case that
+happens. But yeah to sum up:
 
-- We had a choice between simple algorithm or database independence
-- We chose having the simple algorithm because we thought the cost of
-  developing that algorithm (which involves actually coming up with said
-  algorithm and then spending the time and energy to make sure it works) is
-  higher than the cost of not having datacenter independence. Especially since
-  if a datacenter goes down, this service being down won't bring down TSR. TSR
-  is probably the thing which should be super fault tolerant, not this
-  application. In general the customer facing application should probably be
-  the thing that is the most stable.
+- We had a choice between simple algorithm or datacenter independence
+- We chose having the simple algorithm because we thought the cost of developing
+  that algorithm (which involves actually coming up with said algorithm and then
+  spending the time and energy to make sure it works) is higher than the cost of
+  not having datacenter independence. Especially since if a datacenter goes
+  down, this service being down won't bring down TSR. TSR is probably the thing
+  which should be super fault tolerant, not this application. In general the
+  customer facing application should probably be the thing that is the most
+  stable.
 
 Again, I guess just try to remember that as much as we'd like programming to be
-this exact science where there is one truth, one best solution, and we just
-need to think about things long enough to find that best solution, it is not
-like that. Programming is partly about that, definitely. Focusing on that
-aspect gives us clean code that is a pleasure to work with and extend! But keep
-in mind that there is also a business side to programming. This is the part of
+this exact science where there is one truth, one best solution, and we just need
+to think about things long enough to find that best solution, it is not like
+that. Programming is partly about that, definitely. Focusing on that aspect
+gives us clean code that is a pleasure to work with and extend! But keep in mind
+that there is also a business side to programming. This is the part of
 programming which says, "we need to build something which works, which we can
 sell". We might like the idea of coming up with the "perfect" solution for a
 particular problem which is abstract and flexible and easy to maintain and all
@@ -267,14 +293,13 @@ of that good stuff but you need to figure out the pros and cons between getting
 to that perfect solution or simplifying and getting something that works more
 quickly. If you have the theoretical idea for a perfect solution but don't know
 exactly how to implement it, then maybe it should be abandoned for a simpler
-solution. Because coming up with the idea soution is not enough, you have to
-now go and implement said solution which takes time, bugs will occurr and will
-have to be fixed. This all takes time out of your day, time which could be
-spent solving other problems. Of course I'm not advocating to always be
-programming with the mindset of "I just need to get something that works"
-because you'll inevitably end up doing a bunch of "hacky" as time goes on it
-will be harder and harder to make changes i.e you'll accumulate technichal
-debt.
+solution. Because coming up with the idea is not enough, you have to now go and
+implement said idea which takes time, bugs will occurr and will have to be
+fixed. This all takes time out of your day, time which could be spent solving
+other problems. Of course I'm not advocating to always be programming with the
+mindset of "I just need to get something that works" because you'll inevitably
+end up doing a bunch of "hacky" things as time goes on it will be harder and
+harder to make changes i.e you'll accumulate technichal debt.
 
 Tradeoffs tradeoffs, tradeoffs.
 
@@ -286,96 +311,119 @@ this other thing") create a new object which abstracts away some of that logic
 behind a simple interface. Then you can have a mock implementation of that
 interface and your tests will be simpler. Of course you now have to create the
 production focused implementation of that interface (and perhaps test it too)
-but that should be an easier task since the domain you're testing is simpler.
+but that should be an easier task since the domain you're testing is
+simpler/smaller.
 
 If something is still too hard to test, then (if possible) try to change the
 problem so it is easier to solve then solve and test that. And sometimes I'm
 sure that testing something will be hard period, so just suck it up and deal
 with it.
 
-29. Creating something yourself or using an existing product pros and cons.
-Pros: Developers practice craft, you can extend it to suit companies needs if
-need be, you might get other useful tools out of it in the process. Cons: It
-takes time (which also means money) which could be spent developing elsewhere,
-your homemade product will probably never be as good as one produced by a
-company who's whole purpose is to perfect that produc.
+One thing that was sort of difficult to test was making sure that the feature
+flags API kept the flag data in the database and redis instances in sync.
+Looking back now, I'm thinking that maybe caching the flag data should not have
+been this API's concern. Maybe it should have only been worried about managing
+the database and some other service would worry about caching. Everytime the API
+would make a flag change it could emit some "event", then this other caching
+service could listen for these events and update the cache. This would have made
+the feature flags API simpler. Nothing is without it's tradeoffs though, the
+tradeoff in this case is that it would be hard (maybe not even possible) to tell
+whether or not the flag was successfully updated in the cache. In general, I
+think asynchronous things can be hard to monitor.
+
+29. Creating something yourself vs. using an existing product pros and cons.
+
+Pros for creating something yourself:
+
+- Developers practice craft making them more valuable.
+- You can extend it to suit companies needs if need be.
+- You might get other useful tools out of it in the process.
+  
+Cons for creating something yourself:
+
+- It takes time (which also means money) which could be spent developing
+  something else. Not only does it take time to initially develop but you'll
+  have to take time to maintain it and extend it if need be.
+- Your homemade product will probably never be as good as one produced by a
+  company who's whole purpose is to perfect that product.
 
 30. Today (08/14/16, a Sunday) I was lying in bed next to Ara, who was reading
-harry potter book 4, in 40 east 9th streat Chicago, in good old apartment 1612
+harry potter book 4, in 40 east 9th streat Chicago, good old apartment 1612
 thinking about nothing in particular. Pete was going to take a
-html/css/javascript related test later in the day sent to him by some company
-he had applied to and he had been studying those topics in preparation. At some
+html/css/javascript related test later in the day sent to him by some company he
+had applied to and he had been studying those topics in preparation. At some
 point he walked over to Kye and I thought he said something to the effect of,
-"It feels like all problems have already been solved. If I don't know the
-answer I just look it up and there's the solution. It feels more about
-implementation than actually solving problems". I had felt this sort of feeling
-before and it kind of got me down at the time but I remember coming to terms
-with it but never put it into words. I didn't even remember exactly how I had
-come to terms with it so it got me thinking for a little while about why
-programming isn't so bleak as that. Because to me, thinking about programming
-in that way does feel bleak. When I think in such a way (about anything really)
-then I start to think things like, "if someone has already solved this problem,
-then what am I really doing? I'm just copying their solution and adding it to
-my code. I'm like a monkey, who doesn't even think but instead takes input
-describing a problem, looks it up, and copies the solutions find.". Here are a
-couple of reasons why things are not so bleak:
+"It feels like all problems have already been solved. If I don't know the answer
+I just look it up and there's the solution. It feels more about implementation
+than actually solving problems". I had felt this sort of feeling before and it
+had kind of got me down at the time but I remember coming to terms with it but I
+never put it into words. I didn't even remember exactly how I had come to terms
+with it so it got me thinking for a little while about why programming isn't so
+bleak as that. Because to me, thinking about programming in that way does feel
+bleak. When I think in such a way (about anything really) then I start to think
+things like, "if someone has already solved this problem, then what am I really
+doing? I'm just copying their solution and adding it to my code. I'm like a
+monkey, who doesn't even think but instead takes input describing a problem,
+looks it up, and copies the solutions find.". Here are a couple of reasons why
+things are not so bleak as all that:
 
 - You can still solve things yourself, just don't look up how to solve them and
-  figure them out! It might still bum you out that the problem is already
-  solved but at least from your perspective it is new.
+  figure them out! It might still bum you out that the problem is already solved
+  but at least from your perspective it is new.
 - Looking up a solution (unless it is very simple) is almost never as easy as a
   copy paste. You have to read the code you're seeing and understand it to be
-  able to say whether or not it can be applied to what you want to do. As you
-  do that more you inevitably learn more things about the craft which can be
+  able to say whether or not it can be applied to what you want to do. As you do
+  that more you inevitably learn more things about the craft which can be
   applied to future situations. You are still a lot more than a mere monkey.
-- Lastly (and this reason resonates with me the most) I would equate
-  programming/solving some problem in programming to creating something for
-  aesthetic reasons (painting, drawing, wood burning, etc...). Hundreds of
-  thousands (millions really) have, say, drawn/painted a fruit basket.
-  Producing something that represents the fruit basket is "solving the problem"
-  in this metaphor while how you went about doing it (the medium, personal
-  style, etc...) is the implementation. So many people have already "solved"
-  this problem but I get the feeling that that doesn't deter people from doing
-  it themselves. Because in many ways, its not really about the end product,
-  its about how *you* decide to implement it. Its about what experiences you
-  bring to the table and what you personally are trying to accomplish (in terms
-  of what the "bowl of fruit" looks like) and how those translate into the
-  final product. Not to mention you get more practice at your craft. Rarely am
-  I satisfied from simply solving the problem, there's an initial thrill of
-  satisfaction but what really makes me happy is when the code behind my
-  solution is what I consider good. In the metaphor this would be drawing the
-  basket of fruit but drawing it badly or not getting the style across you were
-  going for. The metaphor kind of breaks down here though because it is easy to
-  make a program which solves the problem but is written badly but if the "bowl
-  of fruit" does not look good to you then you are not done. For programming,
-  the act of solving the problem is more decoupled from the aesthetics of the
-  solution where for various art forms, the aesthetic IS the solution.
-  Regardless of the metaphor, the idea here is that even though the problem is
-  "solved" and you are just implementing it, there is still a lot of creativity
-  needed to get the code to a state that makes you happy. Getting the code to
-  be aesthetically pleasing to me is probably my main goal, solving the problem
-  at hand is just a byproduct.
+- Lastly (and this reason resonates with me the most) I would equate solving a
+  problem using programming with creating something for aesthetic reasons
+  (painting, drawing, wood burning, etc...). Hundreds of thousands (millions
+  really) have, say, drawn/painted a fruit basket. Producing something that
+  represents the fruit basket is "solving the problem with programming" in this
+  metaphor. How you went about doing it (the medium, personal style, etc...) is
+  the implementation. So many people have already "solved" this problem but I
+  get the feeling that that doesn't deter people from doing it themselves.
+  Because in many ways, its not really about the end product, its about how
+  *you* decide to implement it. Its about what experiences you bring to the
+  table and what you personally are trying to accomplish (in terms of what the
+  "bowl of fruit" looks like) and how those translate into the final product.
+  Not to mention you get more practice at your craft. Rarely am I satisfied from
+  simply solving the problem, there's an initial thrill of satisfaction but what
+  really makes me happy is when the code behind my solution is what I consider
+  good. In the metaphor this would be drawing the basket of fruit but drawing it
+  badly or not getting the style across you were going for. The metaphor kind of
+  breaks down here though because it is easy to make a program which solves the
+  problem but is written badly but if the "bowl of fruit" does not look good to
+  you then you are not done. For programming, the act of solving the problem is
+  more decoupled from the aesthetics of the solution where for various art
+  forms, the aesthetic IS the solution. Regardless of the metaphor, the idea
+  here is that even though the problem is "solved" and you are just implementing
+  it, there is still a lot of creativity needed to get the code to a state that
+  makes you happy. Getting the code to be aesthetically pleasing to me is
+  probably my main goal, solving the problem at hand is just a byproduct.
 - If it makes you feel better, you can take some solace in the fact that
   probably most people are not solving truly novel problems. What's so
   inherently good about solving a novel problem anyway?
 
-31. Just realized another benefit for having tests. Sometimes a software
-project just gets so large that knowing if a change you are making effects
-other pieces is hard to judge. You could ask co-workers who know the software
-more than you but what if they are busy? If your tests are good then they will
-fail if you made a change which broke something. The inspiration for this one
-came on 08/17/16, we wanted to use an existing key in platform.yml called
-'region'. The strange thing was though was that this key was set to 'us' on
-every datacenter where we wanted it set to things like 'dev', 'us', 'eu' etc...
-Looking through the code I found only one reference to this key and it was a
-hardcoded check to see if the key was equal to 'us', very strange. Anyway, I
-was worried about removing that check because I wasn't sure if there would be
-breaking changes. If there were great tests in place, I wouldn't need to worry.
+31. Just realized another benefit for having tests. Sometimes a software project
+just gets so large that knowing if a change you are making effects other pieces
+is hard to judge. You could ask co-workers who know the software more than you
+but what if they are busy? If your tests are good then they will fail if you
+made a change which broke something. The inspiration for this one came on
+08/17/16, we wanted to use an existing key in platform.yml called 'region'. The
+strange thing was though was that this key was set to 'us' on every datacenter
+where we wanted it set to things like 'dev', 'us', 'eu' etc... Looking through
+the code I found only one reference to this key and it was a hardcoded check to
+see if the key was equal to 'us', very strange. Anyway, I was worried about
+removing that check because I wasn't sure if there would be breaking changes. If
+there were great tests in place, I wouldn't need to worry. I will say though
+that we did have some tests in place and those tests (since they still passed
+after making the changes) gave me some confidence.
 
 32. If the code testing the function of some unit is exactly the same (just
 switched out the function call) of another unit, then those two functions are
 probably the SAME. Seems like an obvious thing but I overlooked it when doing
-some feature flagging stuff. I had a Set() and Create() function which we're
+some feature flagging stuff. I had a Set() and Create() function which were
 pretty much exactly the same (they called the same function createOrSet()
 passing it in the appropriate function to do the actual create() or set()
 operation. I thought I had it right and then I noticed the tests were exactly
@@ -383,48 +431,54 @@ the same for both those functions. I thought that that was because they both
 relied on the same underlying function but no, it was because I had implemented
 the Create() function to be the exact same as the Set() function by accident.
 
-33. If some entity/object needs to be in a certain state then that entity
-should make sure it is in that good state; it should not rely on external
-objects to enforce the state for it. When writing it out like this it seems
-obvious but I didn't think about it like this before. The inspiration for this
-thought (like the last bunch of thoughts) is feature flagging. The database
-structure I came up with is one where there is a "flag" column (indicating the
-flag name) and a "deleted" column (indicating if the flag was deleted or not).
-There are more columns of course but these are the ones that matter for this
-discussion. So there can be multiple flags in the datbase with the same name
-XYZ iff a maximum of one flag named XYZ has its "deleted" column set to false
-and every other flag named XYZ has their "deleted" column set to true. <<---
-That is the state that must be enforced for things to work properly. But I
-delegated the enforcing of that state to other objects which I think is not the
-right thing to do. Specifically, when creating a flag I would do a
-"FlagExists()" check and if the flag did not exist then I'd make a function
-call which ultimitely ended up making an INSERT statement. I think at the time
-I thought it would be simpler to make that check instead of trying to create
-the flag and then bubbling up a result which indicated whether or not the flag
-already existed before creation. Thinking about it now though it was probably
-not a good choice for two reasons. One reason is more stylistic/good practice
-where you should be able to use an object and have it "just work" instead of
-having to know about its internal details. In this case we have to know to only
-call the "CreateFlag()" method on this database object if the flag does not
-already exist, otherwise we'll get into a bad state. This makes it harder to
-use that object in other contexts. Another reason (in this specific example) is
-that there is, I think, a potential for data races where we create a flag
-twice. Request 1 could come in wanting to create flag XYZ, it checks and see's
-that XYZ doesn't exist then hangs. Then request 2 comes in and also wants to
-create flag XYZ, it makes the check and sees that the flag does not exist so it
-proceeds. We'll end up getting 2 flags XYZ inserted into the database putting
-us into a bad state, not good. But if enforcing the state happened at the
-database query level then I don't think this problem would happen.
+33. If some entity/object needs to be in a certain state then that entity should
+make sure it is in that good state; it should not rely on external objects to
+enforce the state for it. When writing it out like this it seems obvious but I
+didn't think about it like this before. The inspiration for this thought (like
+the last bunch of thoughts) is feature flagging. The database structure I came
+up with is one where there is a "flag" column (indicating the flag name) and a
+"deleted" column (indicating if the flag was deleted or not). There are more
+columns of course but these are the ones that matter for this discussion. So
+there can be multiple flags in the datbase with the same name XYZ iff a maximum
+of one flag named XYZ has its "deleted" column set to false and every other flag
+named XYZ has their "deleted" column set to true. <<--- That is the state that
+must be enforced for things to work properly. But I delegated the enforcing of
+that state to other objects which I think is not the right thing to do.
+Specifically, when creating a flag I would do a "FlagExists()" check and if the
+flag did not exist then I'd make a function call which ultimitely ended up
+making an INSERT statement. I think at the time I thought it would be simpler to
+make that check instead of trying to create the flag and then bubbling up a
+result which indicated whether or not the flag already existed before creation.
+Thinking about it now though it was probably not a good choice for two reasons.
+One reason is more stylistic/good practice where you should be able to use an
+object and have it "just work" instead of having to know about its internal
+details. In this case we have to know to only call the "CreateFlag()" method on
+this database object if the flag does not already exist, otherwise we'll get
+into a bad state. This makes it harder to use that object in other contexts.
+Another reason (in this specific example) is that there is, I think, a potential
+for data races where we create a flag twice. Request 1 could come in wanting to
+create flag XYZ, it checks and see's that XYZ doesn't exist then hangs. Then
+request 2 comes in and also wants to create flag XYZ, it makes the check and
+sees that the flag does not exist so it proceeds. We'll end up getting 2 flags
+XYZ inserted into the database putting us into a bad state, not good. But if
+enforcing the state happened at the database query level then I don't think this
+problem would happen.
 
-34. Code that appears in multiple places is not necessarily a bad thing and
-does not necessarily have to be refactored. Its kind of a tradeoff that you
-need to assess. One trait you get about having code copied in places A B and C
-is that if the code in B needs to change then it is not a big deal, just change
-the code. One trait you get about A, B, and C calling out to a common function
-is that if A, B, and C need to change then you just change that one funciton.
-One basically offers more flexibilty (and potentially readability because the
-variable names can be tailored to the specific use case) and the other offers
-easier maintenance should things need to change.
+Then again, I suppose you could argue that using an object only under certain
+circumstances could be part of the object's API. You would only use an object
+under certain circumstances since that is the only time it makes sense to do so.
+Life is complicated I guess.
+
+34. Code that appears in multiple places is not necessarily a bad thing and does
+not necessarily have to be refactored. It's a tradeoff that you need to assess
+depending on your situation. One pro you get from having code copied in places A
+B and C is that if the code in B needs to change then it is not a big deal, just
+change that code. One pro you get about A, B, and C calling out to a common
+function is that if A, B, and C all need to change then you just change that one
+funciton. One basically offers more flexibilty/decoupling (and potentially
+readability because the variable names can be tailored to the specific use case
+and you don't have to jump to a new function to follow the code execution) and
+the other offers easier maintenance should everything need to change.
 
 35. If you need to optimize something, you should really learn how to measure
 the performance of your code. If you learn this skill you can see where the
