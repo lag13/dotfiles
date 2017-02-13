@@ -3,6 +3,9 @@ Glide
 
 Package management for Go: https://glide.sh/
 
+Adding Private Repositories
+---------------------------
+
 For private repositories you'll have to edit the `glide.yml` file. You can see
 an example with the `go-hal-client` repository
 (https://github.com/cbdr/go-hal-client):
@@ -32,3 +35,11 @@ able to get the repository:
   repo: git@github.com:/cbdr/go-hal-client
   vcs: git
 ```
+
+Updating Dependency
+-------------------
+
+Normally just doing `glide update` should do it. But if you're are using an
+exact commit of some github repository then that won't do anything. To fix
+that just change the commit in glide.lock to the desired commit and run `glide
+install`.

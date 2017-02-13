@@ -18,6 +18,10 @@ import (
 // function to build it for you.
 
 func main() {
+	// os.Args holds a slice of the arguments passed into the command.
+	// REMEMBER!! The 0'th spot holds the name of the program being run,
+	// starting at position 1 is going to be the first argument.
+	fmt.Println(os.Args)
 	{ // Run command ignore output 1
 		cmd := exec.Command("ls", []string{"-l"}...)
 		if err := cmd.Run(); err != nil {
@@ -78,5 +82,4 @@ func main() {
 			fmt.Printf("command exited unsuccessfully: %v: %s\n", err, stderr.Bytes())
 		}
 	}
-	fmt.Println(os.Args)
 }

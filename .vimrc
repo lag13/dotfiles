@@ -596,6 +596,20 @@ let g:go_fmt_command = "goimports"
 
 " }}}
 
+" Not sure if it would be useful (might be one of those things that takes up
+" more time than I'd ever save) but sometimes I'm reading code and wish I knew
+" what the input to some function is going to look like (probably I'm looking
+" at unfamiliar code and trying to figure out how things work exactly). It
+" would be cool if I could bring up some text describing what this input will
+" be as well as some examples. This documentation will most likely be
+" something I generate on my own time but then it will be there if I need to
+" refer back to it. This documentation would probably live in a separate file
+" (maybe sharing the name as the file being documented). You know what...
+" maybe I could just do that. Have these .pdoc (personal documentation) files
+" and have a simple plugin which creates them and switches to them based on
+" the current file I'm looking at. In those .pdoc files I would be responsible
+" for the documentation aspect, however I wanted to do it.
+
 " I just tried to do <C-a> to increase the header number of a markdown header.
 " That could be an interesting ability to have. Reminds me of Tim Pope's speed
 " dating plugin.

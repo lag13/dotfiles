@@ -1,6 +1,26 @@
 CoreOS
 ======
 
+Deploying a New Service
+-----------------------
+
+Start to finish, here is me deploying a new service (the tsr-api):
+
+```
+# create a unit file with the same contents as
+# https://github.com/cbdr/tsr-api/blob/master/.coreos/tsr-api%40.service.
+vim tsr-api@.service
+# Submit that unit file so we can spin up instances of it.
+fleetctl submit tsr-api@.service
+# Set up etcd with the appropriate environment for the service. This first
+# involves creating a file with the proper environment then putting it into etcd
+# uner the appropriate key.
+vim tsrapienv
+etcdctl --no-sync set environments/tsr-api < tsrapienv
+# Start up a service
+fleetctl start tsr-api@1
+```
+
 Hooking Up URL To Container
 ---------------------------
 

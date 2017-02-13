@@ -65,3 +65,16 @@ Volumes
 
 More information on volumes:
 http://container-solutions.com/understanding-volumes-docker/
+
+docker-compose
+--------------
+
+version 2 apparently by default creates a network through which all containers
+can talk to one another so you don't really need the "links" option anymore
+(this would create the network between 2 containers and do startup order). All
+you need is "depends_on":
+https://medium.com/@giorgioto/docker-compose-yml-from-v1-to-v2-3c0f8bb7a48e#.1u9f16kj1
+
+version 2 you can configure aspects about the network over which docker
+containers communicate with. I'm really not familiar with it:
+https://docs.docker.com/compose/networking/.

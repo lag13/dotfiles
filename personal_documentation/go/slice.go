@@ -74,3 +74,14 @@ func removeElement(s []string, i int) []string {
 	// defaults to len(s) high-low gives us a slice of length 0.
 	return append(s2[:i], s2[i+1:]...)
 }
+
+// Go does not have a "is this element in the slice" function so you must write
+// your own or use a map if so desired.
+func elemExists(y int, xs []int) bool {
+	for _, x := range xs {
+		if y == x {
+			return true
+		}
+	}
+	return false
+}

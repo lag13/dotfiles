@@ -1,6 +1,19 @@
 REST
 ====
 
+Roy Fieldings's Dissertation IS REST
+--------------------------------
+
+I have learned today (01/25/2017) that Roy Fieldings dissertation originally
+brought REST into being:
+https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm. In other words
+this is the true definition of REST and I should probably read it along with
+his blog (http://roy.gbiv.com/untangled/tag/rest). Judging from  my previous
+difficulties in getting a solid definition it would seem that REST's
+definition is different to a lot of people (probably a product of
+people misinterpreting his dissertation, not realizing it, and spreading that
+knowledge. 
+
 A tutorial:
 
 http://www.restapitutorial.com/
@@ -26,6 +39,14 @@ http://fr.slideshare.net/faberNovel/6-reasons-why-apis-are-reshaping-your-busine
 
 URL vs URI: https://danielmiessler.com/study/url-uri/
 
+https://www.quora.com/What-are-some-guidelines-to-build-a-good-RESTful-API#ans1036119
+
+http://barelyenough.org/blog/2008/05/versioning-rest-web-services/
+
+http://timelessrepo.com/haters-gonna-hateoas
+
+http://blog.steveklabnik.com/posts/2011-07-03-nobody-understands-rest-or-http
+
 Snarky Comment
 --------------
 
@@ -44,9 +65,9 @@ Fieldings blog or his dissertation - Google will help you find it - you are
 not describing REST at all in your answer.
 ```
 
-Now maybe this guy is right (I haven't read Roy Fielding's discertaion and
+Now maybe this guy is right (I haven't read Roy Fielding's dissertation and
 maybe I should: https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm)
 but the fact is based on most of the tutorials and such that I've looked at,
-almost everyone thinks of REST as being a consitent approach to doing CRUD
+almost everyone thinks of REST as being a consistent approach to doing CRUD
 operations and instead of making some snarky comment about "oh, you don't
 really understand how rest works" it should be more constructive or something.

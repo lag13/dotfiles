@@ -31,10 +31,9 @@ your repository.
 Starting Directory
 ------------------
 
-The repository is copied into ~/$CIRCLE_PROJECT_USERNAME where
-$CIRCLE_PROJECT_USERNAME is the name of user: cbdr, lag13, etc... I think that
-is the directory from which all commands get run unless build_dir is
-specified.
+When I did a `pwd` inside the "test" part of the circle.yml file it outputted:
+"/home/ubuntu/tsr-api" so it would appear that your working directory is
+always at the root of your repository.
 
 Environment Variables
 ---------------------

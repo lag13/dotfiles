@@ -22,6 +22,15 @@ func main() {
 	delete(m, "42")
 	mi := make(map[string]int, int64(math.Pow(2, 5)))
 	fmt.Println(len(mi))
+	// Accessing a value not in the map returns the default value for that
+	// type.
+	fmt.Println(m["not-there"])
+	// If you specify another value, conventionally called "ok", then that
+	// second value is a bool indicating if the key exists.
+	_, ok := m["not-there"]
+	if !ok {
+		fmt.Println("the key \"not-there\" does not exist")
+	}
 }
 
 // The easiest way to copy a map is just with a loop. There is no built in map

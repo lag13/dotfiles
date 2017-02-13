@@ -31,6 +31,65 @@ a mysql server by doing:
 select User FROM mysql.user;
 ```
 
+All About Databases
+-------------------
+
+### Where They Are Stored
+
+Each databases is actually a directory somewhere in the file system. Where
+specifically probably depends on how mysql was installed. I think you can
+always find this information by reading the `my.cnf` file then looking for the
+`datadir` key. For the 5.6 docker image of mysql for example
+(`https://hub.docker.com/_/mysql/`) the databases are stored in
+`/var/lib/mysql`.
+
+Brifly looking at the contents of one of these database directories it appears
+to be filled with files who's names are the names of the tables in the
+database. All the tables seem to come as a pair of two files for example:
+
+```
+candidat.frm
+candidat.ibd
+```
+
+It would appear that .idb stands for "InnoDB":
+https://dev.mysql.com/doc/refman/5.7/en/innodb-multiple-tablespaces.html. It
+would appear that the .frm stands for "format" (I'm guessing this file
+describes the structure of the table while the .ibd file contains the data):
+http://dev.mysql.com/doc/internals/en/frm-file-format.html.
+
+### Error When Removing Them
+
+One time when I was dropping a database I got this error:
+
+```
+ERROR 1010 (HY000) at line 1: Error dropping database (can't rmdir './test',
+errno: 39)
+```
+
+This article helped when investigating:
+http://stackoverflow.com/questions/12196996/mysql-error-dropping-database-errno-13-errno-17-errno-39.
+In short that error will occur when there are files in the directory
+representing that database which mysql does not feel like deleting for
+whatever reason.
+
+In my particular case it appeared that the only file that existed in that
+directory was lien_objet_liste_119.ibd:
+
+```
+[root@e397d778a06d test]# ls -la
+total 128
+drwx------ 2 mysql mysql 28672 Jan  9 20:35 .
+drwxr-x--- 6 mysql mysql  4096 Jan  9 20:12 ..
+-rw-rw---- 1 mysql mysql 98304 Jan  9 18:42 lien_objet_liste_119.ibd
+```
+
+This is a flat out guess but I'm thinking that since there was not a pair of
+tables lien_objet_liste_119.ibd and lien_objet_liste_119.frm mysql was
+complaining. A total guess though. I'm not sure how this database got into
+this state.
+
+
 Queries
 -------
 
@@ -180,6 +239,18 @@ from site
 where strLibelle like concat('%', @customer, '%')
 OR strBDD = LEFT(@customer, 20);
 
+```
+
+### Delete Database
+
+```
+DROP DATABASE coolDatabaseName
+```
+
+### List Databases
+
+```
+SHOW DATABASES
 ```
 
 Modes

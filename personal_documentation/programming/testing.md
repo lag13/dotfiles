@@ -281,7 +281,7 @@ takeaways for situations where each should be used.
 
 #### When To Use A Real Deployed Instance Of the Service
 
-For acceptance tests? I think never, this isn't really even a choice. Firs
+For acceptance tests? I think never, this isn't really even a choice. First
 off, if you use a deployed production instance you run the risk of messing
 with real production data. Not good. Even if you use a "staging" instance of
 the service now your test could fail because something is wrong with that
@@ -412,6 +412,13 @@ allows the acceptance test to view the requests that were made which is
 perfect for checking if the application sent the expected requests to the
 expected services.
 
+One negative aspect of using a mock service is that if the real service you
+are emulating changes, then the acceptance tests (since they rely on a mock
+and not the real thing) but when your service gets deployed it might fail
+since the real service you rely on has changed. In this scenario I suppose
+it's more the fault of the service (since they broke their API) but still, it
+would be nice if that could have been caught earlier.
+
 #### When to Inject Different Functionality Into The Application When Testing
 
 This should probably be a last resort when it comes to creating a reliable
@@ -457,7 +464,7 @@ this is always important but it feels a bit more so in this case.
 
 #### Recap + One Trick Which I thought Might Be Useful
 
-Rules:
+Recap of the Rules:
 
 - Never use deployed services in your acceptance testing environment.
 - Use a real service locally for acceptance tests iff creating a mock one is
@@ -476,3 +483,105 @@ of doing this is that you can check the mock that the requests that flowed
 through it are what we expected and you could selectively have the mock return
 some "bad" data when given specific inputs to see how your application
 behaves.
+
+Modularity
+----------
+
+### My Proposed Solution
+
+Separate the logic that is being tested in the version package from the
+responses package because I really don't want changes to the reponse package
+to change unit tests in this package. So we're going to have some sort of
+function which the version package relies on instead of directly relying on
+the response package. Then in the tests we can pass in a mock function just to
+make sure that a response is being written. So the version package will be
+directly responsible for writing the Content-type, the http status code, and
+for providing the basic response body text (which will probably appear in some
+"message" json key). The function getting passed in will deal with
+constructing the appropriate format for the response body.
+
+It feels like when writing code it can kind of be divided into two camps:
+
+1. The code that is unit tested.
+2. The code that will be covered by acceptance tests.
+
+The unit tests should just test the logic of the unit. You should structure
+your code so that the main logic does NOT rely on any external packages. That
+way a change in one of those external packages can never break the logic of
+the unit being tested. The way you'll accomplish this is probably having a
+function or interface parameter to something and you'll end up passing in a
+mock when testing but something real when the code actually runs. When a mock
+is passed in the logic of your unit can be tested completely. When the "real"
+thing gets passed in then acceptance tests will handle that. Maybe you could
+divide all code into "units" and "the parts which inject real functionality
+into the units which will end up running when the actual application is run".
+I wonder if it would be nice to append each file name with "unit" or
+"acceptance" (or something like that) to indicate which files are totally
+independent and which rely on other packages. Something like that would
+probably be better served by good tooling though which could detect when a
+package/file uses external packages.
+
+### The Problem
+
+I'm having a bit of a "problem" right now with the tsr-api. I'm working on
+bringing in versioning capabilities into the API. The way I thought about it
+is that having slightly different versions for things is basically just a
+dispatch; a request comes in requesting a specific version of some resource
+and the appropriate handler gets dispatched based on that version. My plan was
+essentially to have a named map type like this:
+
+```
+type VersionDispatcher map[string]http.Handler
+```
+
+Then on VersionDispatcher I would define a `ServeHTTP()` method which extracts
+the version from the `Accept` header and dispatch to the appropriate handler.
+When an invalid version is specified I would like to respond with an error
+response indicating their failure to select a proper version. With any API you
+want responses to have the same format so a client doesn't have to do a lot of
+hoop jumping. That suggests that you'll end up creating some sort of
+"response" package which has a type which can be marshaled to produce a
+response. The thing I don't like about this is that if we're relying on this
+"response" package, then if that package changes then the unit tests could
+break. Another problem is that we'll probably have some acceptance tests in
+place to check that the error response is expected. I don't know if I like
+that duplication because it would mean updating code in two places if the
+response changes.
+
+To recap, the essential issues are:
+
+1. This "version dispatcher" package is relying on a "response" package to
+   produce a response consistent with the API when things go wrong. Now unit
+   tests for the version dispatcher package will break if the response package
+   changes in a breaking manner. This feels wrong. On the one hand the
+   ServeHTTP being tested is producing a different output so maybe it's good
+   that it fails. On the other hand though it feels like tests should not
+   break if an external package changes. How do we get around this? Maybe we
+   just don't use the external package? But we need to use that external
+   package to get consistant responses. Is the only way to decouple this by
+   using an interface or a function parameter which does the job of formatting
+   the response? It kind of feels like that is what needs to be done. Is that
+   overkill though? Part of me likes doing things like this, a little
+   "buffer"/"converter" between two packages allowing them to be independent
+   units, because then if one package changes it doesn't break the unit tests
+   of the other package. But another part of me thinks this makes the code
+   more confusing because it adds this sort of "boilerplate" code which serves
+   no functional purpose, it only helps decouple things. I suppose there are
+   pros and cons to coupling. A pro for coupling is that code can be more
+   concise and straightforward because all the pieces are tied together. A con
+   is that if all the pieces are tied together then maintenance can be hard
+   because changing something in one package can break something in a
+   different package. These sorts of things are very annoying to deal with.
+2. In addition to the unit tests on this package we'll also most likely have
+   acceptance tests which check for the error responses that this package
+   ultimately generates. That is duplication which I don't really like because
+   if the response changes then it will have to be fixed in two places. Can
+   anything be done about this? It's really not the end of the world but at
+   the same time I don't like it. And what about the "Content-type" header?
+   This package needs to set this value. Should the unit tests and the
+   acceptance tests check for this header? Now we're back to the duplication
+   issue. I feel like this package should check the Content-type though
+   because it directly sets it so if it changes how it sets it then it makes
+   sense for the unit tests to change. But the response body is going to be
+   generated by a separate package and we don't want external packages to mess
+   up this package's unit tests hence this package doesn't worry about it.
