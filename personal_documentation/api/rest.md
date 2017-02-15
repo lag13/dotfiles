@@ -14,6 +14,9 @@ definition is different to a lot of people (probably a product of
 people misinterpreting his dissertation, not realizing it, and spreading that
 knowledge. 
 
+Links
+-----
+
 A tutorial:
 
 http://www.restapitutorial.com/
@@ -26,7 +29,11 @@ http://stackoverflow.com/questions/630453/put-vs-post-in-rest/2590281#2590281
 
 https://apihandyman.io/do-you-really-know-why-you-prefer-rest-over-rpc/
 
-https://www.troyhunt.com/your-api-versioning-is-wrong-which-is/
+https://www.troyhunt.com/your-api-versioning-is-wrong-which-is/ and this one
+linked from that one
+(http://codebetter.com/howarddierking/2012/11/09/versioning-restful-services/
+<<--- I really like this guy. Check out his other stuff too. His current blog
+is here: http://blog.howarddierking.com/)
 
 https://github.com/interagent/http-api-design
 
@@ -46,6 +53,10 @@ http://barelyenough.org/blog/2008/05/versioning-rest-web-services/
 http://timelessrepo.com/haters-gonna-hateoas
 
 http://blog.steveklabnik.com/posts/2011-07-03-nobody-understands-rest-or-http
+
+http://ivanzuzak.info/2010/04/03/why-understanding-rest-is-hard-and-what-we-should-do-about-it-systematization-models-and-terminology-for-rest.html
+
+The URI Is The Thing: https://www.flickr.com/photos/psd/2918889380/
 
 Snarky Comment
 --------------
@@ -71,3 +82,25 @@ but the fact is based on most of the tutorials and such that I've looked at,
 almost everyone thinks of REST as being a consistent approach to doing CRUD
 operations and instead of making some snarky comment about "oh, you don't
 really understand how rest works" it should be more constructive or something.
+
+This Person Puts It Nicely
+--------------------------
+
+From:
+http://codebetter.com/glennblock/2012/03/11/you-cant-achieve-rest-without-client-and-server-participation/.
+
+```
+I think that the mere fact that a REST expert like yourself has to be
+constantly changing his mind  just proves that the term REST almost serves no
+purpose other than confuse people... let's just stick to HTTP web apis with a
+set of recommended practices for both client/server that developers can choose
+to follow or not.
+```
+
+The author then had a nice response and linked to a nice site:
+https://theamiableapi.com/2012/03/18/rest-design-philosophies/
+
+```
+I agree that "REST" has been abused too much to make it meaningful any longer.
+I found this post useful for defining terms: https://theamiableapi.com/2012/03/18/rest-design-philosophies/
+```
