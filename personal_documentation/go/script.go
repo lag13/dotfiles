@@ -64,7 +64,7 @@ func main() {
 			if exitErr, ok := err.(*exec.ExitError); ok {
 				fmt.Printf("command exited unsuccessfully: %v: %s\n", exitErr, exitErr.Stderr)
 			} else {
-				fmt.Printf("command could not be started: %v\n", err)
+				fmt.Printf("command exited unsuccessfully: %v\n", err)
 			}
 		}
 	}
