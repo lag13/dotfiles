@@ -5,7 +5,32 @@ Vendoring (as I know it) is the act of committing dependencies along with your
 own code instead of using a tool like composer to download the dependencies. I
 think I like it basically because of the reasons outlined here:
 
-http://devcenter.bitrise.io/docs/should-i-commit-my-dependencies-into-my-repository
+Vendoring (as I know it) is act of committing dependencies along with your own
+code instead of using a tool like composer to download the dependencies before
+starting up the application. Whether you vendor or not, you should still use
+some sort of package management tool so you know exactly what versions of
+dependencies you have.
+
+Vendoring in general should not happen in libraries because you run the risk
+of the library exposing a vendored type in its public API. The issue that can
+cause is that library A vendors version B of some library and the argument to
+one of its publically available functions takes a type from this library B.
+Now in your repository C you use A and vendor your own different version of
+that same library D. Now if you pass that type from D into A, it might not
+work if the types have become incompatible. So don't vendor in library code.
+
+I do like vendoring in application code basically because of the reasons
+listed here
+(http://devcenter.bitrise.io/faq/should-i-commit-my-dependencies-into-my-repository/)
+which in short are:
+
+- `git clone` (and subsequent `git pull`s) get you all the dependencies
+  necessary.
+- Protects against disappearing libraries. I've never seen it happen but if it
+  ever did it wouldn't be an issue.
+- Make the build process faster because you don't need to pull down
+  dependencies (which can also be annoying to do if you use internal private
+  git repositories).
 
 Vendoring In Libraries
 ----------------------

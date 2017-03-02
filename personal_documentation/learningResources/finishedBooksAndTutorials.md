@@ -12,8 +12,12 @@ A list of books/tutorials that I have completed:
 - The Go Programming Language
 - Haskell Programming: from first principles http://haskellbook.com/
 - Build API's you don't hate
+- https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/SimpleMadeEasy.md
 
 Working On
 ----------
 
 - High Performance Browser Networking: https://hpbn.co/
+- https://thoughtbot.com/upcase/mastering-git
+- Pro Git: https://git-scm.com/book/en/v2
+- 

@@ -1,9 +1,9 @@
 Git
 ===
 
-https://progit.org/
-https://thoughtbot.com/upcase/mastering-git
-http://ohshitgit.com/
+- https://progit.org
+- https://thoughtbot.com/upcase/mastering-git
+- http://ohshitgit.com
 
 Deleting a Tag
 --------------

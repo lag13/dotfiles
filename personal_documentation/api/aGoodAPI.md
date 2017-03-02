@@ -10,7 +10,7 @@ things work but you can still have good APIs with a monolith architecture.
 Easy to use
 -----------
 
-1. Quicker to integration with
+1. Quick to integrate with
 2. Less likely to make a mistake with the integration
 
 Coverage of the Application the API Operates On
