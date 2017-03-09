@@ -1,0 +1,144 @@
+* About
+Personal notes about emacs to help me learn.
+
+My emacs journey is starting. What am I getting myself into?
+
+* Questions
+- In the tutorial around line 370 they said that typing <Return> will insert the newline and line the cursor up with the text above it. When I tried it didn't work. I wonder if some binding I have is off? Or maybe the tutorial is just a bit outdated? TURNS OUT that this option was set in my config: (setq electric-indent-mode nil) which seemed to turn off that behavior. Should the tutorial be upated so if that option is nil then it has some red text about how the configuration is different and all?
+- On line 566 of the tutorial it says to save the TUTORIAL buffer with C-x C-s and it seems to suggest that when you do those commands the buffer will just be saved right away but for me it asks what the name of the file should be/where to save it. Is this a bug or configuration? It also says that the save message should be "Wrote ...TUTORIAL" but mine was different.
+
+* TODOs
+- Configure RET in org mode to open the link if the cursor is on the link
+- Consider activating the org-indent-mode minor mode so these outlines are indented based on headers. Or should I do this manually myself? Or configure emacs so it tries to indent things by default?
+- Figure out how to link to documentation from within an org mode document like this because that could be pretty nifty to have my thoughts written down but backed up by documentation. Also, is there any reason you would not want to document things using that Info format? Why is Org mode better?
+
+* Terms and Miscellaneous Notes
+- It seems that most "file" related commands or just general commands not strictly related to manipulating text start with C-x.
+- Killing - same as cutting
+- The kill ring stores all the things you have ever killed or copied.
+- Yanking - same as pasting. It refers to "yanking" something off of the kill ring into the editor. It's a bit confusing since vim uses the same word to mean copying.
+- Point - where your cursor is (technichally the left edge of the cursor)
+- Window - same as vim's, you look at a buffer through a window
+- Frame - a collection of windows. Originally I thought it was something like vim's tabs but it is not quite that. Opening a new frame (like with M-x make-frame) will do the same sort of things as doing Cmd-n in chrome will do. Both of these "frames" are still the same editor session as far as I can see (they share buffers, C-x C-c will exit both) but it's just this separate frame. I'm not sure why you'd want to do this I feel like I'd want to have everything in just one frame.
+- electric - describing a key which does more than simply inserting the key. For example hitting <Return> might insert the newline character AND insert enough indentation to match the above line.
+- minibuffer - the area at the bottom of the screen where you type when an interactive command is running (like C-s, M-x, C-x C-f, etc..)
+- *Messages* - a buffer which holds every message emacs has ever displayed on the bottom line
+- echo area - if you are typing commands slowly (like C-u pause... 123 pause...) then the command as typed so far will show up here. This is also where messages show up.
+- mode line - the line immediately above the echo line. It is basically vim's status bar showing things like file name, whether the file was modified, and the modes that are active for the buffer.
+- recursive editing levels - don't really know what these are yet. Apparently though, you are in a recursive editing level if there are square brackets around the major mode. For example, you might see [(Fundamental)] instead of (Fundamental).
+
+* Command Reference
+- C-x C-s (save-buffer) - save file
+- C-x s (save-some-buffers) - for each modified buffer corresponding to a file, ask the user if they want to save that buffer
+- C-x C-c - quit emacs
+- C-x C-f - open a new file
+- C-x b - switch to an existing buffer or you can open new buffers
+- C-x k - kill the current buffer
+- C-g - stop the current command
+- M-x <function> (smex) - run an arbitrary command
+- C-/ - undo
+- C-spc - set the mark (basically the equivalent of starting visual mode in vim)
+- C-k (kill-line) - kills the line from the point to the end of theline
+- C-w (kill-region) - kills the region of text
+- M-w (kill-ring-save) - copy the selected region
+- M-d (kill-word) - kill the word
+- C-y - yanks the text we just killed
+- M-y - cycle through the kill ring after yanking
+- C-j - equivalent of return followed by tab
+- M-\ - delete space surrounding the point
+- C-h k <key-binding> - describe the function for the key binding
+- C-h c <key-binding> - echo a brief description of the key binding
+- C-h f <function> - describe the function
+- C-h m - describe the major and minor modes you are in
+- C-h v - documentation on variables
+- C-h a <command> - command apropos (you can see all commands with "command" in their name)
+- C-h i - read the included manuals (like for any installed packages). Inside this manual do `m <menu-name>` to go into that documentation. Type ? to get help. Man this emacs documentation is slick.
+- C-h r - goes directly into the emacs manual which is a good reference. You could also get here by going through the C-h i page.
+- C-x o (other-window) - switch windows
+- C-x 0 (delete-window) - closes the current window
+- C-x 1 (delete-other-windows) - closes all windows except the current one
+- C-x 2 (split-window-below) - splits the current window horizontally
+- C-x 3 (split-window-right) - splits the current window vertically
+- C-x 4 C-f (ido-find-file-other-window) - opens the window you find in a horizontal split
+- C-l (recenter-top-bottom) - first centers the screen around the cursor, then top, then bottom and repeat.
+- When C-n and C-p scroll off the screen by default it seems that that text gets moved to the center of the screen.
+- M-a (backward-sentence) - move back a sentence
+- M-e (forward-sentence) - move forward a sentence
+- C-u <number> <command> - If you type C-u then a number the next command you type will be repeated that many times. For instance you can do `C-u 19 a' and it will insert 19 "a" characters. You can also hold down the meta key while typing the numbers if you don't want to press C-u for some reason. `C-u 10 C-f` would move forward 10 characters.
+- M-k (kill-sentence) - kill to the end of the current sentence
+- replace-string - an interactive command to replace one string with another after the point. If you have a region defined then it will only replace in that region.
+- C-x f (set-fill-column)  - set the fill-column (i.e the width at which point lines will automatically wrap if the Auto Fill mode is on)
+- M-q (fill-paragraph) - same as gwip in vim.
+- C-s (isearch-forward) - does a forward search type C-s again to proceed to the next search match. If you type delete after doing C-s it will go to previous search match locations until you reach the one you started from and then it will actually edit the minibuffer.
+- C-r (isearch-backward) - same as above but does the search backward
+- C-M-v (scroll-other-window) - Does a C-v but in the "other" window (so you don't leave the window you are viewing).
+
+* Modes
+A collection of key bindings and functions packaged together to serve a particular purpose.
+
+There are major modes and minor modes. There can only be one major mode at a time and it seems they are used for a certain file type or language. There can be as many minor modes as you want and they generally define more general purpose benefits. I'm not sure why there is this distinction of major and minor modes, it seems sort of arbitrary but maybe I don't really understand it yet. I'm also a bit confused by when you call something a minor mode and when it is just some variable you set. For example, toggle-truncate-lines is just a function but there is a line-number-mode which I imagine would just set one or two options.
+
+** Major Modes
+*** Fundamental (fundamental-mode)
+Not specialized for anything in particular.
+
+*** Text (text-mode)
+For writing text for humans to read.
+
+*** Info (Info-mode)
+A file format used by GNU for documentation. The emacs manual and associated packages are documented in this format.
+
+**** Command Reference
+- <SPC> - scroll window down and depth first search (dfs) to next node if at the end of current node.
+- <BACKSPACE> - opposite of <SPC>
+- n - go to next node on same level
+- p - go to previous node on same level
+- u - go to the node above the current one
+- <TAB> - move the point to the next menu item or cross reference
+- S-<TAB> - opposite of <TAB>
+- m <menu> - go to the named menu
+- b - go to beginning of current node (could also just do M-<)
+- [ - dfs to previous node
+- ] - dfs to next node
+- f - like `m` but for cross references
+- l - go to the "last" node you have visited
+- r - like `l` but opposite
+- L - display the history of visited nodes in a buffer
+- d - go to the root of the Info documentation from which you can explore all other documentation
+- t - go to the root of the current manual
+- i - most info manuals will have an "index" node which is an index of everything in the manual. I think it's usually at the `t`op of the manual probably labeled index. Doing `i` just lets you search through the index right away instead of having to travel to the index first and then search through it.
+
+*** Org (org-mode)
+Taking notes, managing TODO lists, and much much more.
+
+** Minor Modes
+*** Auto Fill (auto-fill-mode)
+Inserts newlines when a line gets too long.
+
+*** Refill (refill-mode)
+Basically Auto Fill mode but dynamic. Prevents you from having to type M-q all the time.
+
+*** Visual Line (visual-line-mode)
+Wraps the line on word boundaries.
+
+*** Visible (visible-mode)
+Makes invisible text visible. I believe invisible text is stuff like markdown which emacs might display in a different way (like having headers be bigger
+
+* Long Lines
+When a line is too long one of three things could be configured to happen:
+
+1. The line is wrapped at the edge of the window so it looks like multiple lines.
+   - The line could be wrapped on characters (so some words might get split up).
+   - The line could be wrapped but preserve entire words.
+2. The line is "truncated" i.e it just keeps flowing off the right edge of the window.
+3. The line is broken by actual newlines when the line gets too long.
+
+There are various configurations to accomplish any of these things.
+
+* Buffers vs. Files
+If I open a new file with C-x C-f and if I make modifications to that file then it will not let me close it until the changes are saved or until I force closing it. If I create a new buffer with `C-x b` though, I can kill that buffer and not get yelled at for not saving changes. It seems that buffers not attached to files are really disposable.
+
+* OS Specific Notes
+** Mac
+- By default C-up and C-down are taken by mission control. So go to System Preferences > Mission Control and remove those.
+
