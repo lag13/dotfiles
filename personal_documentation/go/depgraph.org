@@ -1,0 +1,5 @@
+* About
+Make a dependency graph of go source code
+
+- [[https://github.com/kisielk/godepgraph]]
+- [[https://github.com/davecheney/graphpkg]]

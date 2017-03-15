@@ -109,3 +109,10 @@ Run In The Background
 I guess you're not supposed to just put '&' at the end of a command to run it
 in the background, you are supposed to do this:
 https://circleci.com/docs/background-process/
+
+Debugging With a Browser
+------------------------
+
+Turns out that you can use a browser to debug circleci. So you can get
+a view into what is actually happening:
+https://circleci.com/docs/1.0/browser-debugging

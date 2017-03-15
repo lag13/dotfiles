@@ -3,14 +3,54 @@ Personal notes about emacs to help me learn.
 
 My emacs journey is starting. What am I getting myself into?
 
+** Links
+- [[https://www.masteringemacs.org]]
+- [[http://ergoemacs.org]]
+
 * Questions
 - In the tutorial around line 370 they said that typing <Return> will insert the newline and line the cursor up with the text above it. When I tried it didn't work. I wonder if some binding I have is off? Or maybe the tutorial is just a bit outdated? TURNS OUT that this option was set in my config: (setq electric-indent-mode nil) which seemed to turn off that behavior. Should the tutorial be upated so if that option is nil then it has some red text about how the configuration is different and all?
 - On line 566 of the tutorial it says to save the TUTORIAL buffer with C-x C-s and it seems to suggest that when you do those commands the buffer will just be saved right away but for me it asks what the name of the file should be/where to save it. Is this a bug or configuration? It also says that the save message should be "Wrote ...TUTORIAL" but mine was different.
+- [[info:emacs#Completion%20Styles][info:emacs#Completion Styles]] says buffer completion by default does the "basic" and "substring" styles of completion. But it seems like it also uses the "partial-completion" style. Mistake? Or am I mistaken?
+- [[info:emacs#Completion%20Options][info:emacs#Completion Options]] says read-file-name-completion-ignore-case defaults to nil but it defaults to t.
+- [[info:emacs#Yes%20or%20No%20Prompts][info:emacs#Yes or No Prompts]] says, "use the history commands ‘M-p’ and ‘M-f" but I don't think M-f is a history command did they mean M-n?
+- Is there any reason you would not want to document things using that Info format? Why is Org mode better?
+- I tried narrowing the view when viewing the emacs manual and when I widened it again I saw all nodes (14.5 and 14.6, etc...) in the same buffer. So it seems that's a bug?
 
 * TODOs
-- Configure RET in org mode to open the link if the cursor is on the link
+- Make a binding for org-store-link. Perhaps C-c l which is similar to it's C-c C-l counterpart to insert a link.
+- Modifiy the org C-c C-o binding so that if the link cannot be found after the point then it will search backward on the current line maybe if that cannot be found it will search forward to the next link in the document wherever it is.
 - Consider activating the org-indent-mode minor mode so these outlines are indented based on headers. Or should I do this manually myself? Or configure emacs so it tries to indent things by default?
-- Figure out how to link to documentation from within an org mode document like this because that could be pretty nifty to have my thoughts written down but backed up by documentation. Also, is there any reason you would not want to document things using that Info format? Why is Org mode better?
+- Figure out how to make emacs reload a buffer automatically (or at least give a warning) if and when the file changes.
+- Figure out how to make something copied onto the clipboard part of the kill ring. I'll have to look at [[info:emacs#Cut%20and%20Paste][info:emacs#Cut and Paste]] for more details. Because right now if I yank and something was killed more recently than something that was copied onto the clipboard, it will yank the kill ring instead of the clipboard. Perhaps it would be nice to put clipboard copies onto the kill ring.
+- Figure out how to do tab completion in normal buffers
+- Have a shell running inside of emacs. Figure out how to get multiple shells as well.
+- How do you edit an existing search command? I was trying to get a regex going and needed to edit parts of it but if you do most commands like C-a it will move you in the main buffer, not the minibuffer
+- How do you copy things without killing them? I know about M-w but that's only if you have something selected. It's a lot easier to do M-d but then you have to undo because it kills the text.
+- Searching does that incremental search thing by default which is nice. But if the next search item is behind you it looks like there is no item to search for. In vim it would still wrap around the incremental search.
+- Can we just type the text we want to add to a rectangle like with vim visual block? There is a function to do it but that seems a bit more clunky than just typing.
+- Can we configure completion so that if you type tab and NOTHING more gets completed, it will immediately open the completion menu?
+- Set read-file-name-completion-ignore-case to nil because I like case insensitive file specifications. I didn't realize Mac OS uses case insensitive files by default!!
+- How do we go backwards through the kill ring? Like the opposite of M-y
+- Set completion-cycle-threshold to some low number like 3 so that if there are only 3 completion possibilities it will cycle through them.
+- See if there is a way to get multitple tabs (like vim). Since I think if I use emacs for everything (shell's included) it will be nice to have a tab just for a layout of shells like I have with tmux. Or something like that.
+- If you enter a command that has a keybinding emacs will tell you about it. Configure that message so it lasts long
+- Learn more about how the global mark ring works, the explanation confused me a bit and I think it could be a useful navigation tool.
+- Map M-<SPC> to cycle-spacing instead of just-one-space which does the same on first invocation anyway. Then again maybe this is silly, I don't even know if I'll use that command
+- Maybe add a mapping for string-insert-rectangle? Also is there any way to make that command show the text being modified as you type? That could be neat.
+- Why does this exist: [[info:emacs#Rectangle%20Registers][info:emacs#Rectangle Registers]]?. It seems that just saving plain text has the same effect as copying a region.
+- You can save window configurations in registers which saves what windows were open as well as what buffers they contained and where the point was in those buffers. Maybe I could leverage this feature to get "tabs" in emacs.
+- Maybe configure C-c C-o in other modes (if it is not taken) so that I can open links outside of org mode as well.
+- So emacs has some "View" mode (which I am not familiar with) for browsing files. Perhaps you have similar bindings that you might have for browsing documentation. I wonder if it could be a fun thing to make a binding to turn view mode on/off, then you can browse files more easily and when you edit you exit view mode. Although at that point its starting to feel just like vim :).
+- For holidays alter the point to be a pumpkin or santa or something like that
+- Enable show-trailing-whitespace so that trailing whitespace is highlighted, or should I just create some sort of automatic thing that removes it so I don't need to worry about it? I can't think of any situation where I've wanted trailing whitespace. The only one offhand would be that language which only uses space and tab characters :). [[info:emacs#Useless%20Whitespace][info:emacs#Useless Whitespace]]
+- Figure out how to use emacs as a PDF viewer because some textbooks and stuff are in a PDF format and it would be nice if I could just read them inside of emacs
+- Is there a "search for this word under the cursor" like vim's '*' command?
+- rgrep is the command to recursively grep for stuff. It actually uses the 'find' command for the recursive bit and find is configured to igore a lot of directories. Can I configure it to ignore 'vendor' by default as well?
+- If you type <TAB> and that match is the "Sole completion" could we configure tab to just open the file?
+- Learn more about how to quickly do search and replace with stuff. I just had to change occurrences of: count and Count to page_size, pageSize, and PageSize and it took me quite a while. The problem was that some of the "count"s were in a string and were supposed to be page_size and some of them were Go variables so they needed to be converted to camel case. Is there a way to make those sorts of changes quickly and easily?
+- Right now if you do an I-search and you type some stuff that cannot be found, it is highlighted red in the minibuffer. The first C-g you do will erase that "red" invalid text and the second one would quit. I sort of feel like <DEL> should remove that invalid text instead?
+- Is there a binding to sequentially visit files in a given directory?
+- Don't create any "backup" files when editing. I just accidentally added them when doing git stuff and I don't really like them anyway.
 
 * Terms and Miscellaneous Notes
 - It seems that most "file" related commands or just general commands not strictly related to manipulating text start with C-x.
@@ -26,18 +66,42 @@ My emacs journey is starting. What am I getting myself into?
 - echo area - if you are typing commands slowly (like C-u pause... 123 pause...) then the command as typed so far will show up here. This is also where messages show up.
 - mode line - the line immediately above the echo line. It is basically vim's status bar showing things like file name, whether the file was modified, and the modes that are active for the buffer.
 - recursive editing levels - don't really know what these are yet. Apparently though, you are in a recursive editing level if there are square brackets around the major mode. For example, you might see [(Fundamental)] instead of (Fundamental).
+- logical line - a string ending in a newline. Sometimes even though a line does appears that it spans multiple lines, that might be because it is "wrapped" at the edge of the window. Even though it looks like multiple lines, it is still one "logical line" because there is no newline at the edge of the window.
+- screen line - a line as you see it on the screen
+- a command is a function but a function is not necessarily a command
+- Mark - an arbitrary point in text that was specified. It's just like a vim mark. Setting the mark means you place it, activating it means that the region will be highlighted
+- Region - the text between the mark and the point
+- Mark Ring - Each buffer remember previous mark locations in a local "mark ring".
+- Global Mark Ring - Every time a mark is made it is also saved in a "global mark ring". I'm a little confused by the description of how it works though. It says that when you set a mark, the old mark will be pushed onto the local mark ring. The old mark will also be pushed onto the global mark ring if the "previous" mark (not sure what they mean here by previous) was set in another buffer.
+- Register - compartments to save text, rectangles, positions (you can jump between buffers), window configurations, and macros! Register names are [a-zA-Z0-9]
+- Bookmarks - record files and positions in them. The only difference between them and registers is that they can have descriptive names and they persiste between emacs sessions.
+- Faces - When emacs displays text differently, that is called a "face".
+
+** Modifiers
+- s - the "super key": [[https://superuser.com/questions/204946/what-is-emacs-keybinding-s-u]]
 
 * Command Reference
 - C-x C-s (save-buffer) - save file
+- C-x C-w (write-file) - save a buffer under a different name. Also uses the current buffer to edit that new file.
 - C-x s (save-some-buffers) - for each modified buffer corresponding to a file, ask the user if they want to save that buffer
-- C-x C-c - quit emacs
-- C-x C-f - open a new file
-- C-x b - switch to an existing buffer or you can open new buffers
+- C-x C-c (save-buffers-kill-terminal) - quit emacs
+- C-x C-f (find-file) - open a new file. If you start typing a new absolute path so (/will/not/use/~/new/path) the ~/new/path part will be used.
+- C-x b - switch to an existing buffer or you can open new buffers. By default it will switch to the last buffer visited unless that buffer is already visible in a window then it will choose the next buffer visited.
 - C-x k - kill the current buffer
 - C-g - stop the current command
-- M-x <function> (smex) - run an arbitrary command
-- C-/ - undo
-- C-spc - set the mark (basically the equivalent of starting visual mode in vim)
+- M-x <function> (execute-extended-command) - run an arbitrary command
+- C-/ (undo) - undo. When used on a region, it will undo changes only in that region.
+- C-<SPC> (set-mark-command) - set the mark (basically the equivalent of starting visual mode in vim). Prefix it to jump back to previous mark positions.
+- C-x C-<SPC> (pop-global-mark) - jumps to the buffer and position fo the global mark ring.
+- C-<SPC> C-<SPC> - set the mark then deactivate it
+- C-x C-x - exchanges the mark and point positions. Prefix it to not have highlighting.
+- M-h (mark-paragraph) - move point to beginning of paragraph and set mark at the end
+- C-x h (mark-whole-buffer) - highlight the entire buffer
+- C-x <SPC> (rectangle-mark-mode) - start rectangle mark mode (i.e vim's visual block mode)
+- C-x C-l (downcase-region) - lowercase the region
+- C-x C-l (upcase-region) - uppercase the region
+- string-insert-rectangle - insert text where the rectangle starts
+- M-{ and M-} - move by paragraph
 - C-k (kill-line) - kills the line from the point to the end of theline
 - C-w (kill-region) - kills the region of text
 - M-w (kill-ring-save) - copy the selected region
@@ -45,15 +109,7 @@ My emacs journey is starting. What am I getting myself into?
 - C-y - yanks the text we just killed
 - M-y - cycle through the kill ring after yanking
 - C-j - equivalent of return followed by tab
-- M-\ - delete space surrounding the point
-- C-h k <key-binding> - describe the function for the key binding
-- C-h c <key-binding> - echo a brief description of the key binding
-- C-h f <function> - describe the function
-- C-h m - describe the major and minor modes you are in
-- C-h v - documentation on variables
-- C-h a <command> - command apropos (you can see all commands with "command" in their name)
-- C-h i - read the included manuals (like for any installed packages). Inside this manual do `m <menu-name>` to go into that documentation. Type ? to get help. Man this emacs documentation is slick.
-- C-h r - goes directly into the emacs manual which is a good reference. You could also get here by going through the C-h i page.
+- M-\ (delete-horizontal-space) - delete space surrounding the point
 - C-x o (other-window) - switch windows
 - C-x 0 (delete-window) - closes the current window
 - C-x 1 (delete-other-windows) - closes all windows except the current one
@@ -64,14 +120,62 @@ My emacs journey is starting. What am I getting myself into?
 - When C-n and C-p scroll off the screen by default it seems that that text gets moved to the center of the screen.
 - M-a (backward-sentence) - move back a sentence
 - M-e (forward-sentence) - move forward a sentence
-- C-u <number> <command> - If you type C-u then a number the next command you type will be repeated that many times. For instance you can do `C-u 19 a' and it will insert 19 "a" characters. You can also hold down the meta key while typing the numbers if you don't want to press C-u for some reason. `C-u 10 C-f` would move forward 10 characters.
+- C-u <number> <command> (universal-argument) - If you type C-u then a number the next command you type will be repeated that many times. For instance you can do `C-u 19 a' and it will insert 19 "a" characters. You can also hold down the meta key while typing the numbers if you don't want to press C-u. `C-u 10 C-f` would move forward 10 characters. C-u by itself passes 4 to the next function and repeating it multiplies by 4 each time.
 - M-k (kill-sentence) - kill to the end of the current sentence
+- M-% (query-replace) - verifies if you want to replace something before doing the replacement. C-w to delete the replacement and enter recursive edit. C-r to edit recursive edit. C-M-c to get out of recursive edit.
 - replace-string - an interactive command to replace one string with another after the point. If you have a region defined then it will only replace in that region.
 - C-x f (set-fill-column)  - set the fill-column (i.e the width at which point lines will automatically wrap if the Auto Fill mode is on)
 - M-q (fill-paragraph) - same as gwip in vim.
 - C-s (isearch-forward) - does a forward search type C-s again to proceed to the next search match. If you type delete after doing C-s it will go to previous search match locations until you reach the one you started from and then it will actually edit the minibuffer.
 - C-r (isearch-backward) - same as above but does the search backward
 - C-M-v (scroll-other-window) - Does a C-v but in the "other" window (so you don't leave the window you are viewing).
+- C-M-S-v (scroll-other-window-down) - Opposite of C-M-v
+- M-r (move-to-window-line-top-bottom) - moves the point between top-middle-bottom
+- M-g g or M-g M-g (goto-line) - go to specified line number
+- M-g <TAB> (move-to-column) - go to specified column
+- C-x C-v (find-alternate-file) - kills the current buffer and opens the specified file in a new buffer (or just switch to the buffer containing the file). You can also do C-x C-f and select the current file.
+- s-u (revert-buffer) - also reloads the current buffer from the file.
+- C-o (open-line) - inserts a line after the point
+- C-x C-o (delete-blank-lines) - delete all surrounding blank lines leaving only one.
+- M-= (count-words-region) - counts the number of lines words and chars in a region.
+- C-x z (repeat) - repeats the last command, whatever it was. You can keep typing 'z' after this command to keep repeating things.
+- C-x <ESC> <ESC> (repeat-complex-command) - repeats a command which used the minibuffer so it calls it again with all the arguments you gave it and stuff like that.
+p- M-^ (delete-indentation) - joins current line to the previous one
+- M-z CHAR (zap-to-char) - kills through the next occurrence of CHAR
+- C-x < (scroll-left) - scrolls the text to the left (so you're field of view moves right)
+- C-x > (scroll-right) - opposite of above. These commands don't seem super user friendly as they scroll the screen but keep the point where it is. Also you can't go back to the previous screen just by scrolling the point, it's almost as if the window has permanently settled on a new location.
+- C-x n n (narrow-to-region) - Makes it so that the region is the only text you can see. Used, I suppose, to focus on just one area.
+- C-x n w (widen) - Undos the narrowing
+- C-x C-+, C-x C-= - increases font size
+- C-x C-- - decreases font size
+- C-x $ - with numeric argument, hide text >= than N columns of indentation
+
+** Help
+- C-h C-h - display all possible help bindings
+- C-h C-f - emacs FAQ
+- C-h c <key-binding> - echo a brief description of the key binding
+- C-h k <key-binding> - describe the key binding
+- C-h K <key-binding> - brings you to the documentation for that key in the manual
+- C-h f <function> - describe the function
+- C-h F <function> - bring up the manual for the function
+- C-h m - describe the modes the current buffer is in
+- C-h l (view-lossage) - see a history of entered commands
+- C-h v <variable> - documentation on variables
+- For the apropos commands <topics> can be a bunch of words or a regex which is very nifty: [[info:emacs#Apropos]]
+- C-h a <topics> (apropos-command) - command apropos (searches for all commands that have "topics" in their name)
+- C-h d <topics> (apropos-documentation) - like C-h a but searches for all documentation (variables, modes, commands, etc...) with the topics.
+- C-h i - read the included manuals (like for any installed packages). Inside this manual do `m <menu-name>` to go into that documentation. Type ? to get help. Man this emacs documentation is slick.
+- C-h r - goes directly into the emacs manual which is a good reference. You could also get here by going through the C-h i page.
+- C-h p - displays emacs packages based on keywords (i.e it groups packages by those with common keywords and presents those keywords to you, you can drill down to see the packages)
+- Doing C-h after a prefix key like C-x will list all the possible keys that come after C-x
+- C-h e - displays the *Messages* buffer
+
+** Minibuffer
+- M-v (switch-to-completions) - moves the cursor to the list of completions.
+- M-p (previous-history-element) - pulls up the previous commands
+- M-n (next-history-element) - opposite of M-p
+- M-r (previous-matching-history-element) - finds the previous command matching a regex
+- M-s (next-matching-history-element) - finds the next command matching a regex
 
 * Modes
 A collection of key bindings and functions packaged together to serve a particular purpose.
@@ -87,6 +191,16 @@ For writing text for humans to read.
 
 *** Info (Info-mode)
 A file format used by GNU for documentation. The emacs manual and associated packages are documented in this format.
+
+*** Help (help-mode)
+For viewing help text and navigating in it.
+
+**** Command Reference
+It has a lot of similar commands as the Info mode such as <TAB> and <RET>
+
+- C-c C-c (help-follow-symbol) - goes to the help for the symbol under the point
+- r (help-go-forward) - go forward to next help topic
+- l (help-go-back) - go back to previous help topic
 
 **** Command Reference
 - <SPC> - scroll window down and depth first search (dfs) to next node if at the end of current node.
@@ -111,6 +225,26 @@ A file format used by GNU for documentation. The emacs manual and associated pac
 *** Org (org-mode)
 Taking notes, managing TODO lists, and much much more.
 
+**** Command Reference
+- M-<RET> (org-meta-return) - insert another element like has come before (doing this on a list will add another list item)
+- <TAB> (org-cycle) - cycles through collapsing and opening the text under headers and lists
+- C-c C-o (org-open-at-point) - open link under the point
+- org-store-link - store an org mode link to the current location. It can later be inserted with C-c C-l
+- C-c C-l (org-insert-link) - inserts a link into the org document (basically just does the formatting bit for you)
+- C-c C-M-l (org-insert-all-links) - insert all stored links
+
+*** Dired (dired)
+The directory editor. Lets perform operations on files such as moving, renaming, and deleting.
+
+**** Command Reference
+- C-x d (dired) - Starts dired using the directory of the current file
+- C-x C-f - If you edit a directory with this command dired will also start
+- n - move point to next file
+- p - move point to previous file
+- <RET> - edit the file under the point
+- o - open file under point in a split and move point to that split
+- C-o - same as o but keep point in current window
+
 ** Minor Modes
 *** Auto Fill (auto-fill-mode)
 Inserts newlines when a line gets too long.
@@ -124,6 +258,33 @@ Wraps the line on word boundaries.
 *** Visible (visible-mode)
 Makes invisible text visible. I believe invisible text is stuff like markdown which emacs might display in a different way (like having headers be bigger
 
+*** Org Indent (org-indent-mode)
+Indent the text of an org mode document based on how nested the headers are. The idea is that for nested headers it is sometimes cleaner if they are actually indented rather than just adding more stars. This is purely a dynamic display sort of thing, it does not actually alter the content of the document.
+
+*** Hl-Line (hl-line-mode)
+Highlights the line that the cursor is on.
+
+*** Size Indication (size-indication-mode)
+Displays the size of the buffer in the mode line.
+
+*** Minibuffer Electric Default (minibuffer-electric-default-mode)
+Hides the default argument shown by some commands using the minibuffer when you start typing something else. Can also be configured so instead of displaying (default the-default) it will just display (the-default).
+
+*** Delete Selection (delete-selection-mode)
+Typing characters in the region will delete the region before typing the character.
+
+*** Common User Access (CUA) (cua-mode)
+Modifies keys to be more "standard" for instance C-x, C-c, C-v, and C-z will perform their "typical" cut, copy, paste, and undo functions but I think that's only if the region is active. Sounds confusing. It does other things as well.
+
+*** Font Lock (font-lock-mode)
+This mode enables syntax highlighting for buffers. Major modes will tell Font Lock which text to give faces to.
+
+*** Highlight Changes (highlight-changes-mode)
+Highlights changes you make to the buffer.
+
+*** Hi Lock (hi-lock-mode)
+Highlight text that matches a specified regular expression.
+
 * Long Lines
 When a line is too long one of three things could be configured to happen:
 
@@ -135,10 +296,31 @@ When a line is too long one of three things could be configured to happen:
 
 There are various configurations to accomplish any of these things.
 
+* Version Control (VC)
+Emacs ships with a generic version control front end called "VC" which works with several different VCS's such as Git and Mercurial.
+
+** Command Reference
+- C-x v r (vc-retrieve-tag) - Switch to a new branch
+- C-x v + (vc-update or vc-pull) - Update the current branch 
+- C-x v = (vc-diff) - diffs the current file against it's revision
+- C-x v i (vc-register) - Start tracking the current file.
+
 * Buffers vs. Files
 If I open a new file with C-x C-f and if I make modifications to that file then it will not let me close it until the changes are saved or until I force closing it. If I create a new buffer with `C-x b` though, I can kill that buffer and not get yelled at for not saving changes. It seems that buffers not attached to files are really disposable.
+
+* Vim vs. Emacs
+Notes about how I think vim and emacs compare to eachother.
+
+** Things I Like From Vim
+- Editing commands that work on a entire lines. Right now it feels like if I want to delete an entire section of lines I have to carefully select the appropriate region taking care to get the newlines and then you have to put your cursor in just the right spot to get the paste to work as desired. Linewise copies+pastes are very nice.
+
+** Things I Like From Emacs
+- Documentation. Holy shit. Don't get me wrong, vim has fantastic documentation but it always kind of felt like you had to know what you were looking for if you wanted to find something. And navigating it felt a little clunkier. But emacs documentation is extremely comprehensive and dynamic and very nice to navigate around. It will even link you to the source code implementing some function if you are really curious!!! Also, if you run a command using M-x and that command has a key binding, it will tell you!!! That is frickin' amazing.
 
 * OS Specific Notes
 ** Mac
 - By default C-up and C-down are taken by mission control. So go to System Preferences > Mission Control and remove those.
+- The "super" key by default is the Cmd key.
 
+
+foo

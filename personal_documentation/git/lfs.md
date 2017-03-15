@@ -25,3 +25,12 @@ enough information for lfs to download it when needed and that "pointer" file
 gets pushed to github. The file itself is pushed to an lfs server. You never
 see these "pointer" files though (even on github), it all happens
 transparently.
+
+Start Using
+-----------
+
+```
+brew install git-lfs && git lfs install
+git lfs track "*.psd" # Specify files just like with .gitignore
+git add .gitattributes # This file is used by lfs to determine which files to track
+```
