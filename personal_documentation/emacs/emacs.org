@@ -14,7 +14,10 @@ My emacs journey is starting. What am I getting myself into?
 - [[info:emacs#Completion%20Options][info:emacs#Completion Options]] says read-file-name-completion-ignore-case defaults to nil but it defaults to t.
 - [[info:emacs#Yes%20or%20No%20Prompts][info:emacs#Yes or No Prompts]] says, "use the history commands ‘M-p’ and ‘M-f" but I don't think M-f is a history command did they mean M-n?
 - Is there any reason you would not want to document things using that Info format? Why is Org mode better?
-- I tried narrowing the view when viewing the emacs manual and when I widened it again I saw all nodes (14.5 and 14.6, etc...) in the same buffer. So it seems that's a bug?
+- When showing filed completion options of something like "/hello/~/test" it will show the prefix /hello/ even though I think it probably should not.
+- I see (defcustom ido-mode...) AND (defun ido-mode...) it would appear that one is used for the custom menu and the other for when you manually edit the init file. Confusing
+- [[https://www.masteringemacs.org/article/effective-editing-movement]] he talks about "Moving Forward and Backward in Lists" but never lists their commands it seems
+- Why do packages get loaded after the init file? It doesn't really make sense to me. I just don't see a reason why you wouldn't want to load all the packages and stuff BEFORE configuration. And actually, it looks like the (package-initialize) function is actually writing a call to itself in the init file. So it would appear that the elpa package authors want packages to be loaded before the init file by default?
 
 * TODOs
 - Make a binding for org-store-link. Perhaps C-c l which is similar to it's C-c C-l counterpart to insert a link.
@@ -50,7 +53,29 @@ My emacs journey is starting. What am I getting myself into?
 - Learn more about how to quickly do search and replace with stuff. I just had to change occurrences of: count and Count to page_size, pageSize, and PageSize and it took me quite a while. The problem was that some of the "count"s were in a string and were supposed to be page_size and some of them were Go variables so they needed to be converted to camel case. Is there a way to make those sorts of changes quickly and easily?
 - Right now if you do an I-search and you type some stuff that cannot be found, it is highlighted red in the minibuffer. The first C-g you do will erase that "red" invalid text and the second one would quit. I sort of feel like <DEL> should remove that invalid text instead?
 - Is there a binding to sequentially visit files in a given directory?
-- Don't create any "backup" files when editing. I just accidentally added them when doing git stuff and I don't really like them anyway.
+- Don't create any "backup" files when editing. I just accidentally added them when doing git stuff and I don't really like them anyway. [[info:emacs#Backup]]. It seems that emacs also creates a "lock" file when you have unedited changes, I think I'd like to turn this off as well: [[info:emacs#Interlocking]].
+- How do I print with emacs? I'd be curious to see how vim does it as well. I would like to learn the internal details of how printing works.
+- Get spellcheck working: [[info:emacs#Spelling]].
+- Remember the `default-directory` variable, maybe I could hijack it if I wanted to emulate my vim way of having tabs for each project.
+- Figure out how I want to make buffer names unique: [[info:emacs#Uniquify]]
+- Make the auto-save use the current file name or turn it off, because right now it auto-saves to a new file: [[info:emacs#Auto%20Save][info:emacs#Auto Save]]
+- I guess there is a file name cache, I wonder if that could be used to more quickly navigate files using vanilla emacs: [[info:emacs#File%20Name%20Cache][info:emacs#File Name Cache]]
+- Look into filesets which also might be a way to more efficiently work with files: [[info:emacs#Filesets]]
+- Play with icomplete mode: [[info:emacs#Icomplete]]
+- Learn more specifics about when the current window gets reused or when the buffer is opened in another window.
+- Enable the built in tab completion feature: [[info:emacs#Indent%20Convenience][info:emacs#Indent Convenience]]
+- For the C-x <left>/<right> command, make it so after doing the first one you can just hit left or right to move through buffers. Or should I just make that the functionality of left and right?
+- Learn how to open a file, as if you were double clicking on it, from inside emacs. There are many times I have to pop open a finder window and go to the place that emacs already is just so I can double click on some file
+- How to delete a lot of lines which do not match some regex.
+- Could we do a save everytime we move away from the emacs frame? Like when I switch applications?
+- Display the full path to the current buffer which is holding a file.
+- Plugin or something which looks for TODO: comments in the files I am changing. Perhaps it's some git hook which checks all files in a commit for those TODO comments.
+- Delete from point to the beginning of the line
+- I had to replace "tokenVerifier" and "TokenVerifier" with "tokenValidator" and "TokenValidator" respectively. When I did the M-x query-replace it didn't get the "TokenValidator" one, but I thought it would? I gotta read up again on how emacs handles replacing because I seem to remember reading that it'd be able to handle that.
+- C-M-b exists which makes me feel like C-M-<DEL> should exist too but it does not. Should I make the binding?
+- Maybe consider auto-refreshing the Dired buffer upon entry
+- I think I'll want to disable the directory local option. Feel like I have no use for it and it probably slows things down a bit: [[info:emacs#Directory%20Variables][info:emacs#Directory Variables]].
+- I just learned about exec-path. What would be a good way to reconcile exec-path and PATH? I want them to be the same if possible. Maybe it's just not a big deal, after all if one is missing a path I could just add it quick.
 
 * Terms and Miscellaneous Notes
 - It seems that most "file" related commands or just general commands not strictly related to manipulating text start with C-x.
@@ -76,6 +101,10 @@ My emacs journey is starting. What am I getting myself into?
 - Register - compartments to save text, rectangles, positions (you can jump between buffers), window configurations, and macros! Register names are [a-zA-Z0-9]
 - Bookmarks - record files and positions in them. The only difference between them and registers is that they can have descriptive names and they persiste between emacs sessions.
 - Faces - When emacs displays text differently, that is called a "face".
+- Undo/Redo - You can keep doing more undo's by repeating C-/. Whenver you do a command that is not C-/ (like C-f) all those undo's you have done are themselves placed into the undo record as a single set of changes. So you almost never lose stuff. It is a bit confusing though. You can also highlight a region and undo will only apply in that region.
+- Each buffer has a local variable called `default-directory` which defaults to the directory the file resides in. You can change it with the `cd` command and view it with the `pwd` command.
+- Emacs has a capability to keep identical copies of certain files in different places, possibly on different machines, and it calls these "shadow" files. Sweet.
+- It would seem that emacs gives you the ability to "disable" functions entirely. Neat! So functions have properties that you can change?
 
 ** Modifiers
 - s - the "super key": [[https://superuser.com/questions/204946/what-is-emacs-keybinding-s-u]]
@@ -87,6 +116,8 @@ My emacs journey is starting. What am I getting myself into?
 - C-x C-c (save-buffers-kill-terminal) - quit emacs
 - C-x C-f (find-file) - open a new file. If you start typing a new absolute path so (/will/not/use/~/new/path) the ~/new/path part will be used.
 - C-x b - switch to an existing buffer or you can open new buffers. By default it will switch to the last buffer visited unless that buffer is already visible in a window then it will choose the next buffer visited.
+- C-x C-b (list-buffers) - lists buffers with more recent ones near the top. Give a prefix to list only file visiting buffers.
+- C-x <left>/<right> - go to recently visited older/newer buffers
 - C-x k - kill the current buffer
 - C-g - stop the current command
 - M-x <function> (execute-extended-command) - run an arbitrary command
@@ -140,7 +171,7 @@ My emacs journey is starting. What am I getting myself into?
 - M-= (count-words-region) - counts the number of lines words and chars in a region.
 - C-x z (repeat) - repeats the last command, whatever it was. You can keep typing 'z' after this command to keep repeating things.
 - C-x <ESC> <ESC> (repeat-complex-command) - repeats a command which used the minibuffer so it calls it again with all the arguments you gave it and stuff like that.
-p- M-^ (delete-indentation) - joins current line to the previous one
+- M-^ (delete-indentation) - joins current line to the previous one
 - M-z CHAR (zap-to-char) - kills through the next occurrence of CHAR
 - C-x < (scroll-left) - scrolls the text to the left (so you're field of view moves right)
 - C-x > (scroll-right) - opposite of above. These commands don't seem super user friendly as they scroll the screen but keep the point where it is. Also you can't go back to the previous screen just by scrolling the point, it's almost as if the window has permanently settled on a new location.
@@ -149,6 +180,38 @@ p- M-^ (delete-indentation) - joins current line to the previous one
 - C-x C-+, C-x C-= - increases font size
 - C-x C-- - decreases font size
 - C-x $ - with numeric argument, hide text >= than N columns of indentation
+- C-t (transpose-chars) - switch two characters
+- M-t (transpose-words) - switch two words
+- C-x C-t (transpose-lines) - switch two lines
+- M-l (downcase-word) - give negative argument to do it on prev word
+- M-u (upcase-word)
+- M-c (capitalize-word) - make first letter capital
+- C-x q (kbd-macro-query) - query the user during macro execution.
+- C-x C-k r (apply-macro-to-region-lines) - Applies the keyboard macro to all lines in the region.
+- C-x C-k n (kmacro-name-last-macro) - Gives a command name for the most recently defined macro. Then you can execute it with M-x.
+- C-x C-d (list-directory) - basically does ls. With C-u it does ls -l.
+- M-x make-directory - creates a directory
+- M-x delete-directory - deletes a directory
+- M-x delete-file
+- M-x vc-delete-file
+- M-x copy-file
+- M-x copy-directory
+- M-x rename-file
+- M-x vc-rename-file
+- M-x clean-buffer-list - deletes buffers which haven't been used in some amount of time.
+- C-M-a - moves to beginning of function
+- C-M-e - moves to end of function
+- C-M-h - puts point at beginning and mark at end of function
+- C-M-f - move over balanced expression (such as pairs of parens, brackets, quotes)
+- C-M-b - opposite of above
+- C-M-d - moves you "down" into a balanced expression (because C-M-f will only move you "across them").
+- C-M-u - opposite of C-M-d
+- C-M-k - kill balanced expression forward
+- C-M-<SPC> - put mark after the following expression
+- C-x C-; - toggle comment in current line or region
+- M-x occur - see how many occurrences of a regex
+- M-g M-n - go to next "error" where error could be positions output from grep
+- M-g M-p - opposite of above
 
 ** Help
 - C-h C-h - display all possible help bindings
@@ -245,6 +308,9 @@ The directory editor. Lets perform operations on files such as moving, renaming,
 - o - open file under point in a split and move point to that split
 - C-o - same as o but keep point in current window
 
+*** Image (image-mode)
+For viewing images.
+
 ** Minor Modes
 *** Auto Fill (auto-fill-mode)
 Inserts newlines when a line gets too long.
@@ -285,6 +351,12 @@ Highlights changes you make to the buffer.
 *** Hi Lock (hi-lock-mode)
 Highlight text that matches a specified regular expression.
 
+*** Midnight (midnight-mode)
+Runs the functions you have placed in the midnight-hook every night at midnight.
+
+*** Icomplete (icomplete-mode)
+Typing in the minibuffer coninuously displays a list of possible completions.
+
 * Long Lines
 When a line is too long one of three things could be configured to happen:
 
@@ -308,14 +380,27 @@ Emacs ships with a generic version control front end called "VC" which works wit
 * Buffers vs. Files
 If I open a new file with C-x C-f and if I make modifications to that file then it will not let me close it until the changes are saved or until I force closing it. If I create a new buffer with `C-x b` though, I can kill that buffer and not get yelled at for not saving changes. It seems that buffers not attached to files are really disposable.
 
-* Vim vs. Emacs
+* Vim vs. Emacs and Thoughts About a Better Editor
 Notes about how I think vim and emacs compare to eachother.
 
 ** Things I Like From Vim
 - Editing commands that work on a entire lines. Right now it feels like if I want to delete an entire section of lines I have to carefully select the appropriate region taking care to get the newlines and then you have to put your cursor in just the right spot to get the paste to work as desired. Linewise copies+pastes are very nice.
+- Working on ranges of lines seems very clean/consistent. You just have one command to remember and basically you give it different ranges depending on what you want to do. In emacs it feels like there is one command to change things after the point and another to work inside a region.
+- How undo works. With emacs it feels like I often need to "spam" undo to get back to the previous state that I want. And when I do undo things, it just makes the undo state more messy! With vim this is not the case, undo's are nicely "chunked" so I only have have to hit undo a couple of times and undoing doesn't add more undo information as it does with emacs.
+- The '*' command. It only does one simple thing, but it is rather nice. Maybe emacs has another way though?
 
 ** Things I Like From Emacs
-- Documentation. Holy shit. Don't get me wrong, vim has fantastic documentation but it always kind of felt like you had to know what you were looking for if you wanted to find something. And navigating it felt a little clunkier. But emacs documentation is extremely comprehensive and dynamic and very nice to navigate around. It will even link you to the source code implementing some function if you are really curious!!! Also, if you run a command using M-x and that command has a key binding, it will tell you!!! That is frickin' amazing.
+- Documentation. Holy shit. Don't get me wrong, vim has fantastic documentation but it always felt like you had to know what you were looking for if you wanted to find something. And navigating it felt a little clunkier. But emacs documentation is extremely comprehensive and dynamic and very nice to navigate around. It will even link you to the source code implementing some function if you are really curious!!!
+- Emacs seems very user friendly in general, offering nice defaults with commands (like switching to the previous buffer if you type nothing with C-x b) AND if you run a command using M-x and that command has a key binding, it will tell you that key binding!!! That is frickin' amazing.
+
+** A Better "editor"
+My thoughts on traits that a better "editor" should have
+
+- linewise operations from vim. I feel like the only reason emacs' C-a goes to the beginning of the line is to facilitate linewise deletes and pastes. But that would be unecessary if you had linewise selections.
+- we'll see how I feel about emacs keybindings after I play around with them a bit but I feel like they will be hard to remember. I think vim's operator+text-object model of editing might be "better"? Definitely less things to remember.
+- it should be more than just an editor. So it can do "non-editing" stuff like run a repl or whatever.
+- It should just have one well defined place where configuration lives. I think emacs can have 3 (or more) potential places where your init file lives. I think this is just confusing, there should only be one. And is there any reason to store this directory of configuration as a "dotfile"? I'm inclined to just have it be a regular directory name.
+- emacs puts a LOT of random stuff in .emacs.d (like high scores in tetris!) I feel like I would prefer it if my editor had one directory for stuff you'd consider commiting to github and another for random stuff like tetris high scores
 
 * OS Specific Notes
 ** Mac
@@ -323,4 +408,8 @@ Notes about how I think vim and emacs compare to eachother.
 - The "super" key by default is the Cmd key.
 
 
+
 foo
+BAR
+Bar
+bar

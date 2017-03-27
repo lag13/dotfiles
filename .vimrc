@@ -596,6 +596,13 @@ let g:go_fmt_command = "goimports"
 
 " }}}
 
+" Feels like for text objects which aren't also motions (like 'ip' and 'ap')
+" there should be a consitant interface to get to the start and end of the
+" text object. Like maybe 'm<text-object>' and 'M<text-object>' will move you
+" to the start and end of the text object. I wonder if that would be useful at
+" all. Probably just one of those things which seems aesthetically pleasing
+" but might not be that useful in practice.
+
 " Not sure if it would be useful (might be one of those things that takes up
 " more time than I'd ever save) but sometimes I'm reading code and wish I knew
 " what the input to some function is going to look like (probably I'm looking

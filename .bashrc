@@ -35,3 +35,6 @@ export PATH="/usr/local/php5/bin:$PATH"
 
 # show my ip address
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+
+# show users
+alias allusers="cut -d: -f1 /etc/passwd"

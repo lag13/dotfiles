@@ -4,11 +4,7 @@ JSON Web Tokens (JWT)
 - https://jwt.io
 - https://medium.facilelogin.com/jwt-jws-and-jwe-for-not-so-dummies-b63310d201a3#.f53hgew8t
 - https://auth0.com/learn/json-web-tokens
-
-Questions
----------
-
-- Hypothetically if you sent all data inside of a JWT token, would there be any need for https? Or is JWT only for transmitting small amounts of data like identifiers of the client? I'm just a little confused about all the players here and how they interact.
+- http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html
 
 About
 -----
