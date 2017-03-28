@@ -20,23 +20,19 @@ My emacs journey is starting. What am I getting myself into?
 - Why do packages get loaded after the init file? It doesn't really make sense to me. I just don't see a reason why you wouldn't want to load all the packages and stuff BEFORE configuration. And actually, it looks like the (package-initialize) function is actually writing a call to itself in the init file. So it would appear that the elpa package authors want packages to be loaded before the init file by default?
 
 * TODOs
-- Make a binding for org-store-link. Perhaps C-c l which is similar to it's C-c C-l counterpart to insert a link.
 - Modifiy the org C-c C-o binding so that if the link cannot be found after the point then it will search backward on the current line maybe if that cannot be found it will search forward to the next link in the document wherever it is.
 - Consider activating the org-indent-mode minor mode so these outlines are indented based on headers. Or should I do this manually myself? Or configure emacs so it tries to indent things by default?
-- Figure out how to make emacs reload a buffer automatically (or at least give a warning) if and when the file changes.
+- Figure out how to make emacs reload a buffer automatically (or at least give a warning) when I first visit a file if the file has changed. Right now it will warn me if I start to type but I think I'd like it better if it warned me right when I visited it.
 - Figure out how to make something copied onto the clipboard part of the kill ring. I'll have to look at [[info:emacs#Cut%20and%20Paste][info:emacs#Cut and Paste]] for more details. Because right now if I yank and something was killed more recently than something that was copied onto the clipboard, it will yank the kill ring instead of the clipboard. Perhaps it would be nice to put clipboard copies onto the kill ring.
-- Figure out how to do tab completion in normal buffers
+- Figure out how to do tab completion in normal buffers. Perhaps that will involve enabling this: [[info:emacs#Indent%20Convenience][info:emacs#Indent Convenience]]
 - Have a shell running inside of emacs. Figure out how to get multiple shells as well.
 - How do you edit an existing search command? I was trying to get a regex going and needed to edit parts of it but if you do most commands like C-a it will move you in the main buffer, not the minibuffer
 - How do you copy things without killing them? I know about M-w but that's only if you have something selected. It's a lot easier to do M-d but then you have to undo because it kills the text.
 - Searching does that incremental search thing by default which is nice. But if the next search item is behind you it looks like there is no item to search for. In vim it would still wrap around the incremental search.
-- Can we just type the text we want to add to a rectangle like with vim visual block? There is a function to do it but that seems a bit more clunky than just typing.
 - Can we configure completion so that if you type tab and NOTHING more gets completed, it will immediately open the completion menu?
-- Set read-file-name-completion-ignore-case to nil because I like case insensitive file specifications. I didn't realize Mac OS uses case insensitive files by default!!
 - How do we go backwards through the kill ring? Like the opposite of M-y
 - Set completion-cycle-threshold to some low number like 3 so that if there are only 3 completion possibilities it will cycle through them.
 - See if there is a way to get multitple tabs (like vim). Since I think if I use emacs for everything (shell's included) it will be nice to have a tab just for a layout of shells like I have with tmux. Or something like that.
-- If you enter a command that has a keybinding emacs will tell you about it. Configure that message so it lasts long
 - Learn more about how the global mark ring works, the explanation confused me a bit and I think it could be a useful navigation tool.
 - Map M-<SPC> to cycle-spacing instead of just-one-space which does the same on first invocation anyway. Then again maybe this is silly, I don't even know if I'll use that command
 - Maybe add a mapping for string-insert-rectangle? Also is there any way to make that command show the text being modified as you type? That could be neat.
@@ -44,38 +40,33 @@ My emacs journey is starting. What am I getting myself into?
 - You can save window configurations in registers which saves what windows were open as well as what buffers they contained and where the point was in those buffers. Maybe I could leverage this feature to get "tabs" in emacs.
 - Maybe configure C-c C-o in other modes (if it is not taken) so that I can open links outside of org mode as well.
 - So emacs has some "View" mode (which I am not familiar with) for browsing files. Perhaps you have similar bindings that you might have for browsing documentation. I wonder if it could be a fun thing to make a binding to turn view mode on/off, then you can browse files more easily and when you edit you exit view mode. Although at that point its starting to feel just like vim :).
-- For holidays alter the point to be a pumpkin or santa or something like that
-- Enable show-trailing-whitespace so that trailing whitespace is highlighted, or should I just create some sort of automatic thing that removes it so I don't need to worry about it? I can't think of any situation where I've wanted trailing whitespace. The only one offhand would be that language which only uses space and tab characters :). [[info:emacs#Useless%20Whitespace][info:emacs#Useless Whitespace]]
+- For holidays alter the point to be a pumpkin or santa or something like that. I think I would really like to do some festive things :).
 - Figure out how to use emacs as a PDF viewer because some textbooks and stuff are in a PDF format and it would be nice if I could just read them inside of emacs
 - Is there a "search for this word under the cursor" like vim's '*' command?
 - rgrep is the command to recursively grep for stuff. It actually uses the 'find' command for the recursive bit and find is configured to igore a lot of directories. Can I configure it to ignore 'vendor' by default as well?
 - If you type <TAB> and that match is the "Sole completion" could we configure tab to just open the file?
 - Learn more about how to quickly do search and replace with stuff. I just had to change occurrences of: count and Count to page_size, pageSize, and PageSize and it took me quite a while. The problem was that some of the "count"s were in a string and were supposed to be page_size and some of them were Go variables so they needed to be converted to camel case. Is there a way to make those sorts of changes quickly and easily?
 - Right now if you do an I-search and you type some stuff that cannot be found, it is highlighted red in the minibuffer. The first C-g you do will erase that "red" invalid text and the second one would quit. I sort of feel like <DEL> should remove that invalid text instead?
-- Is there a binding to sequentially visit files in a given directory?
-- Don't create any "backup" files when editing. I just accidentally added them when doing git stuff and I don't really like them anyway. [[info:emacs#Backup]]. It seems that emacs also creates a "lock" file when you have unedited changes, I think I'd like to turn this off as well: [[info:emacs#Interlocking]].
+- Is there a binding to sequentially visit files in a given directory? And I guess by "sequentially" I mean alphabetically.
 - How do I print with emacs? I'd be curious to see how vim does it as well. I would like to learn the internal details of how printing works.
 - Get spellcheck working: [[info:emacs#Spelling]].
-- Remember the `default-directory` variable, maybe I could hijack it if I wanted to emulate my vim way of having tabs for each project.
-- Figure out how I want to make buffer names unique: [[info:emacs#Uniquify]]
-- Make the auto-save use the current file name or turn it off, because right now it auto-saves to a new file: [[info:emacs#Auto%20Save][info:emacs#Auto Save]]
+- Remember the `default-directory` variable (which is the "pwd" of the current buffer), maybe I could hijack it if I wanted to emulate my vim way of having tabs for each project.
 - I guess there is a file name cache, I wonder if that could be used to more quickly navigate files using vanilla emacs: [[info:emacs#File%20Name%20Cache][info:emacs#File Name Cache]]
 - Look into filesets which also might be a way to more efficiently work with files: [[info:emacs#Filesets]]
 - Play with icomplete mode: [[info:emacs#Icomplete]]
 - Learn more specifics about when the current window gets reused or when the buffer is opened in another window.
-- Enable the built in tab completion feature: [[info:emacs#Indent%20Convenience][info:emacs#Indent Convenience]]
 - For the C-x <left>/<right> command, make it so after doing the first one you can just hit left or right to move through buffers. Or should I just make that the functionality of left and right?
 - Learn how to open a file, as if you were double clicking on it, from inside emacs. There are many times I have to pop open a finder window and go to the place that emacs already is just so I can double click on some file
 - How to delete a lot of lines which do not match some regex.
-- Could we do a save everytime we move away from the emacs frame? Like when I switch applications?
-- Display the full path to the current buffer which is holding a file.
+- How do I display the full path to the current buffer which is holding a file.
 - Plugin or something which looks for TODO: comments in the files I am changing. Perhaps it's some git hook which checks all files in a commit for those TODO comments.
-- Delete from point to the beginning of the line
+- Is there a command to delete from point to the beginning of the line
 - I had to replace "tokenVerifier" and "TokenVerifier" with "tokenValidator" and "TokenValidator" respectively. When I did the M-x query-replace it didn't get the "TokenValidator" one, but I thought it would? I gotta read up again on how emacs handles replacing because I seem to remember reading that it'd be able to handle that.
 - C-M-b exists which makes me feel like C-M-<DEL> should exist too but it does not. Should I make the binding?
 - Maybe consider auto-refreshing the Dired buffer upon entry
-- I think I'll want to disable the directory local option. Feel like I have no use for it and it probably slows things down a bit: [[info:emacs#Directory%20Variables][info:emacs#Directory Variables]].
-- I just learned about exec-path. What would be a good way to reconcile exec-path and PATH? I want them to be the same if possible. Maybe it's just not a big deal, after all if one is missing a path I could just add it quick.
+- I just learned about exec-path. What would be a good way to reconcile exec-path and PATH? I want them to be the same if possible. Maybe it's just not a big deal, after all if one is missing a path I could just add it quick. Look into https://github.com/purcell/exec-path-from-shell to set emac's exec-path based off of the shell. The clojure guy uses it: https://github.com/rayashman/emacs.d/blob/master/init.el
+- Consider auto-saving buffers when losing focus on emacs (see focus-out-hook).
+- This [[https://www.emacswiki.org/emacs/SwitchingBuffers]] seems to have some good info regarding buffer switching. See if there's anything good!
 
 * Terms and Miscellaneous Notes
 - It seems that most "file" related commands or just general commands not strictly related to manipulating text start with C-x.
