@@ -67,6 +67,8 @@ My emacs journey is starting. What am I getting myself into?
 - I just learned about exec-path. What would be a good way to reconcile exec-path and PATH? I want them to be the same if possible. Maybe it's just not a big deal, after all if one is missing a path I could just add it quick. Look into https://github.com/purcell/exec-path-from-shell to set emac's exec-path based off of the shell. The clojure guy uses it: https://github.com/rayashman/emacs.d/blob/master/init.el
 - Consider auto-saving buffers when losing focus on emacs (see focus-out-hook).
 - This [[https://www.emacswiki.org/emacs/SwitchingBuffers]] seems to have some good info regarding buffer switching. See if there's anything good!
+- Can I make emacs play music?? Like I could have it play the tetris music when I play that game.
+- goimports with emacs seems to be failing for some reason? I had a dependency "github.com/cbdr/jwt-auth-go" where the package name is jwtauth. But emacs goimports was erasing that line altogether while vim did the more correct thing and added `jwtauth "github.com/cbdr/jwt-auth-go"`.
 
 * Terms and Miscellaneous Notes
 - It seems that most "file" related commands or just general commands not strictly related to manipulating text start with C-x.
@@ -96,6 +98,7 @@ My emacs journey is starting. What am I getting myself into?
 - Each buffer has a local variable called `default-directory` which defaults to the directory the file resides in. You can change it with the `cd` command and view it with the `pwd` command.
 - Emacs has a capability to keep identical copies of certain files in different places, possibly on different machines, and it calls these "shadow" files. Sweet.
 - It would seem that emacs gives you the ability to "disable" functions entirely. Neat! So functions have properties that you can change?
+- You, of course, have the ability to map keys to commands. But you can also remap all keys that point to a particular function! [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs]]. In some ways you can probably think of it as redefining the function itself that the keys point to.
 
 ** Modifiers
 - s - the "super key": [[https://superuser.com/questions/204946/what-is-emacs-keybinding-s-u]]
@@ -379,6 +382,7 @@ Notes about how I think vim and emacs compare to eachother.
 - Working on ranges of lines seems very clean/consistent. You just have one command to remember and basically you give it different ranges depending on what you want to do. In emacs it feels like there is one command to change things after the point and another to work inside a region.
 - How undo works. With emacs it feels like I often need to "spam" undo to get back to the previous state that I want. And when I do undo things, it just makes the undo state more messy! With vim this is not the case, undo's are nicely "chunked" so I only have have to hit undo a couple of times and undoing doesn't add more undo information as it does with emacs.
 - The '*' command. It only does one simple thing, but it is rather nice. Maybe emacs has another way though?
+- Keybinding seemed "simpler" if you can believe it. Not by much but a little. I think the main thing I miss about making vim keybindings is that you could just make whatever you wanted! In emacs there's this notion of a "prefix key" so if you try to make a mapping "C-a C-a" it would fail because C-a is not a prefix key, vim would just let you make it though.
 
 ** Things I Like From Emacs
 - Documentation. Holy shit. Don't get me wrong, vim has fantastic documentation but it always felt like you had to know what you were looking for if you wanted to find something. And navigating it felt a little clunkier. But emacs documentation is extremely comprehensive and dynamic and very nice to navigate around. It will even link you to the source code implementing some function if you are really curious!!!

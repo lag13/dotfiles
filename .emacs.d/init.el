@@ -28,8 +28,11 @@
 	    (setq gofmt-command "goimports")
 	    (add-hook 'before-save-hook 'gofmt-before-save)))
 
-;; Turn on editorconfig
+;; Turn on editorconfig mode
 (editorconfig-mode 1)
+
+;; Start emacs fullscreen
+(toggle-frame-fullscreen)
 
 ;; exec-path is like "PATH" but for emacs. When emacs tries to run a
 ;; binary, it will search through exec-path to find it.
@@ -52,6 +55,29 @@
 ;; To make it easy to store a link that can be inserted into an org
 ;; document.
 (global-set-key (kbd "C-c l") 'org-store-link)
+
+;; My first stab at emacs programming. Rebinds <left> so that if the
+;; last command was previous-buffer then <left> will repeat that
+;; command otherwise it just does the normal behavior. Same for
+;; <right> with next-buffer.
+(defun left-char-or-previous-buffer ()
+  (interactive)
+  (if (or (eq last-command 'previous-buffer)
+	  (eq last-command 'next-buffer))
+      (progn
+	(previous-buffer)
+	(setq this-command 'previous-buffer))
+    (left-char)))
+(defun right-char-or-next-buffer ()
+  (interactive)
+  (if (or (eq last-command 'previous-buffer)
+	  (eq last-command 'next-buffer))
+      (progn
+	(next-buffer)
+	(setq this-command 'next-buffer))
+    (right-char)))
+(global-set-key (kbd "<left>") 'left-char-or-previous-buffer)
+(global-set-key (kbd "<right>") 'right-char-or-next-buffer)
 
 ;; If there is a key binding for the command just run, let us know
 ;; more quickly. It will also shorten how long the message is
