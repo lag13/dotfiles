@@ -66,3 +66,5 @@ https://octoverse.github.com/
 
 I bought some unix programming books from this site:
 https://www.humblebundle.com/. humble92
+
+https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html

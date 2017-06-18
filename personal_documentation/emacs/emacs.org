@@ -4,6 +4,7 @@ Personal notes about emacs to help me learn.
 My emacs journey is starting. What am I getting myself into?
 
 ** Links
+- [[https://www.gnu.org/software/emacs]]
 - [[https://www.masteringemacs.org]]
 - [[http://ergoemacs.org]]
 
@@ -18,62 +19,293 @@ My emacs journey is starting. What am I getting myself into?
 - I see (defcustom ido-mode...) AND (defun ido-mode...) it would appear that one is used for the custom menu and the other for when you manually edit the init file. Confusing
 - [[https://www.masteringemacs.org/article/effective-editing-movement]] he talks about "Moving Forward and Backward in Lists" but never lists their commands it seems
 - Why do packages get loaded after the init file? It doesn't really make sense to me. I just don't see a reason why you wouldn't want to load all the packages and stuff BEFORE configuration. And actually, it looks like the (package-initialize) function is actually writing a call to itself in the init file. So it would appear that the elpa package authors want packages to be loaded before the init file by default?
+- In the "An Introduction to Programming in Emacs Lisp" document they say that lisp is superior for things like editing: [[info:eintr#Lisp%20History][info:eintr#Lisp History]]. Why?
+- They say you can press space after opening emacs to go to the scratch buffer, not true anymore I think: [[info:eintr#Buffer%20Names][info:eintr#Buffer Names]]
+- He says that some primitive functions are written in C so that GNU emacs can run on any computer that can run C: [[info:eintr#Primitive%20Functions][info:eintr#Primitive Functions]]. I don't really understand what he means by that. Don't some primitive functions HAVE to be written in some language that ends up getting compiled to binary? Or maybe that IS what he means. He just made it sound like writing it in C was optional and everything could have been written in lisp.
+- He says "The documentation string is included in the example because it is a good habit to write documentation string for every function definition." It should be "to write [a] documentation..." right? [[info:eintr#type-of-animal%20in%20detail][info:eintr#type-of-animal in detail]].
+- I wish he would look at the mark-whole-buffer of the latest code version which has one more line of code: [[info:eintr#mark-whole-buffer%20overview][info:eintr#mark-whole-buffer overview]].
+- Did he mean to say xref-find-definitions instead of find-tag? [[info:eintr#Buffer%20Exercises][info:eintr#Buffer Exercises]]
+- I think he has an error. He says that, "The ‘copy-to-buffer’ function illustrates use of two ‘save-excursion’ expressions in one definition" but it only has one: [[info:eintr#More%20Complex][info:eintr#More Complex]].
+- Would have been nice if he explained why the save-excursion was necessary: [[info:eintr#copy-to-buffer]].
+- The append-to-buffer function no longer uses (interactive) with the "B" option. copy-to-buffer does though! [[info:eintr#b%20for%20interactive][info:eintr#b for interactive]]
 
 * TODOs
-- Modifiy the org C-c C-o binding so that if the link cannot be found after the point then it will search backward on the current line maybe if that cannot be found it will search forward to the next link in the document wherever it is.
-- Consider activating the org-indent-mode minor mode so these outlines are indented based on headers. Or should I do this manually myself? Or configure emacs so it tries to indent things by default?
-- Figure out how to make emacs reload a buffer automatically (or at least give a warning) when I first visit a file if the file has changed. Right now it will warn me if I start to type but I think I'd like it better if it warned me right when I visited it.
-- Figure out how to make something copied onto the clipboard part of the kill ring. I'll have to look at [[info:emacs#Cut%20and%20Paste][info:emacs#Cut and Paste]] for more details. Because right now if I yank and something was killed more recently than something that was copied onto the clipboard, it will yank the kill ring instead of the clipboard. Perhaps it would be nice to put clipboard copies onto the kill ring.
-- Figure out how to do tab completion in normal buffers. Perhaps that will involve enabling this: [[info:emacs#Indent%20Convenience][info:emacs#Indent Convenience]]
-- Have a shell running inside of emacs. Figure out how to get multiple shells as well.
-- How do you edit an existing search command? I was trying to get a regex going and needed to edit parts of it but if you do most commands like C-a it will move you in the main buffer, not the minibuffer
-- How do you copy things without killing them? I know about M-w but that's only if you have something selected. It's a lot easier to do M-d but then you have to undo because it kills the text.
-- Searching does that incremental search thing by default which is nice. But if the next search item is behind you it looks like there is no item to search for. In vim it would still wrap around the incremental search.
-- Can we configure completion so that if you type tab and NOTHING more gets completed, it will immediately open the completion menu?
-- How do we go backwards through the kill ring? Like the opposite of M-y
-- Set completion-cycle-threshold to some low number like 3 so that if there are only 3 completion possibilities it will cycle through them.
-- See if there is a way to get multitple tabs (like vim). Since I think if I use emacs for everything (shell's included) it will be nice to have a tab just for a layout of shells like I have with tmux. Or something like that.
-- Learn more about how the global mark ring works, the explanation confused me a bit and I think it could be a useful navigation tool.
-- Map M-<SPC> to cycle-spacing instead of just-one-space which does the same on first invocation anyway. Then again maybe this is silly, I don't even know if I'll use that command
-- Maybe add a mapping for string-insert-rectangle? Also is there any way to make that command show the text being modified as you type? That could be neat.
-- Why does this exist: [[info:emacs#Rectangle%20Registers][info:emacs#Rectangle Registers]]?. It seems that just saving plain text has the same effect as copying a region.
-- You can save window configurations in registers which saves what windows were open as well as what buffers they contained and where the point was in those buffers. Maybe I could leverage this feature to get "tabs" in emacs.
-- Maybe configure C-c C-o in other modes (if it is not taken) so that I can open links outside of org mode as well.
-- So emacs has some "View" mode (which I am not familiar with) for browsing files. Perhaps you have similar bindings that you might have for browsing documentation. I wonder if it could be a fun thing to make a binding to turn view mode on/off, then you can browse files more easily and when you edit you exit view mode. Although at that point its starting to feel just like vim :).
-- For holidays alter the point to be a pumpkin or santa or something like that. I think I would really like to do some festive things :).
-- Figure out how to use emacs as a PDF viewer because some textbooks and stuff are in a PDF format and it would be nice if I could just read them inside of emacs
-- Is there a "search for this word under the cursor" like vim's '*' command?
-- rgrep is the command to recursively grep for stuff. It actually uses the 'find' command for the recursive bit and find is configured to igore a lot of directories. Can I configure it to ignore 'vendor' by default as well?
-- If you type <TAB> and that match is the "Sole completion" could we configure tab to just open the file?
-- Learn more about how to quickly do search and replace with stuff. I just had to change occurrences of: count and Count to page_size, pageSize, and PageSize and it took me quite a while. The problem was that some of the "count"s were in a string and were supposed to be page_size and some of them were Go variables so they needed to be converted to camel case. Is there a way to make those sorts of changes quickly and easily?
-- Right now if you do an I-search and you type some stuff that cannot be found, it is highlighted red in the minibuffer. The first C-g you do will erase that "red" invalid text and the second one would quit. I sort of feel like <DEL> should remove that invalid text instead?
-- Is there a binding to sequentially visit files in a given directory? And I guess by "sequentially" I mean alphabetically.
-- How do I print with emacs? I'd be curious to see how vim does it as well. I would like to learn the internal details of how printing works.
+- Modifiy the org C-c C-o binding so that if the link cannot be found
+  after the point then it will search backward on the current line
+  maybe if that cannot be found it will search forward to the next
+  link in the document wherever it is.
+- Consider activating the org-indent-mode minor mode so these outlines
+  are indented based on headers. Or should I do this manually myself?
+  Or configure emacs so it tries to indent things by default?
+- Figure out how to make emacs reload a buffer automatically (or at
+  least give a warning) when I first visit a file if the file has
+  changed. Right now it will warn me if I start to type but I think
+  I'd like it better if it warned me right when I visited it.
+- Figure out how to make something copied onto the clipboard part of
+  the kill ring. I'll have to look at [[info:emacs#Cut%20and%20Paste][info:emacs#Cut and Paste]] for
+  more details. Because right now if I yank and something was killed
+  more recently than something that was copied onto the clipboard, it
+  will yank the kill ring instead of the clipboard. Perhaps it would
+  be nice to put clipboard copies onto the kill ring.
+- Figure out how to do tab completion in normal buffers. Perhaps that
+  will involve enabling this: [[info:emacs#Indent%20Convenience][info:emacs#Indent Convenience]]. See if
+  there are different ways of doing completion like in vim which has
+  word, whole line, file, etc...
+- Have a shell running inside of emacs. Figure out how to get multiple
+  shells as well.
+- How do you edit an existing search command? I was trying to get a
+  regex going and needed to edit parts of it but if you do most
+  commands like C-a it will move you in the main buffer, not the
+  minibuffer
+- How do you copy things without killing them? I know about M-w but
+  that's only if you have something selected. It's a lot easier to do
+  M-d but then you have to undo because it kills the text.
+- Searching does that incremental search thing by default which is
+  nice. But if the next search item is behind you it looks like there
+  is no item to search for. In vim it would still wrap around the
+  incremental search.
+- Can we configure completion so that if you type tab and NOTHING more
+  gets completed, it will immediately open the completion menu?
+- How do we go backwards through the kill ring? Like the opposite of
+  M-y
+- Set completion-cycle-threshold to some low number like 3 so that if
+  there are only 3 completion possibilities it will cycle through
+  them.
+- See if there is a way to get multitple tabs (like vim). Since I
+  think if I use emacs for everything (shell's included) it will be
+  nice to have a tab just for a layout of shells like I have with
+  tmux. Or something like that.
+- Learn more about how the global mark ring works, the explanation
+  confused me a bit and I think it could be a useful navigation tool.
+- Map M-<SPC> to cycle-spacing instead of just-one-space which does
+  the same on first invocation anyway. Then again maybe this is silly,
+  I don't even know if I'll use that command
+- Maybe add a mapping for string-insert-rectangle? Also is there any
+  way to make that command show the text being modified as you type?
+  That could be neat.
+- Why does this exist: [[info:emacs#Rectangle%20Registers][info:emacs#Rectangle Registers]]?. It seems that
+  just saving plain text has the same effect as copying a region.
+- You can save window configurations in registers which saves what
+  windows were open as well as what buffers they contained and where
+  the point was in those buffers. Maybe I could leverage this feature
+  to get "tabs" in emacs.
+- Maybe configure C-c C-o in other modes (if it is not taken) so that
+  I can open links outside of org mode as well.
+- So emacs has some "View" mode (which I am not familiar with) for
+  browsing files. Perhaps you have similar bindings that you might
+  have for browsing documentation. I wonder if it could be a fun thing
+  to make a binding to turn view mode on/off, then you can browse
+  files more easily and when you edit you exit view mode. Although at
+  that point its starting to feel just like vim :).
+- For holidays alter the point to be a pumpkin or santa or something
+  like that. I think I would really like
+- Figure out how to use emacs as a PDF viewer because some textbooks
+  and stuff are in a PDF format and it would be nice if I could just
+  read them inside of emacs
+- rgrep is the command to recursively grep for stuff. It actually uses
+  the 'find' command for the recursive bit and find is configured to
+  igore a lot of directories. Can I configure it to ignore 'vendor' by
+  default as well?
+- If you type <TAB> and that match is the "Sole completion" could we
+  configure tab to just open the file?
+- Learn more about how to quickly do search and replace with stuff. I
+  just had to change occurrences of: count and Count to page_size,
+  pageSize, and PageSize and it took me quite a while. The problem was
+  that some of the "count"s were in a string and were supposed to be
+  page_size and some of them were Go variables so they needed to be
+  converted to camel case. Is there a way to make those sorts of
+  changes quickly and easily?
+- Right now if you do an I-search and you type some stuff that cannot
+  be found, it is highlighted red in the minibuffer. The first C-g you
+  do will erase that "red" invalid text and the second one would quit.
+  I sort of feel like <DEL> should remove that invalid text instead?
+- Is there a binding to sequentially visit files in a given directory?
+  And I guess by "sequentially" I mean alphabetically. Perhaps there
+  could be one mapping to cycle through files just in the current
+  directory and another to drill down into a directory if that is the
+  next file in the list.
+- How do I print with emacs? I'd be curious to see how vim does it as
+  well. I would like to learn the internal details of how printing
+  works.
 - Get spellcheck working: [[info:emacs#Spelling]].
-- Remember the `default-directory` variable (which is the "pwd" of the current buffer), maybe I could hijack it if I wanted to emulate my vim way of having tabs for each project.
-- I guess there is a file name cache, I wonder if that could be used to more quickly navigate files using vanilla emacs: [[info:emacs#File%20Name%20Cache][info:emacs#File Name Cache]]
-- Look into filesets which also might be a way to more efficiently work with files: [[info:emacs#Filesets]]
+- Remember the `default-directory` variable (which is the "pwd" of the
+  current buffer), maybe I could hijack it if I wanted to emulate my
+  vim way of having tabs for each project.
+- I guess there is a file name cache, I wonder if that could be used
+  to more quickly navigate files using vanilla emacs: [[info:emacs#File%20Name%20Cache][info:emacs#File
+  Name Cache]]
+- Look into filesets which also might be a way to more efficiently
+  work with files: [[info:emacs#Filesets]]
 - Play with icomplete mode: [[info:emacs#Icomplete]]
-- Learn more specifics about when the current window gets reused or when the buffer is opened in another window.
-- For the C-x <left>/<right> command, make it so after doing the first one you can just hit left or right to move through buffers. Or should I just make that the functionality of left and right?
-- Learn how to open a file, as if you were double clicking on it, from inside emacs. There are many times I have to pop open a finder window and go to the place that emacs already is just so I can double click on some file
+- Learn more specifics about when the current window gets reused or
+  when the buffer is opened in another window.
+- For the C-x <left>/<right> command, make it so after doing the first
+  one you can just hit left or right to move through buffers. Or
+  should I just make that the functionality of left and right?
+- Learn how to open a file, as if you were double clicking on it, from
+  inside emacs. There are many times I have to pop open a finder
+  window and go to the place that emacs already is just so I can
+  double click on some file
 - How to delete a lot of lines which do not match some regex.
-- How do I display the full path to the current buffer which is holding a file.
-- Plugin or something which looks for TODO: comments in the files I am changing. Perhaps it's some git hook which checks all files in a commit for those TODO comments.
+- How do I display the full path to the current buffer which is
+  holding a file.
+- Plugin or something which looks for TODO: comments in the files I am
+  changing. Perhaps it's some git hook which checks all files in a
+  commit for those TODO comments.
 - Is there a command to delete from point to the beginning of the line
-- I had to replace "tokenVerifier" and "TokenVerifier" with "tokenValidator" and "TokenValidator" respectively. When I did the M-x query-replace it didn't get the "TokenValidator" one, but I thought it would? I gotta read up again on how emacs handles replacing because I seem to remember reading that it'd be able to handle that.
-- C-M-b exists which makes me feel like C-M-<DEL> should exist too but it does not. Should I make the binding?
+- I had to replace "tokenVerifier" and "TokenVerifier" with
+  "tokenValidator" and "TokenValidator" respectively. When I did the
+  M-x query-replace it didn't get the "TokenValidator" one, but I
+  thought it would? I gotta read up again on how emacs handles
+  replacing because I seem to remember reading that it'd be able to
+  handle that.
+- C-M-b exists which makes me feel like C-M-<DEL> should exist too but
+  it does not. Should I make the binding?
 - Maybe consider auto-refreshing the Dired buffer upon entry
-- I just learned about exec-path. What would be a good way to reconcile exec-path and PATH? I want them to be the same if possible. Maybe it's just not a big deal, after all if one is missing a path I could just add it quick. Look into https://github.com/purcell/exec-path-from-shell to set emac's exec-path based off of the shell. The clojure guy uses it: https://github.com/rayashman/emacs.d/blob/master/init.el
-- Consider auto-saving buffers when losing focus on emacs (see focus-out-hook).
-- This [[https://www.emacswiki.org/emacs/SwitchingBuffers]] seems to have some good info regarding buffer switching. See if there's anything good!
-- Can I make emacs play music?? Like I could have it play the tetris music when I play that game.
-- goimports with emacs seems to be failing for some reason? I had a dependency "github.com/cbdr/jwt-auth-go" where the package name is jwtauth. But emacs goimports was erasing that line altogether while vim did the more correct thing and added `jwtauth "github.com/cbdr/jwt-auth-go"`.
+- I just learned about exec-path. What would be a good way to
+  reconcile exec-path and PATH? I want them to be the same if
+  possible. Maybe it's just not a big deal, after all if one is
+  missing a path I could just add it quick. Look into
+  https://github.com/purcell/exec-path-from-shell to set emac's
+  exec-path based off of the shell. The clojure guy uses it:
+  https://github.com/rayashman/emacs.d/blob/master/init.el. Also learn
+  about how environment variables get set for applications in general.
+  I'm curious about that.
+- Consider auto-saving buffers when losing focus on emacs (see
+  focus-out-hook).
+- This [[https://www.emacswiki.org/emacs/SwitchingBuffers]] seems to have
+  some good info regarding buffer switching. See if there's anything
+  good!
+- Can I make emacs play music?? Like I could have it play the tetris
+  music when I play that game.
+- How to make a little checkbox thing in org mode. I basically just
+  did that but the more manual way, so I should learn how to really do
+  it.
+- Make the game of life in emacs and snake of course!
+- Figure out how to configure emacs to deal well with really large
+  files. I was just looking at a list of all hal customer systems and
+  it slowed emacs to a crawl.
+- When you hit <ret> in I think fundamental mode, it will try to copy
+  the indentation of the above line. Look up what functionality does
+  this and figure out if there is a way for it to EXACTLY copy the
+  indentation. Because I just did it and it inserted a single tab even
+  though the above line was using spaces for indentation.
+- I think I miss being able to navigate by indentation level a la
+  vim's indentwise. I was just in a really long elm function and
+  wanted to navigate by indentation.
+- Make a M-s * mapping similar to M-s . which will search for the
+  EXACT word under the point
+- Maybe make org mode's C-c C-o mapping global? So we can open links
+  from wherever?
+- Is there a way for emacs to copy the entire file being viewed? Like
+  if you copy a file in the finder then you can paste it in a hipchat
+  window. Can you do that copy operation from within emacs?
+- This org mode list was not wrapped for the longest time and then I
+  wanted to wrap it. I thought it would be a simple "highlight the
+  list then do M-q" but that didn't work. Why is that? I had to go
+  through and do M-q on every item in this list.
+- I had a list of databases from a "show database" command which
+  basically outputs a newline delimited list of tables. I needed to
+  surround each table with double quotes and then turn the newlines
+  into commas. How do I do that.
+- Delete the current file and it's associated buffer.
+- Take some tips from emacs rocks: [[http://emacsrocks.com]]. One in
+  particular that I know I want to check out is the rest client mode.
+- Can you write inline code snippets in org mode? Or at least
+  something that would translate to markdown's ``?
+- It seems that org mode's file links are relative to the file where
+  you paste them. Does this make sense? I suppose it does? How would
+  you "translate" a bunch of these links though if they are copied to
+  a file in a different location?
+- Looks like the 'handwrite' function can do printing? Look into it,
+  seems interesting.
+- Look at
+  /Applications/Emacs.app/Contents/Resources/lisp/play/gametree.el.gz.
+  I read the beginning of the documentation and it sounded cool but I
+  really had no idea what he was talking about.
+- There is a "fortune" function which displays a random fortune. But
+  it pulls fortunes from the 'fortune-file' variable so I should think
+  about configuring that and adding some kickass fortunes. There is
+  also a "cookie" command which seems to do the same sort of thing but
+  is maybe more general than fortunes.x
+- There is a "decipher" command which I believe aids in decrypting
+  some simple ciphertext. Awesome. Play around with this sometime!
+- When you make a buffer, can you have it set the mode based on the
+  buffer name? Because I just made a "test.go" buffer and it seems
+  that it did not set the mode to "go".
+- Add markdown support for emacs.
+- I think that if you are at the last grep hit then M-g n should bring
+  you there again and same sort of thing with the first grep hit.
+- For restclient mode, it seems that if the response starts with a
+  number and the Content-Type is "text/plain" then doing C-c C-c will
+  only display the number from the response body. I wonder why this
+  is.
+- Is there a way to configure M-p and M-f in the command line to
+  filter on history based on the stuff typed so far?
+- I think it would be cool if the `godoc` command cached stuff.
+  Looking at the source code it seems that it will always run the
+  command again, replacing the buffer if it exists.
+- I feel like the godoc command should also default to the last
+  entered history item if none was entered, just to be consistant with
+  other commands
+- I also wish that godoc behaved like it's internet counterpart in
+  that you could jump to the definitions of entities. Is there a
+  simple way to do that?
+- It seems that there is no "go test" functionality in go-mode. I'm
+  not really complaining as I like using the command line but I wonder
+  why it is not there. There is also no functionality to "run" or
+  "build" some go code. Again, I'm not really complaining but I wonder
+  why not? It seems that the vim go plugin has these features:
+  https://github.com/fatih/vim-go. That plugin might actually be more
+  comprehensive than the emacs one, interesting.
+- I think for restclient-mode there is also an org mode plugin. Think
+  about adding that. There was just an error that occurred with
+  product instance id's and it would be pretty cool to annotate my
+  findings (including requests) in an org mode document.
+- Try to make restclient mode work for oauth so it'll try and get a
+  token and pass it through on subsequent requests.
+- Some services we have are behind different urls. It would be nice to
+  have the same restclient document work for all those different urls.
+  Think about a nice way to do this.
+- How do you execute shell commands in an org mode document?
+- Not emacs related but I know I'll check back here. When I do Cmd-Tab
+  on mac and an application is in a different "area" (or whatever it's
+  called) then mac does this little scrolling animation over to the
+  other window. I think it would be nicer and more efficient if it
+  just showed the window onscreen immediately, no scrolling required.
+- Something like tim pope's indentation plugin for automatically
+  detecting what indentation to use would be nice to have.
+- How to save a buffer without running hooks because sometimes I want
+  to mess up a Go buffer but I can't because of the save hook.
+- There is a buffer called *Completions* map left and right arrow to
+  switch out of that buffer if we are in the middle of one of those
+  C-x left/right arrow sequences. Completion List mode defined in
+  ‘simple.el’.
+- It would be nice that when you saved a new script, execute
+  permissions would be added automatically like I have it with vim.
+  Similarly it would also be nice if upon initial save of a new script
+  file it would detect the file type.
+- Look into org mode + beamer to generate powerpoints. Also there's a
+  tool called "mindnode" to generate mind maps. I wonder if there is a
+  way to generate a mind map with some emacs package.
+- For environment variable files (so anything that starts with ".env")
+  set the mode so I can use M-q on comments properly.
+- Is there a mode for writing lists and such within comments? Because
+  sometimes I write numbered lists inside of comments and it would be
+  really awesome of M-q did the "right" thing instead of mashing
+  everything together.
+- The yaml major mode for emacs doesn't seem to properly implement M-q
+  when it gets used on comments. Can we fix this?
+- I'm getting a weird bug right now (2017-06-09) where if I hit C-o it
+  sometimes inserts the text:
+		sut := paginator
+
+
 
 * Terms and Miscellaneous Notes
 - It seems that most "file" related commands or just general commands not strictly related to manipulating text start with C-x.
 - Killing - same as cutting
-- The kill ring stores all the things you have ever killed or copied.
+- The kill ring stores all the things you have ever killed or copied. They are stored in a regular old list called kill-ring. When you kill something new that element is consed onto the beginning of this list. There is another variable kill-ring-yank-pointer which is a pointer to a specific item in the kill ring. Calling it a "pointer" is informative but also a bit redundant since in lisp, everything is a pointer. When new things are killed it seems this gets reset to the (car kill-ring).
 - Yanking - same as pasting. It refers to "yanking" something off of the kill ring into the editor. It's a bit confusing since vim uses the same word to mean copying.
 - Point - where your cursor is (technichally the left edge of the cursor)
 - Window - same as vim's, you look at a buffer through a window
@@ -148,7 +380,7 @@ My emacs journey is starting. What am I getting myself into?
 - C-u <number> <command> (universal-argument) - If you type C-u then a number the next command you type will be repeated that many times. For instance you can do `C-u 19 a' and it will insert 19 "a" characters. You can also hold down the meta key while typing the numbers if you don't want to press C-u. `C-u 10 C-f` would move forward 10 characters. C-u by itself passes 4 to the next function and repeating it multiplies by 4 each time.
 - M-k (kill-sentence) - kill to the end of the current sentence
 - M-% (query-replace) - verifies if you want to replace something before doing the replacement. C-w to delete the replacement and enter recursive edit. C-r to edit recursive edit. C-M-c to get out of recursive edit.
-- replace-string - an interactive command to replace one string with another after the point. If you have a region defined then it will only replace in that region.
+- replace-string - an interactive command to replace one string with another after the point. If you have a region defined then it will only replace in that region. To replace newlines do C-q C-j, I wonder why C-q <RET> doesn't work: [[http://stackoverflow.com/questions/613022/how-to-replace-a-character-with-a-newline-in-emacs]].
 - C-x f (set-fill-column)  - set the fill-column (i.e the width at which point lines will automatically wrap if the Auto Fill mode is on)
 - M-q (fill-paragraph) - same as gwip in vim.
 - C-s (isearch-forward) - does a forward search type C-s again to proceed to the next search match. If you type delete after doing C-s it will go to previous search match locations until you reach the one you started from and then it will actually edit the minibuffer.
@@ -206,6 +438,12 @@ My emacs journey is starting. What am I getting myself into?
 - M-x occur - see how many occurrences of a regex
 - M-g M-n - go to next "error" where error could be positions output from grep
 - M-g M-p - opposite of above
+- M-s . - search for symbol under point. Like vim's '*'
+
+Lisp related things:
+- C-M-x
+- C-x C-e - Evaluates "last" (i.e previous) expression and prints in the echo area. With an argument the result is put into the buffer.
+- C-j
 
 ** Help
 - C-h C-h - display all possible help bindings
@@ -351,6 +589,51 @@ Runs the functions you have placed in the midnight-hook every night at midnight.
 *** Icomplete (icomplete-mode)
 Typing in the minibuffer coninuously displays a list of possible completions.
 
+* Elisp
+Emacs is rather unique, at least I think, as far as editors go. Emacs the software is composed of two parts:
+
+1. An interpreter, written in C, for a language they created called Elisp.
+2. A bunch of Elisp code which makes up most (pretty much all) of the editor's functionality.
+
+What's cool/unique about emacs is that you use elisp to extend the editor and since emacs IS written in elisp you can customize emacs however you want. This isn't possible with vim for example because you extend vim using vimscript but the majority of the editor is written in C. So you can only alter the parts that the vimscript gives you access to. I think emacs is even more customizable because it is written in a "lisp" which allow you to do things like redefine functions.
+
+** Typing
+EVERY complete key sequence you type in emacs actually invokes a lisp function of some sort. Even typing plain keys invokes the `self-insert-command` function which just inserts the typed character. What probably goes on inside emacs is that every key you type it looks for a function associated with that key, if none is found then it waits for more keys to be typed.
+
+** Commands
+The functions that get evaluated by typing are called "interactive" functions or "commands": [[info:eintr#How%20to%20Evaluate][info:eintr#How to Evaluate]].
+
+- (interactive) - dclares that the function can be used interactively i.e you can bind keys to it.
+- (buffer-name) - returns the name of the buffer
+- (buffer-file-name) - returns the full path of the name of the file being visited.
+- (current-buffer) - returns the buffer itself that is currently being visited
+- (other-buffer)#<buffer *scratch*> - returns the most recently selected buffer that is not currently visible in a window
+- (switch-to-buffer buffer-or-name) - changes to a different buffer. Probably meant for humans because it displays the buffer in the window.
+- (set-buffer buffer-or-name) - makes buffer-or-name current for editing operations but does not display the buffer.
+- (with-current-buffer buffer-or-name) body...) - arguably a nicer way of working with an alternate buffer.
+- (buffer-size) - size of the buffer in bytes
+- (point) - number of bytes into the file that the pointer is
+- (save-excursion &rest body) - Do whatever you want and aftrwards the point position will be restored.
+- (xref-find-definitions) - Used to find the definition of a function in source code.
+- (goto-char position)
+- (push-mark)
+- (save-restriction &rest body) - Saves the state of narrowing.
+
+[[info:eintr#Review]]
+
+** Key Bindings
+Binding keys to commands.
+
+- The "keymap" is a map from key sequence to command.
+- If a key is followed by other keys, previous keys in the sequence MUST be classified as prefix keys. Where a complete key sequence invokes a command, these prefix keys "load up" anothe keymap to look through.
+- There are many keymaps. Later keymaps on this list take precedence
+  over preceding ones.
+  - Global keymap which applies in all modes
+  - Major mode keymaps which takes effect in a major mode
+  - Minor mode keymaps which take effect in a minor mode
+  - Portions of text in a buffer can specify keymaps
+- Keep in mind that ALL key binding related activity ultimately comes down to using the define-key function. Even global-set-key ultimately just runs (define-key global-map my-cool-key my-cool-command).
+
 * Long Lines
 When a line is too long one of three things could be configured to happen:
 
@@ -402,9 +685,76 @@ My thoughts on traits that a better "editor" should have
 - By default C-up and C-down are taken by mission control. So go to System Preferences > Mission Control and remove those.
 - The "super" key by default is the Cmd key.
 
+* Advice
+- https://en.wikipedia.org/wiki/Advice_%28programming%29
 
+** What is it
+Emacs has an "advice" mechanism which allows you to modify functions
+you do not own. Anything from making the function do some extra
+computation to completely redefining the function is possible, it's
+pretty crazy actually. I believe other names for this kind of feature
+is "decorators", "annotations", and "monkey patching". Common Lisp
+also has this mechanism through it's CLOS library:
+http://www.gigamonkeys.com/book/object-reorientation-generic-functions.html.
 
-foo
-BAR
-Bar
-bar
+** How I Feel About It
+Initially when I heard about this I was both skeptical and amazed. On
+the amazed side, the thought of being able to modify ANY existing
+function seemed super cool because it makes configuration so much more
+powerfull. For instance, maybe you wanted to print a message everytime
+function A is called. The problem is that other functions B and C call
+A AND there is a keybinding D for function A. So if we wanted to make
+this configuration seamless you'd have to make a wrapper A' for A,
+create new functions B' and C' for B and C which call A', and adjust
+the binding. Yuck. With this feature you just "advise" A and you're go
+on your merry way. That is pretty damn cool.
+
+But then when I thought about it a little more I thought, "man this is
+also dangerous and confusing". Because every time a function is
+"advised" its definition starts getting spread out across multiple
+files. Just saying that makes me shiver a bit. And then to understand
+how this new "advised" function behaves you have to know how this
+"advice" abstraction works which makes things more confusing. And if
+you mess up the function then everyone using the function gets messed
+up too. With great power comes great responsibility I guess.
+
+** When To Use It
+To me it feels like the only time you should use this feature is in
+your own personal configuration where you might want some particular
+function to behave differently. If you are making a public package
+then this should be avoided because packages should be as simple as
+possible. But I don't know too much about it and in such a complicated
+world you can find good use cases for just about anything.
+
+** Code Example
+Here is my super crappy not even close to real implementation of an
+advice feature just to get a sense for how it works.
+
+First we'll define a function foo and note that it just adds one to
+it's argument:
+#+BEGIN_SRC elisp
+  (defun foo (x)
+    (1+ x))
+  (foo 1)
+#+END_SRC
+
+Then we'll make a macro which modifies any function by adding one to
+the parameter before passing it to the original function:
+#+BEGIN_SRC elisp
+  (setq lexical-binding t)
+  (defmacro my-advice (f)
+    (list 'let (list (list 'orig-f (list 'symbol-function (list 'quote f))))
+      (list 'defun f '(x)
+            '(funcall orig-f (1+ x)))))
+#+END_SRC
+
+Now we note that if we pass 'foo to this macro, it will redfine foo so
+it returns the number passed into it plus 2. Unfortunately it seems
+that evaluating this code doesn't work. I expect it's something weird
+with the "lexical-binding" parameter not taking effect. But if you
+evaluate these individually with a C-x C-e then you'll see it in
+action:
+#+BEGIN_SRC elisp
+  (my-advice foo)
+  (foo 1)
+#+END_SRC

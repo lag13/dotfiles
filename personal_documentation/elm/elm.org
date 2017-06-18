@@ -1,0 +1,4 @@
+- [[http://stackoverflow.com/questions/27441648/what-does-the-operator-mean-in-elm]]
+- [[http://package.elm-lang.org/]]
+- https://www.brianthicks.com/post/2017/01/13/create-custom-json-decoders-in-elm-018/
+- http://eeue56.github.io/json-to-elm/

@@ -1,0 +1,109 @@
+* Golang
+General information about the Go programming language.
+
+* What Go Has to Offer
+This is what I think Go has to offer.
+
+** Easy to read
+Programmers spend a good chunk of time reading and trying to
+understand code (sometimes even code that they themselves wrote!).
+Some programming languages have features or let you extend the
+language in ways which let them do really cool things but unless you
+understand that abstraction, it can be hard to understand what is
+going on. Go doesn't have a lot of really "fancy" features which means
+it can't do some of those "cool" things BUT that also means the code
+is easier to understand.
+
+** Errors Are Just Values
+I've always disliked exceptions even when I was first learning
+programming in college (although maybe that was because I had trouble
+understanding them!). In all seriousness though, I am not a fan of
+exceptions as an error handling mechanism because it feels too
+extreme. If unexpected happens you don't need to blow up the program.
+You can of course catch exceptions but do you know for sure which
+functions throw exceptions and which don't?
+
+Also, since errors are just values you can manipulate them and create
+abstractions around them if you need/want.
+
+** Interfaces Are Satisfied Implicitly
+This is a nice little feature which makes Go feel very lightweight.
+Normally if a class implements an interface you must declare it as
+implementing that interface. Not necessary in Go, if the "class"
+satisfies an interface then it just works!
+
+** A Simple Testing Framework
+Some languages have a testing framework where it almost feels as if
+you're programming in another language. For Go though, the testing
+framework is pretty much just Go code. I like this personally because
+less "magic" in code generally seems to make it easier to
+read/understand which in turn can make it easier to modify.
+
+** Easy Concurrency
+Goroutines are a super easy way to achieve concurrency and channels
+are an easy way to manage that concurrency.
+
+** The Standard Library
+The standard library is frickin' amazing. They've got practically
+everything you could want when programming. I like this because it
+means you don't need to go "hunting" too much for a package which does
+XYZ and since these packages are part of the standard library I get
+some confidence that they work pretty well since everyone is using
+them.
+
+And in general it definitely feels like a lot of tooling comes along
+with the language which is nice since working with a language involves
+so much more than just the language itself.
+
+** Tooling
+Go has some nice tooling around it probably in part because there is a
+library which can parse Go programs.
+
+- gofmt - I love this one. Basically ALL Go code should be run through
+  this program which will properly indent it and such. It means that
+  everyone uses the same style. This avoids things like this
+  [[https://github.com/bbatsov/ruby-style-guide]] (granted some of this
+  document is about actual style rather than indentation and stuff,
+  but a good bit of it is for things like "use 2 spaces for
+  indentation").
+- goimports - Also great. It actually combines what gofmt does (i.e
+  properly indenting code) with automatic adding/removing of package
+  import statements.
+- godoc - If you format your comments a certain way, which the Go
+  people reccomend that you do, then this tool will parse them and
+  give you some nice documentation.
+- go build - It will prevent compilation if there are unused variables
+  or import statments. I think this is the way things should be when
+  it comes to languages, it shouldn't be able to run until the
+  unecessary stuff is gone.
+- guru - Answers language level questions about your go program. For
+  example you can find all the places where a particular function is
+  called:
+  https://docs.google.com/document/d/1_Y9xCEMj5S-7rv2ooHpZNH15JgRT5iM742gJkw5LtmQ/edit
+
+* Links
+- [[https://golang.org]]
+- [[https://blog.golang.org]]
+- [[https://changelog.com/gotime]]
+- [[https://dave.cheney.net]]
+- [[https://peter.bourgon.org/go-best-practices-2016]]
+- [[https://talks.golang.org/2014/organizeio.slide#1]]
+- [[http://dave.cheney.net/2012/01/18/why-go-gets-exceptions-right]]
+- [[https://davidnix.io/post/error-handling-in-go]]
+- [[https://github.com/gophercon/2016-talks/tree/master/JackLindamood-PracticalAdviceForGoLibraryAuthors]]
+
+* General
+- When you execute "go run" or "go test" what actually happens is that
+  these programs will start up ANOTHER process and run that. For "go
+  run" this means compiling and executing whatever you told it to run.
+  For "go test" this means creating, compiling, and then executing a
+  "test binary" which runs all your tests. If you send a TERM signal
+  to "go run" or "go test" it will terminate the "go run"/"go test"
+  command but the process that was started by them continues
+  functioning. In other words, they don't forward that TERM signal to
+  the process they started. If you send them an INT signal nothing at
+  all seems to happen which is strange to me because if you do C-c at
+  the terminal (which sends INT) then it stops the process. I bet
+  stdin is sent directly to the started up process. If you send TERM
+  or INT to the started process then the corresponding "go run"/"go
+  test" command will be stopped as well.

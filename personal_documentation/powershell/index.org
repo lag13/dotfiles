@@ -1,0 +1,10 @@
+* About
+Information about window's powershell program.
+
+- http://dereknewton.com/2010/12/powershell-grep-equivalent
+
+get-childitem <dir> [-include <file-pat>[,<file-pat>]*] [-rec]
+
+select-string -pattern "regex"
+
+Pipe the first one to the second to grep recursively.

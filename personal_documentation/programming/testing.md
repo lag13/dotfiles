@@ -4,25 +4,35 @@ Testing Code
 I'm still learning but it seems like writing tests for your code is a pretty
 neat thing to do. Some benefits:
 
-1. Promotes the application being broken up into manageable chunks (because
-   when a "chunk" becomes too complicated it becomes very difficult to test).
-   In general I think testing can tell you a good deal about your code and
-   "offer" suggestions on how to improve it if you listen carefully. :).
-2. Encourages you to think about the "behavior" you want from some piece of
-   code instead of getting bogged down in the details of the implementation
-   (which, interestingly, can lead you to forget what you were trying to do in
-   the first place!). Specifying the behavior you want by writing a test first
-   (i.e TDD) can be especially nice because then it gives you something to
-   work towards and you'll never forget what you originally intended to do.
-3. Allows you to refactor with confidence!!! This is probably one of my
-   favorite benefits, if you have good unit tests and you refactor the
-   internal implementation (assuming the public functions remain the same) and
-   your tests still pass then you've got good confidence that your unit is
-   still working as expected. Even better, if you have good acceptance tests
-   you can refactor the whole codebase and as long as those acceptance tests
-   still pass you can be fairly confident that you have not broken anything!
-4. You can catch bugs just due to the fact that you're looking at your code
-   from a different perspective.
+1. Promotes the application being broken up into manageable chunks
+   (because when a "chunk" becomes too complicated it becomes very
+   difficult to test). In general I think testing can tell you a good
+   deal about your code and "offer" suggestions on how to improve it
+   if you listen carefully. :).
+2. Encourages you to think about the "behavior" you want from some
+   piece of code instead of getting bogged down in the details of the
+   implementation (which, interestingly, can lead you to forget what
+   you were trying to do in the first place!). Specifying the behavior
+   you want by writing a test first (i.e TDD) can be especially nice
+   because then it gives you something to work towards and you'll
+   never forget what you originally intended to do.
+3. Allows you to refactor with confidence!!! This is probably one of
+   my favorite benefits, if you have good unit tests and you refactor
+   the internal implementation (assuming the public functions remain
+   the same) and your tests still pass then you've got good confidence
+   that your unit is still working as expected. Even better, if you
+   have good acceptance tests you can refactor the whole codebase and
+   as long as those acceptance tests still pass you can be fairly
+   confident that you have not broken anything!
+4. You can catch bugs just due to the fact that you're looking at your
+   code from a different perspective.
+5. Looking at the tests can answer questions about how the code works.
+   What I mean is that sometimes code can be fairly abstract which
+   makes it tougher to understand. Concrete things, on the other hand,
+   are very good for understaning. When you write tests you have to
+   use some type of concrete values and so you'll get a better sense
+   about what is going in and coming out of the functions being
+   tested.
 
 - http://blog.thecodewhisperer.com/ (I read a couple from here but all seem
   good http://blog.thecodewhisperer.com/series#integrated-tests-are-a-scam)

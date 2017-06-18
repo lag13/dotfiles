@@ -17,6 +17,8 @@ only seen addr be the port to listen on like ":8080". I believe that is a
 shorthand for doing "0.0.0.0:8080" which means accept connections from
 anywhere on port 8080. handler is usually nil in which case the
 DefaultServeMux is used.
+
+https://github.com/golang/go/issues/18082
 */
 package main
 
@@ -93,6 +95,11 @@ func jsonHandler(w http.ResponseWriter, r *http.Request) {
 	if err := d.Decode(&s); err != nil {
 		fmt.Printf("decoding json: %v", err)
 	}
+	// You can also read the body and unmarshal it in two
+	// different steps if you so desire. This is useful if you
+	// want to see what the raw body actually is for instance.
+	// body, err := ioutil.ReadAll(r.Body)
+	// err := json.Unmarshal(body, &s)
 	m["request_body_as_str"] = s
 	// What type of HTTP request (GET, POST, PUT, etc...)
 	m["method"] = r.Method

@@ -37,7 +37,10 @@ See `docker help push`
 Example:
 
 ```
+# This will push just this tagged image
 docker push quay.io/cbone/scalp:http
+# This will push ALL tagged images of this one
+docker push quay.io/cbone/scalp
 ```
 
 Dangling Volumes
@@ -78,3 +81,9 @@ https://medium.com/@giorgioto/docker-compose-yml-from-v1-to-v2-3c0f8bb7a48e#.1u9
 version 2 you can configure aspects about the network over which docker
 containers communicate with. I'm really not familiar with it:
 https://docs.docker.com/compose/networking/.
+
+Create And Run Example
+---------------------
+
+docker container create --name lucas2 -it busybox
+docker start -i lucas2

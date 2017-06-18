@@ -23,18 +23,27 @@ func main() {
 	// starting at position 1 is going to be the first argument.
 	fmt.Println(os.Args)
 	{ // Run command ignore output 1
-		cmd := exec.Command("ls", []string{"-l"}...)
+		fmt.Println("COMMAND START 1")
+		cmd := exec.Command("ls", "-l")
 		if err := cmd.Run(); err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println("COMMAND FINISH 1")
 	}
 	{ // Run command ignore output 2
-		cmd := &exec.Cmd{Path: "/bin/ls", Args: []string{"-l"}}
+		fmt.Println("COMMAND START 2")
+		// It is a conventional unix thing that the first
+		// argument to a command is the command's name.
+		// exec.Command() takes care of this detail for you so
+		// it's probably better to use that.
+		cmd := &exec.Cmd{Path: "/bin/ls", Args: []string{"/bin/ls", "-l"}}
 		if err := cmd.Run(); err != nil {
 			log.Fatal("running command with manually created Cmd struct: ", err)
 		}
+		fmt.Println("COMMAND FINISH 2")
 	}
 	{ // Run command and get output 1
+		fmt.Println("COMMAND START 3")
 		cmd := "ls"
 		args := []string{"-l"}
 		output, err := exec.Command(cmd, args...).Output()
@@ -42,16 +51,21 @@ func main() {
 			log.Fatal(err)
 		}
 		fmt.Println(string(output))
+		fmt.Println("COMMAND FINISH 3")
 	}
 	{ // Run command and get output 2
-		// The first argument to a command is conventionally the command
-		// itself.
+		fmt.Println("COMMAND START 4")
+		// It is a conventional unix thing that the first
+		// argument to a command is the command's name.
+		// exec.Command() takes care of this detail for you so
+		// it's probably better to use that.
 		cmd := &exec.Cmd{Path: "/bin/ls", Args: []string{"/bin/ls", "-l"}}
 		output, err := cmd.Output()
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Println(string(output))
+		fmt.Println("COMMAND FINISH 4")
 	}
 	// Run command and process error. Note that if you do not manually set the
 	// Cmd struct to have a non-nil "Stderr" field and you use the "Run()"
@@ -59,6 +73,7 @@ func main() {
 	// "Output()" command and the "Stderr" field is nil then any stderr will be
 	// added to the returned "ExitError" struct's "Stderr" field.
 	{
+		fmt.Println("COMMAND START 5")
 		cmd := exec.Command("rm", []string{"this-file-dont-exist-12345abcde"}...)
 		if _, err := cmd.Output(); err != nil {
 			if exitErr, ok := err.(*exec.ExitError); ok {
@@ -67,6 +82,7 @@ func main() {
 				fmt.Printf("command exited unsuccessfully: %v\n", err)
 			}
 		}
+		fmt.Println("COMMAND FINISH 5")
 	}
 	// Process stderr output by setting the Cmd struct's Stderr field. I think
 	// the only reason you'd want to manually do this yourself is if you wanted
@@ -75,11 +91,13 @@ func main() {
 	// (32768) bytes from the beginning of the error and the same amount of
 	// bytes from the end).
 	{
+		fmt.Println("COMMAND START 6")
 		cmd := exec.Command("rm", []string{"this-file-dont-exist-12345abcde"}...)
 		var stderr bytes.Buffer
 		cmd.Stderr = &stderr
 		if err := cmd.Run(); err != nil {
 			fmt.Printf("command exited unsuccessfully: %v: %s\n", err, stderr.Bytes())
 		}
+		fmt.Println("COMMAND FINISH 6")
 	}
 }

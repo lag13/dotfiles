@@ -1,0 +1,23 @@
+* About
+This is about processes.
+
+* Signals
+Signals are an asynchronous message (really just a number I believe)
+that you can send to another process. I think they are generally used
+to tell a process that it should stop. I've only seen a handful of
+them myself and it feels like the ones I've seen are all different
+flavors of terminating a program:
+
+| Name    | Number | Can Be Caught? | Description                                                                                                     |
+|---------+--------+----------------+-----------------------------------------------------------------------------------------------------------------|
+| SIGINT  |      2 | Y              | Terminal interrupt signal, sent when a user presses C-c.                                                        |
+| SIGTERM |     15 | Y              | Terminate the program.                                                                                          |
+| SIGKILL |      9 | N              | Kill the program                                                                                                |
+| SIGQUIT |      3 | Not Sure       | Terminal quit signal, sent when user presses C-\. By default the program dumps it's memory to stdout and exits. |
+
+So even with this small example you could sort of see how even though
+SIGINT and SIGTERM can end up causing the same thing (i.e program
+termination) they have a different connotation to them. For example a
+terminal editor program might catch C-c so it can do what it wants
+with that character (like invoke some editing command) but it probably
+wouldn't do the same with SIGTERM.

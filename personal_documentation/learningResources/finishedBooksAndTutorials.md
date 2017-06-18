@@ -1,7 +1,7 @@
 Finished Books and Tutorials
 ============================
 
-A list of books/tutorials that I have completed:
+A list of books/tutorials/talks that I have completed:
 
 - Steve Losh's vimscript tutorial
 - Vim edit text at the speed of thought
@@ -20,4 +20,4 @@ Working On
 - High Performance Browser Networking: https://hpbn.co/
 - https://thoughtbot.com/upcase/mastering-git
 - Pro Git: https://git-scm.com/book/en/v2
-- 
+- Communicating Sequential Processes: http://www.usingcsp.com/cspbook.pdf

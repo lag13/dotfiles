@@ -3,15 +3,41 @@
 ;; believe that when emacs starts up it does something like "find the
 ;; first non empty file in the list (~/.emacs ~/.emacs.d/init.el).
 
+;; Need to set GOPATH so tools like goimports will work.
+(setenv "GOPATH" (concat (getenv "HOME") "/gocode"))
+;; exec-path is like "PATH" but for emacs. When emacs tries to run a
+;; binary, it will search through exec-path to find it.
+(setq exec-path
+      (append (list
+	       "/usr/local/bin"
+	       (concat (getenv "GOPATH") "/bin"))
+	      exec-path))
+;; Have PATH be the same as exec-path. We do this because emacs will
+;; invoke a shell to run a program and the shell needs PATH set
+;; appropriately.
+(setenv "PATH" (mapconcat 'identity exec-path path-separator))
+
 ;; Load packages. As of Emacs 25.1 the (package-initialize) function
 ;; will actually write a call to (package-initialize) in the init file
-;; if such a call does not already exist:
-;; [[file:/Applications/Emacs.app/Contents/Resources/lisp/emacs-lisp/package.el.gz::(package--ensure-init-file))]].
-;; So it would appear that the elpa package authors prefer it if
-;; package loading happens before the init file runs. Doing it this
-;; way does feel a bit hacky though. I wonder if they are trying to
-;; make loading packages before the init file the standard way of
-;; doing things?
+;; if such a call does not already exist (describe-function
+;; package--ensure-init-file). So it would appear that the elpa
+;; package authors prefer it if package loading happens before the
+;; init file runs. Doing it this way does feel a bit hacky though. I
+;; wonder if they are trying to make loading packages before the init
+;; file the standard way of doing things? Also, I'm so used to a 1-1
+;; relationship between a vim "package" and the repository that holds
+;; the code for that package (I suppose in part because I didn't
+;; really use a package manager for vim and was downloading the
+;; repositories). In emacs though, which has a package manager built
+;; in, this relationship need not hold. For example this single
+;; repository https://github.com/dominikh/go-mode.el has multiple
+;; packages associated with it:
+;; https://github.com/melpa/melpa/blob/master/recipes/go-mode,
+;; https://github.com/melpa/melpa/blob/master/recipes/go-guru. I think
+;; I like that, it gives the author more freedom on how to structure
+;; their code (for like the above author they can have all the code in
+;; one repository but still divy it up into multiple packages allowing
+;; users to only install the things they want to).
 (package-initialize)
 
 ;; package-archives is a list of package archives to search through
@@ -25,19 +51,31 @@
 ;; Run goimports when saving a Go file.
 (add-hook 'go-mode-hook
 	  (lambda ()
+	    (setq godoc-command "godoc")
+	    (setq godoc-use-completing-read t)
+	    (local-set-key (kbd "M-.") #'godef-jump)
 	    (setq gofmt-command "goimports")
 	    (add-hook 'before-save-hook 'gofmt-before-save)))
 
+;; 2 spaces seems to be used in the example elm tutorials I've seen.
+(setq elm-indent-offset 4)
+
 ;; Turn on editorconfig mode
+(setq editorconfig-exclude-modes '(org-mode))
 (editorconfig-mode 1)
+
+;; By default restclient mode does not define a file type where it
+;; will be triggered.
+(add-to-list 'auto-mode-alist (cons "\\.http\\'" 'restclient-mode))
+
+;; I'm not interested in eldoc mode
+(global-eldoc-mode 0)
+
+;; Hitting return will open the link under the point.
+(setq org-return-follows-link t)
 
 ;; Start emacs fullscreen
 (toggle-frame-fullscreen)
-
-;; exec-path is like "PATH" but for emacs. When emacs tries to run a
-;; binary, it will search through exec-path to find it.
-(setq exec-path
-      (append exec-path '("/usr/local/bin" "~/gocode/bin")))
 
 ;; I like specifying case when typing file names. To be honest a good
 ;; reason I want this is probably so typing just 'D' can complete on
@@ -56,11 +94,10 @@
 ;; document.
 (global-set-key (kbd "C-c l") 'org-store-link)
 
-;; My first stab at emacs programming. Rebinds <left> so that if the
-;; last command was previous-buffer then <left> will repeat that
-;; command otherwise it just does the normal behavior. Same for
-;; <right> with next-buffer.
-(defun left-char-or-previous-buffer ()
+(defun lag13-left-char-or-previous-buffer ()
+  "Repeats `previous-buffer' if the last command was
+`previous-buffer' or `next-buffer', otherwise it does
+`left-char'."
   (interactive)
   (if (or (eq last-command 'previous-buffer)
 	  (eq last-command 'next-buffer))
@@ -68,7 +105,10 @@
 	(previous-buffer)
 	(setq this-command 'previous-buffer))
     (left-char)))
-(defun right-char-or-next-buffer ()
+
+(defun lag13-right-char-or-next-buffer ()
+  "Repeats `next-buffer' if the last command was `next-buffer' or
+`previous-buffer', otherwise it does `right-char'."
   (interactive)
   (if (or (eq last-command 'previous-buffer)
 	  (eq last-command 'next-buffer))
@@ -76,8 +116,11 @@
 	(next-buffer)
 	(setq this-command 'next-buffer))
     (right-char)))
-(global-set-key (kbd "<left>") 'left-char-or-previous-buffer)
-(global-set-key (kbd "<right>") 'right-char-or-next-buffer)
+
+;; My first stab at emacs programming. Makes buffer switching with C-x
+;; <left>/<right> a little quicker when you need to repeat it.
+(global-set-key (kbd "<left>") 'lag13-left-char-or-previous-buffer)
+(global-set-key (kbd "<right>") 'lag13-right-char-or-next-buffer)
 
 ;; If there is a key binding for the command just run, let us know
 ;; more quickly. It will also shorten how long the message is
@@ -87,7 +130,7 @@
 ;; Highlight whitespace at the end of lines and empty lines at the
 ;; beginning or end of buffers.
 ;; [[info:emacs#Useless%20Whitespace][info:emacs#Useless Whitespace]]
-(setq whitespace-style '(face trailing empty))
+(setq whitespace-style '(face empty))
 (global-whitespace-mode)
 
 ;; I feel like backup files just clutter things and I've never had a
@@ -119,15 +162,53 @@
 ;; Highlight matches immediately as you type.
 (setq lazy-highlight-initial-delay 0)
 
+;; Pause tetris then switch to a different buffer.
+(defun lag13-tetris-suspend ()
+  "Pauses the game of tetris (unless it is already paused) and
+switches to buffer `other-buffer'. Useful for when you are struck
+by inspiration while playing and quickly need to act on that
+inspiration. Also useful if someone of importance happens to be
+walking by and you don't want them to see you plaing tetris, that
+works too."
+  (interactive)
+  (or tetris-paused (tetris-pause-game))
+  (message nil)
+  (switch-to-buffer (other-buffer)))
+
+(add-hook 'tetris-mode-hook
+	  (lambda ()
+	    ;; This keymap is active when tetris-mode-hook is running
+	    ;; and when a game has ended. The only reason I added it
+	    ;; is so if I switch to the buffer of a finished game I
+	    ;; can still get out of it the same way. Completeness
+	    ;; right?
+	    (define-key tetris-null-map "s" 'lag13-tetris-suspend)
+	    (define-key tetris-mode-map "s" 'lag13-tetris-suspend)))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (editorconfig go-mode))))
+ '(package-selected-packages
+   (quote
+    (dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(put 'narrow-to-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
+;; Jump to the "alternate" file.
+(global-set-key (kbd "C-x C-a") 'ff-get-other-file)
+
+(defun view-help-buffer ()
+  "Quickly view the help buffer. This code was copied from `view-echo-area-messages' and modified to work with the help buffer."
+  (interactive)
+  (with-current-buffer (help-buffer)
+    (goto-char (point-max))
+    (display-buffer (current-buffer))))
+(global-set-key (kbd "C-h H") 'view-help-buffer)

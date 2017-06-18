@@ -124,6 +124,9 @@ ALTER TABLE table_name
 MODIFY col_name INT;
 
 ALTER TABLE table_name
+MODIFY col_name varchar(123);
+
+ALTER TABLE table_name
 DROP col_name;
 
 ALTER TABLE `mytable`
@@ -136,9 +139,9 @@ ADD INDEX `productInstanceID` (`productInstanceID`)
 ### INSERT
 
 ```
-INSERT INTO TABLE_NAME (column1, column2, column3,...columnN)]  
+INSERT INTO TABLE_NAME (column1, column2, column3,...columnN)]
 VALUES (value1, value2, value3,...valueN);
- 
+
 INSERT INTO TABLE_NAME VALUES (value1,value2,value3,...valueN);
 ```
 
@@ -252,6 +255,26 @@ DROP DATABASE coolDatabaseName
 ```
 SHOW DATABASES
 ```
+
+### Subqueries
+
+Here is an example of a subquery. Now, either I do not understand
+subqueries well but this sort of thing is what makes sql confusing. I
+select from some subquery which is basically a different table) but
+I'm not actually selecting any columns from that table, I'm selecting
+them from one of the joined tables.
+
+select site.*
+from (
+select pkSite, count(*) as count
+from site
+where fkServeurBD = 52
+and strBDD IN ("123points8","3a-academy","3a-academy-sandbox")
+group by strBDD
+) as subSite
+inner join site on site.pkSite = subSite.pkSite
+where subSite.count = 1
+and site.iSuppr = 1;
 
 Modes
 -----

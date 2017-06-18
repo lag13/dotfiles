@@ -4,6 +4,7 @@ Git
 - https://progit.org
 - https://thoughtbot.com/upcase/mastering-git
 - http://ohshitgit.com
+- https://csswizardry.com/2017/05/little-things-i-like-to-do-with-git/
 
 Deleting a Tag
 --------------

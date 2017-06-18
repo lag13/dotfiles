@@ -1,0 +1,191 @@
+* Total Test Coverage In Go
+"Enjoy the process of your search without sucumbing to the pressure of
+the result" - Will Ferrell
+
+For some reason, there seems to be no way to get a "total" percent of
+code covered by tests for your entire repository. The builtin "go
+test" tool only operates on individual packages so any coverage
+reports you generate will only be for that one package. One thing I've
+seen people do to get around this is analyze each coverage profile and
+compute a total percent. A concrete example I have seen of this is:
+
+1. Generate all the individual coverage reports
+2. Combine them into one big coverage report
+3. Send that report to https://coveralls.io which does the percent
+   calculation for you.
+
+The problem is that every tool/script I've seen which takes an
+approach similar to the above one will ignore packages that have no
+unit tests because their tool/script relies on the 'go test' command
+[[https://github.com/golang/go/blob/master/src/cmd/go/internal/test/test.go#L689][which will not generate a coverage profile if no test files exist]].
+This means that they only get a percent of code coverage for the code
+that is already tested:
+
+- https://github.com/go-playground/overalls/blob/master/overalls.go#L335
+- https://github.com/mlafeldt/chef-runner/blob/v0.7.0/script/coverage#L25
+- https://github.com/pierrre/gotestcover
+- https://github.com/golang/go/issues/6909#issuecomment-233493644
+- https://github.com/haya14busa/goverage/blob/master/main.go#L236
+
+* My Goals
+After thinking about it, these are test metrics that what I want to
+know about my repository:
+
+1. Total percentage of how much code is covered by unit tests.
+2. Total percentage of how much code is covered by acceptance tests.
+
+All of these approaches rely on figuring out how many total lines of
+testable code (structs for example are not considered testable code)
+is in my repository. For 2 I'll have to generate a [[https://www.elastic.co/blog/code-coverage-for-your-golang-system-tests][test binary]] and run
+it (or something like that).
+
+* Ideas For How To Accomplish This
+1. Write an empty "_test.go" file in every package that has no unit
+   tests before using "go test". By doing this we'll get coverage
+   profiles for every package which we can somehow use to get a total
+   count of lines vs. lines covered by unit tests.
+2. Learn how "go test" counts lines and see if it is possible to use
+   that functionality independently of anything else.
+3. Figure out how the "go tool cover" command works because it
+   calculates percent. Maybe we can leverage it to do other things.
+
+** 1
+This might actually be the solution we need. It appears that if there
+is no test files then it really doesn't do anything that we want it to
+do:
+https://github.com/golang/go/blob/master/src/cmd/go/internal/test/test.go#L689.
+And there doesn't seem to be a clever way around it.
+
+** 2
+"go test" will count lines by annotating the source code with
+counters, running the tests (which in turn call functions in the
+annotated source code), and then looking at the counters to calculate
+things. This all happens only if a "*_test.go" file exists so I don't
+think there is a simple way to get a count of total lines
+independently of invoking "go test".
+
+** 3
+"go tool cover" does calculations based on the existance of a
+coverprofile. This means the coverprofile must exist in the first
+place which means the "go test" command will have to generate it.
+
+* Research
+** Testing in the Go Ecosystem
+From the testing package documentation:
+#+BEGIN_QUOTE
+  To write a new test suite, create a file whose name ends _test.go that
+  contains the TestXxx functions as described here. Put the file in the same
+  package as the one being tested. The file will be excluded from regular
+  package builds but will be included when the ``go test'' command is run.
+  For more detail, run ``go help test'' and ``go help testflag''.
+#+END_QUOTE
+
+Besides running tests and seeing if they pass you can also output
+something called a "coverprofile" which gives information about how
+many *statements* in your package are covered by tests. For example
+the command "go test -coverprofile=test.out" will output a
+coverprofile called "test.out" for the package being tested.
+
+The slightly confusing thing (at least it was confusing to me) is that
+the "go test" command can't really do anything with that coverprofile
+even though it is the one that generated it. Intelligent parsing of
+this coverprofile is done by "go tool cover". With that command you
+can do things like:
+
+- go tool cover -html=c.out -o coverage.html - Generate an html file
+  of the source code with highlighting denoting which lines are
+  covered by tests and which are not.
+- go tool cover -func=c.out - See the test coverage for each function
+  and also output the total percent coverage for that coverprofile.
+
+Another thing you can do with this tool is generate modified source
+code (go tool cover -mode=set file.go) which aids in generating the
+coverprofile. The "go test" tool actually relies on this functionality
+when it generates the coverprofile (which confused me when I first
+heard it, it's just weird to me that I think "go test" is the only
+tool which uses this functionality and yet it lives in "go tool cover"
+instead of "go test"). I'm not *exactly* sure how it all pieces
+together but I think I've got the general gist. When "go test" is run
+with the "coverprofile" option set:
+
+- This is the code that executes:
+  https://github.com/golang/go/blob/master/src/cmd/go/internal/test/test.go#L422.
+- This function will eventually be called:
+  https://github.com/golang/go/blob/master/src/cmd/go/internal/test/test.go#L573.
+- And that function will call Action() from the "work" package which
+  will eventually call this "cover" function:
+  https://github.com/golang/go/blob/master/src/cmd/go/internal/work/build.go#L1380.
+  And that function, as the comment hints at, basically runs "go tool
+  cover" to annotate the source code making coverage measure possible:
+  https://github.com/golang/go/blob/master/src/cmd/go/internal/work/build.go#L1792.
+- Those annotated files are copied to this new directory:
+  https://github.com/golang/go/blob/master/src/cmd/go/internal/test/test.go#L777.
+- This "_testmain.go" file gets written to the test directory, it will
+  be the code that executes your tests:
+  https://github.com/golang/go/blob/master/src/cmd/go/internal/test/test.go#L951.
+  You can see the template for this file here:
+  https://github.com/golang/go/blob/master/src/cmd/go/internal/test/test.go#L1497
+- In that template you can see references to "cover"
+  variables/counters so somehow it must know what those "counter"
+  variable names are and it hooks into that. Then when "_testmain.go"
+  is run the annotated code is what gets called on so those variables
+  get updated and we get knowlege about which lines are run.
+- _testmain.go, among other things, will call "os.Exit(m.Run())" from
+  the testing package:
+  https://github.com/golang/go/blob/master/src/testing/testing.go#L254.
+  This function is where a lot of the flag parsing happens (for
+  instance coverprofile:
+  https://github.com/golang/go/blob/master/src/testing/testing.go#L254)
+  which is also confusing to me that flag parsing takes place in a
+  package because flags seem like a runtime concept yet here this
+  package is parsing them. Also confusing is the fact that the "go
+  test" command needs to know about the flags in order to pass them
+  along. Seems like a lot of coupling there.
+- The coverprofile finally gets written out at the end with this line:
+  https://github.com/golang/go/blob/master/src/testing/testing.go#L1106.
+  Another thing that is weird to me is that the "go tool cover"'s data
+  structure used to parse coverfiles is not used here to write them.
+  So again, there seems to be some coupling of tools.
+
+It's easy to criticize when you find things hard to understand but
+this code all works and, after seeing the overall structure, it makes
+more sense. I still feel like there's some weird dependencies/coupling
+though which make things harder to understand.
+
+** Coverage File Structure
+The testing package [[https://golang.org/pkg/testing/#Cover][defines a struct]] which is used to generate these
+cover profiles. Here is an example coverprofile:
+#+BEGIN_EXAMPLE
+  mode: count
+  github.com/lag13/test-go-test/has-unit-tests/hut.go:3.24,5.2 1 2
+  github.com/lag13/test-go-test/has-unit-tests/hut.go:7.26,8.7 1 0
+  github.com/lag13/test-go-test/has-unit-tests/hut.go:11.2,11.16 1 0
+  github.com/lag13/test-go-test/has-unit-tests/hut.go:8.7,10.3 1 0
+#+END_EXAMPLE
+
+Based on the data structure, experimentation, and final verification
+by looking at the [[https://github.com/golang/go/blob/master/src/testing/cover.go#L99][source]] [[https://github.com/golang/go/blob/master/src/cmd/cover/profile.go#L30][code]], the structure of this coverage file is:
+#+BEGIN_EXAMPLE
+  <pkg-name>:<start-line>.<start-col>,<end-line>.<end-col> <num-statements> <count>
+#+END_EXAMPLE
+
+The last "<count>" will become just a 1 or 0 when using the "set" mode
+and it will be a cumulative number if using "count" or "atomic" mode.
+
+It's a little confusing that the "testing" package generates the
+coverage profile and "go tool cover" consumes it but they don't use
+the same data structure for the generating+consuming.
+
+** Other Miscellaneous Things To Check Out
+- https://github.com/smartystreets/goconvey - Both a library which
+  provides some more "behavioral" approaches to testing and a command
+  line application which will automatically re-run tests when things
+  change. This author seems to have other stuff related to testing in
+  go such as a library of assertions. And in general this guy seems to
+  have a lot of cool repos.
+- https://github.com/onsi/ginkgo - Another behavioral driven testing
+  framework for go.
+- https://gocover.io/ - View coverage for ANY go package.
+- https://github.com/cweill/gotests - Generate table test skeleton
+  from source code.
+

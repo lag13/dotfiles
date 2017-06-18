@@ -1,0 +1,5 @@
+Turns out that you can export functions by doing: "export -f
+function_name".
+https://unix.stackexchange.com/questions/22796/can-i-export-functions-in-bash.
+That way subshells of your script will have access to the functions
+you export.

@@ -557,3 +557,73 @@ correct. If CHAINCONTEXT in this scenario was sensitive (and so could not be
 logged) you could even set up your code to encrypt it with your public key or
 something and then log that! That is probably indicative that you've got
 problems if it's that hard to test something but it's a fun idea.
+
+39. I'm starting to think that whenever you make an API you should
+make a separate package for the types that your api returns. So there
+would be a type for the response and the data inside of the response
+etc... That way, making a client will be that much easier and if
+people want to make multiple clients they can and they can all pull
+from that same package specifying types.
+
+40. We tend to use the word "error" a lot when something goes wrong.
+But a lot of the time it seems a little inaccurate. An "error" seems
+to imply that something went wrong in the program, perhaps a file
+could not be opened or a database connection failed. But a lot of the
+time the program encountered no error and instead the user made a
+"mistake" when using your program. In those cases I think "mistake" is
+a better choice of words than "error". For example, if the user sent
+an improper query string and the API detects this then it should
+report a "mistake" not an "error".
+
+41. NEVER directly construct dependencies that you need, always inject
+them (i.e pass them in). If something needs to be constructed at run
+time then inject a "factory" which can build that thing for you. And
+when it comes to factories keep this "rule" in mind:
+
+  The ONLY time you need a factory to construct some thing XYZ is if
+  you are using XYZ in multiple places. If you are only using XYZ once
+  after returning from the factory then you don't need to inject a
+  factory. Your thing can instead rely on an interface which does what
+  XYZ does. Under the hood the real thing that gets injected might
+  construct something but that doesn't really matter, all your thing
+  needs is to use that interface.
+
+Adhering to this principle helps decouple your code and makes unit
+testing easier.
+
+42. Unit tests are great because they can help inform you when your
+code could be structured better. If code is hard to unit test, it's
+probably an indication that your unit is too complicated and should be
+broken up. Or if something just "feels weird" with your unit test
+(like a you don't use a function from an interface you rely on or if
+you always pass the same value into a function) that can be an
+indication that your code could be improved. For example, I was
+working on ats-requisitions, which is an API around requisitions, and
+one of my packages used to rely on a database factory AND a paginator
+factory. The database factory constructed a database which was passed
+into the paginator factory which returned a paginator, then a function
+was called on that paginator, and the database was closed. But the
+whole test felt a little weird to me since there was so much
+abstraction with all the factories that it felt like my unit test
+really wasn't doing anything. So I didn't have a concrete idea of what
+was wrong but there was just a feeling that something was amiss.
+Additionally I had a "database" abstraction which could
+"GetRequisitions" and "Close" the underlying database connection and
+those unit tests felt weird because the "Close" operation was part of
+the interface but I never needed to test it. After some thinking I
+realized that I didn't need to "Close" the database in the code with
+the database+paginator factory and in fact I didn't need those
+factories at all since the object they produced was only used ONCE.
+This meant the "Close" method also got put inside the database
+abstraction so it was unit tested. This all lead to better organized
+code all because of some unit test weirdness. So if something feels
+weird in a unit test definitely PAY ATTENTION, it probably means you
+can structure your code better.
+
+I guess when it comes down to it, consumers of XYZ will make XYZ
+better. In this case unit tests are consumers of your code and so they
+will make your code better.
+
+So a couple take away points from this are:
+- Be suspicious of factories and whether they are actually needed.
+- If a method on a struct is not being unit tested then it probably shouldn't exist on the struct.
