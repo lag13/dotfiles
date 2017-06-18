@@ -299,8 +299,8 @@ My emacs journey is starting. What am I getting myself into?
 - I'm getting a weird bug right now (2017-06-09) where if I hit C-o it
   sometimes inserts the text:
 		sut := paginator
-
-
+- Learn about how to have emacs automatically download my packages on
+  startup if I'm on a new machine.
 
 * Terms and Miscellaneous Notes
 - It seems that most "file" related commands or just general commands not strictly related to manipulating text start with C-x.
