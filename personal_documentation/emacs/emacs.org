@@ -301,6 +301,12 @@ My emacs journey is starting. What am I getting myself into?
 		sut := paginator
 - Learn about how to have emacs automatically download my packages on
   startup if I'm on a new machine.
+- Now that I've finally gotten fairly proficient in one particular language
+  (golang) I think I should sit down and really think about what things I
+  want when editing a programming language. I want a better workflow that
+  can be used consistantly across different languages. That workflow will
+  probably be different for translated languages than compiled but some
+  stuff should still hold true.
 
 * Terms and Miscellaneous Notes
 - It seems that most "file" related commands or just general commands not strictly related to manipulating text start with C-x.
