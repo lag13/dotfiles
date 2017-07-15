@@ -127,12 +127,6 @@
 ;; displayed but we can always check *Messages* if we're interested.
 (setq suggest-key-bindings 1)
 
-;; Highlight whitespace at the end of lines and empty lines at the
-;; beginning or end of buffers.
-;; [[info:emacs#Useless%20Whitespace][info:emacs#Useless Whitespace]]
-(setq whitespace-style '(face empty))
-(global-whitespace-mode)
-
 ;; I feel like backup files just clutter things and I've never had a
 ;; use for them as of yet (crosses fingers).
 (setq make-backup-files nil)
@@ -142,11 +136,13 @@
 ;; benefit because I'm the only one editing files on my computer.
 (setq create-lockfiles nil)
 
-;; Normally auto-saving happens in a different file than the one the
-;; buffer is visiting. But that creates more files floating around
-;; which I don't care for. So let's have auto-save effect the current
-;; file being edited.
-(setq auto-save-visited-file-name "auto-save in current file please!")
+;; I tend to save files very often so auto-saving is not helping me
+;; much and I did just get bit in the butt for having it. I was making
+;; a game in emacs and my file contents got lost because I
+;; accidentally started the game in the buffer containing the file,
+;; the file was auto-saved, and I could not undo since starting the
+;; game disables it.
+(setq auto-save-default nil)
 
 ;; So when buffer names are created, they show up as (concat bufname
 ;; uniquify-separator dir) instead of (concat bufname "<" dir ">")
@@ -192,7 +188,7 @@ works too."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))))
+    (php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -211,4 +207,12 @@ works too."
   (with-current-buffer (help-buffer)
     (goto-char (point-max))
     (display-buffer (current-buffer))))
-(global-set-key (kbd "C-h H") 'view-help-buffer)
+(global-set-key (kbd "C-h h") 'view-help-buffer)
+
+;; How to do global search and replace:
+
+;; 1. Go into Dired mode and hit Q on the file or directory where this
+;; search and replace should happen.
+
+;; 2. After doing that run the save-some-buffers command which will
+;; save modified file buffers.

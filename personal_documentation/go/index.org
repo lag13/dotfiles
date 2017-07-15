@@ -107,3 +107,17 @@ library which can parse Go programs.
   stdin is sent directly to the started up process. If you send TERM
   or INT to the started process then the corresponding "go run"/"go
   test" command will be stopped as well.
+- An error when either:
+  1. A promise could not be kept.
+  2. A response could not be given.
+
+* Tool Examples
+** Rewrite Your Source Code
+gofmt has the ability to "rewrite" source code for you. It's basically
+just a search and replace sort of thing but it operates on actual go
+syntax rather than just plain strings. For example this will rewrite
+all strings that say '"hello"' to be just 'world' (presumably 'world'
+is a variable):
+#+BEGIN_SRC sh
+  gofmt -r '"hello" -> world' file.go
+#+END_SRC

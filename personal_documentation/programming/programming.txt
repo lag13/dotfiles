@@ -627,3 +627,46 @@ will make your code better.
 So a couple take away points from this are:
 - Be suspicious of factories and whether they are actually needed.
 - If a method on a struct is not being unit tested then it probably shouldn't exist on the struct.
+
+43. People say that each "unit" (whether that be a class or function
+or package) should have only one responsiblity. I think that statement
+is a little abstract. What is a "responsibility"? I think a better
+statement to have in mind is: "each unit should be responsible for
+performing one data transformation". Even though the idea of "one
+transformation" can also be a little hazy it is more concrete to me
+than "one responsibility". For example, creating a function which
+sends a request and returns structured information from the response
+is one transformation. You *could* call that 3 transformations (one
+for transforming function parameters to a request, one for sending a
+request (thereby turning the request into a response), and one for
+turning the response into structured data) but unless those
+intermediate transformations are needed by other functions there is no
+need to do everything separately. Although it is good to be aware of
+all data transformations which go on.
+
+A less elegant but more accurate statement to keep in mind is "each
+unit should be responsible for performing a data transformation which
+is used by 2 or more other units". For instance, in the above example
+a function which sends a request and returns structured data is
+actually composed of 3 transformations, but if those first 2 (function
+parameters -> request and request -> response) are not needed by 2 or
+more other units then there is no need to expose them and your overall
+transformation becomes function parameters -> structured response
+data. However, there are usually exceptions to every rule and I think
+two exceptions here are "if a unit is getting too large then feel free
+to break it up" and "if you think that some intermediate
+transforamtion *could* be useful in the future to have on it's own
+then feel free to break up the unit". "too large" is arbitrary but if
+your unit test is becoming unmanagable then that is a sign that the
+unit is too large.
+
+44. I think in general if you are returning a custom type, that type
+should be exposed by the package/class/whatever.
+
+45. I never thought about it before but if you have a function, it is
+coupled to whatever functions it calls. So if you have a large chain
+of functions, it could be hard to pick out one in the middle that you
+want to use independently. I know this sounds silly but it's worth
+thinking about whether it is better for function A to call B and use
+B's value or if A could be used independently of B and so pass in B's
+value to A instead.

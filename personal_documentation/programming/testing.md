@@ -618,3 +618,41 @@ on that matter:
 
 If one of those things don't hold then then your code will be covered by
 acceptance testing and you needn't worry about unit testing it.
+
+## Unit Tests Exercising Multiple Units vs. Acceptance tests
+Recently at work another developer, Dmitry, has been pushing for
+having unit tests which exercise multiple real units instead of
+"acceptance" tests as we've been doing for the past year (I'm not sure
+if we have an official name for them but I'll call them "unit
+acceptance tests" for the time being). Basically he thinks that
+maintaing mock APIs (so these APIs are *actual* servers that you have
+to spin up) is too much work and things should be more abstracted away
+behind some sort of interface. So instead of, say, creating a mock
+server which returns JSON and pointing your code to that, you would
+inject a mock into your main code which returns the structured JSON. I
+can see his reasoning in some ways but I'm not sure if I agree with
+him. These are my thoughts on the matter.
+
+I think my thoughts are pretty simple actually. There are probably two
+reasons I like acceptance tests which both stem from the fact that
+acceptance tests know NOTHING about your implementation, they only
+care about the behavior of the feature:
+
+1. You can do mass refactors (perhaps you drastically change how your
+   code is organized or maybe you change the language of the source
+   code itself!) and the acceptance tests still work. This gives you
+   freedom to change your code however you want and still have
+   confidence that it works.
+2. Since acceptance tests know nothing about the implementation and
+   care only about the feature, they help you focus on **what** a
+   feature should be doing instead of getting bogged down in the
+   details of **how** to make that feature. With so many ways to
+   abstract and organize your code, having this simple goal can help
+   you complete your feature more quickly. The idea of identifying the
+   behavior you want first and then hammering out the implementation
+   details seems like such an obvious way to develop but you'd be
+   surprised at how easy it is to forget this; there's a lot of
+   abstraction and such in code so it's easy to get lost.
+
+Dmitry's approach does not get these benefits. I still need to try his
+approach though, maybe I'll like it more than I think.
