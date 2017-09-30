@@ -276,6 +276,15 @@ inner join site on site.pkSite = subSite.pkSite
 where subSite.count = 1
 and site.iSuppr = 1;
 
+### Increase Auto-Increment Value
+Most tables have a column which is an ID for that row. That value gets
+automatically incremented starting from 1. You can change where this
+value starts from whenever you want:
+
+```
+ALTER TABLE table_name AUTO_INCREMENT = 1500;
+```
+
 Modes
 -----
 

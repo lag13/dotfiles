@@ -314,6 +314,14 @@ My emacs journey is starting. What am I getting myself into?
   multiple times doesn't cause any "issues"?
 - Check out this for more game programming fun:
   https://www.reddit.com/r/emacs/comments/4ojxby/writing_a_game_in_emacs/.
+- When you switch buffers they supply the buffer name you would switch
+  to if the minibuffer was empty and you hit enter. Sometimes I just
+  start typing even though the default is the one I want to go to.
+  Make a mapping "shift-return" to go to the default even if I've
+  started typing.
+- Is there an emacs command to kill buffers that used to be associated
+  with files but are not longer associated with files?
+- Show the current time somewhere.
 
 * Terms and Miscellaneous Notes
 - It seems that most "file" related commands or just general commands not strictly related to manipulating text start with C-x.
@@ -603,20 +611,38 @@ Runs the functions you have placed in the midnight-hook every night at midnight.
 Typing in the minibuffer coninuously displays a list of possible completions.
 
 * Elisp
-Emacs is rather unique, at least I think, as far as editors go. Emacs the software is composed of two parts:
+Emacs is rather unique, at least I think, as far as editors go. Emacs
+the software is composed of two parts:
 
-1. An interpreter, written in C, for a language they created called Elisp.
+1. An interpreter, written in C, for a language they created called
+   Elisp.
 2. A bunch of Elisp code which makes up most (pretty much all) of the editor's functionality.
 
-What's cool/unique about emacs is that you use elisp to extend the editor and since emacs IS written in elisp you can customize emacs however you want. This isn't possible with vim for example because you extend vim using vimscript but the majority of the editor is written in C. So you can only alter the parts that the vimscript gives you access to. I think emacs is even more customizable because it is written in a "lisp" which allow you to do things like redefine functions.
+What's cool/unique about emacs is that you use elisp to extend the
+editor and since emacs IS written in elisp you can customize emacs
+however you want. This isn't possible with vim for example because you
+extend vim using vimscript but the majority of the editor is written
+in C. So you can only alter the parts that the vimscript gives you
+access to. I think emacs is even more customizable because it is
+written in a "lisp" which allow you to do things like redefine
+functions. So you can even do things like redefine functions which are
+a core part of the editor. This is probably not advised but hey, you
+can do it.
 
 ** Typing
-EVERY complete key sequence you type in emacs actually invokes a lisp function of some sort. Even typing plain keys invokes the `self-insert-command` function which just inserts the typed character. What probably goes on inside emacs is that every key you type it looks for a function associated with that key, if none is found then it waits for more keys to be typed.
+EVERY complete key sequence you type in emacs actually invokes a lisp
+function of some sort. Even typing plain keys invokes the
+`self-insert-command` function which just inserts the typed character.
+What probably goes on inside emacs is that every key you type it looks
+for a function associated with that key, if none is found then it
+waits for more keys to be typed.
 
 ** Commands
-The functions that get evaluated by typing are called "interactive" functions or "commands": [[info:eintr#How%20to%20Evaluate][info:eintr#How to Evaluate]].
+The functions that get evaluated by typing are called "interactive"
+functions or "commands": [[info:eintr#How%20to%20Evaluate][info:eintr#How to Evaluate]].
 
-- (interactive) - dclares that the function can be used interactively i.e you can bind keys to it.
+- (interactive) - dclares that the function can be used interactively
+  i.e you can bind keys to it.
 - (buffer-name) - returns the name of the buffer
 - (buffer-file-name) - returns the full path of the name of the file being visited.
 - (current-buffer) - returns the buffer itself that is currently being visited
@@ -638,14 +664,20 @@ The functions that get evaluated by typing are called "interactive" functions or
 Binding keys to commands.
 
 - The "keymap" is a map from key sequence to command.
-- If a key is followed by other keys, previous keys in the sequence MUST be classified as prefix keys. Where a complete key sequence invokes a command, these prefix keys "load up" anothe keymap to look through.
+- If a key is followed by other keys, previous keys in the sequence
+  MUST be classified as prefix keys. Where a complete key sequence
+  invokes a command, these prefix keys "load up" anothe keymap to look
+  through.
 - There are many keymaps. Later keymaps on this list take precedence
   over preceding ones.
   - Global keymap which applies in all modes
   - Major mode keymaps which takes effect in a major mode
   - Minor mode keymaps which take effect in a minor mode
   - Portions of text in a buffer can specify keymaps
-- Keep in mind that ALL key binding related activity ultimately comes down to using the define-key function. Even global-set-key ultimately just runs (define-key global-map my-cool-key my-cool-command).
+- Keep in mind that ALL key binding related activity ultimately comes
+  down to using the define-key function. Even global-set-key
+  ultimately just runs (define-key global-map my-cool-key
+  my-cool-command).
 
 * Long Lines
 When a line is too long one of three things could be configured to happen:
@@ -659,7 +691,8 @@ When a line is too long one of three things could be configured to happen:
 There are various configurations to accomplish any of these things.
 
 * Version Control (VC)
-Emacs ships with a generic version control front end called "VC" which works with several different VCS's such as Git and Mercurial.
+Emacs ships with a generic version control front end called "VC" which
+works with several different VCS's such as Git and Mercurial.
 
 ** Command Reference
 - C-x v r (vc-retrieve-tag) - Switch to a new branch
@@ -668,30 +701,101 @@ Emacs ships with a generic version control front end called "VC" which works wit
 - C-x v i (vc-register) - Start tracking the current file.
 
 * Buffers vs. Files
-If I open a new file with C-x C-f and if I make modifications to that file then it will not let me close it until the changes are saved or until I force closing it. If I create a new buffer with `C-x b` though, I can kill that buffer and not get yelled at for not saving changes. It seems that buffers not attached to files are really disposable.
+If I open a new file with C-x C-f and if I make modifications to that
+file then it will not let me close it until the changes are saved or
+until I force closing it. If I create a new buffer with `C-x b`
+though, I can kill that buffer and not get yelled at for not saving
+changes. It seems that buffers not attached to files are really
+disposable.
 
 * Vim vs. Emacs and Thoughts About a Better Editor
 Notes about how I think vim and emacs compare to eachother.
 
 ** Things I Like From Vim
-- Editing commands that work on a entire lines. Right now it feels like if I want to delete an entire section of lines I have to carefully select the appropriate region taking care to get the newlines and then you have to put your cursor in just the right spot to get the paste to work as desired. Linewise copies+pastes are very nice.
-- Working on ranges of lines seems very clean/consistent. You just have one command to remember and basically you give it different ranges depending on what you want to do. In emacs it feels like there is one command to change things after the point and another to work inside a region.
-- How undo works. With emacs it feels like I often need to "spam" undo to get back to the previous state that I want. And when I do undo things, it just makes the undo state more messy! With vim this is not the case, undo's are nicely "chunked" so I only have have to hit undo a couple of times and undoing doesn't add more undo information as it does with emacs.
-- The '*' command. It only does one simple thing, but it is rather nice. Maybe emacs has another way though?
-- Keybinding seemed "simpler" if you can believe it. Not by much but a little. I think the main thing I miss about making vim keybindings is that you could just make whatever you wanted! In emacs there's this notion of a "prefix key" so if you try to make a mapping "C-a C-a" it would fail because C-a is not a prefix key, vim would just let you make it though.
+- Editing commands that work on a entire lines. With emacs you must do
+  C-a and then start your highlighting. Then when you paste you also
+  have to do a C-a before pasting. It's not too bad once you get used
+  to it but having copy+paste commands which just work on entire lines
+  regardless of where the cursor is was pretty convenient.
+- Working on ranges of lines seems very clean/consistent. You just
+  have one command to remember which by default works on the current
+  line but you can also make it work on multiple lines. In emacs there
+  seem to be some commands to modify things after the point and
+  sometimes different ones to work in a region.
+- How undo works. With emacs it feels like I often need to "spam" undo
+  to get back to the previous state that I want. And when I do undo
+  things, it just makes the undo state more messy! With vim this is
+  not the case, undo's are nicely "chunked" so I only have have to hit
+  undo a couple of times and undoing doesn't add more undo information
+  as it does with emacs.
+- The '*' command. It only does one simple thing, but it is rather
+  nice. Maybe emacs has another way though?
+- Keybinding seemed "simpler" if you can believe it. Not by much but a
+  little. I think the main thing I miss about making vim keybindings
+  is that you could just make whatever you wanted! In emacs there's
+  this notion of a "prefix key" so if you try to make a mapping "C-a
+  C-a" it would fail because C-a is not a prefix key, vim would just
+  let you make it though.
 
 ** Things I Like From Emacs
-- Documentation. Holy shit. Don't get me wrong, vim has fantastic documentation but it always felt like you had to know what you were looking for if you wanted to find something. And navigating it felt a little clunkier. But emacs documentation is extremely comprehensive and dynamic and very nice to navigate around. It will even link you to the source code implementing some function if you are really curious!!!
-- Emacs seems very user friendly in general, offering nice defaults with commands (like switching to the previous buffer if you type nothing with C-x b) AND if you run a command using M-x and that command has a key binding, it will tell you that key binding!!! That is frickin' amazing.
+- Documentation. Holy shit. Don't get me wrong, vim has fantastic
+  documentation but it always felt like you had to know what you were
+  looking for if you wanted to find something. And navigating it felt
+  a little clunkier. But emacs documentation is extremely
+  comprehensive and dynamic and very nice to navigate around. It will
+  even link you to the source code implementing some function if you
+  are really curious!!! I fucking love that. It's super neat too when
+  you load your own functions and can view documentation on them.
+- Emacs seems very user friendly in general, offering nice defaults
+  with commands (like switching to the previous buffer if you type
+  nothing with C-x b) AND if you run a command using M-x and that
+  command has a key binding, it will tell you that key binding!!! That
+  is so cool.
 
 ** A Better "editor"
-My thoughts on traits that a better "editor" should have
+My thoughts on traits that a better "editor" should have:
 
-- linewise operations from vim. I feel like the only reason emacs' C-a goes to the beginning of the line is to facilitate linewise deletes and pastes. But that would be unecessary if you had linewise selections.
-- we'll see how I feel about emacs keybindings after I play around with them a bit but I feel like they will be hard to remember. I think vim's operator+text-object model of editing might be "better"? Definitely less things to remember.
-- it should be more than just an editor. So it can do "non-editing" stuff like run a repl or whatever.
-- It should just have one well defined place where configuration lives. I think emacs can have 3 (or more) potential places where your init file lives. I think this is just confusing, there should only be one. And is there any reason to store this directory of configuration as a "dotfile"? I'm inclined to just have it be a regular directory name.
-- emacs puts a LOT of random stuff in .emacs.d (like high scores in tetris!) I feel like I would prefer it if my editor had one directory for stuff you'd consider commiting to github and another for random stuff like tetris high scores
+- the operator+text-object model of editing from vim (so "normal" mode
+  is the default). We'll see how I feel about emacs' editing
+  facilities after using it more but I feel like they'll be hard to
+  remember so you'll end up using a lot of "primative" motions to get
+  the job done. The operator+text-object model definitely feels like
+  it gives the most power while requiring you to remember the least.
+- it should be more than just an editor. So it can do "non-editing"
+  tasks like run a repl.
+- it should have one place where configuration lives. I think emacs
+  can have 3 (or more) potential places where your init file lives
+  which is just silly to me. There should only be one. And is there
+  any reason to store this directory of configuration as a "dotfile"?
+  Just curious. I'm a little inclined to just have it be a regular
+  directory.
+- emacs puts a LOT of random stuff in .emacs.d (like high scores in
+  tetris!) I feel like I would prefer it if my editor had one
+  directory for stuff you'd consider saving somewhere and another for
+  random stuff like tetris high scores.
+- nicely chunked undos like vim but have undo functionality when
+  you're within insert mode. Because sometimes it is just convenient
+  to "live" in insert mode for a little while and while you're there
+  it would be nice to have some undo functionality. Or maybe enforcing
+  the separation is better as vim does, I'm not really sure.
+- this is kind of a language issue but I bring it up since editors
+  have to deal with it. Indentation for code should never be a debate.
+  There should just be one way to format a particular language that
+  everyone is forced to adhere to and the editor should support this.
+  I just hate having to go into an editor and fiddle with the
+  indentation settings, IT SHOULD JUST WORK GOD DAMMIT. This is one
+  reason I love golang, it has a program which enforces a certain
+  style which can be run automatically whenever I save a file so I
+  never have to worry about indentation. I think it would be nice if
+  you could take this even farther and make it impossible to even
+  write syntactically bad code (like with paredit) but that might be
+  hard. On a related note if possible the editor should be configured
+  so whenever a file is saved imports and stuff are automatically
+  taken care of (goimports does this and it is awesome).
+- the language used to create the editor should also be the language
+  used to extend it. This is taken straight from emacs. I don't really
+  know why you wouldn't want to do this since it means that people can
+  make the editor do anything they want.
 
 * OS Specific Notes
 ** Mac
@@ -771,3 +875,89 @@ action:
   (my-advice foo)
   (foo 1)
 #+END_SRC
+* Indentation
+How indentation appears to work in emacs:
+- [[info:emacs#Indentation]]
+- [[info:emacs#Program%20Indent][info:emacs#Program Indent]]
+
+For most modes, hitting the <TAB> key runs the function
+"indent-for-tab-command" which will automatically indent the code.
+There are some exceptions to this notably C and other C like languages
+like Java which run the c-indent-line-or-region for some silly reason
+I do not understand. But regardless, you hit <TAB> and code gets
+indented.
+
+** Tab Stops
+Emacs defines certain column numbers to be "tab stops" which are used
+as stopping points by <TAB> when inserting *whitespace* in Text mode
+and related modes. So in Text mode, if you type <TAB> it will try to
+insert the proper amount of whitespace (i.e spaces and tabs) to reach
+the next tab stop. But honestly this whole thing still confuses me and
+I feel like it just shouldn't be a thing. I still don't have an
+accurate mental model of exactly what is going on. It's a good thing
+this sort of thing doesn't really come up when editing programming
+languages.
+
+I think this naming is a little bad since it referrs to (I believe)
+the key on the keyboard but it makes you think of the tab character.
+
+** Indentation For Programs
+All that nonsense about tab stops really only matters when editing
+text files which honestly doesn't happen too much. When editing these
+are your two main ones:
+
+- <TAB> - Typically runs indent-for-tab-command
+- <RET> - Inserts a newline and indents (assuming electric-indent-mode
+  is on.
+
+*** WTF C?!?!?
+Probably because C is so old and everyone has opinions C has multiple
+"styles" of indentation and emacs tries to support everything. By
+default C code will use the "gnu" style of indentation.
+
+- c-default-style - an alist of mode symbols to a "style" (which is
+  just a string). So if that mode becomes active then that indentation
+  style is applied.
+- c-style-alist - an alist of all the styles. It seems a little
+  ridiculous to me.
+
+** Configuration/Commands
+From my findings it kind of seems like every language is going to have
+its own special way of doing indentation. The only common thread is
+that the entrypoint is the same (which is not always the case as we've
+seen with C) but after that its just some independent lisp code. It
+feels like there's duplication going on here because every language
+might define a constant saying how many spaces to indent by or
+whatever. I thought vim was a little simpler in this respect (but
+indentation also confused me there so lets not get into that).
+Regardless, it feels like if you want to customize some indentation
+then you'll be diving into some code:
+
+- tab-width - Change the displayed width of tab characters. I think
+  this will also change which characters get inserted (spaces or tabs)
+  when hitting a tab that tries to align on a tab stop.
+- indent-for-tab-command - What typically gets run when hitting <TAB>
+  in a program.
+  - indent-line-function - What really gets called to handle program
+    indentaion when hitting <TAB>. It is a variable and all you do is
+    set it to the value of a symbol which has a function which takes
+    care of the indentation. So this will be different for every
+    language which is a tad annoying because then I think every
+    language will have its own variables for adjusting indentation
+    level and such. For example javascript uses the function
+    js-indent-line which relies on a variable js-indent-level which
+    determines how many spaces of indentation to use. But yeah, if you
+    look here for a language you should be able to reverse engineer
+    how the spacing is being determined.
+- electric-indent-mode - Performs indentation when you type certain
+  characters such as <RET> and {.
+  - electric-indent-functions - A hook that if it returns non-nil
+    indentation is performed.
+  - electric-indent-chars - A list of chars that if typed will perform
+    indentation.
+- c-indent-line-or-region - For C and other C like code the <TAB> key
+  is mapped to this for some weird reason.
+- indent-tabs-mode - Set to nil to use only spaces for indentation. I
+  think this option is only applicable in Text modes.
+- tabify - turns spaces into tabs in the region.
+- untabify - turns tabs into spaces in the region.

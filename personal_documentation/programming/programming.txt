@@ -670,3 +670,41 @@ want to use independently. I know this sounds silly but it's worth
 thinking about whether it is better for function A to call B and use
 B's value or if A could be used independently of B and so pass in B's
 value to A instead.
+
+46. Liked this comment about mocks that I had in a repo:
+
+    I'm making heavy use of mocks in testing and I'm not sure if I
+    like how I've gone about doing it. Sometimes it just feels like
+    the mock code "gets in my way". Sometimes I have to put some
+    thought into making the "correct" mock code when I just want to
+    write the test. Perhaps that's just the tradeoff that has to be
+    made but I want there to be a better way. Perhaps the "better way"
+    will be re-structuring the application so mocks are simpler?
+    Perhaps the "better way" will be one with less mocks altogether?
+    Or perhaps the "better way" will be accepting the fact that I need
+    mocks and get better at managing them?
+
+After working with Dmitry's ats-hire code I'm definitely leaning
+towards the thought that interfaces and mocks have no business being
+in unit tests unless the interface represents a true abstraction (i.e
+multiple objects can go in that interface slot). If there are too many
+mocks then at some point the unit tests seem to mostly be concerned
+with instantiating all these mocks and making sure they get called
+properly. So if this communication pattern changes then all these unit
+tests have to change as well. More and more I'm starting to think that
+this person's ideas were right on the money:
+http://enterprisecraftsmanship.com/2016/07/05/growing-object-oriented-software-guided-by-tests-without-mocks/.
+It also makes me appreciate acceptance tests more because in working
+on this repository I have "painted myself into a corner" a couple
+times where I: need new functionality so I start writing a unit, try
+to integrate that unit with another one and get unit tests, then I try
+to wire up EVERYTHING so it works but I realize I need to change other
+code first and it starts getting messy. If you had a good
+understanding of the code to begin with I don't think you'd have this
+issue but since I don't I didn't realize this problem until later.
+
+47. If a program is behaing "weirdly" as in its behavior does not
+appear to be consistent your first thoughts should either be: memory
+problem (like different things are writing to the same memory) or some
+sort of thread related prolem (like maybe some code is not thread
+safe).

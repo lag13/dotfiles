@@ -2,3 +2,5 @@
 - [[http://package.elm-lang.org/]]
 - https://www.brianthicks.com/post/2017/01/13/create-custom-json-decoders-in-elm-018/
 - http://eeue56.github.io/json-to-elm/
+- https://webcache.googleusercontent.com/search?q=cache:7jhiIUdJKkoJ:https://dev.to/rtfeldman/tour-of-an-open-source-elm-spa+&cd=1&hl=en&ct=clnk&gl=us
+- https://github.com/tomekwi/elm-live

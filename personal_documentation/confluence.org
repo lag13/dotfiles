@@ -1,0 +1,5 @@
+To paste code in confluence:
+1. Go to "Insert more content"
+2. Go "Markup"
+3. Insert code between {code}...{code}
+4. After doing so you can change the colorscheme and such

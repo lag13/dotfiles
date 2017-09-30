@@ -1,0 +1,4 @@
+ISO 8601 is the standard way to represent time as a string.
+
+UTC time is the standard time which I believe corresponds to British
+time which is 5 hours ahead of chicago time.

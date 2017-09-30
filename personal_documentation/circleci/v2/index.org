@@ -14,6 +14,23 @@ Taking notes to learn about how circleci 2.0 works.
 - https://circleci.com/docs/1.0/adding-read-write-deployment-key/
 - https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 
+For circleci to be able to create tags it needs to have an ssh key
+which has write permission for a given repository. (I'm unsure if this
+ssh key is only necessary if the repository is private). To do this:
+
+1. Run this on your terminal: ssh-keygen -t rsa -b 4096 -C "your_github_email@example.com"
+   Do not enter any passphrase.
+2. Go to Settings -> Deploy Keys for your repository
+   (https://github.com/your-org/your-repo/settings/keys) and add the
+   key. The title I usually give is "CircleCI Create Tags", you copy
+   the public key, and remember to give it write access!
+3. You are then going to add the private key to circleci. So go to
+   "Project settings" -> "SSH Permissions"
+   (https://circleci.com/gh/your-org/your-repo/edit#ssh) then add the
+   ssh key. The "Hostname" should be "github.com" and when pasting the
+   private key you include the "-----BEGIN RSA PRIVATE KEY-----"
+   lines.
+
 * Inch by Inch (Row by Row)
 Documenting every step I took. Builds start [[https://circleci.com/gh/cbdr/tsr-featureflags/160][here]].
 

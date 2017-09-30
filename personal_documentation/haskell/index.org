@@ -1,0 +1,6 @@
+* Haskell
+General information about Haskell.
+
+* Links
+- https://twitter.com/1haskelladay
+- http://chrispenner.ca/posts/conways-game-of-life

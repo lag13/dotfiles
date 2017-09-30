@@ -3,19 +3,22 @@
 ;; believe that when emacs starts up it does something like "find the
 ;; first non empty file in the list (~/.emacs ~/.emacs.d/init.el).
 
-;; Need to set GOPATH so tools like goimports will work.
-(setenv "GOPATH" (concat (getenv "HOME") "/gocode"))
-;; exec-path is like "PATH" but for emacs. When emacs tries to run a
-;; binary, it will search through exec-path to find it.
-(setq exec-path
-      (append (list
-	       "/usr/local/bin"
-	       (concat (getenv "GOPATH") "/bin"))
-	      exec-path))
-;; Have PATH be the same as exec-path. We do this because emacs will
-;; invoke a shell to run a program and the shell needs PATH set
-;; appropriately.
-(setenv "PATH" (mapconcat 'identity exec-path path-separator))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+(put 'narrow-to-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
 
 ;; Load packages. As of Emacs 25.1 the (package-initialize) function
 ;; will actually write a call to (package-initialize) in the init file
@@ -48,7 +51,34 @@
  'package-archives
  '("melpa" . "http://melpa.org/packages/"))
 
-;; Run goimports when saving a Go file.
+;; Will install all the packages declared by this init file. This is
+;; only useful for new computers which do not have my selected
+;; packages. The package-refresh-contents will slow things down on
+;; start up but I don't startup emacs that often so its fine with me.
+;; TODO: Should the call to package-initialize go after this??
+(package-refresh-contents)
+(package-install-selected-packages)
+
+(add-hook 'c-mode-common-hook
+	  (lambda()
+	    (setq comment-start "// ")
+	    (setq comment-end "")))
+
+;; Need to set GOPATH so tools like goimports will work.
+(setenv "GOPATH" (concat (getenv "HOME") "/gocode"))
+;; exec-path is like "PATH" but for emacs. When emacs tries to run a
+;; binary, it will search through exec-path to find it.
+(setq exec-path
+      (append (list
+	       "/usr/local/bin"
+	       (concat (getenv "GOPATH") "/bin"))
+	      exec-path))
+;; Have PATH be the same as exec-path. We do this because emacs will
+;; invoke a shell to run a program and the shell needs PATH set
+;; appropriately.
+(setenv "PATH" (mapconcat 'identity exec-path path-separator))
+
+;; Go specific hooks
 (add-hook 'go-mode-hook
 	  (lambda ()
 	    (setq godoc-command "godoc")
@@ -56,6 +86,30 @@
 	    (local-set-key (kbd "M-.") #'godef-jump)
 	    (setq gofmt-command "goimports")
 	    (add-hook 'before-save-hook 'gofmt-before-save)))
+
+;; TODO: Do haskell stuff one thing that looked cool was configuring
+;; "stylish-haskell" to run on save. Maybe this configuring this
+;; haskell-process-args-ghci would be useful? I think ghci runs by
+;; default for interactive haskell in emacs.
+
+;; (org-babel-do-load-languages
+;;  'org-babel-load-languages
+;;  '((haskell . t)))
+
+;; TODO: Why is it done this way instead of with a hook? I commented this out since it seemed to mess up the interactive session if I ran it.
+;; (eval-after-load "haskell-mode"
+;;   '(define-key haskell-mode-map (kbd "C-c C-c") 'haskell-compile))
+
+;; Enables creating interactive shell stuff
+(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+(eval-after-load "haskell-mode"
+  '(define-key haskell-mode-map (kbd "C-`") 'haskell-interactive-bring))
+(setq haskell-process-type 'stack-ghci)
+      
+;; ;; Haskell specific hooks
+;; (add-hook 'haskell-mode-hook
+;; 	  (lambda ()
+;; 	    (interactive-haskell-mode 1)))
 
 ;; 2 spaces seems to be used in the example elm tutorials I've seen.
 (setq elm-indent-offset 4)
@@ -181,22 +235,6 @@ works too."
 	    (define-key tetris-null-map "s" 'lag13-tetris-suspend)
 	    (define-key tetris-mode-map "s" 'lag13-tetris-suspend)))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-(put 'narrow-to-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
 
 ;; Jump to the "alternate" file.
 (global-set-key (kbd "C-x C-a") 'ff-get-other-file)

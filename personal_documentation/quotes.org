@@ -1,0 +1,38 @@
+* Kafka On The Shore
+#+BEGIN_QUOTE
+"Arch. Archduke. Beethoven dedicated it to the Austrian archduke
+Rudolph. It's not the official name, more like the piece's nickname.
+Rudolph was the son of Emperor Leopold the Second. He was a very
+skilled musician, who studied piano and music theory with Beethoven.
+starting when he was sixteen. He looked up to Beethovedn. Archduke
+Rudolph didn't make a name for himself as either a pianist or a
+composer, but sort of stood in the shadows lending a helping hand to
+Beethoven, who didn't know much about getting ahead in the world. If
+it hand't been for him, beethoven would have had a much tougher time."
+
+"Those kind of people are necessary in life, huh?"
+
+"Absolutely."
+
+"The world would be a real mess if everybody was a genius. Sombody's
+got to keep watch, take care of business."
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+Listening to Fournier's flowing, dignified cello, Hoshino was drawn
+back to his childhood. He used to go to the river every day to catch
+fish. Nothing to worry about back then, he reminisced. Just live each
+day as it came. As long as I was alive, I was *something*. That was
+just how it was. But somewhere along the line it all changed. Living
+turned me into nothing. Weird... People are born in order to live,
+right? But the longer I've lived, the more I've lost what's inside
+me - and ended up empty. And I bet the longer I live, the emptier, the
+more worthless, I'll become. Something's wrong with this picture. Life
+isn't supposed to turn out like this! Isn't it possible to shift
+direction, to change where I'm headed?
+#+END_QUOTE
+
+* Random People
+#+BEGIN_QUOTE
+Everyone deserves a conversation.
+#+END_QUOTE

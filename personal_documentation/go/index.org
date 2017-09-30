@@ -71,7 +71,9 @@ library which can parse Go programs.
   import statements.
 - godoc - If you format your comments a certain way, which the Go
   people reccomend that you do, then this tool will parse them and
-  give you some nice documentation.
+  give you some nice documentation. It even has configuration to start
+  a local server which displays documentation: 'godoc -v
+  -http="localhost:6060"'.
 - go build - It will prevent compilation if there are unused variables
   or import statments. I think this is the way things should be when
   it comes to languages, it shouldn't be able to run until the
@@ -91,6 +93,8 @@ library which can parse Go programs.
 - [[http://dave.cheney.net/2012/01/18/why-go-gets-exceptions-right]]
 - [[https://davidnix.io/post/error-handling-in-go]]
 - [[https://github.com/gophercon/2016-talks/tree/master/JackLindamood-PracticalAdviceForGoLibraryAuthors]]
+- https://github.com/ardanlabs/gotraining
+- https://github.com/hybridgroup/gobot
 
 * General
 - When you execute "go run" or "go test" what actually happens is that
@@ -107,9 +111,16 @@ library which can parse Go programs.
   stdin is sent directly to the started up process. If you send TERM
   or INT to the started process then the corresponding "go run"/"go
   test" command will be stopped as well.
-- An error when either:
+- An error should be returned when either:
   1. A promise could not be kept.
   2. A response could not be given.
+- The testing framework also supports writing "example" code which is
+  really cool because it basically allows you to treat code as
+  documentation and since the example code is compiled it will
+  complain if it ever goes out of date:
+  https://blog.golang.org/examples.
+- Looks like you can mess with the linker!! Cool!!!
+  https://blog.alexellis.io/inject-build-time-vars-golang/
 
 * Tool Examples
 ** Rewrite Your Source Code

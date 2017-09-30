@@ -15,9 +15,11 @@ instantly.
 
 - https://ngrok.com
 
-"I want to expose a local server behind a NAT or firewall to the internet.".
-In other words, creates a publically available URL for your server. Very
-nifty.
+"I want to expose a local server behind a NAT or firewall to the
+internet.". In other words, creates a publically available URL for
+your server. Very nifty. Doing a simple `ngrok http 8080` will create
+a publically available URL which points to a server running at
+localhost:8080.
 
 ### entr
 

@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+# Makes it impossible to commit the "devutil/.env" file.
+cannot_commit = "devutil/.env"
+files_modified = `git diff-index --cached --name-only HEAD`.split("\n")
+files_modified.each do |file|
+  if file == cannot_commit
+    puts "[POLICY] You cannot commit the #{cannot_commit} file. If this is a mistake, edit the .git/hooks/pre-commit file."
+    exit 1
+  end
+end

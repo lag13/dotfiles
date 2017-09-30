@@ -1,0 +1,178 @@
+* C
+General information about the C programming language.
+
+* Breaking Up a Program Into Modules/Packages
+I'm no C expert (so there could be a better way or tools to make the
+process easier) but it feels like C involves a decent amount of manual
+work if you want to break up code into different
+packages/modules/files. For every ".c" library file you should create
+a corresponding ".h" file, called a "header" file. In short this file
+should contain the API for your library. This means it contains C
+declarations (functions and variables), type definitions, other
+#includes (so that any ".c" file which #include's this header file
+will compile. I think this means you include any header files which
+define types that your header file uses), macros, and maybe some
+inline functions. Any code which wants to use your library will
+#include it's header file. The effect of doing this #include is that
+those declarations will be visible in your code and you can reference
+the library's functions/variables/types without getting compiler
+errors. Then when the code is linked you specify your code and the
+library it uses and the linker will take care of assigning definitions
+to the declarations. For example with gcc you can do:
+
+#+BEGIN_SRC sh
+  gcc main.c library.c
+#+END_SRC
+
+In other languages what is/is not part of your API typically lives
+within the source code itself. In Go for example identifiers starting
+with a capital letter indicates public/private and for Java you
+precede identifiers with the words public/private. But this is not the
+case with C and I am not sure why. Perhaps that sort of logic was too
+hard to code back in the early days of programming? Or maybe this was
+done for compilation performance improvements (e.g. if file A includes
+file B and C's header files you only need to compile A once even if B
+and C change because A does not really care too much about the
+"definition" of things, it only needs their declarations and the
+linker will take care of associating those declarations with
+definitions)? Or perhaps there is some other benefit to doing things
+this way? I'm not really sure, but it definitely seems like more work
+to maintain (not to mention it is error prone) which I don't like.
+
+It's worth noting that there is no real difference between a ".c" file
+and a ".h" file i.e. you can put the same code constructs inside
+either one. The only difference is in how they are treated/thought
+of/used. It's also worth noting that you CAN #include one ".c" file
+inside another (since the #include LITERALLY just copy pastes whatever
+file you give it in place of the #include) but my brief research seems
+to indicate that this is bad practice.
+
+When including header files you have created enclose the header file
+in double quotes (so #include "myheader.h"). This instructs the
+compiler to look for that header file relative to the file being
+compiled.
+
+The directory /usr/include contains header files for the system. Look
+through some to get a sense of what "standard" header files look like.
+
+Another bad thing the C language in terms of breaking up code into
+small pieces is that there is no way to tell what identifiers come
+from which header file. This problem becomes worse when you realize
+that header files can include other header files. For example, header
+file A.h includes stdbool.h and source file B.c includes A.h. If B.c
+uses the "bool" type then things will work. But if later down the line
+A realizes that it no longer needs stdbool.h and removes it then, B
+will not compile anymore because the "bool" type is not declared. The
+fix is for B to directly include stdbool.h. I bet in practice this
+does not come up too much and it would be easy to remedy but this
+"action at a distance" sort of stuff is very annoying. Basically it
+just seems to take a lot of discipline and knowlege to know which
+headers declare which identifiers and keep your code up to date with
+all that stuff.
+
+** My Coding Practices
+My evolving set of thoughts for keeping code organized and well
+maintained:
+
+1. If the ".h" file includes a certain header file, do not include
+   that header file in the corresponding ".c" file. Seems like doing
+   this would require less maintenance.
+2. Write all documentation comments in the ".h" file.
+3. Above each import, write a list of identifiers which are used from
+   that header file? Wonder if that is too much work or if it could be
+   a useful practice to keep your #include's consistent with your
+   code.
+
+* Structure of main function
+In C it is fun to try and allocate all necessary memory once up front
+and then distribute it. So a good way to break up main seems to be:
+
+1. Declare all variables
+2. Allocate memory
+3. Initialize variables
+4. Execute your code
+5. Free up memory
+
+Sometimes as part of the allocating memory you'll have to initialize
+some variables.
+
+* Arrays vs Pointers
+This has often been a very confusing topic for me as these two types
+often behave in very similar ways and yet do have some differences.
+The major things to keep in mind seem to be:
+
+1. If you ever declare an array it MUST be declared with a fixed size
+   since array memory is allocated at compile time. So if you KNOW how
+   much memory you need at compile time use an array. Otherwise you
+   only know how much memory you need at compile time so use a pointer
+   and malloc the memory.
+2. The sizeof operator for arrays will include all the memory that the
+   array occupies. It is an error to take the sizeof an array with an
+   unspecified size. For pointers sizeof returns how big the pointer
+   is.
+3. When you pass an array to a function it "decays" into a pointer. So
+   technically speaking there is NO SUCH THING as a function which
+   takes an array as a parameter (so its probably best practice to
+   NEVER declare a function as accepting an array as a parameter).
+   However, it would also appear that this "decaying" does NOT happen
+   recursively. So if you pass a struct to a function and that struct
+   has an array as a field then it will still be an array inside the
+   function. Very weird.
+
+#+BEGIN_SRC c
+  #include <stdio.h>
+
+  // Apparently sizeof operates at compile time. Interesting!
+
+  // Apparently having an array of unspecified size is not allowed if
+  // its the only member of a struct.
+
+  // struct hasEmptyArr {
+  //   int arr[];
+  // };
+
+  struct hasArr {
+    int arr[3];
+  };
+
+  // It would appear that even though this struct has an array inside of
+  // it, that "inner" array does NOT decay into a pointer when passed
+  // into this function.
+  void printHasArrSize(struct hasArr h) {
+    printf("hasArr: %lu\n", sizeof(h));
+    printf("hasArr.arr: %lu\n", sizeof(h.arr));
+  }
+
+  // The compiler warns here that doing sizeof will return sizeof(int*)
+  // since this array decays into a pointer.
+  void printArrSize(int arr[3]) {
+    printf("int[]: %lu\n", sizeof(arr));
+  }
+
+  int main(int argc, char **argv) {
+    printf("int: %lu\n", sizeof(int));
+    printf("int*: %lu\n", sizeof(int*));
+    // When taking sizeof of an array the array NEEDS to have a
+    // specified length because otherwise C doesn't know how to
+    // calculate its size.
+    printf("int[4]: %lu\n", sizeof(int[4]));
+    struct hasArr h;
+    printf("in main hasArr: %lu\n", sizeof(h));
+    printf("in main hasArr.arr: %lu\n", sizeof(h.arr));
+    printHasArrSize(h);
+  }
+#+END_SRC
+
+TODO: Have some org mode C blocks executing code to illustrate all
+these ideas.
+
+- https://stackoverflow.com/questions/12127625/array-syntax-vs-pointer-syntax-in-c-function-parameters
+- http://www.geeksforgeeks.org/g-fact-5/
+
+* Links
+- https://www.gamedev.net/articles/programming/general-and-gameplay-programming/organizing-code-files-in-c-and-c-r3173 (or the original post is here: https://www.gamedev.net/articles/programming/general-and-gameplay-programming/organizing-code-files-in-c-and-c-r1798)
+- http://www.cplusplus.com/forum/articles/10627/
+- https://gcc.gnu.org/onlinedocs/cpp/Header-Files.html
+- http://www.geeksforgeeks.org/understanding-extern-keyword-in-c/
+- http://c-faq.com/~scs/cgi-bin/faqcat.cgi
+- http://www.dribin.org/dave/blog/archives/2010/05/15/c99_syntax

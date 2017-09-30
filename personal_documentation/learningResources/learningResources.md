@@ -68,3 +68,70 @@ I bought some unix programming books from this site:
 https://www.humblebundle.com/. humble92
 
 https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html
+
+https://hackernoon.com/12-signs-youre-working-in-a-feature-factory-44a5b938d6a2
+
+API Authentication Techniques:
+https://docs.google.com/spreadsheets/d/1tAX5ZJzluilhoYKjra-uHbMCZraaQkqIHl3RIQ8mVkM/edit#gid=0
+
+A Mathematician's Lament:
+https://www.maa.org/sites/default/files/pdf/devlin/LockhartsLament.pdf
+
+Debugging a docker container:
+https://medium.com/@rothgar/how-to-debug-a-running-docker-container-from-a-separate-container-983f11740dc6
+
+Interpreter In Go:
+https://interpreterbook.com/
+This also seems sort of related: https://blog.gopheracademy.com/advent-2014/parsers-lexers/
+
+Particular approach to branching:
+http://nvie.com/posts/a-successful-git-branching-model/
+
+Joseph reccomended this:
+http://www.poodr.com/
+
+Browser automation:
+https://github.com/graphcool/chromeless
+https://github.com/GoogleChrome/puppeteer#readme
+
+Netflix talking about how they stay so reliable:
+https://medium.com/netflix-techblog/active-active-for-multi-regional-resiliency-c47719f6685b
+
+Joseph was using this to help is wife with a website:
+http://jekyllrb.com/
+
+Aunss was using this site to teach himself react among other things:
+https://thinkster.io/tutorials/getting-started-with-react
+
+Talks a little more about 12 factor authentication:
+https://www.oreilly.com/ideas/design-build-release-run
+
+Some guys criticism on the GOOS book. I think he has some valid points
+and I kind of feel like he is "correct":
+http://enterprisecraftsmanship.com/2016/07/05/growing-object-oriented-software-guided-by-tests-without-mocks/
+
+Something I saw about building a docker-like container with just a
+little bit of Go. Have no idea if its good or not but the idea of
+getting a rough understanding of containers sounded really appealing:
+https://www.infoq.com/articles/build-a-container-golang
+
+I think people "post" up a problem they want coded and random coders
+will solve it for them and get paid doing it sometimes:
+https://www.topcoder.com/
+
+A hackerrank-esque site:
+https://codefights.com/
+
+I want to learn how multipart form data works. It came up during work
+and it appears that this little "sub-protocol" of HTTP is not just a
+simple "send the data and get back a response":
+https://stackoverflow.com/questions/4526273/what-does-enctype-multipart-form-data-mean
+https://tools.ietf.org/html/rfc2388
+https://stackoverflow.com/questions/8659808/how-does-http-file-upload-work
+
+Gophercon 2017:
+https://www.youtube.com/playlist?list=PL2ntRZ1ySWBdD9bru6IR-_WXUgJqvrtx9
+https://www.youtube.com/playlist?list=PL2ntRZ1ySWBfhRZj3BDOrKdHzoafHsKHU
+
+Seems super neat basically github will host a little website for you:
+https://pages.github.com/

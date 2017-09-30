@@ -1,0 +1,20 @@
+* About
+Dealing with errors in programming.
+
+* Errors are in the eye of the beholder
+The word "error" in programming means that something "went wrong" with
+your code. It feels like it would be easy to tell when something "went
+wrong" with your program but it can actually be quite tricky because
+whether or not something is an error all depends on your *perspective*
+which is probably not something that apparent within your source code.
+
+Here's an example of errors not being so cut and dry. When sending
+data across the internet to another service you would *think* that if
+the data fails to get ther then that is an error. But that assumption
+would be wrong. For example the UDP protocol itself was built around
+the notion that it does *not* care whether the data gets there or not.
+
+* Conclusion
+When considering whether or not something should be an error consider
+it from the point of view of the code being written. Think about what
+this code does as well as *who* will be calling it.

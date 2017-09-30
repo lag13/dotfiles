@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	var port = flag.Int("port", 80, "port to use for the server")
+	var port = flag.Int("port", 8080, "port to use for the server")
 	flag.Parse()
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		rawRequest, err := httputil.DumpRequest(r, true)
@@ -18,7 +18,7 @@ func main() {
 			fmt.Fprintf(w, "error dumping raw request: %v", err)
 			return
 		}
-		log.Printf("%s", rawRequest)
+		log.Printf("### New Request ###\n%s###################", rawRequest)
 	})
 	log.Print("starting server")
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("localhost:%d", *port), nil))

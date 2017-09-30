@@ -49,6 +49,7 @@ func TestIsEven(t *testing.T) {
 	}
 	for i, test := range tests {
 		errorMsg := func(str string, args ...interface{}) {
+			t.Helper()
 			t.Errorf("Running test %d, where %s:\n"+str, append([]interface{}{i, test.testScenario}, args...)...)
 		}
 		got := IsEven(test.num)
@@ -109,4 +110,10 @@ You can specify a variable (isTesting or something like that) and set it to
 true in the test code. Maybe this could fix a situation where you need some
 alternate test code to run when testing otherwise run some normal code.
 http://stackoverflow.com/questions/28476307/in-go-how-to-get-test-environment-at-run-time
+
+This package seems useful for getting clear diff outputs of large data
+structures like structs: https://github.com/kylelemons/godebug
+
+    t.Errorf("didn't get user info we wanted\n%s", pretty.Compare(got, want))
+
 */
