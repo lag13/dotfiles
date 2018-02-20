@@ -1,0 +1,350 @@
+* Coding Principles
+Principles I try to follow when coding. My professional experience
+primarily stems from writing HTTP APIs in golang, so the wording might
+reflect that, but these principles are applicable to other areas.
+
+* Test Driven Development (TDD)
+** Elaborate
+When a feature needs to be added/updated:
+1. Write an acceptance test to exercise that feature and check that
+   the expected response is received and that the "world" is effected
+   in the expected manner. Ideally this test should be as
+   "<<end-to-end>>" as possible meaning that the test spins up the
+   software and interacts with it from the outside as another entity
+   would. With HTTP APIs, for example, this involves sending a request
+   to an endpoint and checking that:
+   - the expected response is received
+   - the endpoint makes the expected
+     POST/PUT/DELETE/anything-that-modifies-the-external-world API
+     calls
+2. Write a failing unit test
+3. Make the test pass
+4. Refactor
+5. Go back to (2) until the acceptance test passes at which point the
+   feature is done! Acceptance tests need only be run when you feel
+   that the feature is finally complete so they do not get run often.
+
+Doing (1) is difficult because before the test can be written a
+working local environment (referred to in the [[http://www.growing-object-oriented-software.com/][GOOS book]] as a "walking
+skeleton") must be created. Some info:
+- Docker is a useful tool for spinning up local instances of other
+  software in a programatic consistant fashion.
+- Some software (like MYSQL and redis) can be set up to run locally.
+  This is nice as it brings your API closer to a real production
+  environment.
+- You might not be able to get some software running locally which
+  means a mock version should be created. For example if your API
+  talks to another API X, you have to mock the endpoints of X that the
+  API talks to.
+
+** Pros and Cons
+Pros:
+1. Serves as high level documentation for what a feature does.
+2. Makes you aware of where your API lives in relation to other APIs
+   which allows for API level refactoring. For example if you notice
+   that multiple APIs talk to the same software X, Y, and Z (another
+   API, redis cache, etc...) then you could write an API which talks
+   to X, Y, and Z and passes along the information to these APIs. This
+   reduces the number of things that depend on X, Y, and Z making the
+   API ecosystem more flexible.
+3. Allows you to do LARGE refactors because these acceptance tests are
+   agnostic to the code structure (assuming they're [[end-to-end]] which
+   they really should be).
+4. Helps flesh out dependencies early in development so those
+   dependencies can be dealt with. Such dependencies could include a
+   MYSQL DB or another team's API which needs to change.
+5. Forces you to have a local environment for the software.
+
+Cons:
+1. Establishing the "walking skeleton" means you need to know
+   *exactly* how your API communicates with the outside world. This
+   means having a knowlege of protocols (HTTP, SMTP, etc...) and other
+   software specifics (like the API details for AWS services). This is
+   hard to do and takes time.
+2. People seem to be less accustomed to working with acceptance tests
+   as opposed to unit tests.
+   
+* Don't Repeat Yourself (DRY)
+If the same lines of code appear in a codebase (for example the same
+function calls are occuring) then try to refactor code so they only
+occur in one place.
+
+A powerful tool to address this problem are interfaces.
+
+** Pros and Cons
+Pros:
+- If that code needs changing ideally it only has to change in one
+  place.
+- If there is no repeated code then this means individual units will
+  be simpler making unit tests simpler which means faster development.
+
+Cons:
+- The act of removing repeated code usually ends up in more units
+  which means more layers. More layers makes understanding how
+  everything works as a whole more difficult and means that you need
+  to combine all these layers somewhere.
+
+** Example
+In this handler code, note the repeated calls to ~WriteHeader()~ and
+~Write()~:
+#+BEGIN_SRC go
+  package handler
+
+  type Handler1 struct {}
+
+  func (h Handler1) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+          // determine status code and body through complicated logic...
+          status := 200
+          body := []byte("hello world! This is handler 1")
+          w.WriteHeader(status)
+          w.Write(body)
+  }
+
+  type Handler2 struct {}
+
+  func (h Handler2) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+          // determine status code and body through complicated logic...
+          statusCode := 400
+          respBody := []byte("hello buddy! This is handler 2")
+          w.WriteHeader(statusCode)
+          w.Write(respBody)
+  }
+#+END_SRC
+
+This is a slightly better solution (now the ~WriteHeader()~ and
+~Write()~ calls only occur once):
+#+BEGIN_SRC go
+  package handler
+
+  func helperWriteResponse(w http.ResponseWriter, statusCode int, body []byte) {
+          w.WriteHeader(statusCode)
+          w.Write(body)
+  }
+
+  type Handler1 struct {}
+
+  func (h Handler1) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+          // determine status code and body somehow...
+          status := 200
+          body := []byte("hello world! This is handler 1")
+          helperWriteResponse(w, status, body)
+  }
+
+  type Handler2 struct {}
+
+  func (h Handler2) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+          // determine status code and body somehow...
+          statusCode := 400
+          respBody := []byte("hello buddy! This is handler 2")
+          helperWriteResponse(w, statusCode, respBody)
+  }
+#+END_SRC
+
+But the above solution is still not great because the function call
+~helperWriteResponse()~ is repeated. This means that the logic of
+writing a response is still part of the handler code so, in a sense,
+nothing has really changed and it just "feels" nicer because the
+writing logic is contained in one function. You'll feel the pain of
+this non-DRY'ness when writing unit tests because that writing logic
+will need be tested twice which is more repetition slowing you down.
+
+I would consider something like this to be the best solution:
+#+BEGIN_SRC go
+  package httpwriter
+
+  type Presenter interface {
+          PresentHTTP(r *http.Request) (statusCode int, body []byte)
+  }
+
+  type Writer struct {
+          Presenter Presenter
+  }
+
+  func (w Writer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+          statusCode, body := w.Presenter.PresentHTTP(r)
+          w.WriteHeader(statusCode)
+          w.Write(body)
+  }
+
+  // in another package...
+  package handler
+
+  type Handler1 struct {}
+
+  func (h Handler1) PresentHTTP(r *http.Request) (int, []byte) {
+          // determine status code and body somehow...
+          status := 200
+          body := []byte("hello world! This is handler 1")
+          return status, body
+  }
+
+  type Handler2 struct {}
+
+  func (h Handler2) PresentHTTP(r *http.Request) (int, []byte) {
+          // determine status code and body somehow...
+          statusCode := 400
+          respBody := []byte("hello buddy! This is handler 2")
+          return statusCode, respBody
+  }
+#+END_SRC
+
+With this approach there is no repetition which leads to simpler
+handler logic which in turn leads to simpler unit tests. The only
+drawback I see is that these two components must be combined to get a
+handler but I would take that over repetition any day.
+
+* Keep code as "black and white" as possible in regards to errors
+When code reaches some sort conclusion and is responding back to the
+user either:
+1. Something wrong happened on our end that cannot be fixed by the
+   user. Log an error (so the dev team can look into it) and give the
+   user a generic "500 something went wrong" message which indicates
+   that they can do nothing except wait (if desired you could be more
+   descriptive about what went wrong but since the user in this
+   situation can do nothing then that is not necessary).
+2. The user did something wrong and *they* can do something to fix the
+   problem. Log *nothing* and give them a descriptive response telling
+   them how they can correct their mistake.
+3. Things were successful, log nothing and give the user back their
+   response.
+
+Don't mix these situations up. For example, don't log an error if (2)
+happens because that would interrupt our dev team potentially because
+of a silly mistake on the users part.
+
+Sometimes it seems like there could be "grey" areas where it could
+either be your fault or the users fault (and there probably are a
+couple) but I believe that a lot of the time you can make a
+distinction. For example consider this authentication code:
+#+BEGIN_SRC go
+  func Authorize(passwordFromUser string, usersPassword string) (SomeResource, string) {
+          if passwordFromUser != usersPassword {
+                  // who's fault is it?
+          }
+  }
+#+END_SRC
+
+Technically that could be either our fault (we configured their
+password wrong) or their fault (they gave us the wrong password). But
+since (technically speaking) the user can do something different and
+fix the problem I would say this falls under (2). If it turns out that
+we made a mistake then the user will eventually contact us and we'll
+work it out.
+
+* Do Not Use Mocks
+Inspired by:
+http://enterprisecraftsmanship.com/2016/07/05/growing-object-oriented-software-guided-by-tests-without-mocks/.
+
+A "mock" in this context means "an interface that in a production
+scenario will only ever have one concrete implementation". You should
+not use mocks whenever possible. An alternate way to say that is "only
+use an interface when in a production scenario their are multiple
+concrete implementations of that interface".
+
+Don't use mocks because any code involving an interface makes code
+harder to unit test. Having just one is not too bad but if you get
+into the habit of using mocks then it is easier to attach more.
+
+** Example
+A common example of a mock is a database abstraction which is
+responsible for receiving and returning language data structures and
+deal with the db specifics thereby allowing other areas of the code to
+work on a "higher" level instead of needing to worry about database
+specifics. That sounds amazing on paper but in reality it often leads
+to hard to maintain code.
+
+** Rambling
+- Mocks feel like a crutch to make it possible to write unit tests
+  rather than a true abstraction that warrants an interface. It's just
+  a hack to get around the fact that a side effect is occurring.
+- Code becomes harder to maintain when the logic that you unit test
+  involves mocks and data transformations. So mocks are not
+  "technically" at fault for creating hard-to-maintain code but they
+  definitely make it easier since.
+
+* Divide Code into 2 Pieces: Functional (i.e. no side effects) and Side Effects
+** Elaborate
+Divide code into two pieces:
+1. The functional parts (i.e. just data transormations)
+2. The parts which perform side effects (i.e. talking to a database,
+   writing to a file, sending a HTTP request, etc...)
+
+Unit test the (1)'s and to get the final working code combine the
+(1)'s and the (2)'s like this:
+- (1) Transform data: A -> B
+- (2) Perform a side effect with B producing C
+- Repeat until done
+
+Test this "combined" code with an acceptance test. If there are no
+acceptance tests then substituting mocks for the side effects is a way
+to do it. Whatever the testing method, it should not have to do much
+more than hit the happy path to make sure everything is connected.
+
+** Why?
+Unit testing functions is extremely easy because all you need worry
+about is "given this input, does it produce the expected output".
+Since most logic in a given application consists of functional data
+transformations this means that most code will be easy to unit test
+which means faster development. Additionally, these functions will be
+limited in size (because they are squeezed between all the side
+effects) which also makes unit testing easier.
+
+If code is not divided up like this then it will be the "combined" (1)
+and (2) code. This code is harder to test because:
+- There is more code to test
+- Interfaces are needed to hide the side effects and as discussed
+  previously, interfaces make testing difficult.
+
+And if code is hard to test then it slows down development.
+
+One con is that it feels weird because the functions you are unit
+testing are not a complete "unit" of work. They do not represent a
+full feature or anything like that, they are just one decomposition of
+the feature.
+
+** Example
+Enter example here
+
+* Do As Little Work as Possible
+Have someone else deal with errors if you can manage it. Don't code
+more than you need to stuff like that. Don't make "flexible" or
+"easily extendable" code.
+
+* By Tidy With Your Code, Only Provide What is Necessary
+I've seen code where they provide a "large" context sort of object
+which holds common things that will get used by probably most handlers
+like:
+- Logger
+- Database object
+- Configuration struct (which probably was created from environment
+  variables)
+
+That seems like a nice idea because then if a handler ever needs
+something hey! You don't even have to worry about it because its
+already there.
+
+But this might make unit tests trickier? Because you don't know what
+should be filled in? Or heck maybe it is okay and I just like the idea
+of being tidy. Maybe I worry too much about unit tests as opposed to
+just pushing out functionality. You can write high quality code
+without any unit tests.
+
+Actually I think it ISbad because it encourages you to use those
+resources where maybe there is a better way to structure things so
+that those resources can live only in one place. For example if you
+pass a logger around to everything and a handler needs to log an error
+then they'll probably reach for that logger since its conveniently
+right there but it would probably be nicer if that logger lived in one
+place and the handler just returned data to log. Because maybe one day
+you want to change the logger somehow or want to send data that was
+being logged to an API as well.
+
+* Remember the Context
+Knowing the context of what your application is doing and who it talks
+to is important when deciding how a feature should work or what should
+be logged.
+
+* Principle
+** Elaborate
+** Why?/Pros and Cons
+** Example

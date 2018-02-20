@@ -54,3 +54,14 @@ time=2012:11:24T17:32:23.3435 level=INFO msg="gps@mozilla.com successfully logge
 The point is that structured logging gives us the information we already had
 but now machines can also parse that information which gives us greater
 flexibility for how we deal with data.
+
+Scalyr
+------
+
+Scalyr helps aggregate logs in one place. I noticed when I was
+debugging something that lines I "echo"d in a bash script were not
+always showing up and I *think* that is because they did not end in a
+newline. In short, I think logs sometimes have trouble making it to
+their destination unless they end in a newline. This would make sense
+as you see this sort of feature in many places. I bet the "echo" in
+question did not even make it to stdout because it was buffered.

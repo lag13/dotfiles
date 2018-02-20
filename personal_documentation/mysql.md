@@ -134,6 +134,9 @@ ADD `accountDID` varchar(64) DEFAULT "",
 ADD `productInstanceID` varchar(128) DEFAULT "",
 ADD `category` varchar(32) DEFAULT "",
 ADD INDEX `productInstanceID` (`productInstanceID`)
+
+ALTER TABLE mytable
+ALTER col_name SET DEFAULT "";
 ```
 
 ### INSERT
@@ -164,6 +167,23 @@ INSERT INTO table_name (column1, column2, column3,...columnN)
 VALUES(value1, value2, value3,...valueN)
 ON DUPLICATE KEY UPDATE columnx = X, columny = Y, ...
 ```
+
+### Size of DB
+https://stackoverflow.com/questions/1733507/how-to-get-size-of-mysql-database
+
+```
+SELECT table_schema "DB_Name",
+Round(Sum(data_length + index_length) / 1024 / 1024, 1) "Size in MB"
+FROM information_schema.tables
+GROUP BY table_schema;
+```
+
+Add this to specify one DB:
+```
+WHERE table_schema='ENTER NAME OF DB HERE';
+```
+
+### Not Sure
 
 Note that this updates a row if the row being inserted violates the UNIQUE
 constraint of the table. I'm not sure on the specifics but you can define a

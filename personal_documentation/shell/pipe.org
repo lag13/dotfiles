@@ -1,0 +1,14 @@
+If you use commands like ~head~ in a pipe then it could cause problems
+because ~head~ will terminate when it gets all the data it needs which
+closes the pipe it reads from and the command trying to send to that
+pipe will receive a SIGPIPE signal
+#+BEGIN_SRC sh
+  core@ip-172-10-51-31 ~ $ seq 1 1000000 | sed '2,$ d'
+  1
+  core@ip-172-10-51-31 ~ $ echo ${PIPESTATUS[@]}
+  0 0
+  core@ip-172-10-51-31 ~ $ seq 1 1000000 | head -n1
+  1
+  core@ip-172-10-51-31 ~ $ echo ${PIPESTATUS[@]}
+  141 0
+#+END_SRC

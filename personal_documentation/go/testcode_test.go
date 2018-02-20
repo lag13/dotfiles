@@ -14,6 +14,8 @@ do go test testcode*.
 
 I kind of like testing in Go because its really just normal go code instead
 of some completely new thing.
+
+https://github.com/go-test/deep
 */
 package testcode
 

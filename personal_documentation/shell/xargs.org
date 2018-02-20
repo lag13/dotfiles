@@ -1,0 +1,5 @@
+xargs can only execute one command at a time. You can get around this
+though by using bash/sh/... as the command to execute. You can even
+get some nested xargs by doing this!
+
+etcdctl ls environments | xargs -I {} sh -c "etcdctl get {} | xargs -I % echo '{}: %'" | grep 'hotpot.*cb1tools'

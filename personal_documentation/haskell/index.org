@@ -1,6 +1,87 @@
 * Haskell
 General information about Haskell.
 
+* Breaking Up a Program Into Modules/Packages
+- All file names and directories start with a capital letter.
+- If the directory structure is A/B/C.hs then the module name is
+  "A.B.C". So in C.hs you would write "module A.B.C ......" and when
+  importing that module you would do "import A.B.C".
+- Like C (and unlike Go) a single directroy can contain multiple
+  modules. So if you define A.hs and B.hs in the current directory
+  then those module names would be "module A" and "module B".
+- Go packages do not exist in a centralized place. The import path
+  serves as both the directory structure AND as the location online
+  where that package comes from (github, gopkg, bitbucket, etc...) and
+  the go tooling knows how to download code from all those places. In
+  haskell though there is one centralized place where haskell
+  libraries are kept (this seems like a nice simplification for the
+  tooling). This centralized place is [[https://hackage.haskell.org][here]] and it is called a "package
+  archive". Where modules are language constructs which allow you to
+  break up a program into pieces a "package" is:
+  - A description of what it does
+  - Licence information
+  - Author information
+  - A declarative specification of library & tool dependencies
+  - A list of executables and/or library modules provided by the
+    package
+  - Haddock documentation (if available) with source links
+  - A downloadable gzipped tarball
+  - A name which you referr to when downloading it
+  In short, a package is a standard way to wrap up your collection of
+  module(s) so it can be shared.
+
+* Stack vs Cabal
+https://www.fpcomplete.com/blog/2015/06/why-is-stack-not-cabal
+
+Its worth noting that until relatively recently (I think) the tooling
+around haskell has been very segmented and/or lacking. It is very
+interesting how a big reason why you would use a programming language
+or not is not even about the language itself but rather the community
+and tooling around that language. A language is so much more than just
+a language specification:
+- compilers
+- package repositories and the tools to download from/upload to them
+  so sharing code is easy. This also gets into WHERE exactly this
+  downloaded code is being stored
+- the recommended way to organize a project and its directories
+  whether it be a main program or library
+- how library dependencies are managed
+- whether you vendor libraries in a main application or not
+- how tests get run
+- how to write documentation for your code
+- knowing about libraries that can help accomplish things you need to
+  (Go is very good at that because its standard library is so full
+  featured)
+
+* Stack
+Stack is your all-in-one tool for working with haskell. It can be used
+to:
+
+- Compile code
+- Start a repl
+- Initialize a project/package (in haskell projects have a standard
+  structure)
+- Dependency management within a project
+
+Some stack concepts (some which did not originate with stack):
+
+- Cabal - stands for Common Architecture for Building Applications and
+  Libraries. The spec is [[https://www.haskell.org/cabal/proposal/pkg-spec.pdf][here]] and the library/package is [[https://hackage.haskell.org/package/Cabal][here]].
+- Hackage - a collection of haskell packages
+- [[https://www.stackage.org/][Stackage]] - (Stable Hackage) Sits on top of hackage it associates
+  some sort of snapshot ID with a stable set of packages. So basically
+  you specify that snapshot ID and then all those packages under that
+  ID are guaranteed to work together. It appears that you have to make
+  a request to stackage to get a package added there.
+- LTS (Long Term Support) - One type of stackage snapshot. The other
+  one is a nightly snapshot. LTS has a version associated with it so
+  you can get a sense if any of the packages under that snapshot
+  contains breaking changes which I suppose could make upgrading
+  versions easier? The nightly snapshot is just a date.
+
 * Links
+- https://hackage.haskell.org/
+- http://industry.haskell.org/
 - https://twitter.com/1haskelladay
 - http://chrispenner.ca/posts/conways-game-of-life
+- http://learnyouahaskell.com/

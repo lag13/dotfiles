@@ -30,6 +30,8 @@ My emacs journey is starting. What am I getting myself into?
 - The append-to-buffer function no longer uses (interactive) with the "B" option. copy-to-buffer does though! [[info:eintr#b%20for%20interactive][info:eintr#b for interactive]]
 
 * TODOs
+- Can I configure it to ask for confimration before quitting if I
+  accidentally quit emacs?
 - Modifiy the org C-c C-o binding so that if the link cannot be found
   after the point then it will search backward on the current line
   maybe if that cannot be found it will search forward to the next
@@ -322,6 +324,9 @@ My emacs journey is starting. What am I getting myself into?
 - Is there an emacs command to kill buffers that used to be associated
   with files but are not longer associated with files?
 - Show the current time somewhere.
+- There appears to be a bug in org mode. When you save links to files,
+  if the saved link has a '\' in it then the search will bring you to
+  the file but not to the specific location you saved.
 
 * Terms and Miscellaneous Notes
 - It seems that most "file" related commands or just general commands not strictly related to manipulating text start with C-x.

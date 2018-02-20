@@ -1,0 +1,47 @@
+# Environment variables can have newlines in them. ECS parameter store
+# values can also have newlines in them BUT if you are using the UI
+# and are trying to add newlines to values of type "SecureString" then
+# it does not work: https://github.com/aws/aws-cli/issues/2596.
+# Seriously, if you try to hit <return> in the UI then nothing
+# changes. What seems even stranger to me though is that if you paste
+# text containing newlines then each newline gets converted to a
+# <space> character (and what REALLY bugs me about the UX is that even
+# if a value has newlines in it, when you see the value from the list
+# view then the newlines get converted to spaces). So the only way to
+# add newlines to a value of type "SecureString" (which you probably
+# want for things like RSA private keys) is through the aws command
+# line:
+# https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-su-create.html#param-create-cli-securestring
+
+# Unfortunately, when trying to use the aws CLI to add RSA keys I ran
+# into difficulties. First off, it appears that the documentation and
+# our version of the CLI are out of sync (I did not see
+# "put-parameter" as an available command). Secondly when trying to
+# run other "aws ssm" commands such as "list-commands" I got a
+# permission error. Since I figure it will be annoying to try and sort
+# that out AND because it feels nice that we are consistent and update
+# all environment variables through the UI, this means we need to
+# convert a RSA private key with spaces into one with newlines. i.e.
+# convert this:
+
+# -----BEGIN RSA PRIVATE KEY----- content content -----END RSA PRIVATE KEY-----
+
+# to this:
+
+# -----BEGIN RSA PRIVATE KEY-----
+# content
+# content
+# -----END RSA PRIVATE KEY-----
+
+# This bash accomplishes that. The first sed script adds a newline
+# after the "BEGIN RSA" bit and before the "END RSA" bit then the
+# second sed script adds newlines for all the content.
+echo "$DEPLOYMENT_RSA" | \
+    sed '{
+s/- /-\
+/
+s/ -/\
+-/
+}' | \
+    sed '2 s/ /\
+/g' > "$keyfile"

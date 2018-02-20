@@ -708,3 +708,7 @@ appear to be consistent your first thoughts should either be: memory
 problem (like different things are writing to the same memory) or some
 sort of thread related prolem (like maybe some code is not thread
 safe).
+
+48. Getting the data in the proper format is a PRIORITY. Having to
+transform data before it can be used is just terrible. RSA Private
+keys in EC2 parameter store.
