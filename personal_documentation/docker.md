@@ -173,3 +173,34 @@ you left out a value for `value_from_env` it will get its value from
 the environment variable with the same name. So that snippet of code
 is equivalent to: `docker build --build-arg buildno=1 --build-arg
 password=secret --build-arg value_from_env=$value_from_env`.
+
+## Caching
+You want to leverage caching as much as possible so your builds will
+be as fast as possilbe. So we need to be aware of docker's algorithm
+for when a cached image can be used instead of created:
+https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#build-cache
+
+The basic algorithm seems to be:
+1. We start at the FROM image
+2. We look at the next instruction:
+   - If the instruction is the same as it was before then we use the
+     cache.
+   - Otherwise we run that instruction and ALL subsequent steps will
+     be redone.
+3. While there are more instructions go to step 2
+
+With that in mind 
+1. Put instructions that do not change much at the top of the
+   Dockerfile because if something at the top of the Dockerfile
+   changes then ALL subsequent steps will be re-ran. Note that when
+   doing something like "COPY . ." if ANY file you are copying has
+   changed then there will be no cache hit and all subsequent steps
+   will be re-run.
+2. Make use of multi-stage builds whenever useful to get more out of
+   the caching. For example I was trying to Dockerize a legacy
+   application where essentially the WORKDIR path will have the
+   version being deployed in it. So that means WORKDIR will always be
+   changing which will cause all subsequent commands to not use the
+   cache. So having a separate build stage where we downloaded
+   dependencies and then copied those over to the new location helped.
+   

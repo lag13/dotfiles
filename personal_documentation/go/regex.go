@@ -6,7 +6,10 @@ import (
 )
 
 func main() {
-	fmt.Println("vim-go")
+	fmt.Println(extractHostnamePanic("root:@tcp(mysql:3306)/tsrfeatureflags"))
+	regex := regexp.MustCompile(`^Prop([0-9]+)`)
+	fmt.Println(regex.MatchString("Prop120"))
+	fmt.Println(regex.FindStringSubmatch("Prop89"))
 }
 
 func extractHostnamePanic(dataSourceName string) string {

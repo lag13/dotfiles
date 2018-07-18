@@ -26,12 +26,13 @@ it. For example, maybe you got a PR ready before lunch, ask someone to review
 it before leaving for lunch so by the time you get back there might be
 feedback on it.
 
-8. Do the minimal amount of work first, get the minimum viable product both in
-terms of the code you write and the actual product. In other words, don't try
-to abstract too much from the get go. Even if you think some abstraction might
-be useful later, do not do it until you really need it because there is a good
-chance that you might never need the abstraction and then when people look at
-your code they'll wonder why there is this extra layer.
+8. Do the minimal amount of work first, get the minimum viable product
+both in terms of the code you write and the actual product. In other
+words, don't try to abstract too much from the get go. Even if you
+think some abstraction might be useful later, do not do it until you
+really need it because there is a good chance that you might never
+need the abstraction and then when people look at your code they'll
+wonder why there is this extra layer.
 
 9. Do a quick mental checklist, and better yet, actually test whether
 "special" characters have the potential to break the program. This is
@@ -712,3 +713,36 @@ safe).
 48. Getting the data in the proper format is a PRIORITY. Having to
 transform data before it can be used is just terrible. RSA Private
 keys in EC2 parameter store.
+
+49. Related to 8. When faced with a problem try to solve the LITERAL
+probelem that is in front of you. We had a problem were a certain API
+request resulted in a slow underlying SQL query. I spent a good deal
+of time trying to make the query better for the request as a whole but
+did not manage to finish. The guy who continued my work solved the
+problem at hand namely he made the underlying SQL query faster for the
+EXACT query that came into our system. Perhaps that approach is not
+better in the *long* run but it is a good bandaid so we can continue
+and solve other problems.
+
+50. If you are working on something new, work through your specific
+card with someone who has worked on it before. I had a card to modify
+the sertifi integration which I had never seen before and I was partly
+feeling lazy and partly feeling that my solution would work but that
+turned out to not be the case and it caused bugs in other areas of the
+system. My change felt so innocuous too!
+
+51. When putting some new system/code in place you should have a
+rollback plan in case something goes wrong.
+
+52. If you do not know something do NOT go forward with the change or
+at least let people know the areas you do not know. It is a
+programmers job to know everything about what they are doing and those
+unknowns almost always get you.
+
+53. Even if someone says something should be solved a certain way,
+question it. For a sertifi card they said to investigate changing the
+a setting on sertifi's end as the means of solving it but I think it
+could have also been solved without their involvement.
+
+54. Microservices are good because any shitty code will remain fairly
+small in scope.

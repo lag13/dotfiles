@@ -55,14 +55,20 @@ git merge -s subtree --squash mysql/master
 git merge -X subtree=vendor/github.com/go-sql-driver/mysql --squash mysql/master
 ```
 
-It looks like there are also ways to push local changes to a dependency to its
-github repository but I'll learn those when needed.
+It looks like there are also ways to push local changes to a
+dependency to its github repository but I'll learn those when needed.
 
 Deleting a Branch
 -----------------
 
 ```
 git -d branch-to-delete
+```
+
+To delete a branch on the remote repository you can do:
+
+```
+git push origin --delete branch-to-delete
 ```
 
 Cherry Picking

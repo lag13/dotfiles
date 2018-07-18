@@ -10,7 +10,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))))
+    (cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -111,8 +111,8 @@
 ;; 	  (lambda ()
 ;; 	    (interactive-haskell-mode 1)))
 
-;; 2 spaces seems to be used in the example elm tutorials I've seen.
-(setq elm-indent-offset 4)
+;; https://github.com/avh4/elm-format, npm install -g elm-format
+(setq elm-format-on-save t)
 
 ;; Turn on editorconfig mode
 (setq editorconfig-exclude-modes '(org-mode))
@@ -206,7 +206,7 @@
 
 ;; I've never had any use for specific settings for particular files
 ;; or directories so I figured I'd disable those features.
-(setq enable-local-variables nil)
+;; (setq enable-local-variables t)
 (setq enable-dir-local-variables nil)
 
 ;; Highlight matches immediately as you type.

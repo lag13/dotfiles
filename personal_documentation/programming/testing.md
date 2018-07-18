@@ -656,3 +656,99 @@ care about the behavior of the feature:
 
 Dmitry's approach does not get these benefits. I still need to try his
 approach though, maybe I'll like it more than I think.
+
+My latest thoughts on testing: No mocks!
+----------------------------------------
+These are three services which use this "no-mocking" approach (and also logging error stack traces + other stuff):
+- https://github.com/cbdr/cangrade-connector
+- https://github.com/cbdr/ats-indeed-apply
+- https://github.com/cbdr/ats-requisitions
+@JosephPalmour
+I'll link more specific areas to look at in a second
+
+I'll take cangrade-connector as an example. The others are similar enough
+
+All error logging at the moment happens in this one place:
+- https://github.com/cbdr/cangrade-connector/blob/master/internal/handler/handler.go#L20-L22
+
+So this function 'New()' is used to create a http.Handler. So that's one thing to note about these repos. Any handler logic does NOT implement the http.Handler interface.
+
+Instead, the handler logic will usually return response data and an error and the marshalling+writing of the response and the logging of the error happens elsewhere. I think this makes the handler logic itself a little simpler to test and reduces code like this from being repeated in multiple places: https://github.com/cbdr/assessments/blob/master/internal/handler/postresults.go#L44-L46
+
+For cangrade, the handlers all implement this interface: https://github.com/cbdr/cangrade-connector/blob/master/internal/auth/auth.go#L17.
+
+```
+// ProviderHandler will handle the core logic for a given request. It
+// will be called once the request has been authorized by this
+// package.
+type ProviderHandler interface {
+        ProviderPresentHTTP(r *http.Request, accountID string) (response.StructuredResponse, error)
+}
+```
+
+And here is one such handler that implements that interface: https://github.com/cbdr/cangrade-connector/blob/master/internal/endpoints/getpkg/getpkg.go
+
+And this brings us to the "no mock" approach I mentioned earlier
+
+As you can see, that handler ^^ has no unit tests: https://github.com/cbdr/cangrade-connector/tree/master/internal/endpoints/getpkg
+
+that is because it performs side effects and any side effect related code should be caught with an end-to-end/acceptance test.
+
+The logic of that handler which DOES get unit tested is the function in this file: https://github.com/cbdr/cangrade-connector/blob/master/internal/endpoints/getpkg/internal/internal.g...
+
+So the essential idea with that "no mock" approach is that you separate your handler logic into 2 pieces:
+
+1. The purely functional code which does data transformations, for example transforming an incoming request into a (SQLQuery, response). The response would probably indicate some sort of "Bad Request" which should get returned by the caller.
+
+2. The code with side effects which will always look something like:
+- Do some data transformations
+- Perform a side effect (run sql query, send http request, etc...) with the result of that data transformation
+- Do another data transformation with the result of that side effect
+- Perform another side effect with the result of THAT data transformation
+- etc...
+
+Here are other examples of what that side effect logic tends to look like:
+- https://github.com/cbdr/ats-indeed-apply/blob/master/internal/endpoints/applicants/applicants.go#L24
+- https://github.com/cbdr/ats-requisitions/blob/master/internal/endpoints/getreqs/getreqs.go#L26
+
+So the main 2 things to focus on with these repos are:
+- This "no mock" approach to writing handlers
+- Breaking out the http.Handler logic across multiple packages and then combining everything to get the complete http.Handler
+
+The pros and cons for those 2 new things as I see it are:
+
+### The "no mock" approach ###
+Pros:
+- Its easier to understand the logic of the handler because you don't need to go searching for implementations of any mocks to get the complete picture of *exactly* what is happening. This also means that if you want to change the functionality of a given endpoint, ideally you'll only have to look in one area of the code.
+- Its easier to write the unit tests because your units are just functions which means all you have to worry about are inputs and outputs. This contrasts with testing units that have mocks because to get a complete unit test you have to worry about inputs, outputs, AND if the expected arguments were passed into these mocks.
+Cons:
+- You need to have end-to-end tests to cover the areas of code which perform side effects (then again for code that mocks out a function call which performs a side effect I wouldn't counsider that actually testing the side effect either, you're just testing that a function gets called and hope that it performs a side effect in a production scenario). It can be complicated to setup end-to-end tests and since they test so many layers it could take some time to get to the area of code you're interested in testing. In my experience this hasn't been that bad though.
+
+### Breaking out the http.Handler logic ###
+Pros:
+- Less logic (error logging, json marshalling, etc...) is spread around the handlers so it reduces some code and makes them easier to test.
+Cons:
+- Harder to understand at first. We all understand the http.Handler interface which makes reading/understanding such easier. But when breaking out the http.Handler logic you need to come up with all these other interfaces which we are not familiar with.
+
+To finish off. This is what the complete http.Handler which retrieves packages from cangrade is composed of:
+
+- https://github.com/cbdr/cangrade-connector/blob/master/internal/handler/handler.go#L14. This logic is responsible for: dispatching based on the HTTP method and constructing the response if they provide the incorrect method, logging any errors, constructing a generic 500 response if something goes wrong, and writing the response.
+- https://github.com/cbdr/cangrade-connector/blob/master/internal/contentneg/contentneg.go#L27. This logic is responsible for marshalling JSON for the response body.
+- https://github.com/cbdr/cangrade-connector/blob/master/internal/auth/auth.go#L38. This logic is responsible for authorizing the request before passing it along to code which *really* handles the logic of the request
+- https://github.com/cbdr/cangrade-connector/blob/master/internal/endpoints/getpkg/getpkg.go#L24. And finally, this logic is responsible for getting a list of packages from cangrade. This is the ONLY place where the "no mock" approach is taken (which again means that you do not use an interface unless it has more that one concrete implementation in production).
+Phew that was a lot.
+
+I really hope you all read through this stuff because I think it will make our APIs better.
+
+At the moment I think the organization of my end-to-end tests could really use some work (and I am working on making it nicer!) so don't copy me too much :): https://github.com/cbdr/cangrade-connector/tree/master/e2e
+
+And one elaboration on the Con from the "no mock" approach. You really should have end-to-end tests for any endpoints adhering to this "no mock" approach. But sometimes creating your environment so end-to-end tests are possible is difficult. For example our hotpot workers SSH into a server and I don't know how to set that up. I would argue that the REAL problem here is that we shouldn't have to SSH anywhere but that is the world we live in and we have to deal with it.
+
+In that situation I probably will rely on some sort of mock because I cannot set up an end-to-end test for that functionality. But whenever it is easier to set up an end-to-end test for some specific endpoint/functionality I will probably go with the "no mock" approach.
+
+And I will probably ALWAYS try to structure code in this "no mock" fashion of side-effects vs. pure functional logic regardless of whether I use mocks ore not.
+
+Last thing and I'm done. This whole "no mock" business was inspired by this article: http://enterprisecraftsmanship.com/2016/07/05/growing-object-oriented-software-guided-by-tests-without-mocks/
+
+
+I'm not saying that this approach is correct but I think it is and this guy agrees with me!!!!! https://www.youtube.com/watch?v=EaxDl5NPuCA. The bit about implementing multiplication as a series of "add()" calls and checking if "add()" is called the appropriate number of times really resonated with me.

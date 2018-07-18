@@ -1,0 +1,307 @@
+- nil and false are false everything else is true
+- def should be used to define constants but it seems you can use it
+  to redefine things. Seems strange that you can use it that way if
+  you're not supposed to.
+- Can represent ratio's just like common lisp
+- " for strings. Use 'str' for string concatenation.
+- :some-_&text is a "keyword". I believe they are commonly used for
+  map keys
+- {} for maps. For example {:key1 1 1 123 "1" 456}. As you can see any
+  keys are fair game and any values too. (get map key) returns nil if
+  no value. (get-in {:a 0 :b {:c "ho hum"}} [:b :c]) == (get (get {:a
+  0 :b {:c "ho hum"}} :b) :c). This also works ({:key1 1} :key1) AND
+  (:key1 {:key1 1}) which feels very strange if you ask me.
+- keywords are primarily used as keys in a map. They can also be used
+  as a function to look up a key in a map. Apparently this is commonly
+  done.
+- [] for vectors. (get [1 2 3] 0). [1 "one" :one]. (conj [1 2] 3) =>[1
+  2 3]
+- Lists '(1 2 3). (nth '(1 2 3) 0) => 1. (conj '(1 2) 0) => (0 1 2).
+  You could use lists when adding things to the beginning is a common
+  operation.
+- Set: #{"kurt" 20 :icicle}. There are apparently hash sets and sorted
+  sets but hash sets are more common. (conj #{:a :b} :b) => #{:a :b}
+  (conj #{1 2} 3) => #{1 2 3}. (contains? #{1 2} 1) => true. (:a
+  #{:a :b}) => :a. (get #{:a :b} :a) => :a
+- Clojure promotes using these simple data structures rather than
+  reaching for something more complicated like creating classes. "It
+  is better to have 100 functions operate on one data structure than
+  10 functions on 10 data structures." - Alan Perlis.
+- There are functions, special forms, and macros.
+- (defn name "docstring" [arg1 arg2] (println arg1) (println arg2))
+- you can define functions with multiple arities! So you could in one
+  function definition define what that function would do if it
+  receives 1 or 2 or 3 arguments. (defn weird ([] "hey") ([a] (str "hey " a)))
+- (defn incs [& all] (map inc all))
+- Destructuring! Do it with lists, maps, and vectors:
+  #+BEGIN_SRC clojure
+    (defn my-first
+      "gets the first element"
+      [[f]]
+      f)
+  #+END_SRC
+  #+BEGIN_SRC clojure
+    (defn treasure
+      [{lat :lat lng :lng}]
+      (println (str "Treasure lat: " lat))
+      (println (str "Treasure lng: " lng)))
+  #+END_SRC
+  The following is the same as above (plus printing out the whole map
+  that gets passed in:
+  #+BEGIN_SRC clojure
+    (defn treasure
+      [{:keys [lat lng] :as treasure-loc-map}]
+      (println lat)
+      (println lng)
+      (println treasure-loc-map))
+  #+END_SRC
+- Anonymous function (def m3 (fn [n] (* n 3))). Which is actually
+  equivalent to (def m3 #(* %1 3)). Apparently this is possible
+  because of a feature called "reader macros". %1 == % so #(* %1 3) is
+  the same as #(* % 3)
+- conj is short for "conjoin" which means to combine. To summarize,
+  conj can be used on lists, vectors, and maps. It is like "cons" on
+  lists and "append" on vectors.
+  https://clojuredocs.org/clojure.core/conj. The documentation is
+  still a little confusing to me because what I think of as the type
+  signature says: (conj coll x) (conj coll x & xs) but looking at the
+  source code I see it can take zero and one argument. Upon further
+  investigation I think the documentation might be out of date. It
+  looks like what arguments it could take are manually specified
+  because (and I'm just guessing here) this function is being defined
+  in a more primative way:
+  https://github.com/clojure/clojure/blob/clojure-1.9.0/src/clj/clojure/core.clj#L75.
+  But compare that with https://clojuredocs.org/clojure.core/into and
+  its implementation:
+  https://github.com/clojure/clojure/blob/clojure-1.9.0/src/clj/clojure/core.clj#L6807.
+- Example of loop:
+  #+BEGIN_SRC clojure
+    (loop [i 10]
+      (if (zero? i)
+        (println "Launch!")
+        (do (println i)
+            (recur (dec i)))))
+  #+END_SRC
+  loop is like a little anonymous function that you can use "recur" to
+  loop back on. It feels quite "unstructured" compared to other loops
+  but I guess its fine.
+- Clojure apparently does not do tail call optimization :(. Although
+  map and reduce will probably be more common than explicit recursion
+  sometimes you will want explicit recursion and when that happens you
+  can just use the word "recur" and I guess that ends up recursing
+  using the function that is being defined.
+  #+BEGIN_SRC clojure
+    ;; Bad
+    (defn my-sum
+      [[val & vals]]
+      (if (nil? val)
+        0
+        (+ val (my-sum vals))))
+
+    ;; Good
+    (defn my-sum2
+      ([vals]
+       (my-sum2 vals 0))
+      ([[val & vals] acc]
+       (if (nil? val)
+         acc
+         (recur vals (+ val acc)))))
+  #+END_SRC
+  That's a real bummer since I think the former is so much more
+  elegant but maybe that's just my Little Schemer bias talking.
+- You can interact with namespaces, the current one is in a variable
+  *ns* (ns-name *ns*). Access function from another namespace: ns/fn.
+  refer brings all objects from a different namespace into the current
+  one, like a '.' import in go. alias lets you refer to a namespace
+  with a different name: (alias shorter really.long.alias). The ns
+  macro automatically refers clojure.core.
+- a namespace this-really.cool-namespace.thingy/fn means that where
+  the source code is rooted (which will be src for lein projects)
+  there is a clojure file in this_really/cool_namespace/thingy.clj and
+  inside that file is a function fn. Its a little odd that '.' in the
+  namespace translates to '/' in the directory. (require ns) reads in
+  the file designated by the namespace, creates the namespace, and
+  evaluates the functions in the file. (use ns) is equivalent to doing
+  (require ns) (refer ns).
+- Its confusing to me that if I do (def hey "you") then that creates a
+  mapping from the symbol "hey" to a "var" which you can get by doing
+  (var hey) or use the reader macro #' like #'hey. And then if you
+  dereference the returned var like (deref (var hey)) it returns the
+  value. Why can't a symbol be directly associated with the value? Why
+  does this "var" thing exist at all?
+- lol:
+  #+BEGIN_QUOTE
+  This chapter gives you the conceptual foundation you need to go mad
+  with power writing your own macros. It explains the elements of
+  Clojure’s evaluation model: the reader, the evaluator, and the macro
+  expander. It’s like the periodic table of Clojure elements. Think of
+  how the periodic table reveals the properties of atoms: elements in
+  the same column behave similarly because they have the same nuclear
+  charge. Without the periodic table and its underlying theory, we’d
+  be in the same position as the alchemists of yore, mixing stuff
+  together randomly to see what blows up. But with a deeper
+  understanding of the elements, you can see why stuff blows up and
+  learn how to blow stuff up on purpose.
+  #+END_QUOTE
+- Clojure (and lisp) "compilation" process:
+  1. reader: text->clojure data structures
+  2. macro expander: invokes macros (which are basically just
+     functions that are marked to be called during this phase). Macro
+     return values will be evaluated so the return value better be
+     valid clojure. The arguments to a macro are not evaluated like
+     they are with a function which is just because of when the macro
+     gets invoked, not because of the macro itself. Seriously a macro
+     is just a function that gets invoked in a different scenario.
+  3. evaluator: evaluates the AST (i.e. clojure list) to produce a
+     value.
+  It appears that steps 2 and 3 happen simultaneously as the clojure
+  data structures in the file are evaluated. For instance this code
+  fails because when backwards is evaluated my-reverse has not been
+  defined yet:
+  #+BEGIN_SRC clojure
+  (defmacro backwards
+  [form]
+  (my-reverse form))
+
+  (def my-reverse (partial reduce conj ()))
+  #+END_SRC
+  assuming my-reverse had been defined before then its clear that as
+  the macro is "expanding" the my-reverse function will be evaluated
+  hence we see how 2 and 3 happen simultaneously.
+- ` is like ' but can be undone by ~. @~ is like ~ but explodes the
+  resulting list into the current one.
+- macros can make code more concise to write but the downside is that
+  you have to understand this new mini DSL. I have yet to encounter a
+  situation where I *really* feel like making a macro would help out a
+  lot. Like the example in the book where he created some a
+  "validation" macro which would run success code on success and error
+  code on failure he said it was helpful because he was repeating that
+  logic everywhere but I would say that if that logic is being
+  repeated, maybe a refactor should be made so that logic is NOT
+  repeated. That would be a better solution than hiding some of that
+  noise behind a macro. Don't get me wrong, macros are super cool and
+  I love them dearly its just that I feel like needing to write one
+  yourself happens pretty rarely. Then again I really haven't written
+  a lot of lisp yet so we'll see!
+- futures are pretty cool. Reminds me of the go keyword as a dead
+  simple way to do concurrency stuff. delays seem unecessary but I
+  skimmed that part pretty quick. promises seem useful as well.
+- "Where functions rewrite values, macros rewrite code" -
+  https://aphyr.com/posts/305-clojure-from-the-ground-up-macros. Nice
+  concise quote explaining macros.
+- Assuming (def hello "you") these all produce "you":
+  - hello
+  - (deref (var hello))
+  - (deref (resolve 'hello))
+  - (deref (ns-resolve *ns* 'hello))
+  - @(var hello) (because @form == (deref form))
+  - @#'hello (because #'form == (var form))
+  Again, why does a symbol map to a var which maps to a value? Why not
+  just have symbol -> value?
+
+** Bugs in Tutorial
+- Their example min function call (min [{:a 1 :b 3} {:a 5 :b 0}]) is
+  wrong. The keys should be :lat and :lng
+  https://www.braveclojure.com/organization/
+
+** Questions?
+- What do you do when things go wrong? Go returns error types which
+  you check but clojure functions only return one value so what do we
+  do? Are there exceptions to deal with?
+- Logging
+- http
+- database
+
+** TODO
+- finish tutorial
+- could you have a macro that performed a side effect during its
+  expansion. hehe sounds fun. Like you could have it send an http
+  request and put the result into the code.
+- how do I work effectively in a project that has multiple namespaces?
+  It seems that when you modify a function in namespace X you just
+  recompile X but is there a way to say "hey, recompile everything
+  starting at main". Also though its a pain working in the repl, do I
+  need to switch namespaces everytime I want to really test out
+  functionality coming from that namespace?
+- how do I effectively deal with environment variables with clojure
+- is there a way to attach functions to an object? Becuase being able
+  to do that feels useful because then if multiple functions need
+  access to the same state then you don't have to constantly pass that
+  state in, you just set it once in the object and then call functions
+  on said object.
+- make macro for simple math equations in infix notation.
+- how do you make a reader macro? Can you?
+- make modification to healthcheck service
+- write snake
+- rewrite that XML analyzer script in clojure, see how the logic
+  differs
+- write basic http server that talks to a database. maybe breath of
+  the wild items will be stored
+- apply to job
+- profit
+
+** Thoughts about language design
+- I like having a type system. Preferably something expressive like
+  haskell
+- I don't want to have to think about how to optimize the code, when
+  to call memoize on a function, etc... I just want it to figure out
+  how it can run as fast as humanly possilbe. So they should do things
+  like tail optimization.
+- I do not like exceptions as an error handling mechanism. Why should
+  parsing an integer from a string raise an exception???? So I really
+  like how Go returns an "error" type to signal that something could
+  go wrong because it is so easy to forget to check for an exception
+  since its not forced by a type system or anything like that.
+- I like having an interpreter
+- I like lisp's consistancy in syntax
+- I don't like all these import options (:as, :refer, etc...). I like
+  go's where it automatically forces you to use the package name. Go
+  also lets you have an alias for a package in the case of name
+  collisions but it is not used as often. I would almost prefer to go
+  further and make it impossible to have an alias for a package unless
+  there is a naming conflict that must be resolved. I would love it
+  even more if making alias' for package names was completely
+  impossible though I'm not sure what that should look like if a
+  package name collision.
+- I like Go's automatic adding of imports with goimports.
+- I like Go's large standard library which deals with almost
+  everything for you
+- I think tutorials should be more hands on, building some sort of
+  large-ish program or series of them instead of all this discussion
+  about datatypes and why one language is so great. We can look up the
+  specifics about datatypes later, just let us program.
+- Is the ability to create private functions really necessary? I feel
+  like you could just better organize your code and create a let
+  closure defining the "private" function and then define any
+  functions that need it within that let body.
+- I don't like how you have to restate the namespace in a clojure file
+  because what the namespace is should already be implicit in the
+  directory path. Seems like a duplication of information. Go's
+  approach seems nicer because you just specify the package name. Then
+  again I wonder if that could be considered duplicate information
+  because it could be gleaned from the directory name.
+- Having all these ways to interact with namespaces in-ns, refer,
+  alias, require seems confusing especially since he said you'll
+  probably only use them in the repl. I feel like there should not be
+  any options, you just have to use the namespace with its fully
+  qualified name or something like that.
+- Its kind of cool in clojure to have the same function except varying
+  numbers of arguments but it makes things pretty confusing sometimes.
+  For example the "reduce" function is pretty complicated in how the
+  function behaves based on what parameters are given.
+
+** Setup
+Had this in ~/.lein/profiles.clj:
+
+{:user {:plugins [[cider/cider-nrepl"0.18.0-snapshot"]]}}
+
+to make cider work: http://docs.cider.mx/en/latest/. But I wiped my
+lein config and reinstalled and I didn't seem to need that
+configuration.
+
+Learned that lein will default to using clojure version 1.8.0 even
+though 1.9.0 has been out for 7 months. It looks like a fix has been
+made but a new release has not been created yet encorporating that
+fix. So changing the clojure version manually seems to be the way to
+go OR you could install the updated templates under a new name:
+https://github.com/technomancy/leiningen/issues/2373.

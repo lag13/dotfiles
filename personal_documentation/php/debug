@@ -1,0 +1,1 @@
+php -d "display_errors=1" <php-script>

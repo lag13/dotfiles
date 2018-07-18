@@ -30,6 +30,7 @@ My emacs journey is starting. What am I getting myself into?
 - The append-to-buffer function no longer uses (interactive) with the "B" option. copy-to-buffer does though! [[info:eintr#b%20for%20interactive][info:eintr#b for interactive]]
 
 * TODOs
+- C-x m composes an email. Look up how to configure this.
 - Can I configure it to ask for confimration before quitting if I
   accidentally quit emacs?
 - Modifiy the org C-c C-o binding so that if the link cannot be found

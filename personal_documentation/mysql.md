@@ -156,6 +156,15 @@ SET column1=value1, column2=value2, ...
 WHERE some_column=some_value;
 ```
 
+You can also do dynamic value updates:
+```
+update affectation
+inner join poste on affectation.fkPoste = poste.pkPoste
+set affectation.tsr_workflow_id = poste.tsr_workflow_id
+where affectation.tsr_workflow_id = 0
+and affectation.iSuppr = 0;
+```
+
 ### Insert Or Update
 
 Sometimes you want to insert new data or update data if a row already exists.
@@ -350,6 +359,18 @@ until mysql -u root -p$mysqlRootPassword  -e ";" ; do
 	echo "error connecting to mysql database, retrying..."
 done
 ```
+
+## EXPLAIN
+Put it in front of a query to get the execution plan for SQL which can
+help explain why a query is slow or not.
+
+- https://dev.mysql.com/doc/refman/5.7/en/using-explain.html
+
+## Slow Queries
+Determining the source of slowness in a query is a recursive process:
+1. In a GROUP BY clause
+2. In an ORDER BY clause
+3. In a subquery
 
 TODO
 ----

@@ -1,0 +1,14 @@
+* sites-enabled vs. sites-available
+These are where the vhost files go. Anything in sites-enabled is a
+vhost that is visible to apache. Basically, and this seems to hold for
+other similarly named files, "available" holds actual files and
+"enabled" holds symlinks to those files. I think that makes it simpler
+to "kill" a vhost if the site is misbehaving (because you just remove
+the symlink) and its sort of a separation of deployment vs moving
+things to the newly deployed "thing":
+- http://web.onassar.com/blog/2012/07/19/enabling-an-apache-virtual-host-with-sites-available-enabled-directory/
+- https://stackoverflow.com/questions/21812360/what-is-the-difference-between-sites-enabled-and-sites-available-directory
+- https://serverfault.com/questions/83508/purpose-of-debian-sites-available-and-sites-enabled-dirs
+
+* _default_
+https://serverfault.com/questions/567320/difference-between-default-and-in-virtualhost-context?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
