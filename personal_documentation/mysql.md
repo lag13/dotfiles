@@ -314,6 +314,31 @@ value starts from whenever you want:
 ALTER TABLE table_name AUTO_INCREMENT = 1500;
 ```
 
+### Set timezone
+Was doing some clojure programming and when I started up my mac's
+local mysql server and tried to run some clojure code to pull from a
+database on that server it complained saying that the set timezone was
+not recognized. I found the timezone and then set it with these two
+commands:
+
+```
+# This returned "SYSTEM" when I executed it
+SELECT @@global.time_zone;
+
+# This is chicago time. It seems that even though I set this value the db still stores stuff in UTC: https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html
+SET GLOBAL time_zone = "-05:00";
+```
+### Create User and grant them priveleges to a database
+https://dev.mysql.com/doc/refman/8.0/en/adding-users.html
+
+```
+CREATE USER 'todouser'@'localhost' IDENTIFIED BY 'todopassword';
+CREATE DATABASE todos;
+GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP
+ON todos
+TO 'todouser'@'localhost';
+```
+
 Modes
 -----
 

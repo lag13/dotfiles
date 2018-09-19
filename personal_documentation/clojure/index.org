@@ -11,6 +11,8 @@
   no value. (get-in {:a 0 :b {:c "ho hum"}} [:b :c]) == (get (get {:a
   0 :b {:c "ho hum"}} :b) :c). This also works ({:key1 1} :key1) AND
   (:key1 {:key1 1}) which feels very strange if you ask me.
+- MapEntry is a 2 element vector the first is a key the second is a
+  value.
 - keywords are primarily used as keys in a map. They can also be used
   as a function to look up a key in a map. Apparently this is commonly
   done.
@@ -182,7 +184,14 @@
   noise behind a macro. Don't get me wrong, macros are super cool and
   I love them dearly its just that I feel like needing to write one
   yourself happens pretty rarely. Then again I really haven't written
-  a lot of lisp yet so we'll see!
+  a lot of lisp yet so we'll see! But I've often encountered a
+  situation where I want to interact with a macro in some way but
+  there is no "interacting" with a macro because they don't exist
+  during runtime so I have to understand its expansion into normal
+  function calls. So really it just feels like the macro gets in the
+  way of understanding sometimes and it feels like they generally more
+  useful for adding facilities that feel more like language level
+  features.
 - futures are pretty cool. Reminds me of the go keyword as a dead
   simple way to do concurrency stuff. delays seem unecessary but I
   skimmed that part pretty quick. promises seem useful as well.
@@ -199,30 +208,99 @@
   Again, why does a symbol map to a var which maps to a value? Why not
   just have symbol -> value?
 
+** Working with lists by indice
+Turn a even sized list into a map:
+- (apply hash-map list)
+- (into {} (map vec (partition 2 list)))
+
+map-indexed
+keep-indexed (not sure why there is no "filter-indexed")
+reduce-kv (if applied to a vector the keys will be the indices)
+
+** Contains
+contains? is for fast lookup and does NOT work for any sequence (see
+the google group links below the question):
+https://stackoverflow.com/questions/3249334/test-whether-a-list-contains-a-specific-value-in-clojure
+
 ** Bugs in Tutorial
 - Their example min function call (min [{:a 1 :b 3} {:a 5 :b 0}]) is
   wrong. The keys should be :lat and :lng
   https://www.braveclojure.com/organization/
+- On https://www.braveclojure.com/multimethods-records-protocols/, the
+  link http://clojure.org/datatypes/ 404's now.
 
 ** Questions?
 - What do you do when things go wrong? Go returns error types which
   you check but clojure functions only return one value so what do we
   do? Are there exceptions to deal with?
-- Logging
+- Logging - https://github.com/yogthos/clj-log does map structured
+  logging which I guess could work but I feel more comfortable doing
+  JSON or logfm structured logging. Which could mean this for JSON:
+  https://github.com/puppetlabs/structured-logging. Or this for
+  logfmt: https://github.com/bnadlerjr/logfmt Or perhaps this for
+  logfmt? https://github.com/yeller/logfmt (it was listed here
+  https://www.brandur.org/logfmt). This guy has some popular clojure
+  libraries so maybe this is worth looking at as well:
+  https://github.com/ptaoussanis/timbre. ats-health-check uses clj-log
+  and it seems weird because in scalyr it looks like one log occupies
+  multiple lines. ats-candidate-clj uses org.clojure/tools.logging but
+  I'm just seeing some exception looking logs in the output which
+  makes me think that either the service does not usually log things
+  (i.e. it usually "just works") or something is wonky.
+  ats-myc-indexer does log with json but its logging setup seems
+  rather confusing at least when looking at project.clj. But it does
+  seem to use log4j and org.clojure/tools.logging. So I suppose with
+  some configuration I could get what I want.
 - http
 - database
+
+** Issues I want to figure out a better system for
+- Adding dependencies seems very manual which I do not like. To add a
+  new dependency you have to add it to project.clj and restart the
+  repl. Is there a way to automatically do that? Like some cider
+  command or something which loads it into the repl and adds it to
+  project.clj?
+- There is a System/getenv but there is no System/setenv because (I
+  suspect) Java does not have it either:
+  https://docs.oracle.com/javase/7/docs/api/java/lang/System.html. I
+  think Java does not have it because of something to do with the JVM?
+  I'm really not sure and need to learn more about that.
+- Understand better how clojure relates to the JVM, Java, classpaths,
+  jars, uberjars... all that jazz.
+- When compiling a web service it looks like Ray's team used 'lein
+  ring uberjar'. Basically you specify a "handler" (don't even need to
+  specify a main function) and it will create a main function for you
+  which starts a web server. The issue I'm having is that I feel like
+  before the application starts up you need to do some initialization
+  like loading environment variables and then pass in those
+  environment variables into the handler or something like that. What
+  they did is they have this "config" map of environment variables
+  which is scattered throughout the code. I don't like that because
+  then functions are tied to this config struct and so if you wanted
+  to test those functions you'll have to initialize the config struct.
+  Is that difficult to do? I'm just not sure I guess. With database
+  connections as well it seems like they do sort of an on demand thing
+  where it only loads stuff when necessary. I feel like this would
+  make testing harder but maybe its okay.
 
 ** TODO
 - finish tutorial
 - could you have a macro that performed a side effect during its
   expansion. hehe sounds fun. Like you could have it send an http
   request and put the result into the code.
+- I like the idea of evaluating the whole file in the repl whenever I
+  save. How could I do that?
 - how do I work effectively in a project that has multiple namespaces?
   It seems that when you modify a function in namespace X you just
   recompile X but is there a way to say "hey, recompile everything
   starting at main". Also though its a pain working in the repl, do I
   need to switch namespaces everytime I want to really test out
   functionality coming from that namespace?
+- When I switch away from the default "user" namespace I lose some of
+  the commands like source and doc. Is there a way to fix that? Or
+  should I change my workflow so those commands aren't needed?
+- Is there a way that given a function, see what namespace it came
+  from?
 - how do I effectively deal with environment variables with clojure
 - is there a way to attach functions to an object? Becuase being able
   to do that feels useful because then if multiple functions need
@@ -230,7 +308,58 @@
   state in, you just set it once in the object and then call functions
   on said object.
 - make macro for simple math equations in infix notation.
-- how do you make a reader macro? Can you?
+- What is considered idiomatic error handling in clojure?
+  https://www.reddit.com/r/Clojure/comments/6wmnfm/thoughts_on_failjure_vs_funcoolcatseither_for/.
+  It seems that the community accepts all manner of approaches:
+  exceptions, either monad from the "cats" library, a more basic
+  approach of returning a tuple of [error result], nil-punning where
+  returning 'nil' signifies that something went wrong.
+- I had to manually import the clojure.test library in my CIDER repl.
+  Can that be done automatically instead? I imagine I'd always want
+  that library.
+- Starting to learn unit testing and I like the idea of the with-test
+  macro so you can define tests next to the function.
+  #+BEGIN_SRC clojure
+    (with-test
+      (defn add2 [x]
+        (+ x 2))
+      (is (= 4 (add2 2)))
+      (is (= 10 (add2 8))))
+  #+END_SRC
+  However, I feel like we don't need to repeat calls to add2, so could
+  we define something where we just give it a list of inputs and
+  expected outputs and it will apply the appropriate function? Offhand
+  that seems nice to me:
+  #+BEGIN_SRC clojure
+    (with-test
+      (defn add2 [x]
+        (+ x 2))
+      2 4
+      8 10)
+  #+END_SRC
+  Hmm, that does look a tad cryptic though. But I like it because I
+  could change the name of the function and the tests would still
+  pass. I guess what I really want here is go's table driven test
+  where I don't have to repeat the function name everywhere. Perhaps
+  this is a suitable (and less cryptic) alternative:
+  #+BEGIN_SRC clojure
+    (with-test
+      (defn add2 [x]
+        (+ x 2))
+      (doseq [{:keys [input output]}
+              [{:input 2 :output 4}
+               {:input 8 :output 10}]]
+        (is (= output (add2 input)))))
+  #+END_SRC
+  ^^ That actually does not work the 'is' macro seems to report on the
+  literal expression you gave it. I'll table this thought for now,
+  perhaps I shouldn't worry too much about making clojure like Go.
+  They do have clojure.test/are which seems similar to what I want but
+  I don't know if you can run specific tests within the "are".
+- the library expectations seems like a nice library for testing:
+  https://semaphoreci.com/community/tutorials/testing-clojure-with-expectations.
+  Written by this guy:
+  http://blog.jayfields.com/2010/08/clojuretest-introduction.html
 - make modification to healthcheck service
 - write snake
 - rewrite that XML analyzer script in clojure, see how the logic
@@ -290,6 +419,159 @@
   For example the "reduce" function is pretty complicated in how the
   function behaves based on what parameters are given.
 
+** General clojure impressions
+- When looking for tutorials it always seems that they are from a year
+  or longer ago. Is that because clojure is just not as popular a
+  language? Perhaps I'm just not looking in the right places.
+- It feels like there are sooo many library options to solve a
+  particular task when compared to Go. I get a little overwhelmed
+  trying to decide what I should choose.
+- I think that learning clojure is one of the first times I've learned
+  a language after doing significant work in another one (Go) and its
+  interesting to see some of the same problems come up. For instance
+  some people in the clojure community like the idea of an ORM while
+  others do not. The community also seems divided on handling errors.
+  Is it common to have these sorts of divides? Because I really wish
+  there was one supported idiomatic way to do things especially for
+  something more "basic" like error handling.
+- I liked in Go that the entrypoint to your application is always
+  gonna just be main. With clojure it seems there are other ways to
+  get a working application for example lein-ring which seems to be a
+  mini DSL for creating a main function after you give some handlers
+  and such.
+- Logging feels way too complicated. I don't understand why there
+  needs to be all this configuration around logging. To me, logging
+  should be simple, if an error happens you log it. Done. So why are
+  there all these configurations options and even plugin support??
+  What is going on here?? https://en.wikipedia.org/wiki/Log4j. Are we
+  going for logging systems that are turing complete or something? He
+  puts it nicely:
+  https://spin.atomicobject.com/2015/05/11/clojure-logging/
+- Relying on the JVM probably provides some benefits that I don't
+  fully understand but man does it feel like there are a lot of
+  complications that come along for the ride:
+  http://brownsofa.org/blog/2015/06/14/clojure-in-production-logging/
+- Stack traces are super hard to parse and seem to contain mostly
+  noise.
+- Man is test output tough to parse in clojure if an exception gets
+  thrown because then a stacktrace 10 miles long gets printed.
+- Relying on Java really seems like a blessing and a curse. On the one
+  hand you bring in all those libraries and such but on the other hand
+  all the crap comes with it including sort of weird things like this
+  AWS library in clojure https://github.com/mcohen01/amazonica which
+  has next to no documentation because all the library does is
+  translate from clojure to java calls and the java code is already
+  documented:
+  https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/index.html
+
+** Thoughts On Unit Testing
+In trying to get unit testing with the health-check service to work
+I've done some research and what I've concluded is that I pretty much
+have the same opinion on testing that I've arrived at while developing
+with Go namely:
+1. Break logic up on boundaries of side effects. So, unit test
+   functions that have no side effects. These functions will return
+   the *intent* to perform a side effect (for example returning a http
+   request rather than sending it).
+2. To test side effects run an e2e test. If it is difficult to perform
+   a side effect (like ssh) then mock. This is not preferable but if
+   (1) is adhered to then I think the code quality will still be good.
+
+Here are some clojure specific testing approaches and why I do not
+like them:
+
+1. with-redefs - The worst way to unit test because:
+   1. renaming the function your redefining would generate a false
+      positive in your unit test
+   2. mocking out a side effect is, I believe, generally not good
+      testing practice assuming that what you end up doing is testing
+      that the mock function received the correct arguments because:
+      1. You are not actually testing whether a side effect happens,
+         you are testing your *intention* for a side effect to happen
+         so I think you gain a false sense of confidence that your
+         side effect will work. The only way to test that a side
+         effect actually happened is to run the real code (like in an
+         e2e test).
+      2. A test with a mock will probably involve checking that your
+         mock received the correct intputs which I think makes for a
+         messier test than checking if a function returns the expected
+         data.
+      3. If this side effect is embedded in some conditional logic the
+         test becomes confusing because it needs to be aware that if
+         we pass inputs XYZ then the side effect will or will not
+         happen. In other words the test now has knowledge of the
+         internals of the function which seems to go against the goal
+         of testing where you do not care about internal
+         implementation details.
+2. Passing in a function which performs the side effect - This feels
+   better than the previous approach since 1->1 is no longer an issue
+   but it does not fix 1->2.
+
+But we still want to test b/c it allows us to confidently refactor and
+can help get right and maintain tricky logic so I think my clojure
+code will look like:
+#+BEGIN_SRC clojure
+  (gen-http-resp #(execute-redis-cmd (incoming-req-to-redis-cmd req)) some-other-arg)
+#+END_SRC
+
+In other words we:
+1. Convert input to side effect intent
+2. Wrap that side effect intent in a no-argument function which
+   performs the side effect
+3. Pass that no-argument function to another function which will
+   *first* execute that side effect and then do the other data
+   transformations
+
+In (3) it sounds like we'll pass in a mock during a unit test and I
+think that is true but I'm okay since 1->2->2 and 1->2->3 are not
+applicable. 1->2->1 is to some extent but it doesn't bother me since
+the assembling of the proper side effect happens elsewhere and
+wrapping it in this anonymous function is just to get around the fact
+that this code could throw an exception and we want to be able to unit
+test that to make sure we get the proper behavior. In Go an error
+would be returned from the side effect and you could pass in the error
+to the function but I don't think we can do that kind of thing with
+exceptions. Or maybe we can! Or maybe, when I start doing this I'll
+realize that most of the time I can just let the original exception
+bubble up to the top. I'll have to actually start coding to refine
+this testing strategy for clojure.
+
+** Develop web server
+- altering dependencies do: sesman-restart
+- lein ring server starts a server and reloads in the face of changes.
+
+When doing this tutorial I tried to follow but I got this fuckin'
+error which I do not understand at all:
+
+(use 'compojure.route)
+CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/ns did not conform to spec:
+In: [2] val: ((require [clojure.string :as str])) fails spec: :clojure.core.specs.alpha/ns-form at: [:args] predicate: (cat :attr-map (? map?) :clauses :clojure.core.specs.alpha/ns-clauses),  Extra input
+ #:clojure.spec.alpha{:problems [{:path [:args], :reason "Extra input", :pred (clojure.spec.alpha/cat :attr-map (clojure.spec.alpha/? clojure.core/map?) :clauses :clojure.core.specs.alpha/ns-clauses), :val ((require [clojure.string :as str])), :via [:clojure.core.specs.alpha/ns-form], :in [2]}], :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436 0x233bfad "clojure.spec.alpha$regex_spec_impl$reify__2436@233bfad"], :value (ring.util.mime-type "Utility functions for finding out the mime-type of a file." (require [clojure.string :as str])), :args (ring.util.mime-type "Utility functions for finding out the mime-type of a file." (require [clojure.string :as str]))}, compiling:(ring/util/mime_type.clj:1:1)
+
+Modifying some of the dependencies to have different versions seemed
+to fix things. But that's fucking stupid!!! Why should I be manually
+modifying dependencies for things to work????
+http://kendru.github.io/restful-clojure/2014/03/01/building-out-the-web-service-restful-clojure-part-3/
+
+It may also be the case that I was doing something dumb... some typo
+or something. Still!! That error was not helpful to me at all.
+
+** Emacs
+C-c C-e - eval expression
+
+C-c M-p - put expression into repl if invoked with prefix evaluates
+it as well
+
+C-c M-n - switch to namespace of current buffer
+
+C-c C-k - compile current buffer
+
+C-c C-d C-d - display docs for symbol under point
+
+M-. - go to source code for symbol
+
+C-c C-z - go to repl buffer for source file
+
 ** Setup
 Had this in ~/.lein/profiles.clj:
 
@@ -305,3 +587,7 @@ made but a new release has not been created yet encorporating that
 fix. So changing the clojure version manually seems to be the way to
 go OR you could install the updated templates under a new name:
 https://github.com/technomancy/leiningen/issues/2373.
+** Links
+- https://clojure.org/
+- https://www.braveclojure.com/clojure-for-the-brave-and-true/
+- https://purelyfunctional.tv/guide/clojure-concurrency/

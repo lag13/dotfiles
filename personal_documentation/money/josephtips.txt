@@ -1,0 +1,112 @@
+Lucas Groenendaal	money question. I don't do much with my money, pretty much just stick it in my chase savings account which earns like 0 interest. So my mom was saying I should move it somewhere that has a higher interest.
+
+Do you use a particular bank that has a higher interest rate?	5:07 PM
+Joseph Palmour	I use capital one 360, but it's interest rate isn't great according to a quick search	5:09 PM
+Joseph Palmour	it's 1%	5:09 PM
+Joseph Palmour	looks like some go up to 1.75%	5:09 PM
+Joseph Palmour	though I don't know much about those so maybe there are tradeoffs	5:10 PM
+Joseph Palmour	but...	5:10 PM
+Joseph Palmour	one thing I really wish I would have done straight out of school	5:10 PM
+Joseph Palmour	though it would have really been impossible given the low salary I had as a teacher	5:10 PM
+Joseph Palmour	is save in a roth IRA	5:10 PM
+Joseph Palmour	you do that?	5:11 PM
+Lucas Groenendaal	my mom set one up for me in highschool! But I'm not sure if I really make a lot off of it actually. I don't do much in terms of managing my money, I just save it	5:11 PM
+Joseph Palmour	ooo, too bad you aren't in norcross	5:11 PM
+Joseph Palmour	we had a few conversations about this stuff over chinese	5:12 PM
+Joseph Palmour	and keiichi really studies these things	5:12 PM
+Joseph Palmour	I read this book over the christmas break: https://www.amazon.com/Bogleheads-Guide-Investing-Taylor-Larimore/dp/0470067365	5:12 PM
+
+
+Joseph Palmour	so here are a few things that I think are pretty good advice (got the keiichi stamp of approval)	5:13 PM
+Lucas Groenendaal	:)	5:13 PM
+Joseph Palmour	* make sure you contribute 6% to your CB 401k so you get the max matching from CB (3%), but don't contribute more because the fees are really bad	5:13 PM
+Joseph Palmour	* make sure you pick investments from the low cost options in the CB 401k plan	5:14 PM
+Joseph Palmour	* if you can you should save beyond that 6%. Seems like 10-20% is a good number to get you on track for a nice retirement	5:15 PM
+Joseph Palmour	* save it in a tax sheltered account (IRA or Roth IRA) to avoid paying taxes on gains (this has the disadvantage that you are penalized if you withdraw before retirement age, but that's not so bad since you probably shouldn't be withdrawing it anyway)	5:16 PM
+Joseph Palmour	* when you chose investment options in the IRA or Roth IRA, make sure they are low cost (non-managed index funds are the best)	5:17 PM
+Joseph Palmour	* pick a good ratio of bonds (conservative) and stocks (risky), with general rule of thumb being have a percentage of bonds equal to your age, so you get more conservative as you get closer to retirement	5:18 PM
+Joseph Palmour	* have an emergency fund set up in a savings account (I use capital one 360) with 3 months salary, since you don't want to raid your retirement account	5:19 PM
+Joseph Palmour	I really wish I had done these things younger	5:19 PM
+Joseph Palmour	but you should totally contribute to the roth IRA, try to hit the max per year if you can ($5500)	5:20 PM
+Lucas Groenendaal	I think the only thing I don't really do is manage any of these accounts (401k and roth IRA in this case). I contribute to both but I haven't messed around with investing that money	5:22 PM
+Joseph Palmour	you also probably don't want more than 6 months in an emergency fund since that means it can't grow tax deferred	5:22 PM
+Lucas Groenendaal	I like the bond % == your age rule	5:22 PM
+Joseph Palmour	unless you really think you would need it	5:22 PM
+Joseph Palmour	it's easy to automate the contributions and investments too	5:23 PM
+Joseph Palmour	you should do it!	5:23 PM
+Joseph Palmour	if you use vanguard this would be easy to set up and would be pretty solid: https://www.bogleheads.org/wiki/Three-fund_portfolio	5:24 PM
+Joseph Palmour	From Vanguard's list of "core funds," the funds that are best for a three-fund portfolio are: Vanguard Total Stock Market Index Fund (VTSMX) Vanguard Total International Stock Index Fund (VGTSX) Vanguard Total Bond Market Fund (VBMFX)	5:25 PM
+Lucas Groenendaal	I should. For the 401k how do you invest? I just see this slider thing
+Joseph Palmour	ah... let me check that out	5:25 PM
+Joseph Palmour	I just realized they take a 2% cut every paycheck (shows as plan administration fee) on top of the expense ratios that vary based on the funds you pick	5:26 PM
+Joseph Palmour	it's crazy!!!	5:26 PM
+Joseph Palmour	makes me so mad	5:26 PM
+Lucas Groenendaal	what does that mean exactly?	5:27 PM
+Joseph Palmour	click my accounts, then "view manage my investments" on the left	5:30 PM
+Joseph Palmour	2% of what I contribute each month to my retirement count doesn't go to me	5:31 PM
+Joseph Palmour	it goes to the "plan administrators"	5:31 PM
+Lucas Groenendaal	what???	5:32 PM
+Lucas Groenendaal	I'm not sure I have that	5:32 PM
+Lucas Groenendaal	maybe because I didn't change it from the default?	5:32 PM
+Joseph Palmour	and then on top of that all of the investment options have expenses	5:32 PM
+Joseph Palmour	Vanguard Total Stock Market Idx I hs the lowest "expense ratio"	5:32 PM
+Joseph Palmour	so I put 100% in that	5:32 PM
+Joseph Palmour	Keiichi does too	5:32 PM
+Joseph Palmour	but you wouldn't want to do that if the 401K represents all your retirement savings	5:33 PM
+Joseph Palmour	since that would be putting stocks at 100% and bonds at 0%	5:33 PM
+Joseph Palmour	since i have an IRA from when I taught I make sure that the total makeup of it and the CB account puts me at a percentage of investments being in bonds that is appropriate	5:34 PM
+Joseph Palmour	so I never did research on what CB offers for bonds, but you'd probably want to have a mix of the 2	5:34 PM
+Lucas Groenendaal	gotcha. Based on my picture, am I getting that 2% cut? Am I looking on the right page?	5:35 PM
+Joseph Palmour	ah, that's the funny thing, I have all my data go to mint	5:36 PM
+Joseph Palmour	and I see that 2% show up each month in mint as a "plan administrator fee"	5:36 PM
+Lucas Groenendaal	mint?	5:37 PM
+Joseph Palmour	I haven't searched to see if it shows up on that page	5:37 PM
+Joseph Palmour	I need to do that	5:37 PM
+Joseph Palmour	but then on top of that, you chose this account: https://www.morningstar.com/funds/xnas/jffix/quote.html	5:37 PM
+Joseph Palmour	which has a 0.6% expense ratio which isn't terrible	5:37 PM
+Joseph Palmour	but this is 0.04%: https://awrd.morningstar.com/SBT/Tools/MR/Default.aspx?fullversion=1&ticker=VITSX	5:37 PM
+Joseph Palmour	which you could be doing	5:37 PM
+Joseph Palmour	the big difference is that what you have has a pretty nice convenience factor... it's aimed at retirement in 2055	5:38 PM
+Joseph Palmour	so it automatically "balances" your ratio of bonds to stocks and probably has an intelligent mix of large cap / small cap and  foreign vs domestic, which gives you some diversification	5:39 PM
+Lucas Groenendaal	that's neat	5:39 PM
+Lucas Groenendaal	where that vangaurd thing is just stock?	5:39 PM
+Lucas Groenendaal	like you mentioned?	5:39 PM
+Joseph Palmour	yep, it's 100% stock	5:40 PM
+Joseph Palmour	it's an index fund with super low cost	5:40 PM
+Joseph Palmour	so it is a collection of stocks that represents the entire US economy	5:40 PM
+Lucas Groenendaal	and what's that "mint" thing you mentioned ^^?	5:40 PM
+Joseph Palmour	https://www.mint.com/	5:40 PM
+Joseph Palmour	it's kind of creepy because you're giving all of your financial data to intuit in return for easy tracking of everything	5:41 PM
+Lucas Groenendaal	haha	5:41 PM
+Joseph Palmour	not sure that I feel good about doing that, but it is convenient	5:41 PM
+Lucas Groenendaal	ah I found the "Plan Administration Fee"	5:42 PM
+Joseph Palmour	click "transaction history" under "account information"	5:42 PM
+Joseph Palmour	yep	5:42 PM
+Joseph Palmour	just found it myself	5:42 PM
+Joseph Palmour	Not sure if it's a fixed rate or a percentage	5:42 PM
+Joseph Palmour	and not sure if it changes or not based on what you invest in	5:42 PM
+Joseph Palmour	but regardless, you get hit with that fee plus the 0.6% expense ratio for using the JFFIX fund	5:43 PM
+Joseph Palmour	there are tons of nifty online calculators that you can use to see how much money that plan administration fee is costing you	5:43 PM
+Joseph Palmour	for me it amounts to nearly 2%	5:44 PM
+Lucas Groenendaal	not sure if I'm seeing that 0.6% but those 2 fees are a bummer!	5:44 PM
+Joseph Palmour	the .6 won't show in your transaction history	5:44 PM
+Joseph Palmour	because it's just taken out of the returns you get when you invest in JFFIX	5:44 PM
+Joseph Palmour	it's "hidden"	5:44 PM
+Lucas Groenendaal	this is too complicated. I just want to live!	5:44 PM
+Joseph Palmour	but look at the expenses section at https://www.morningstar.com/funds/xnas/jffix/quote.html	5:44 PM
+Joseph Palmour	I know it's crazy	5:45 PM
+Joseph Palmour	but if you do a calculation on the money you save by spending the few hours it takes to get it right, I think you'll find you basically can retire a year or two early by spending that time	5:46 PM
+Joseph Palmour	it's like investing in VIM skills :)	5:46 PM
+Lucas Groenendaal	haha	5:46 PM
+Lucas Groenendaal	maybe I should pick up that book	5:46 PM
+Lucas Groenendaal	and talk to Keiichi	5:46 PM
+Lucas Groenendaal	and keep talking to you	5:46 PM
+Lucas Groenendaal	and actually do it	5:46 PM
+Joseph Palmour	you should!	5:46 PM
+Lucas Groenendaal	(mess with investments that is)	5:46 PM
+Joseph Palmour	the book is quick	5:47 PM
+Joseph Palmour	it's philosophy is not a get rich quick philosophy though	5:47 PM
+Lucas Groenendaal	that's my kind of philosophy	5:47 PM
+Lucas Groenendaal	get rich quick is too easy, takes all the fun out of it	5:47 PM
+Lucas Groenendaal	how will you appreciate your wealth if you don't work hard and take time to accumulate it?	5:47 PM
+Joseph Palmour	it's more of a realistic, "sorry you won't get a huge rate of return and will never be super rich, but you should feel confident that you'll slowly build enough wealth to retire comfortably"	5:48 PM

@@ -86,6 +86,13 @@ http://stackoverflow.com/questions/6217156/break-a-previous-commit-into-multiple
 git reset HEAD~
 ```
 
+## Undo (revert) recent commit
+```
+git revert HEAD
+```
+
+https://www.atlassian.com/git/tutorials/undoing-changes
+
 Weird Issue
 -----------
 

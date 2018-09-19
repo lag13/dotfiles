@@ -112,6 +112,13 @@ instances or sending SNS messages (which, since you can pretty much put any
 service on the other side of an SNS message, alarms could end up triggering
 almost anything!).
 
+Cloudwatch can also be used to schedule automated actions. For example
+you can configure cloudwatch to emit an event every 5 hours and when
+said event is emitted a lambda function will be executed or something
+like that. So using cloudwatch in combination with some other AWS
+infrastructure (lambda, SNS, SQS, etc...) you can perform a task on
+some sort of schedule.
+
 ### Alarms
 
 #### Understanding The Alarm Rules

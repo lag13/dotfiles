@@ -1,0 +1,1183 @@
+* The Bogleheads' Guide to Investing (second edition)
+I'm gonna take some notes here from the above book.
+
+- https://www.bogleheads.org/
+
+TODO: I don't understand how investing works in the sense that if I am
+profiting then I feel like *someone* *somewhere* has to be losing
+money right? If everyone and their mother did this style of investing
+then I feel like it wouldn't work.
+
+TODO: I've heard people say things along the lines of "the stock
+market always goes up in the grand scheme of things" (so they
+acknowledge that their are dips but overall things will keep growing).
+I don't understand that sentiment because *nothing* in this universe
+will continue forever and so I feel like growth of my money is not
+guaranteed either.
+
+TODO: If the market is always going up then that means stocks prices
+are continually rising and if that is the case then at some point
+won't it be impossible to invest because everything is too expensive?
+
+One way to think about investing is that a owner of a business is to
+you as an employee is to the money you own. In other words, as the
+owner of a business employees will make you money and similarly your
+money can make you more money. Thanks Pete for this analogy!
+
+* Talk with Pete
+- Investing has been pitched to me as a low risk way to make a lot of
+  money (if done right) which sounds to good to be true. So what's the
+  catch? - Investing is *not* a 0 risk so there is that to keep in
+  mind. Something else to keep in mind though is that due to
+  inflation, not investing in *something* has a 100% success rate at
+  losing money.
+- So if investing is so good why don't more people do it? - Ignorance,
+  laziness, distrust, and some people can't handle seeing their money
+  fluctuate.
+- If more people invested would individuals get less out of investing?
+  Almost like adding more investors would dilute a pool? - I think the
+  question should be if people started spending less would individuals
+  get less out of investing and the answer is yes.
+- If I'm making so much money investing it feels like *someone* has to
+  be losing in this situation. - The losers are the people who spend
+  money on shit because they make a company more successful and then
+  that gets passed onto you. So you are benefiting from the consumers
+  ultimately.
+- Say you bought 10,000 dollars worth of stock in amazon and just held
+  it forever and let it pay dividends. If the amount of dividends paid
+  out by amazon is greater than 10,000 then amazon has lost money. -
+  Seems like Pete wasn't 100% sure how to answer this but it sounds
+  like dividends might never really reach what you initially invested.
+  I suppose it would eventually but by that time is reached amazon
+  will have invested your 10,000 into its business and probably made
+  much more from its customers than what your dividends would ever pay
+  out.
+
+* Talk with Robinette
+- acorns (micro investing)
+- robinhood app (no fees when trading stocks)
+
+* Chapter One: Choose a Sound Lifestyle
+Covers stuff that seemed more or less like common sense to me
+(probably because I've observed my parents living like this):
+
+- Be focused on increasing net worth rather
+- Pay of debts if you have them
+- Establish an emergency fund. How many month's worth you want is very
+  variable but they recommend 6 months for most people. I myself put
+  away 30000 which would be 1 year based on my spending in 2017.
+
+They also had me calculate my net worth which I evaluated as being
+$167,500:
+
+- 401k (58,000)
+- Roth IRA (32,000)
+- Health Savings Account (2,000)
+- Stock (just with vanguard yesterday) (10,000)
+- Savings account with northpointe (30,000)
+- Checking account (13,000)
+- Disney Vacation Club Member. I have 225 points and selling it for
+  $100 per point seems reasonable so (22,500)
+
+* Chapter Two: Start Early and Invest Regularly
+Some more stuff that I have heard about namely that the most important
+way to aquire wealth is to learn to save however possible (move
+somewhere cheaper, no more starbucks, etc...). Once you start saving
+then investing that money is how you really grow your wealth.
+
+** Rule of 72
+Sounds like a way to estimate how quickly compound interest will cause
+your investment to double. Divide 72 by the anual rate of return.
+
+For example, an investment that returns 8% will double every 9 years
+because 72/8 = 9.
+
+TODO: I'd like to see how that math works.
+
+** Not all debt is bad
+Say you have the money to pay off a house. It could be a better
+financial choice to not do that and instead take out a loan because if
+the loan grows at X% but you invest the money and it grows at more
+than X% then that's extra cash!
+
+Thought that was interesting as I always assumed debt was something to
+be killed immediately.
+
+* Chapter Three: Know What You're Buying: Part One:
+Stocks and Bonds
+
+Turns out you can invest in a lot of things:
+- stocks
+- bonds
+- mutual funds (generally they recommend investing by this route)
+- funds-of-funds
+- exchange-traded funds (ETFs)
+- annuities
+
+** Stocks
+- you literally own part of the corporation and you can participate in
+  business decisions (although you will probably never make an impact
+  being one individual)
+- stock price is determined by how much a buyer is willing to buy and
+  how much the seller is willing to accept. TODO: Does this mean at
+  one moment in time people can pay different amounts for the same
+  stock? How it is determined how stock prices change really confuses
+  me. I guess this question can be more fundamental too: at what point
+  does the price of an apple (or any product) change? I guess I also
+  need to understand more *who* the seller of this stock is.
+- some stocks pay dividends, I guess its the company thanking you for
+  giving them your money? TODO: This model confuses me because in the
+  extreme if everyone just held on to the stocks for a given company
+  wouldn't they suck the life out of the company as the company paid
+  them all dividends?
+- selling stock when it is a higher price than you bought it will net
+  a profit.
+
+TODO: Are there a finite number of stocks for a given company?
+
+** Bonds
+- literally a loan to some entity (government, corporation,
+  municipality...). So it collects interest (usually semiannually).
+  TODO: What's the difference between a bond and a loan you recieve
+  for, say, a home
+- maturity date - the date at which point the original purchase price
+  of the bond is returned. TODO: Is the interest paid to you
+  periodically or is all the accumulated interest added on to the bond
+  value and given back to you when it matures?
+
+*** Treasure Issues
+- safest investments since they're backed by the US government
+- interest income is exempt from local and state taxes
+
+**** T-Bill, T-Notes, and T-Bonds
+- same type bond with a different name based on the length of the
+  bond:
+  - T-Bill - (0,1] year
+  - T-Notes - (1,10] years
+  - T-Bonds - (10,inf) years
+- collectively called *Treasuries*
+
+**** Treasure Inflation-Protected Securities (TIPS)
+- protects against inflation somehow
+
+**** U.S. Savings Bonds
+- two types
+  - I Bonds - covered later
+  - EE Bonds
+    - Has a fixed interest rate for 20 years set by the Treasury using
+      some undisclosed formula TODO: Does it get set to a new interest
+      rate for the remaining 10 years?
+    - min interest rate of 3.526 which (by 72 rule) means that the
+      value will double in 20 years.
+- after purchace, can be cashed in the range of years (1, 30]
+
+*** Government Agency Securities
+Something about mortgage backed securities (MBS) which was incredibly
+confusing and so I'm ignoring this for now.
+
+*** Corporate Bonds
+The bond's yield (which I think means interest rate?) is determined
+roughly by how trustworthy the business is. More trustworthy means a
+smaller interest rate.
+
+*** Municipal Bonds
+- State and local governments sell bonds to pay for various government
+  projects.
+- Normally free free from federal taxes and state taxes and might be
+  free from local taxes as well. So it could be tax free.
+- Normally have a lower yield than other bonds but the lack of taxes
+  can make up for that.
+
+*** Bond mutual funds (also just "bond funds")
+- collection of bonds that keep buying more bonds (the bonds that
+  mature will be used to buy more bonds which will eventually mature
+  and the cycle continues).
+- duration - a bond fund has no maturation date but the *duration* of
+  a bond fund helps estimate how a bond perform... somehow. For
+  example a duration of 4.3 years roughly means that if stocks rose 1%
+  then the bond fund would fall 1% and the inverse is true (if stocks
+  fell 1% then the bond fund would rise 4.3%
+
+TODO: Why do bonds perform opposite of interest rates? And what does
+"interest rate" even mean here? Does that mean an interest rate of
+stocks?
+
+*** Investing in Bonds
+- Why? Bonds often do not move in the same direction as stocks so they
+  can act as a stabalizer to your portfolio. TODO: If bonds move
+  opposite of stocks then don't they just cancel eachother out?
+- Having a percentage equal to your age of your portfolio be bonds is
+  a good rule of thumb. TODO: Why is this? Are bonds more stable than
+  stocks? Why?? I feel like economic downturns only last ~10 years so
+  couldn't you safely keep most of your stuff in stocks (which I guess
+  I'm assuming grow faster) until you're older and definitely want
+  that stability?
+
+TODO: On their pros&cons list for individual bonds it said that you
+know you won't lose money since you always get the principal back at
+maturity but don't you effectively lose money because of inflation?
+
+* Chapter Four: Know What You're Buying: Part Two:
+Mutual Funds, Funds of Funds, Annuities, and ETFs
+
+TODO: They use the word "security" and "index" and I think those are
+different words to describe the concept of an investment but I'm not
+sure.
+
+TODO: I don't understand how these different types of investment
+options get created. Do people just make them up and put them into
+effect on the fly? Or do laws need to be passed before the investment
+can be implemented.
+
+** Mutual Funds
+- Pool money from multiple investors to buy securities (stocks, bonds,
+  money market instruments, ...). TODO: What are money market
+  instruments?
+- You own a fractional percent of all the securities in the mutual
+  fund. TODO: Could you mimic a mutual fund yourself by buying
+  fractional pieces of lots of different securities?
+- Governed by the Investment Company Act of 1940 TODO: Read up on this
+  as I think it'd be interesting to see the specific laws that make
+  certain investment types possible.
+- Operated by professional money managers so its kind of like they do
+  the nitty gritty investment work for you (how much of this company's
+  stock to buy and such) and you just have to pick a mutual fund that
+  fits your goals (risky, safe, ...)
+- READ THE PROSPECTUS for a mutual fund which gives objectives, costs,
+  past performance, ... to help you decide if the mutual fund is right
+  for you.
+- A mutual fund is kind of like a company but their business is making
+  investments.
+- Essentially it is just a collection of investments. It feels like
+  they are useful for those who want to make money from investing but
+  don't want to do the work themselves.
+
+TODO: Could I create a mutual fund? How does one do that?
+
+*** Types
+- Equity - invest in stocks
+  - Aggressive growth funds
+  - Growth funds
+  - Growth and income funds
+  - International funds
+  - ...
+- Bond - invest in bonds (I believe the "bond fund" discussed
+  previously is the same as a bond mutual fund)
+  - Short-term bond funds (1-4 year maturity)
+  - Intermediate-term bond funds (4-10 year maturity)
+  - Long-term bond funds (>=10 maturity)
+- hybrid/balanced - invest in stocks and bonds
+- money market funds - TODO: not really sure what this entails
+- There are even mutual funds geared towards specific industries like
+  energy.
+- There are even mutual funds of mutual funds (funds of funds I think
+  they are called)
+
+*** Mutual Fund Management Styles
+**** Index fund
+- Market Index:
+  - Weighted average of the values of several stocks (or generally any
+    investment type) to generate a sense of how those stocks are
+    doing.
+  - Different market indices
+    - Standard and Poor's 500 index (S&P 500) averages the stock prices
+      of the 500 large-cap U.S. stocks
+    - Dow Jones Industrial Average (DJIA) indexes 30 stocks traded on
+      the New York Stock Exchange (NYSE) and the NASDAQ
+    - Nasdaq Composite Index
+    - Wilshire 5000 Total Market Index (TMWX) indexes ALL U.S.
+      companies
+
+TODO: Why are there so many different market indexes? Perhaps there's
+just one for the most commonly traded stocks?
+
+TODO: Could I create my own market index consisting of the various
+stocks I have?
+
+- An index fund attempts to match some benchmark like a market index.
+  TODO: why is the word "attempts" in this definition? Can't an index
+  fund by stocks to completely match, say, the stocks used by the S&P
+  500 and then they'd match that benchmark perfectly?
+- Low management cost because they copy some benchmark. TODO: If all
+  index funds do is copy the stock layout of something else, why can't
+  an individual do that themselves?
+- Sounds like Vanguard was the first company to create index funds.
+- Warren Buffet recommends index funds as places to grow your
+  retirement money.
+
+**** Active
+- Actively research and select stocks in an attempt to perform better
+  than everyone else.
+- Higher cost because they have people actively researching which
+  stocks to invest in.
+- Index funds outperform most active funds in the long run because of
+  their low costs.
+
+TODO: So, active funds have people who attempt to figure out which
+stocks will perform the best and this is one reason why they have
+higher operating costs than index funds. This makes sense, but it
+feels like any individual index fund is destined to die eventually
+because they don't make any effort to do anything new? Does that make
+sense?
+
+TODO: Can an index funds allocation change over time or is it locked
+in?
+
+*** Mutal Funds Pros/Cons
+In general mutual funds seem ideal for the individual investor (i.e.
+someone who might not have a lot of cash to throw around or someone
+who does not want to take the time to decide which stocks to invest
+in):
+
+- Diversification
+- Professional management
+- Automatic reinvestment (if configured)
+- Economy of scale i.e. buying lots of individual stocks could
+  accumulate transaction fees or something like that but for mutual
+  funds you just have to buy one big thing and similarly if you need
+  some cash you can sell one big thing instead having to go to all
+  your different stocks and sell.
+
+** Annuities
+Sounded pretty crappy so I'll only look into them more if I'm looking
+for other ways to invest.
+
+** Exchange-Traded Funds (ETFs)
+Not super clear but it seems that its like a mutual fund but you can
+trade its stocks during the day just like you can with normal stocks
+(I guess you cannot trade during the day with mutual funds?)
+
+* Chapter Five: Perserve Your Buying Power with Inflation-Protected Bonds
+** Inflation (sucks)
+- The rate at which the general level of prices for goods and services
+  is rising and, consequently, the purchasing power of currency is
+  falling.
+- The Bureau of Labor Statistics (https://www.bls.gov/cpi/home.htm)
+  estimates inflation by seeing how the prices of certain goods that
+  are representative of the economy change over time.
+  - Consumer Price Index (CPI) https://www.bls.gov/cpi/. Measure of
+    price changes in consumer goods and services like gasoline, food,
+    clothing, and automobiles.
+  - Producer Price Index (PPI) https://www.bls.gov/ppi/. Same thing
+    but measured from the sellers perspective.
+  - As you might expect, these two values are in sync but PPI will
+    usually increase before CPI.
+- Lately the inflation rate has been at about 2%
+- Nominal return - The growth of your money
+- Real return - Nominal minus the rate of inflation. The amount of
+  money we have left after subtracting inflation. The growth rate of
+  your purchasing power. *THIS* seems to be the value I want to
+  maximize when doing financial calculations.
+
+** I Bonds and TIPS
+TODO: Read up on these again. My initial impression of them is that
+they are investment options that protect against inflation. Looking at
+some of the data it seems that if you hold them to max duration and if
+you are in a low enough tax bracket then you *will* get value out of
+them. Even if you don't end up netting a profit you will end up losing
+less had that money just been sitting in a mattress somewhere.
+
+TODO: Would a 0% rate of inflation be ideal? Or is that not really
+possible?
+
+TODO: Historically it seems like inflation always rises which feels
+bad somehow. Is it bad? Will inflation eventually stop rising?
+
+* Chapter Six: How Much Do You Need to Save?
+What I *really* want to know is, varying certain parameters, how long
+would it take until I can retire but I suppose this is an important
+question to answer as well. I bet I could get the number of years from
+this value. Perhaps I could even get how much I need to save if I set
+a number of years as my target. I would be interested in seeing both
+at any rate (i.e. the questions: if I save X dollars how long until I
+can retire? and if I want to retire in X years how much money do I
+need to save?)
+
+** Retirement Factors
+1. The amount we save
+2. Our current age
+3. The age at which we plan to retire
+4. How many years we'll have to live off our retirement account
+5. Whether we plan to leave an estate or if we just want to not run
+   out of money before we die.
+6. The expected rate of return on our investments
+7. The rate of inflation over our accumulation period
+8. Whether we can expect an inheritance prior to retirement
+9. Our other sources of income in retirement (pensions, social
+   security, part time work, etc...)
+
+I suppose (2) and (3) could be combined into one number: the number of
+years until we want to retire. I imagine that I'll leave out some of
+the other values in my calculations like inheritance and other sources
+of income but we'll see when I start writing this down as code.
+
+Ideally I'd like to leave behind an estate. Creating something which
+will outlive me and potentially support my family and friends for
+generations to come but we'll see how the numbers work out.
+
+Questions I want to answer. Given I want to be able to spend D dollars
+per year:
+- How much do I need to save per year if I want to retire in X years?
+- If I save X dollars every year, how long until I retire?
+- How much money would I need to save for my portfolio to be able to
+  support me *and* last "forever". Because if my portfolio becomes
+  self sufficient like that then I could leave it behind when I die.
+- The probability that my retirement plan would work
+
+And of course while answering these questions I'll vary how much I
+want to live off of per year, inflation rates, etc...
+
+TODO: How would I factor things like roth IRA and 401k into whatever
+equation I come up with? Because I want to be able to retire before I
+am able to touch those 2 accounts and ideally I'd like to be able to
+retire without using them because if I was able to live off a
+portfolio for the rest of my life then when I'm old enough to use
+those retirement funds my portfolio can just grow and I could leave it
+to my family and friends. Also not relying on those feels like it
+would make the calculations easier. But if I wanted to factor those
+into my calculations I suppose I could do 2 separate calculations, one
+is how much money I need to save so I could survive until I need to
+withdraw from those accounts and the other would be how long those
+accounts can last. We'll see though.
+
+** Calculating an estimated return on your portfolio
+1. Find out the estimated return (total or real I don't think it
+   really matters though if you are doing the total return I guess
+   you'd need to know the inflation) for the various investment types
+   in your portfolio. For example:
+   - U.S. Large-Cap Stocks
+   - U.S. Small-Cap Stocks
+   - TIPS
+   - ...
+   Apparently https://portfoliosolutions.com/ has this information but
+   I would be interested in calculating it myself based on past
+   history.
+2. Know the proportion of each investment type in your portfolio
+3. Do calculation:
+   #+BEGIN_SRC clojure
+     (defn estimated-portfolio-return [investments]
+             (if (empty? investments)
+               0
+               (let [{:keys [return proportion]} (first investments)]
+                 (+ (* return proportion)
+                    (estimated-portfolio-return (rest investments))))))
+   #+END_SRC
+   Is there a mathematical term for this? Like weighted average?
+
+These calculations are still a work in progress. Like I wonder if
+inflation should be taken into account in the above function? Or if
+you should calculate the real return of each investment type before
+using that function. It feels to me like an investor should *only* be
+interested in the real return but maybe that's wrong.
+
+They mention that there are a lot of calculators online such as
+https://www.bankrate.com/calculators/retirement/retirement-calculator.aspx.
+I could see it being handy but I think I'd prefer to make my own to
+get a better sense of the math that's involved and because I think I
+can add more flexibility in the logic to answer exactly the questions
+I'm interested in. It's still pretty fun and informative to play
+around with though. I'm a little confused by that calculator in
+general though because your retirement balance always hits zero by the
+time retirement is over which I feel like can't be true for certain
+parameters you enter. Or maybe it really does just calculate the
+*exact* amount you would need to zero out by the end?
+
+TODO: One fear (sort of) about retiring early is that it fixes your
+income for the rest of your life. But if I retire while I still have
+kids (which I think would be ideal) I'd like to still pay for their
+college funds and such. I guess I could just add to the amount I say
+that I need per year to factor in education?
+
+TODO: Have to remember to account for any expenses associated with
+holding an index fund or something similar.
+
+TODO: They say to get more conservative as you get older. But I feel
+like if you intend for your investment to last forever wouldn't you
+*want* to take higher risk all the time since apparently more risk
+means better payout?
+
+* Chapter Seven: Keep it Simple
+Make Index Funds the Core, or All, of Your Portfolio
+
+Just preaching the gospel of index funds.
+
+A quote from Richard Ferri said once you've chosen each of these index
+funds you will have a simple but complete portfolio:
+1. Bond index fund
+2. total US stock market index fund
+3. broad international index fund
+
+Despite their intense love of index funds they end saying that they
+have stock in some actively managed funds. I'm not sure why though if
+index funds seem to be the greatest thing since sliced bread. Maybe
+they just like messing around?
+
+* Chapter Eight: Asset Allocation
+The cornerstone of successful investing.
+
+This chapter was a little too abstract for my taste because they
+stress the importance of asset allocation but it feels like they don't
+give enough specifics of what benefits different asset allocations
+have. For example at one point they say:
+#+BEGIN_QUOTE
+Let's assume your goal is to save for retirement. After careful
+consideration of all the factors we've discussed here, you and your
+spouse agree on a portfolio of stocks and bonds that seems about right
+for you. Congratulations! You've just made your most important
+portfolio decision.
+#+END_QUOTE
+
+Seriously? That's not helpful at all as it gives no specifics. I know
+its hard but *surely* you could be more helpful. Instantiate some
+specific values for the different factors involved with asset
+allocation or *something*.
+
+Asset Allocation:
+- The chosen investments and the percentage allocated to each
+  investment *and* how that percentage will change over time (they
+  don't explicitly mention that last part but it seems relevant). I
+  imagine I'll divide my retirement funds between:
+  - US Stocks
+  - Internation Stocks
+  - Bonds
+- Decide your asset allocation based off:
+  - goals
+    - helps determine how much money is necessary
+  - time frame
+    - stocks are bad investments if you need this investment in <=5
+      years because they are volatile i.e. maybe you'd make a little
+      money in the first 2 years and then it crashes hard for the
+      next 3.
+  - risk tolerance
+    - Do NOT lose faith in your asset allocation and start selling if
+      a bear market starts. Be confident in your asset allocation and
+      whether the storm. In 2000-03-10 the NASDAQ reached an alltime
+      high of 5049. 32 months later on 2002-10-09 it had dropped to
+      1224 (75%!!!). At the end of 2006 the NASDAQ was back up to
+      only 2415. Something like that could happen and you need to be
+      confident in your asset allocation and maintain it no matter
+      what.
+  - personal financial situation
+    - if you have a pension and social security income then you do not
+      need to accumulate as much of a retirement fund for instance.
+    - or someone with a large portfolio doesn't need to be as risky
+      because they could probably sustain themselves on the smaller
+      interest rate when applied to that large portfolio.
+- Besides cost, the most important choice when investing. It matters
+  more than market timing and more than stock selection. Partly its
+  important because it takes the decision making out of all future
+  transactions thereby saving you time.
+
+** Efficient Market Theory (EMT)
+Alfred Cowles:
+- researched the ability of stock market "experts" to predict the
+  stock market. His conclusion "it is doubtful"
+- Cowles Commission for Economic Research - contains raw stock market
+  data.
+
+You cannot beat the market because:
+- share prices already encorporate all relevant information
+- you'd need to have some sort of insider information that *no one*
+  else in the world knows about
+
+Therefore you just ride along with the market and the best way to do
+that is with index funds.
+
+TODO: read "A Random Walk Down Wall Street"
+
+** Modern Portfolio Theory (MPT)
+- Harry Markowitz credited as being the father of MPT
+- The greater the risk, the greater the return or "there is no free
+  lunch"
+
+** Do not put all your eggs in one basket
+- The japanese stock market (the Nikkei 225 Index) reached an all-time
+  high of 39916 in 1989. Today (2018-09-12) it has still not recovered
+  and sits at 22787.33. Who's to say that the same thing won't happen
+  to US stock investors?
+- "Never treat the highly likely as certain and the highly unlikely as
+  impossible" - Larry Swedrow.
+
+TODO: Are stocks kind of just a big ponzi scheme? Everyone puts there
+money in and stocks will go up if more people invest because there is
+more money in the pot. Hmmmmm
+
+** My asset allocation
+"Sit down and draft an asset allocation plan. If you don't know how
+much of your total net worth is allocated to each asset class and why,
+then you're making about the worst mistake in investing." - Gregory
+Baer
+
+I'd imagine I want something like:
+- stocks
+  - 50% US
+  - 40% International
+- bonds remaining 10%
+
+But I'm thinking that:
+- roth IRA I'll dump into Vanguard Target Retirement 2055 (VTSAX) so I
+  don't have to worry about it.
+- 401k I still need to modify it it somehow so it can be used more as
+  a retirement fund (as of 2018-09-14 it is all in stock)
+- betterment I'll let it auto adjust and do its thing. This might
+  serve as my early retirement account but I'm not sure yet.
+- perhaps I'll have that split at vanguard and those stocks will just
+  be my playing around money! At the very least they could serve as an
+  emergency fund of sorts if the betterment funds dry up.
+
+TODO: Why does Joseph invest in 3 different fidelity funds rather than
+just using something like one of those retirement funds?
+
+* Chapter Nine: Costs Matter, Keep Them Low
+Pretty straightforward message here, keep costs as low as possible
+because something as small as 1% can make a big change:
+https://www.betterment.com/resources/true-cost-1-percent-expense-ratio/
+
+** Fees, fees, fees
+I don't understand what most/all of these fees mean exactly but here
+they are. The most important easy metric to be aware of is the
+"Expense Ratio" which is a percentage they will take out of your fund
+at the end of the year (or throughout the year, who knows). It
+represents the operating costs of your fund (minus any hidden fees).
+So pick something with a low expense ratio.
+
+Besides that, not all of these fees apply in every situation (like
+when first buying into the fund of making trades within the fund) and
+some of these fees might not exist at all in certain funds. They're
+probably good to keep in mind though.
+
+But this does not even count the taxes that will get taken out of your
+accounts!
+
+*** Fees covered by the prospectus
+- Sales Charge on Purchases
+- Deferred Sales Charge
+- For No-Load Mutual Funds:
+  - Purchase Fees
+  - Exchange Fees
+  - Account Fees
+  - Redemption Fees
+  - Management Fees
+  - 12b-1 Fees
+  - Miscellaneous Other Expenses
+
+*** Fees NOT covered by the prospectus
+- Hidden Transaction Costs
+- Brokerage Commissions
+- Soft-Dollar Arrangements
+- Spread Costs
+- Market Impact Costs
+- A Word About Turnover
+- Wrap Fees
+
+* Chapter 10: Taxes Part One
+Mutual Fund Taxation
+
+In short, if you buy and hold index funds then you will be avoiding
+taxes as much as feasibly possible.
+
+Mutual funds get taxed on two things:
+- Dividends
+- Capital Gains
+
+** Dividends
+- A distribution of the company's earnings to its shareholders. It
+  could come in the form of:
+  - cash
+  - stocks
+  - other things I guess
+
+*** Stock Dividends
+- Prior to the Jobs and Relief Reconciliation Act of 2003 stock
+  dividends were taxed at the investor's marginal (highest) income tax
+  rate.
+- Now "qualified" dividends (most US companies pay this) the tax rates
+  are (basically just knocks it down a notch from whatever your tax
+  rate is):
+  - 0% on any amount that would be taxed on a 10-15% rate
+  - 15% on any amount that would be taxed on a 15-39.6% rate
+  - 20% on any amount that would be taxed at a 39.6% rate
+- Stocks are more tax efficient because of this law but bonds are not
+  because the law does not apply to them.
+
+TODO: Wait, someone can have multiple income tax rates? What does that
+mean? I guess I don't even understand what an income tax rate is
+actually.
+
+TODO: What is a qualified dividend?
+
+*** Bond Dividends
+- bond dividends == bond yields
+- taxed at the investor's marginal income tax rate
+
+TODO: If dividends are reinvested do they get taxed? Or do they only
+get taxed when you take them out of your brokerage account?
+
+** Capital Gains/Losses
+- Capital gain (also called a realized capital gain) occurs when a
+  stock or bond is sold for a profit
+- Capital loss (also called a realized capital loss) occurs when a
+  stock or bond is sold for less than the purchasing price
+- If a capital gain is achieved you will be taxed and report that on
+  1099-DIV
+- Unrealized capital gains/losses are the value of your fund's
+  securities that have not yet been sold. This info is available on
+  the fund's prospectus
+
+TODO: The book recommends that you be wary of funds with high levels
+of unrealized capital gains because if they are sold then you'll get
+taxed. I'm not totally clear on why this is though because aren't you
+going to get taxed anyway? It almost sounds like they are advocating
+against making money.
+
+*** Short and Long Term Capital Gains
+- Short - Profit on the sale of a security that is held for 12 months
+  or *less*.
+- Long - Profit on the sale of a security or mutual fund held more
+  than 1 year.
+- Tax rates for short-term gains are taxed at the shareholders highest
+  marginal income tax rate while long-term gains are taxed at a
+  maximum of 15%
+- Lesson is to buy and hold mutual funds for more than 12 months
+
+TODO: What about the specific stocks inside a mutual fund? When those
+are being bought and sold do those taxes get passed onto you somehow?
+
+TODO: What if you recently buy some more mutual fund stock and then
+sell some later. Will it tax it as a short term gain? But what if you
+are selling from the portion of the mutual fund which was *not* bought
+recently? Does that even make sense or is that sort of thing possible?
+
+- Favor funds with low dividends TODO: Why would they suggest this?
+  I'd rather get paid $10 than $0 because even if $10 is taxed I'll
+  still be getting more than 0.
+- Favor funds with qualified dividends
+- Favor funds with low turnover (the stocks within the fund are not
+  sold until it would be classified as a long-term gain)
+- Favor index funds and tax-managed funds
+
+** Investing in taxable accounts
+- mutual fund's prospectus will include "before tax" and "after tax"
+  returns. Morningstar provides a "Tax-Cost Ratio" which is the
+  percentage point reduction in fund return because of taxes.
+- use long term holdings in a taxable account
+- use tax efficient funds in a taxable account (not bonds or active
+  stocks)
+
+** Tax-Managed Funds
+Seems to be some special sort of mutual fund which attempts to reduce
+taxes? Features:
+- Low turnover
+- Use HIFO (highest-in, first-out) accounting - sell highest cost
+  shares first which keeps capital gains to a minimum TODO: Not sure
+  how this works exactly
+- Tax-loss harvesting - the manager sells losing stocks to accumulate
+  tax losses which can later be used to offset capital gains from
+  winning stocks. TODO: This concept confuses the hell out of me
+  because it feels like you're just playing some 0 sum game. Sure,
+  maybe you'll get a lot of capital gains with no taxes but those
+  gains will be brought to 0 because of the losses you've incurred. So
+  it must be that the reduction in taxes is greater than the capital
+  loss.
+- Selecting low-dividend paying stocks TODO: Again, I don't understand
+  why you want low-dividends. Let's say the tax rate is 50%, I'd
+  prefer to have 50% of 100 than 50% of 10.
+- Holding securities for long-term gains
+- Use redemption fees - Some sort of fee to discourage shareholders
+  from selling profitable shares
+
+TODO: A lot of this stuff confuses me. First off, are tax-managed
+funds a specific type of mutual fund? Or are they an entirely
+different beast?
+
+** Strategies to Tax-Manage Your Own Portfolio
+- Keep turnover low to avoid capital gains taxes
+- Use only tax-efficient funds in taxable accounts (like index funds)
+- Avoid short-term gains because they are taxed at a higher rate
+- Buy fund shares after the distribution date. TODO: Again, don't
+  understand this.
+- Sell fund shares before the distribution date TODO: They seemed
+  pretty weak in supporting this claim
+- Sell profitable shares after the new year to avoid paying taxes
+  until the end of the year
+- Harvest tax losses TODO: I should learn more about how this works I
+  guess I could see it working in the sense that you could sell one
+  stock and then buy a mostly equivalent stock so you'll report a
+  tax-loss which will offset the gains but since you reinvested that
+  money in more or less the same stock, you didn't really lose
+  anything. Interesting
+
+** Bonds in your taxable account
+They say that bonds are very complex and often contain hidden fees and
+certain restrictions. So perhaps I'll just hold bond funds or not even
+deal with bonds at all when it comes to taxable accounts. That being
+said two things they reccomend are:
+- Municipal bond funds. Morningstar has some tax-equivalent yield
+  calculators to help determine whether to buy a municipal bond fund
+- U.S. Savings Bond (I and EE bonds) which are tax-deferred for up to
+  30 years (gives you time to get into a lower tax bracket I guess)
+
+* Chapter 11: Taxes: Part Two
+Managing Your Portfolio for Maximum Tax Efficiency
+
+** Use Tax-Sheltered Accounts
+The best way to deal with taxes is just to avoid them alltogether by
+using various retirement plans where no taxes are applied as the money
+grows.
+
+*** 401(k) Plans
+An employee retirement plan where contributions are pretax (i.e. your
+contributions are not taxed so you could get tax deductions on that)
+but when you withdraw you will get taxed.
+
+*** 403(b)
+401k's are given out by profit-making entities and 403b's are giving
+out by non-profits like schools.
+
+*** Individual Retirement Account (IRA)
+TODO: Talk to people about whether they use a traditional IRA or a
+Roth IRA. To make that decision I guess I'd also have to understand
+more your income is determined.
+
+The basic idea that I know is that Roth IRAs do after-tax
+contributions and (hence) tax-free withdrawls while traditional IRAs
+are the opposite.
+
+There are calculators on morningstar and vanguard to help determine
+which IRA is better suited for you. It will be a good choice
+regardless though!
+
+** Recommendations
+- Invest in your 401k up to the company match
+- Contribute to your IRA up to the maximum
+- Contribute to the 401k up to the maximum
+- Additional funds should go into tax-efficient mutual funds
+
+TODO: Do you really need to invest *that* much in your retirement
+funds? Because if you do that it feels like there will be nothing left
+to invest in funds that you could use to retire early. Also, assuming
+everything goes fine (you don't lose your 401k or IRA and markets
+behave as expected) then won't you have *way* more money than you
+need?
+
+- Use tax-advantaged accounts
+- Buy fund shares *after* the distribution date
+- Place tax inefficient funds in retirement accounts and tax efficient
+  funds in taxable accounts
+- Use tax managed or tax efficient index funds in taxable accounts
+- Keep taxable fund turnover low to avoid capital-gains taxes
+- Avoid short-term gains by holding for more than 12 months
+- Sell losing shares *before* year-end (tax-loss harvest)
+- Sell profitable shares *after* the new year (to delay tax payment)
+- Consider municipal bonds and US savings bonds for taxable accounts
+- During years of low income, consider converting to a Roth
+- Consider gifts to charities of securities with large capital gains
+- Appreciated holdings in taxable accounts are capital gains and
+  income tax free if left to heirs
+
+TODO: I need to figure out what percentage of my income goes to
+federal and state and wherever the hell else it goes. I just want to
+get an accurate number of how much I make every year at my job.
+
+TODO: Do you get taxed on interest applied to a savings account?
+Because there's a product in betterment called "smart saver" which
+advertises a 1.83 interest rate and I would assume that is account is
+taxed both when get more money because of interest AND when you take
+money out of the account and it made me wonder if the growth from a
+savings account is taxed as well? And also, if you pull some money out
+of the savings account would that be taxed?
+
+
+* Chapter 12: Diversification
+- Do not put all your eggs in one basket
+- Just holding lots of mutual funds might not get you diversification
+  because those separate mutual funds could be investing in all the
+  same stocks
+- Correlation Coefficient or R-squared
+  - A number from [-1,1] which represents how often investments move
+    in the same direction.
+  - A 1 means that they always move in the same direction
+  - Try to pick investmens with a lower correlation coefficient to
+    increase your diversity
+  - TOOD: How does this get calculated?
+
+* Chapter 13: Performance Chasing and Market Timing Are Hazardous to Your Wealth
+- More and more studies prove that NO ONE can predict which way the
+  stock markets (or bonds) will swing.
+- Past performance is NO indicator of future performance
+- Market Timing - A strategy based on predicting short-term price
+  changes in securities, which is virtually impossible to do
+- Buy and hold is the best strategy long term
+
+* Chapter 14: Savvy Ways to Invest for College
+Ecomnomists report that a college education adds many thousands of
+dollars to a man's lifetime income - which he then spends sending his
+son to collge. - Bill Vaughan
+
+- More education usually means higher earnings over a lifetime hence
+  giving your child more education is a good investment.
+
+TODO: Does more education == more money really true? I've seen
+conflicting things on the internet
+
+TODO: Look into what kind of data the Bureau of Labor Statistics
+
+Looks like there are a number of plans specifically for education
+saving and investing. The book lists some but until I need to do
+something like this myself I will not bother taking notes on these
+things. That being said they reccomend a couple things:
+- Joseph Hurley's "The Best Way to Save for College"
+- www.savingforcollege.com
+- IRS Publication 970 (Tax Benefits for Education) at www.irs.gov
+
+* Chapter 15: How to Manage a Windfall Successfully
+- Windfall: coming into a large sum of money in a very short period of
+  time. They can come from
+  - Inheritance
+  - A divorce settlement
+  - A lawsuit settlement
+  - Widowhood
+  - An insurance settlement
+  - A real estate sale
+  - Stock options
+  - A one-time, income bonus
+  - Sudden growth of a business
+  - Sale of a business
+  - A new job with a big increase in income
+  - Retirement
+
+There general advice with handling a windfall is just to not freak out
+and spend it all which I think I can manage. They reccomend:
+- Have a little celebration!
+- Deposit the money in a safe account for >= 6 months and leave it
+  alone to calm down.
+- Get a realistic estimate of what the windfall can buy
+  - Even a large sum goes quite quickly if you don't watch it!
+  - Generaly advised that you can spend 5000 for every 100000 that is
+    invested TODO: Is it because a 100000 investment will typically
+    gain more than 5000 every year? What's the math on that?
+- Make a wish list. What do you want out of life and how can the
+  windfall help you get there:
+  - now
+  - in 1 year
+  - in 5 years
+  - in 10 years
+- Get professional help if you are not well educated in finances
+  - a certified public accountant is a good bet: https://www.aicpa.org/
+
+* Chapter 16: Do you need an advisor
+- Sounds like you just need to be careful and do your research before
+  hiring one because a lot of people will try to rip you off or sell
+  you stuff just because it will get them a commission.
+- Certified financial advisor (CFA) and Certified financial planner
+  (CFP) are two good bets
+
+* Chapter 17: Track Your Progress and Rebalance When Necessary
+Foolproof systems don't take into account the ingenuity of fools. -
+Gene Brown
+
+- Rebalancing - bringing our portfolio back to our target asset
+  allocation as market forces mess up your allocation percentages
+- Why
+  - Your allocation was selected because you felt most comfortable
+    with the amount of risk it represented. Rebalancing makes
+    sure you maintain the level of risk you are comfortable with.
+  - Forces you to sell high and buy low which is good to grow your
+    money because investments have a tendency to revert to the mean
+    (RTM) over time
+- Rebalancing across different asset classes (stocks, bonds, and cash)
+  is the primary determinant of risk but you can (and I feel like you
+  should) rebalance across subcategories of an asset class (like
+  keeping US vs. international stocks at a consistant ratio) because I
+  believe in some sort of RTM stuff and doing that rebalancing will
+  force you to sell high and buy low.
+
+** How to track when you need to rebalance
+- Vanguard offers a portfolio tracking service called "Portfolio
+  Watch" which shows you percentages of asset classes in your
+  portfolio and since you can sync other accounts into vanguard you
+  can get a birds eye view on your *entire* portfolio.
+- Morningstar offers a portfolio tracker
+- You could configure an excel spreadsheet to track things yourself
+
+** How often to rebalance
+- Most commonly people rebalance based on a time interval like
+  quarterly, semiannually, or annually.
+- Some rebalance whenever an asset class exceeds a certain percentage
+  out of the norm (say 5%)
+
+I imagine I'll rebalance annually to avoid the capital gains taxes.
+
+TODO: How do capital gains taxes work exactly? Do I have to not buy
+*any* stock for a whole year before I can sell? Like if had not bought
+any new stock that year and I bought some *more* stock in a mutual
+fund on Dec 31, the next day it grew and I rebalanced my portfolio
+which involved selling some stocks. Would the capital gains tax be
+applied because technically I bought some new stock and I'm selling
+it? Or is buying and selling stock like a queue data structure where
+the most recently bought stock would be sold last?
+
+** How to rebalance
+- Sell the high performing assets and put that money in the
+  underperforming ones
+- Invest your income into funds which are underperforming
+ 
+TODO: When rebalancing your portfolio they talk about cash being
+another possible assed allocation on top of stocks and bonds. What is
+this cash investment they're talking about?
+
+TODO: Right now I have vanguard configured to put any dividends or
+capital gains in their little money market fund thing. Should I
+instead configure it to reinvest those gains? And would I get taxed on
+those gains if they were reinvested vs. put in that money market
+account vs. withdrawing them completely?
+
+TODO: How does contributing to your investments factor into
+rebalancing? Because I imagine that I'll be contributing my money on a
+regular basis which makes me feel like I won't have to rebalance much
+because it will have been done automatically over time. Also if you
+contribute money you probably want to keep your asset ratios but what
+if to keep the ratio you have to buy more of an asset that is already
+doing well? Then you'd be buying high which seems like a bad thing.
+
+TODO: The statistics I've seen seem to show that a portfolio of all
+stocks do better in the long run. But part of me is thinking that if
+you have a more stable part of your portfolio (i.e. bonds) then *that*
+mixed portfolio will do better because you can actually sell the high
+performing stocks and store them in a stable fund which will steadily
+grow. Because otherwise it feels like stocks will be worth a lot but
+you won't do anything with them or if you do get some dividends you'd
+just be reinvesting those dividends in the stock you are buying high.
+Is this idea of mine true?
+
+* Chapter 18: Tune Out the "Noise": It's Almost Always Wrong
+"It ain't so much the things we don't know that get us in trouble.
+It's the things we know that ain't so". - Artemus Ward
+
+- Most of wall street and the media are just trying to sell you
+  something ("hottest stocks to buy right now!!" sort of stuff). Do
+  not listen to any of it. Their purpose is to make money for
+  themselves, not for you
+- Be skeptical of anything you hear
+- Jason Zweig offers good advice in his column "The Intelligent
+  Investor" in the Wall Street Journal
+- Jane Bryant Quinn has good advice at http://janebryantquinn.com/
+
+* Chapter 19: Mastering Your Investments Means Mastering Your Emotions
+Another sort of "fluffy" chapter (at least it is for me) about how you
+need to be less emotional when investing otherwise you'll lose your
+money.
+
+"Everyone is a fool for at least five minutes a day. Wisdom consists
+of not exceeding the limit." - Elbert Hubbard
+
+** Behavioral Economics (sounds fascinating doesn't it??)
+- Behavioral economics is the study of psycology as it relates to the
+  economic decision-making processes of individuals and institutions.
+- Sounds like its basically the study of why people make shitty
+  economic decisions.
+- Classical economics assumes that human beings make rational choices
+  about how to allocate their dollars to maximize their satisfaction,
+  but people usually buy emotionally and *justify* with logic.
+- This field was pioneered by two Israeli's Amos Tversky and Daniel
+  Kahnerman who came up with a list judgmental heuristis that people
+  use when making economic decisions.
+
+** Greed and Fear
+- Two main emotions which drive many investors
+- Greed can cause people to buy high because the see a well performing
+  investment and think it will keep performing well.
+- Fear can cause people to sell low because they see the stock
+  dropping and are afraid it will drop further.
+
+** List of emotional traps to be aware of
+- Recency bias - Never assume today's results predict tomorrows
+- Overconfidence - No one can consistently predict short-term market
+  movements
+- Loss aversion - Being so afraid that you do not invest means you
+  will be losing money
+- Paralysis by analysis - Every day you do not invest is another day
+  where compounding interest is not working for you
+- The endowment effect - just because you own it, or are a part of it,
+  does not mean its worth more. For example just because you work for
+  your company does not mean you should invest in its stocks
+- Mental accounting - Money spent is a sunk cost (it's gone!) and
+  should play no part in making future decisions.
+- Anchoring - Holding out until you get your price to sell an
+  investment is playing a fool's game. And in general holding onto
+  anything, like beliefs, is not good long term. Be critical
+- Financial negligence - Take the time to learn the basics of sound
+  investing. (They say that learning the basics is pretty simple stuff
+  but I would disagree. Maybe its simple to *continue* investing once
+  you get going because you basically just pump money into your
+  investments and rebalance once a year. But getting started is not
+  simple. It's taken almost half a month to finish this book and I've
+  really been putting in time! Additionally there are still so many
+  things I do not know which I feel I should.)
+
+It was cool reading through this list. I definitely recognize these
+two traits in myself:
+- Paralysis by analysis - like when I was trying to pack up my super
+  nintendo when bringing it to Chicago and was just sitting there not
+  sure what to do.
+- Anchoring (maybe?) - Like when me and Jason finished the Turkey Trot
+  race and were looking for Ara for a *while* even though she had
+  finished a while ago. It's like I just got locked into my decision
+  process of waiting for her and I couldn't get out of it.
+
+* Chapter 20: Making Your Money Last Longer Than You Do
+"How much of my portfolio can I spend each year without running out of
+money?" is the big question that retirees need to answer. You can
+answer that question with 100% certainty if you gather this
+information:
+- Current value of your portfolio
+- Your date of death
+- Your portfolio returns every year leading up to your demise
+- Your federal, state, and local tax rates each year until your demise
+- Inflation rates
+- Health care costs
+- Amounts of your pension and any other income
+- Future value of any real estate you may own
+- All unanticipated changes in your pension and health care coverage
+
+You can see there's a problem, there is no way to know all of this
+information. At best we can approximate how much money we'll need, but
+that approximation along with being a little flexible should get you
+through retirement just fine.
+
+** Tips
+The motto of the retieree when it comes to making their money last
+should be "Be flexible". Even when you're retired you're not done
+putting in effort, you just have a greater probability of not needing
+to work:
+- Keep *fixed* living expenses as low as possible. This gives you the
+  ability to revert to a frugal way of living should markets perform
+  badly.
+- Have a viable way to earn income if needed.
+- Purchase an immediate annuity that guarantees a fixed monthly income
+  (although they also say that perhaps this is no longer necessary
+  since taxes are lower on dividends and such).
+- If you withdraw 4% of your portfolio per year there is a good chance
+  that the portfolio will last forever (MMM said this as well). I feel
+  like if you are flexible with this 4% number and withdraw less when
+  times are bad then it will definitely last forever.
+
+TODO: They casually mentioned that Michael LeBoeuf (one of the
+authors) made 1 million working from home and he wrote a book "The
+Perfect Business" on how he did it. WHAT??? How the hell did 
+
+TODO: I really need to understand why bonds are safer than stocks. I
+want to see and understand these "atoms" that make up our investment
+choices.
+
+TODO: When they say things like "withdraw X% of the portfolio does
+that mean selling X% of the stocks? Or selling enough of the stocks so
+we get X% of the value of the entire portfolio?
+
+* Chapter 21: Protect Your Assets by Being Well-Insured
+TODO: Since I invested $10000 in that vanguard total stock index
+account I got the admiral shares. Will I have admiral shares for the
+rest of my life? Like if I sell $5000 worth of stock will I lose the
+admiral shares allocation? Also when I bought the 10000 it seemed to
+offer me the option to select or not select admiral shares. Why would
+someone NOT use the admiral shares?

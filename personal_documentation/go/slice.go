@@ -39,7 +39,7 @@ func main() {
 	// fmt.Println(s[:])
 	// fmt.Println(s[:len(s)])
 	// Prints out the slice s minus the last element
-	fmt.Println(s[:len(s)-1])
+	fmt.Println(s[:1])
 	// removing various elements
 	fmt.Println("remove element 0:", removeElement(s, 0))
 	fmt.Println(s)
