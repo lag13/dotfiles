@@ -750,7 +750,12 @@ recently? Does that even make sense or is that sort of thing possible?
 
 - Favor funds with low dividends TODO: Why would they suggest this?
   I'd rather get paid $10 than $0 because even if $10 is taxed I'll
-  still be getting more than 0.
+  still be getting more than 0. The prefixed this little bullted list
+  with "For maximum tax efficiency in taxable accounts, you should do
+  the following" so do they suggest these *purely* to reduce taxes?
+  That seems odd to me because the goal should be to just maximize
+  overall return and I feel you'd get there faster with stocks that
+  pay higher dividends.
 - Favor funds with qualified dividends
 - Favor funds with low turnover (the stocks within the fund are not
   sold until it would be classified as a long-term gain)
@@ -792,7 +797,17 @@ different beast?
 
 ** Strategies to Tax-Manage Your Own Portfolio
 - Keep turnover low to avoid capital gains taxes
-- Use only tax-efficient funds in taxable accounts (like index funds)
+- Use only tax-efficient funds in taxable accounts (like index funds).
+  A rough order of asset classes from most tax efficient to least are:
+  - Low-yielding cash, money market
+  - Tax-managed stock funds
+  - Total-market stock index funds
+  - Mid-cap and small-cap index funds
+  - Active stock funds
+  - Balanced funds
+  - Taxable bond funds
+  - REIT funds
+  - High-yield bond funds
 - Avoid short-term gains because they are taxed at a higher rate
 - Buy fund shares after the distribution date. TODO: Again, don't
   understand this.
@@ -874,6 +889,24 @@ need?
 - Consider gifts to charities of securities with large capital gains
 - Appreciated holdings in taxable accounts are capital gains and
   income tax free if left to heirs
+
+Another rough order of worse tax to best tax:
+- high-yield bonds
+- international bonds
+- taxable domestic bonds
+- inflation-protected securities (TIPS)
+- Real estate investment trusts (REIT)
+- balanced funds
+- stock-trading accounts
+- small-value stocks
+- small-cap stocks
+- large-value stocks
+- international stocks
+- large-growth stocks
+- most stock index funds
+- tax-managed funds
+- EE and I bonds
+- tax-exempt (muni) bonds
 
 TODO: I need to figure out what percentage of my income goes to
 federal and state and wherever the hell else it goes. I just want to
@@ -1140,7 +1173,7 @@ information:
 - Future value of any real estate you may own
 - All unanticipated changes in your pension and health care coverage
 
-You can see there's a problem, there is no way to know all of this
+You can see there's a problem, there is no way to *know* all of this
 information. At best we can approximate how much money we'll need, but
 that approximation along with being a little flexible should get you
 through retirement just fine.
@@ -1175,9 +1208,240 @@ that mean selling X% of the stocks? Or selling enough of the stocks so
 we get X% of the value of the entire portfolio?
 
 * Chapter 21: Protect Your Assets by Being Well-Insured
+"Insurance is the business of protecting you against everything except
+the insurance agent." - Evan Esar
+
+They *really* recommend insurance. On my first readthrough it kind of
+put me off "woa guys, there's no need to be *that* careful" but on a
+second readthrough I can get behind what they're saying. Because if
+you die or get injured to the point where you cannot perform your job,
+then you (and your family if you have one and your income is needed to
+support said family) could be *screwed*. Being one accident from
+financial ruin is a scary thought for sure.
+
+** Insurance to keep in mind and when to get it
+- Life 
+  - For anyone in your family on whom others depend for financial
+    support.
+  - If you do not support others with your money then you do NOT need
+    this.
+  - If you have a lot of money to leave your dependents then you may
+    not need this.
+  - Buy "term insurance" should you need it for the longest period you
+    can afford. Make sure the policy is renewable regardless of your
+    health.
+  - Amount of life insurance needed:
+    1. Annual income (in dollars) needed by survivors
+    2. Annual income available (pension, social security, annuities,
+       ...)
+    3. Annual income shortfall (1) - (2)
+    4. (3) * num-years-income-is-needed
+    5. Emergency funds
+    6. Estimated funeral expenses
+    7. Other cash needs (taxes, college, bequests, ...)
+    8. Total family needs (add lines 4-7)
+    9. Total assets available (savings, investments, ...)
+    10. (9) - (8)
+- Health care coverage
+  - Make sure to get "major medical coverage" to cover the big bills
+  - Consider getting a high deductible plan with an HSA
+- Disability - If you get injured an are unable to work that is
+  terrible because you still need income AND you're health care costs
+  are probably going to be astronomical.
+  - Buy as much disability coverage as you think you'll need (max is
+    60% of income)
+  - Do not buy one through your employer in case you lose that job
+- Property
+  - fire, flood, earthquake, robbery...
+  - make a list of all personal possessions in your home (perhaps take
+    a video of you walking through the house) and store that video
+    somewhere. That way if things get destroyed you can show that to
+    the insurance people.
+- Auto
+- Liability - protection against lawsuits
+- Long-term care - there is insurance for putting people in nursing
+  homes which could be much more cost effective than withdrawing money
+  from your investments.
+  - When in mid-late 50s consider purchasing this
+  - 600/1000 people will require a nursing home stay at an average
+    cost of 50000 per year <--- that is what you are protecting
+    against.
+
+** Tips
+- Only insure against the big catastrophes and disasters that you
+  can't afford to pay for out of pocket.
+- Carry the largest possible deductibles you can afford because this
+  means lower premiums which means that should an event never happen
+  you've paid the minimum you had to.
+- Only buy coverage from the best-rated insurance companies.
+- Never fail to buy insurance because the odds of something happening
+  are small.
+- Good insurance sites:
+  - www.answerfinancial.com
+  - www.insure.com
+  - www.insurance.com
+  - www.insweb.com
+  - www.pivot.com
+  - www.quickquote.com
+  - www.reliaquote.com
+
+TODO: They recommend not buying disability through your employer in
+case you lose your job. But couldn't that argument apply towards
+health insurance as well? Or do they suggest that because if you
+became disabled and lost your job you would be royally screwed but if
+you lost your job and need healthcare costs its not as big of a deal?
+
 TODO: Since I invested $10000 in that vanguard total stock index
 account I got the admiral shares. Will I have admiral shares for the
 rest of my life? Like if I sell $5000 worth of stock will I lose the
 admiral shares allocation? Also when I bought the 10000 it seemed to
 offer me the option to select or not select admiral shares. Why would
 someone NOT use the admiral shares?
+
+* Chapter 22: Passing It On When You Pass On
+TODO: I read this chapter once but I don't believe its relevant to me
+yet. I do have some assets that I could pass on but I won't worry
+about that until I create my first will. I imagine I'll create a will
+when I have more responsibility for others or when my financial
+situation (investments and such) settles down.
+
+* Chapter 23: You Can Do It: The Bogleheads Will Help
+Summary:
+- Choose and live a sound financial lifestyle
+  - Pay off debt
+  - establish an emergency fund
+  - learn to live below our means
+- Start to save early and invest regularly. The early we start the
+  earlier compounding (the 8th wonder of the world) has a chance to
+  work.
+- Know more about the various investment choices available to us such
+  as stocks, bonds, and mutual funds. Try not to invest in anything
+  you do not understand.
+- Figure out approximately how much you might need for your
+  retirement.
+- Indexing via low-cost mutual funds is a strategy that will, over
+  time, outperform the vast majority of strategies. If you choose to
+  own actively managed mutual funds, make sure to keep the cost low
+  and put them in a tax-advantaged account if possible because trading
+  will happen more frequently.
+- Create an asset allocation plan based on your goals, time horizon,
+  and risk tolerance. Keep it as simple as possible.
+- Taxes can be your biggest expense so put tax-inefficient funds in
+  tax-deferred accounts and put tax-efficient funds in your taxable
+  account.
+- Rebalancing controls risk and may reward you with higher returns.
+- Market timing and performance chasing are poor strategies.
+- Invest for your children's education.
+- Know how to handle a windfall.
+- Do your research if you think you need a financial advisor.
+- Understand the importance of protecting the future buying power of
+  your assets by investing in things like inflation protected
+  secutirites.
+- Do not listen to any investment fads. Tune it all out.
+- Protect your assets with insurance. Remember that *you* are your
+  most important asset.
+- Don't let emotions get the better of you as it will probably harm
+  your investments.
+
+TODO: Why can I not see the price of my vanguard total stock index
+mutual fund change throughout the day like I can see funds in
+betterment change throughout the day? I imagine it's value *must* be
+changing throughout the day to arrive at the final value so why can we
+not see that change?
+
+* Apendices
+** Recommended Resources
+*** Books
+**** Novice
+- The Coffeehouse Investor by Bill Shultheis. A little book with a big
+  message: How to invest simply and successfully.
+- The Informed Investor by Frank Armstrong III. An easy-to-understand
+  explanation of how the market works.
+- The Little Book of Common Sense Investing by John C. Bogle. This is
+  a short, delightful-to-read, small-size book. The legendary founder
+  of retail index funds explains the many reasons he recommends broad
+  market index funds for most investors.
+- The Millionaire in You by Michael LeBoeuf. A primer on how to invest
+  money and time intelligently to achieve financial freedom.
+- Protecting Your Wealth in Good Times and Bad by Richard A. Ferri,
+  CFA. A former Marine fighter pilot, stockbroker, and author of four
+  financial books, Mr. Ferri has written this easy-to-read guide-book
+  for a sound investment strategy.
+- Straight Talk on Investing by Jack Brennan. Elegantly simple,
+  eminently sensible, and delightfully readable.
+- You've Lost It, Now What? by Jonathan Clements. Gives
+  straightforward advice people need in order to invest successfully.
+
+**** Intermediate
+- Bogle on Mutual Funds: New Perspectives for the Intelligent Investor
+  by John Bogle. May be the best book about mutual fund investing ever
+  written.
+- Common Sense on Mutual Funds by John Bogle. Warren Buffet called
+  this book "A must read for every investor."
+- The Four Pillars of Investing by Bill Bernstein. A brilliant,
+  small-town doctor became fascinated with investing. The result is
+  one of the best books on the subject.
+- The Only Guide to a Winning Investment Strategy You'll Ever Need by
+  Larry Swedrow. An excellent insight into how to avoid Wall Street's
+  "Loser's Game".
+- A Random Walk Down Wall Street by Burton G. Malkiel. An investor
+  classic.
+
+**** Books for those who want to learn more
+- Asset Allocation by Roger C. Gibson. One of the best books on the
+  subject.
+- Capital Ideas by Peter L. Bernstein. Gives a fascinating history of
+  the financial revolution of the past 30 years.
+- The Intelligent Investor by Benjamin Graham. A beautifully written
+  book by one of the most respected financial writers in America.
+- The Only Guide to a Winning Bond Strategy by Larry Swedroe. Makes
+  the complex world of bonds easy to understand and guides us to their
+  proper use in our portfolio.
+
+*** Websites
+- http://www.altruistfa.com/readingroom.htm - reading room of
+  boglehead contributor Eric Haas.
+- http://crr.bc.edu/ - Excellent source of reasearch and articles
+  about retirement issues.
+- https://www.bloomberg.com/ Financial news and information, including
+  current bond prices and yields.
+- https://www.bogleheads.org/
+- http://bylo.org/ Boglehead Bylo Selhi has good mutual fund info.
+- http://choosetosave.org/ Saving tips! Also has a financial
+  calculator.
+- http://www.coffeehouseinvestor.com/ Hosted by boglehead Bill
+  Schultheis. Solid info.
+- http://efficientfrontier.com/ Boglehead Bill Bernstein.
+- http://thefinanceprofessor.com/ Jim Mahaer assistant professor of
+  finance at St. Bonaventure University blends the academic world of
+  finance with the real world.
+- https://firecalc.com/ Detailed online calculator for determining
+  satisfactory portfolio withdrawal rates in retirement.
+- http://jasonzweig.com/ Jason Zweig has created a site for investors
+  who want to learn to think for themselves.
+- https://humbledollar.com/ Jonathan Clements is one of the best
+  financial newspaper columnist in the business and has a lot of
+  practical information.
+- http://moneychimp.com/ Everything about money; articles,
+  calculators, and more.
+- https://www.morningstar.com/ The best source of general information
+  about mutual funds.
+- https://portfoliosolutions.com/ Homepage of boglehead Richard Ferri.
+- https://www.research-finance.com/ John P. Scordo collects the best
+  academic and financial articles.
+- http://retireearlyhomepage.com/ Teaches you about retiring early.
+  The host, John P. Greaney, retired at age 38 and hasn't looked back.
+- https://rickferri.com/ Actual homepage of Richard Ferri
+- http://vanguard.com/bogle_site/bogle_home.html Browse the archives
+  for Mr. Bogle's many speeches.
+
+TODO: Reach out to Alex Frakt and Larry Auton to see if I could help
+with the boglehead website.
+
+
+TODO: How often do stocks and stuff compound? Daily? It's kind of a
+confusing question to think about to me because I would imagine you
+only get compounding effects if you actually buy more stock... And the
+increase in your stock holdings is determined both by your dividends
+and the estimated price of the stocks. So do they just average those 2
+numbers somehow to get an estimate of compounding?

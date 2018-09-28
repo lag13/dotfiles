@@ -1,0 +1,100 @@
+Ideas on saving more and making more
+1. Get a costco card and start going to costco on the weekends to buy
+   stuff in bulk.
+2. In the future look for a place to live that has a low rental cost.
+   This is probably the most important one I can do because as it
+   stands now my rent accounts for almost 75% of my expenses.
+3. Sell some of my stuff on craigslist
+   - super nintendo
+   - books
+   - gamecube
+   - etc...
+4. Go out to eat a max of 1 time per week.
+5. Look for a higher paying job. I'm thinking that I will do this at
+   the end of the year.
+6. As Tony Robbins puts it, find a way to add more value!! And when I
+   say add more value I don't believe you should be searching only for
+   profit. Just try to find ways to give back to people at first and
+   if it turns into something that makes money great otherwise great!
+   - blogs. Some article ideas (some from just my github profiles)
+     - Y combinator (perhaps come up with a really cool way to
+       programatically generate the examples that I so tediously typed
+       myself). If that little programatic way to generate the
+       examples is cool enough I could even do an article on that.
+     - Haskell's type system and why it is cool
+     - Talking about all the snake implementations
+     - go all out on fizzbuzz and implement different solutions
+     - talk about my dislike of mocks and that functional
+       transformations should be the most important things to keep in
+       mind
+     - Create a little y combinator based bit of obfuscated code to
+       display my email and github that could be put on a resume.
+       Could we even do it in bash??? Thanks to my train buddy for
+       that idea!
+     - Create a tutorial on investing and the different types of
+       investments. As part of that tutorial write a lot of code to
+       *really* show the hard numbers backing all this stuff.
+     - Contact that vim hacker that I helped a while ago when I
+       extended his surround plugin for backwards compatability to see
+       if he has anything I could help with.
+     - Write a program to help with writing Diary entries. It could
+       hold more structured data which could make it more easily
+       searchable. Talk with Joe about this.
+   - Teach things to friends just to see what that feels like. It
+     could turn into some tutoring on the side.
+   - Work part time somewhere. Perhaps Robert's Clojure company would
+     be willing to let me work part time for instance.
+   - Learn data analysis, it could be useful somewhere
+   - Zach Anderson had mentioned some sort of track software that he
+     thought would be nice to have. Contact him and see if we could
+     build it.
+   - Jason Kirk had an idea for sort of a facebook for research papers
+     where everything was open. Talk to him and start building that.
+   - I'm starting credit card churning and I wonder if I could create
+     a site to help people manage the credit cards that they have
+     open. Could do useful things like send them alerts or give them
+     an estimate of how much money the need to spend per day. If I
+     could somehow track their spending then that would be awesome
+     too.
+7. Keep reading financial books and just try to understand investing
+   your money in general.
+8. Ask friends and family what their investment portfolio looks like
+   in an effort to build the "best" portfolio for me.
+9. Use public transportation less. Walk or bike instead.
+10. Come up with a couple cheap recipes. Ideally easy as well. I'm
+    picturing something with potatoes. I believe MMM has some
+    reccomendations so that's a place to start.
+11. Consider some sort of pay as you go cellphone plan. I'll plan to
+    talk with parents and others on skype or through some other free
+    means.
+12. Look into a credit card which offers more cash back:
+    https://www.bankrate.com/credit-cards/cash-back/. It looks like
+    there are a lot of cards which could really put more money back
+    into my pocket. Also google MMM on credit cards. It sounds like
+    there is a community of people who start lots of credit cards just
+    to get the rewards. Also https://www.reddit.com/r/churning/
+13. Look into investing my HSA
+14. Look into "pre-tax transit" benefit offered by CB. Could net me
+    some extra free cash.
+15. Get my frequent flyer mile stuff straightened out. Why would I
+    turn down free flights???
+16. Start using mint to track all my spending and accounts (it could
+    include credit cards, neat!)
+
+TODO: I want to know what MMM's portfolio looks like. Does he
+literally have everything in stocks? Does he have some bonds funds
+which he lives off of when times are tough and otherwise he's got
+stocks? Part of that curiosity stems from the fact that relying purely
+on stock as a source of retirement income seems bad in the scenario
+that the stock market plummets but you still need to rely on a source
+of income. In such situations it feels like you *need* some sort of
+steadier income source that you can rely on such as bonds.
+
+TODO: Why wouldn't you want to invest in something that pays higher
+dividends? This article talks about that:
+- http://www.mrmoneymustache.com/2011/12/22/guest-posting-from-dividend-mantra-what-is-dividend-growth-investing/
+- https://jlcollinsnh.com/2011/12/27/dividend-growth-investing/
+At the very least it feels like that growth would be more stable long
+term. I also don't understand why you're growth wouldn't be *larger*
+long term because you could reinvest those dividends back into the
+stock.
