@@ -77,11 +77,11 @@ type PersonInterface struct {
 // xmlns="another-ns-thingy-cause-why-not">0</HeightInFeet><weight>0</weight></NodeNameForBodyStats>
 type PersonEmbed struct {
 	Name
-	BodyStats
+	BodyStats `xml:"this-will-do-nothing"`
 }
 
-// When there are xml.Name values on the embedded struct the xml.Name
-// value on the struct doing the embedding takes prescedence:
+// When there are xml.Name values on some of the embedded structs, the
+// xml.Name on the struct *doing* the embedding takes prescedence:
 // <person-embed-xml-name><FirstName></FirstName><LastName></LastName><HeightInFeet
 // xmlns="another-ns-thingy-cause-why-not">0</HeightInFeet><weight>0</weight><field>hey</field></person-embed-xml-name>
 type PersonEmbedXMLName struct {
@@ -97,14 +97,21 @@ type BloodType struct {
 	Positive bool
 }
 
-// When embedding multiple structs each with a XMLName value on it the
-// one defined first determines the XML node name which will hold this
-// value:
+// When embedding multiple structs each with a xml.Name value on it
+// the one defined first determines the XML node name which will hold
+// this value:
 // <blood-type><Letter></Letter><Positive>false</Positive><HeightInFeet
 // xmlns="another-ns-thingy-cause-why-not">0</HeightInFeet><weight>0</weight></blood-type>
 type PersonEmbedsStructsWithXMLNames struct {
 	BloodType
 	BodyStats
+}
+
+// This just goes to show yet again that an XML tag applied to an
+// embedded struct does NOTHING.
+// <PersonEmbedNoXMLName><FirstName></FirstName><LastName></LastName></PersonEmbedNoXMLName>
+type PersonEmbedNoXMLName struct {
+	Name `xml:"even-though-Name-struct-has-no-xml-node-this-will-not-work"`
 }
 
 // This is one way to achieve some deep nesting and not need to write
@@ -182,6 +189,7 @@ func main() {
 	xmlMarshalAndPrint(PersonEmbed{Name: Name{}, BodyStats: BodyStats{}})
 	xmlMarshalAndPrint(PersonEmbedXMLName{Name: Name{}, BodyStats: BodyStats{}, OneMoreField: "hey"})
 	xmlMarshalAndPrint(PersonEmbedsStructsWithXMLNames{BloodType: BloodType{}, BodyStats: BodyStats{}})
+	xmlMarshalAndPrint(PersonEmbedNoXMLName{})
 	xmlMarshalAndPrint(Layers1{L1Str: "first layer", L2Str: "second layer", L3Str: "third layer"})
 	xmlMarshalAndPrint(Layers2{L1Str: "first layer", Layer22: Layer22{L2Str: "second layer", Layer23: Layer23{L3Str: "third layer"}}})
 	xmlMarshalAndPrint(Layers3{L1Str: "first layer", Layer32: Layer32{L2Str: "second layer", Layer33: Layer33{L3Str: "third layer"}}})
