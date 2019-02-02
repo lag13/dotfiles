@@ -402,3 +402,6 @@ TODO
 
 I guess there's a json datatype now:
 http://dev.mysql.com/doc/refman/5.7/en/json.html
+
+## Running query on multiple DB tables
+- https://gist.github.com/sakai135/78cc6ad9df8ac42ffa0e

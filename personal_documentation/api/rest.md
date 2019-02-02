@@ -58,6 +58,10 @@ http://ivanzuzak.info/2010/04/03/why-understanding-rest-is-hard-and-what-we-shou
 
 The URI Is The Thing: https://www.flickr.com/photos/psd/2918889380/
 
+Another nice discussion of REST: http://homepages.tig.com.au/~ijoyner/Ian_Joyner/REST.html
+
+REST vs SOAP: http://spf13.com/post/soap-vs-rest/
+
 Snarky Comment
 --------------
 
@@ -82,6 +86,11 @@ but the fact is based on most of the tutorials and such that I've looked at,
 almost everyone thinks of REST as being a consistent approach to doing CRUD
 operations and instead of making some snarky comment about "oh, you don't
 really understand how rest works" it should be more constructive or something.
+
+Upon rereading that comment (2018-10-16) it doesn't really seem THAT
+snarky. I was probably frustrated at the time about snarky comments
+similar to that one so I projected more snarkiness into the tone than
+was actually there.
 
 This Person Puts It Nicely
 --------------------------

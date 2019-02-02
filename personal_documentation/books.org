@@ -1,0 +1,31 @@
+- https://www.amazon.com/Accelerate-Software-Performing-Technology-Organizations/dp/1942788339/ref=sr_1_1?ie=UTF8&qid=1540486750&sr=8-1&keywords=accelerate+jez+humble
+
+how to calculate yield
+
+Long-term tax-exempt fund (VWLTX):
+share price: $11.16
+operating expenses: 0.19%
+yield: 3.15%
+tax-bracket: 24%
+taxable-equivalent yield: (/ 3.15 (- 1 0.24)) 4.144736842105263
+
+Vanguard Long-Term Bond ETF (BLV):
+share price: $84.32
+operating expenses: 0.07%
+yield: 4.21%
+
+Vanguard Tax-Exempt Bond ETF (VTEB):
+share price: $50.16
+operating expenses: 0.09%
+yield: 2.83%
+taxable-equivalent-yield: (/ 2.83 (- 1 .24)) 3.723684210526316%
+
+Vanguard Long-Term Corporate Bond ETF (VCLT):
+share price: $84.45
+operating expenses: 0.07%
+yield: 4.86%
+
+Vanguard Total Bond Market ETF (BND):
+share price: $77.87
+operating expenses: 0.05%
+yield: 3.34%

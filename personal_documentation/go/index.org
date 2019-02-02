@@ -95,6 +95,7 @@ library which can parse Go programs.
 - [[https://github.com/gophercon/2016-talks/tree/master/JackLindamood-PracticalAdviceForGoLibraryAuthors]]
 - https://github.com/ardanlabs/gotraining
 - https://github.com/hybridgroup/gobot
+- https://github.com/enocom/gopher-reading-list
 
 * General
 - When you execute "go run" or "go test" what actually happens is that
@@ -132,3 +133,5 @@ is a variable):
 #+BEGIN_SRC sh
   gofmt -r '"hello" -> world' file.go
 #+END_SRC
+* Reddit opinions
+https://www.reddit.com/r/golang/comments/ahbpf7/i_havent_worked_with_go_since_around_when_it/

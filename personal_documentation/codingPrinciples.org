@@ -348,3 +348,5 @@ be logged.
 ** Elaborate
 ** Why?/Pros and Cons
 ** Example
+* Primary Keys vs GUIDs
+https://tomharrisonjr.com/uuid-or-guid-as-primary-keys-be-careful-7b2aa3dcb439

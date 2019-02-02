@@ -328,6 +328,14 @@ My emacs journey is starting. What am I getting myself into?
 - There appears to be a bug in org mode. When you save links to files,
   if the saved link has a '\' in it then the search will bring you to
   the file but not to the specific location you saved.
+- When switching buffers I often have a lot of files that are named
+  the same like "main.go". It would be nice that if I have main.go
+  typed (or even as far as the match can get for main.go) and hit
+  something (perhaps shift-enter) then it will find the "closest"
+  main.go file (i.e. probably the one in the repository I'm working
+  in)
+- Can we list only the buffers in the current project? Like C-u C-x
+  C-b or something?
 
 * Terms and Miscellaneous Notes
 - It seems that most "file" related commands or just general commands not strictly related to manipulating text start with C-x.
