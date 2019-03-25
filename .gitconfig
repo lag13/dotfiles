@@ -4,11 +4,12 @@
 	default = current
 [core]
 	excludesfile = /Users/lgroenendaal/.gitignore
+	# The default mac vim does not support copying to/from the clipboard
 	editor = /usr/local/bin/vim
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
-# [url "git@github.com:"]
-	# insteadOf = https://github.com/
+[url "git@github.com:"]
+	insteadOf = https://github.com/

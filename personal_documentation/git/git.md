@@ -6,6 +6,12 @@ Git
 - http://ohshitgit.com
 - https://csswizardry.com/2017/05/little-things-i-like-to-do-with-git/
 
+## Comparing across tags/commits/etc...
+- https://github.com/org/repo/compare/v1.2.9...v1.3.7
+- https://github.com/org/repo/compare/c32f45b...b1eae98
+
+You can do something like `git diff v1.2.9 v1.3.7` as well.
+
 Deleting a Tag
 --------------
 
@@ -89,6 +95,14 @@ git reset HEAD~
 ## Undo (revert) recent commit
 ```
 git revert HEAD
+```
+
+## Undo all current changes
+https://stackoverflow.com/questions/1090309/git-undo-all-working-dir-changes-including-new-files
+
+```
+git reset --hard
+git clean -fdn
 ```
 
 https://www.atlassian.com/git/tutorials/undoing-changes
@@ -290,3 +304,6 @@ files_modified.each do |file|
   end
 end
 ```
+
+## Search for a string in all past commits
+`git rev-list --all | xargs git grep something`

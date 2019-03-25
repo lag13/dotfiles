@@ -96,6 +96,7 @@ library which can parse Go programs.
 - https://github.com/ardanlabs/gotraining
 - https://github.com/hybridgroup/gobot
 - https://github.com/enocom/gopher-reading-list
+- https://github.com/golang/go/wiki/Modules
 
 * General
 - When you execute "go run" or "go test" what actually happens is that
@@ -135,3 +136,17 @@ is a variable):
 #+END_SRC
 * Reddit opinions
 https://www.reddit.com/r/golang/comments/ahbpf7/i_havent_worked_with_go_since_around_when_it/
+* Working with private repos
+- https://github.com/golang/go/wiki/Modules#how-do-i-use-vendoring-with-modules-is-vendoring-going-away
+- https://github.com/golang/go/issues/25982#issuecomment-410626120
+- https://golang.org/doc/faq#git_https
+
+When Go tries to download private repositories it will fail unless
+you've done one of the things listed in the links above. Before go
+modules we didn't care too much and just vendor'd everything but now
+with go modules the 'go' command ignores the vendor directory by
+default unless you add the ~-mod=vendor~ flag:
+https://github.com/golang/go/wiki/Modules#how-do-i-use-vendoring-with-modules-is-vendoring-going-away.
+So I feel like we'll need to change the build process somehow to
+either be able to pull from private repos and NOT use vendor OR vendor
+private repos and then add ~-mod=vendor~ to all go commands.

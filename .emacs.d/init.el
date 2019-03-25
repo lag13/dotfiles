@@ -8,9 +8,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(grep-find-ignored-directories
+   (quote
+    ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "vendor")))
  '(package-selected-packages
    (quote
-    (terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode)))
+    (jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode)))
  '(send-mail-function (quote smtpmail-send-it))
  '(smtpmail-smtp-server "smtp.gmail.com")
  '(smtpmail-smtp-service 25))
@@ -67,15 +70,29 @@
 	    (setq comment-start "// ")
 	    (setq comment-end "")))
 
-;; Need to set GOPATH so tools like goimports will work.
-(setenv "GOPATH" (concat (getenv "HOME") "/gocode"))
 ;; exec-path is like "PATH" but for emacs. When emacs tries to run a
 ;; binary, it will search through exec-path to find it.
+(setq exec-path (append (list "/usr/local/bin")
+			exec-path))
+
+;; Need to set GOPATH so tools like goimports will work:
+;; https://www.emacswiki.org/emacs/ExecuteExternalCommand,
+;; http://ergoemacs.org/emacs/modernization_elisp_lib_problem.html,
+;; https://stackoverflow.com/questions/14074912/how-do-i-delete-the-newline-from-a-process-output,
+;; [[info:elisp#Regexp%20Backslash][info:elisp#Regexp Backslash]].
+;; TODO: I want this to work but for some reason when this code gets
+;; run as part of startup, it cannot find the go command but after I'm
+;; inside the editor running the command works as expected so for now
+;; I'll just hardcode the GOPATH.
+
+;; (setenv "GOPATH" (replace-regexp-in-string "\n*\\'" "" (shell-command-to-string "go env GOPATH")))
+
+(setenv "GOPATH" (concat (getenv "HOME") "/go"))
+
 (setq exec-path
-      (append (list
-	       "/usr/local/bin"
-	       (concat (getenv "GOPATH") "/bin"))
+      (append (list (concat (getenv "GOPATH") "/bin"))
 	      exec-path))
+
 ;; Have PATH be the same as exec-path. We do this because emacs will
 ;; invoke a shell to run a program and the shell needs PATH set
 ;; appropriately.
@@ -95,9 +112,16 @@
 ;; haskell-process-args-ghci would be useful? I think ghci runs by
 ;; default for interactive haskell in emacs.
 
-;; (org-babel-do-load-languages
-;;  'org-babel-load-languages
-;;  '((haskell . t)))
+;; https://orgmode.org/worg/org-contrib/babel/languages.html#configure.
+;; TODO: I'm still kind of confused how this works. For example I was
+;; able to run an elisp code snippet even though I don't currently see
+;; that as a potential language in org-babel-load-languages but I did
+;; see it earlier. Also I *swear* I did not have to add support for
+;; shell before and it magically started working but later when I
+;; tried that was not the case and I had to do something like this.
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((shell . t)))
 
 ;; TODO: Why is it done this way instead of with a hook? I commented this out since it seemed to mess up the interactive session if I ran it.
 ;; (eval-after-load "haskell-mode"
@@ -243,12 +267,38 @@ works too."
 (global-set-key (kbd "C-x C-a") 'ff-get-other-file)
 
 (defun view-help-buffer ()
-  "Quickly view the help buffer. This code was copied from `view-echo-area-messages' and modified to work with the help buffer."
+  "Quickly view the help buffer. This code was copied from
+`view-echo-area-messages' and modified to work with the help
+buffer."
   (interactive)
   (with-current-buffer (help-buffer)
     (goto-char (point-max))
     (display-buffer (current-buffer))))
+
 (global-set-key (kbd "C-h h") 'view-help-buffer)
+
+(defun insert-timestamp ()
+  "Inserts the current time in UTC. This is nifty for me because
+I oftentimes find myself taking notes as something happens and
+writing down that time. I use UTC because I want my time to have
+a consistent format. Timezone format is ISO 8601:
+https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
+  (interactive)
+  (insert (format-time-string "%Y-%m-%dT%H:%M:%SZ" (current-time) t)))
+
+(global-set-key (kbd "C-c t") 'insert-timestamp)
+
+(defun insert-date ()
+  "Inserts the current date. As opposed to `insert-timestamp' I
+  insert the local date since I'm usually just recording when I
+  work on things"
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d")))
+
+(global-set-key (kbd "C-c d") 'insert-date)
+
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Grep-Searching.html
+(setq grep-save-buffers nil)
 
 ;; How to do global search and replace:
 
@@ -257,3 +307,136 @@ works too."
 
 ;; 2. After doing that run the save-some-buffers command which will
 ;; save modified file buffers.
+
+
+;; How to work with org mode tables: C-c | to create a table, if a
+;; table does not have a header then you can open up a line below the
+;; row you want for a header and type |-<TAB>.
+
+;; TODO: When running C-c | over a region org mode assumes that the
+;; region is comma delimited and create the table based on that. You
+;; can do C-u C-u C-u to enter in a regex to delimit on instead. I
+;; think that should be the default though since I do NOT do this
+;; often enough to warrant a default behavior which I will probably
+;; never remember.
+
+
+;; TODO: Make an escape and unescape function similar to tpope's [y
+;; and ]y commands in https://github.com/tpope/vim-unimpaired
+
+;; TODO: Is there an org mode command to undo the expansion that
+;; happens after you hit tab? Sometimes I just want to see a quick
+;; view of the headings and then undo that expansion.
+
+;; TODO: Make artist-mode's C-n the same as picture-mode's C-n in the
+;; sense that it appends to the buffer. Why would it not do this by
+;; default?
+
+;; TODO: I want to be able to paste in picture mode and not have the
+;; text shift.
+
+;; TODO: In artist-mode I want to be able to move rectangles around
+;; and also have text wrap withing that rectangle. Is something like
+;; that possible?
+
+;; TODO: I miss vim's autocomplete features like file completion and
+;; basic keyword matching. They felt really simple and I want to see
+;; if emacs has something similar. It seems that company mode might be
+;; the way to go. People say it's easier to setup. Also there is the
+;; function comint-dynamic-complete-filename
+;; (https://superuser.com/questions/67170/how-do-i-complete-file-paths-in-emacs)
+;; which might be just what I need. Just need to think of a good
+;; keybinding to use. There is also M-/ similar to vim's C-p and C-n
+;; commands. Maybe that's all I'll need.
+
+(global-set-key (kbd "M-\\") 'comint-dynamic-complete-filename)
+
+;; TODO: Speed up replacing a string with another string. Like could I
+;; highlight the two strings I need instead of typing them?
+
+;; TODO: I should make sure that artist mode only uses spaces (no
+;; tabs) so that I can copy the document elsewhere and the formatting
+;; will not get messed up:
+;; https://stackoverflow.com/questions/43976371/artist-mode-drawing-characters-disorder
+
+;; TODO: Command to cycle through files in a directory, handy when
+;; there are only a couple files in the directory and you want to move
+;; around between them. At this point I wonder if I should just get a
+;; more full featured file opener thingy.
+
+;; TODO: Can I configure C-c C-c in org mode to not try to put the
+;; output of a program into a table? I feel like the raw output would
+;; be more useful.
+
+;; TODO: Learn how to increase the emacs font size for presentation
+;; purposes.
+
+;; TODO: Learn from this guy: https://github.com/cgore He seems super
+;; sharp and seems like a super lisp geek.
+
+;; TODO: Prevent emacs quitting when Cmd-Q is hit, I just did that
+;; accidentally and its a little annoying.
+
+;; TODO: Configure terraform so it runs terraform fmt on save.
+
+;; I tend to be okay not using line numbers when coding (I did for a
+;; while in fact) but they are useful if any sort of pair programming
+;; is being done because then the other person can be like "I think we
+;; should edit line XYZ"
+(global-display-line-numbers-mode)
+
+;; TODO: Sometimes I want to "find" a specific file like how the find
+;; command works. How could I do that with emacs? Should I just bite
+;; the bullet and install some sort of fuzzy file finder?
+
+;; TODO: Had an embarassing moment pair programming where the issue
+;; was actually fixed but I forgot to save the file so we thought it
+;; was not fixed. Look into saving the file automatically. Perhaps
+;; when I tab away from emacs or something.
+
+
+;; https://www.emacswiki.org/emacs/UnfillParagraph
+(defun unfill-paragraph (&optional region)
+  "Takes a multi-line paragraph and makes it into a single line of text."
+  (interactive (progn (barf-if-buffer-read-only) '(t)))
+  (let ((fill-column (point-max))
+        ;; This would override `fill-column' if it's an integer.
+        (emacs-lisp-docstring-fill-column t))
+    (fill-paragraph nil region)))
+
+
+;; Yesterday (2019-03-14 i.e. pi day) I learned about tau
+;; (https://tauday.com) and now I'm a tau convert. I can't say I've
+;; EVER needed to use pi before but I just wanted to write this down.
+(setq tau (* 2 pi))
+
+;; And of course: https://xkcd.com/1292/
+(setq pau (* 1.5 pi))
+
+;; TODO: It would be cool if whenever I type in an orgmode buffer it
+;; timestamped my edits or something. Then I could do things like:
+;; "hey emacs, show me my edits within the past day" or something like
+;; that and then I'd be able to see what I was working on. That would
+;; also mean that I get sort of a builtin scrum thingy because during
+;; scrum I can just be like "hey emacs, show my edits for the past
+;; day" and I'll just read off what is there. I'm sure this would be a
+;; difficult thing to do but I think it could be cool.
+
+;; TODO: Learn more about babel to create results. I think I'd like
+;; the default behavior to be to not try and put the results in a
+;; table. Also I tried to reevaluate the same expression and it made a
+;; new RESULTS section rather than replacing the old one. Can I change
+;; that behavior? That would be nice I think. I think it would also be
+;; cool if babel could nicely format a JSON response or something
+;; similar. I suppose I could use that http mode that I played around
+;; with a bit! That might be a lot easier than doing curl stuff
+;; actually.
+
+;; TODO: In orgmode when editing a go code block saving does not cause
+;; goimports to be run so the imports are sadly not automatically
+;; managed. I'm not sure how best to resolve this or if it's worth
+;; doing. I guess for the time being I can manually edit go files and
+;; copy them in but I think it would be neat to have a solution to
+;; this. Documenting things in org mode is just too much fun. Or
+;; perhaps I'll just have to pick another language which is easier to
+;; work with? Not sure.

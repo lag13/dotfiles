@@ -189,7 +189,7 @@ The basic algorithm seems to be:
      be redone.
 3. While there are more instructions go to step 2
 
-With that in mind 
+With that in mind
 1. Put instructions that do not change much at the top of the
    Dockerfile because if something at the top of the Dockerfile
    changes then ALL subsequent steps will be re-ran. Note that when
@@ -203,4 +203,84 @@ With that in mind
    changing which will cause all subsequent commands to not use the
    cache. So having a separate build stage where we downloaded
    dependencies and then copied those over to the new location helped.
-   
+
+## Scratch
+The scratch image is very limited and will probably need extra things
+like CA certs. For instance one time I dealt with an application which
+set the timezone to something other than the default of UTC so the
+timezone data /usr/share/zoneinfo/America/Chicago had to be copied
+into the scratch image. For CA certs, the file containing all of them
+lives in /etc/ssl/certs/ca-certificates.crt. This tutorial sums that
+up nicely:
+https://sebest.github.io/post/create-a-small-docker-image-for-a-golang-binary/
+
+## Docker vs Virtual Machine (VM)
+This one has confused me for a while and I think still confuses me a
+bit. I'll document here things that I've learned.
+
+In one sentence: a container (i.e. docker) is process and a VM is a
+server
+
+Containers are (I *think*) a combination of two linux kernel features:
+1. namespace - controls which resources are visible to a process
+2. control group - controls how much of certain resources can be used
+
+Containers have been around before docker came along but docker made
+interacting with them much easier. In addition to dealing with
+namespaces and c groups docker also uses a union file system which
+promotes reusability:
+https://medium.freecodecamp.org/a-beginner-friendly-introduction-to-containers-vms-and-docker-79a9e3e119b
+
+Here is what a container looks like:
+```
+                +------------+
+                | Container  |
++------------+  +------------+  +------------+
+|   App A    |  |   App B    |  |   App C    |
++------------+  +------------+  +------------+
+|  Bins/Libs |  |  Bins/Libs |  |  Bins/Libs |
++------------+--+------------+--+------------+
+|                   Docker                   |
++--------------------------------------------+
+|                  Host OS                   |
++--------------------------------------------+
+|               Infrastructure               |
++--------------------------------------------+
+```
+
+Here is what a VM looks like:
+```
+                +------------+
+                |     VM     |
++------------+  +------------+  +------------+
+|   App A    |  |   App B    |  |   App C    |
++------------+  +------------+  +------------+
+|  Bins/Libs |  |  Bins/Libs |  |  Bins/Libs |
++------------+  +------------+  +------------+
+|  Guest OS  |  |  Guest OS  |  |  Guest OS  |
++------------+--+------------+--+------------+
+|                 Hypervisor                 |
++--------------------------------------------+
+|                  Host OS                   |
++--------------------------------------------+
+|               Infrastructure               |
++--------------------------------------------+
+```
+
+So a container is a way to separate processes so it *looks* like they
+operate by themselves but each container shares the same kernel (i.e.
+part of the operating system that deals with devices, process
+management, memory management, and system calls). Note that ALL linux
+distributions share the same kernel and the only difference is
+userland stuff:
+https://serverfault.com/questions/755607/why-do-we-use-a-os-base-image-with-docker-if-containers-have-no-guest-os
+All docker containers run on linux and when I do docker stuff on my
+mac those containers do indeed run on a linux kernel. I think there's
+some linux VM'ing going on but for just the kernel so I think that
+would mean that there's a hypervisor? A hypervisor by the way is a
+process that sits between an OS and the hardware. A hypervisor runs
+your VMs. I believe that hypervisors contain kernel logic within them
+(which an OS needs in order to run).
+
+TODO: Is there any reason why ALL processes don't run inside a
+continer of some sort? Seems like a nice idea?

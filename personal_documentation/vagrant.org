@@ -1,0 +1,18 @@
+Vagrant is a way to spin up virtual machines and provision said
+machines with whatever software is necessary. I think it can then
+distribute the resulting image for deployment. In some ways it feels
+like it glues together 2 things (and all of these things are specified
+in a file called Vagrantfile so it can be reproduced elsewhere):
+1. Hypervisor software (e.g. virtual box) - is capable of running a VM
+2. Configuration management software (e.g. shell script, ansible,
+   chef, puppet, etc...) - software that can be used to install any
+   necessary software onto a computer
+
+A Vagrantfile is written in ruby (not sure why this is)
+
+https://stackoverflow.com/questions/38872670/what-is-the-difference-between-a-vagrant-provider-and-a-vagrant-provisioner
+
+This is a nice little tutorial on vagrant where he sets up a LAMP
+stack: https://www.youtube.com/watch?v=vBreXjkizgo. This guy seems
+like a solid tutorial person actually, I'll have to check out some of
+his other stuff.

@@ -1,0 +1,44 @@
+https://www.ansible.com/resources/get-started
+
+Ansible seems to be a number of things (in some ways if a tool is
+capable of running shell scripts or something similar couldn't it
+technically be anything you want?) but for the purposes of Vagrant, it
+is a provisioner (outside of the vagrant world, a synonym is
+configuration management system).
+
+- Playbooks - contain plays
+- Plays - contain tasks. A play basically maps a set of hosts to a set
+  of tasks
+- Tasks - Run modules
+- Modules - Basically an actual command that gets run like "yum" but
+  with a slightly different syntax.
+- Handlers something which get run once at the end of a play
+- Role - a playbook which is fully self contained. Each role lives in
+  a certain place and has a certain directory structure:
+  https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html
+  Ansible galaxy is a repository for user generated roles. Here is a
+  tutorial where someone creates a role:
+  https://www.azavea.com/blog/2014/10/09/creating-ansible-roles-from-scratch-part-1/
+- Inventory a list of places where you want your automation to happen.
+
+Ansible is a python script (actually a bunch of them I think) so you
+need python in order to run it. They talk a lot about automation using
+ansible (like automating deployments) but I can't help think of our
+automated bifrost deployment which required us to install ruby and
+setup environment variables so we could deploy 4.0 and how annoying
+that was to setup and how in the back of my mind I was always worried
+that deployment would not work anymore if we somehow all lost our
+computers which contained the necessary configuration (or if we all
+left the company which is a real issue right now). So I'm not sure if
+I'm a big fan of the idea of using it to deploy stuff. If it was a
+simple binary we could download and install then maybe I'd feel
+better.
+
+Really weird thing happened to me, I ran:
+#+BEGIN_SRC shell
+ansible localhost -m yum -a "name=jq"~
+#+END_SRC
+
+and it WORKED?? Very strange. Trying the same thing with "apt" instead
+of "yum" failed as expected. Very strange.
+
