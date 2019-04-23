@@ -284,3 +284,8 @@ your VMs. I believe that hypervisors contain kernel logic within them
 
 TODO: Is there any reason why ALL processes don't run inside a
 continer of some sort? Seems like a nice idea?
+
+## Copy from container to local filesystem
+`docker cp container:container/path local/path`
+
+https://stackoverflow.com/questions/22049212/copying-files-from-docker-container-to-host

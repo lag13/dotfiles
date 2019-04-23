@@ -10,7 +10,6 @@ stty discard undef
 # TODO: Configure the prompt to show things like the current branch in git and
 # maybe some colors as well.
 
-export GOPATH="$HOME/gocode"
 # So C-xC-e will start vim
 export EDITOR=vim
 # Ignore duplicate history entries.
@@ -28,9 +27,9 @@ cover () {
     go test -covermode=count -coverprofile="$t" "$@" && go tool cover -html="$t" && unlink "$t"
 }
 
+export PATH="$HOME/bin:$PATH"
 export PATH="$GOPATH/bin:$PATH"
 export PATH="$HOME/.rbenv/shims:$PATH"
-export PATH="$PATH:$HOME/tr-testing-and-deployment-scripts/hotpot"
 export PATH="/usr/local/php5/bin:$PATH"
 
 # show my ip address
@@ -38,3 +37,7 @@ alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 
 # show users
 alias allusers="cut -d: -f1 /etc/passwd"
+
+# eval "$(pyenv init -)"
+# eval "$(pyenv virtualenv-init -)"
+# source <(kubectl completion bash)

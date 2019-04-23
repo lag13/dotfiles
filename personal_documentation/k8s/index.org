@@ -1,0 +1,3 @@
+** Get logs
+If you go to the console and click into a deployment, there is a way
+to view the logs.

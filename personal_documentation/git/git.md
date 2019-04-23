@@ -82,6 +82,10 @@ Cherry Picking
 
 http://think-like-a-git.net/sections/rebase-from-the-ground-up/cherry-picking-explained.html
 
+`git cherry-pick <commit-sha|branch>` will replay the changes of the
+commit you specified (or the commit or the commit pointed to by the
+branch you specified) onto HEAD.
+
 Break Up Recent Commit
 ----------------------
 

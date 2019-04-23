@@ -440,3 +440,16 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; this. Documenting things in org mode is just too much fun. Or
 ;; perhaps I'll just have to pick another language which is easier to
 ;; work with? Not sure.
+
+
+;; TODO: projectile, helm, magit, tramp, eshell,
+;; https://github.com/wasamasa/dotemacs,
+;; https://github.com/aterweele/emacs.d,
+;; https://github.com/atw-gr/emacs.d
+
+
+;; TODO: I had to delete every buffer who's file lived in the packerex
+;; directory because I moved them to another directory and didn't want
+;; name conflicts when I started using the files in the new directory
+;; location. I would like to know of a way to quickly delete multiple
+;; buffers matching some sort of regex.

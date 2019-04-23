@@ -140,6 +140,7 @@ https://www.reddit.com/r/golang/comments/ahbpf7/i_havent_worked_with_go_since_ar
 - https://github.com/golang/go/wiki/Modules#how-do-i-use-vendoring-with-modules-is-vendoring-going-away
 - https://github.com/golang/go/issues/25982#issuecomment-410626120
 - https://golang.org/doc/faq#git_https
+- https://smartystreets.com/blog/2018/09/private-dependencies-in-docker-and-go
 
 When Go tries to download private repositories it will fail unless
 you've done one of the things listed in the links above. Before go
