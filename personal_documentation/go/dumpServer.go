@@ -19,6 +19,7 @@ func main() {
 			return
 		}
 		log.Printf("### New Request ###\n%s###################", rawRequest)
+		w.Write([]byte(r.URL.Path))
 	})
 	log.Print("starting server")
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("localhost:%d", *port), nil))

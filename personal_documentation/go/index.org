@@ -151,3 +151,8 @@ https://github.com/golang/go/wiki/Modules#how-do-i-use-vendoring-with-modules-is
 So I feel like we'll need to change the build process somehow to
 either be able to pull from private repos and NOT use vendor OR vendor
 private repos and then add ~-mod=vendor~ to all go commands.
+* When to panic
+https://www.reddit.com/r/golang/comments/2a1sie/when_to_call_panic/
+
+- when the code is statically wrong
+- an unrecoverable error where you no longer guarantee the state

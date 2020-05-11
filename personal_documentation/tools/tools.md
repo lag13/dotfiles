@@ -1,5 +1,7 @@
-Tools
-=====
+# Tools
+
+Useful tools (anything from a bash command to a binary that needs to
+be downloaded) for programming.
 
 ### devd
 
@@ -31,6 +33,30 @@ well to the unix philosophy which makes it very useful. One common thing is to
 run tests when source code changes. Example which echo's "hey" every time one
 of the listed files changes: `find . | entr echo "hey"`.
 
+### BFG
+
+- https://rtyley.github.io/bfg-repo-cleaner/
+- https://github.com/rtyley/bfg-repo-cleaner
+
+Clean github repos of things like passwords
+
+### rclone
+
+- https://rclone.org/
+- https://github.com/rclone/rclone
+
+sync files between your computer and things like Dropbox or Google
+Drive. Does not currently auto sync things but with a little scripting
+it could: https://github.com/rclone/rclone/issues/249. Works on any
+platform!
+
+### croc
+
+- https://github.com/schollz/croc
+- https://schollz.com/blog/croc6/
+
+Transfer files between two computers.
+
 ### tmux
 
 - https://tmux.github.io
@@ -43,3 +69,9 @@ through typing, you can also script.
 
 I learned my initial tmux stuff through this guy:
 http://minimul.com/teaches/tmux.
+
+### watch
+
+Command on linux by default which repeatedly runs a command and
+displays it's output. Good if you are waiting for something to happen
+and don't want to keep rerunning the command manually.

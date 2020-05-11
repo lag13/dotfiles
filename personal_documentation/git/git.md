@@ -20,6 +20,11 @@ https://nathanhoad.net/how-to-delete-a-remote-git-tag
 git tag -d my_tag
 git push origin :refs/tags/my_tag
 
+## Adding a tag
+
+git tag my_tag
+git push origin --tags
+
 Submodules
 ----------
 

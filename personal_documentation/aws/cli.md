@@ -59,3 +59,7 @@ aws s3 cp --recursive s3://lucas-eu-testing-attachments/folder s3://lucas-eu-tes
 aws s3 mv --recursive s3://lucas-eu-testing-attachments/folder s3://lucas-eu-testing-customer-attachments/otherfolder
 ```
 
+
+Size of an s3 bucket: https://serverfault.com/questions/84815/how-can-i-get-the-size-of-an-amazon-s3-bucket
+
+aws cloudwatch get-metric-statistics --namespace AWS/S3 --start-time 2020-04-21T00:00:00 --end-time 2020-04-22T00:00:00 --period 86400 --statistics Average --region us-east-1 --metric-name BucketSizeBytes --dimensions Name=BucketName,Value=grinfrastructure Name=StorageType,Value=StandardStorage

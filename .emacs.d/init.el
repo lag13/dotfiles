@@ -8,12 +8,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(clean-buffer-list-delay-general 1)
  '(grep-find-ignored-directories
    (quote
     ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "vendor")))
+ '(groovy-indent-offset 2)
  '(package-selected-packages
    (quote
-    (jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode)))
+    (groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode)))
  '(send-mail-function (quote smtpmail-send-it))
  '(smtpmail-smtp-server "smtp.gmail.com")
  '(smtpmail-smtp-service 25))
@@ -119,6 +121,13 @@
 ;; see it earlier. Also I *swear* I did not have to add support for
 ;; shell before and it magically started working but later when I
 ;; tried that was not the case and I had to do something like this.
+
+;; TODO: Before emacs 26 it complains about "ob-shell" not being
+;; loadable but apparently ob-sh works and on emacs 26 it complains
+;; about ob-sh not being loadable. Maybe I should just stick with
+;; emacs 26 and not care about backwards compatability, either way
+;; though I wanted to make a note that maybe I should modify this to
+;; be backwards compaitble.
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((shell . t)))
@@ -155,7 +164,7 @@
 ;; Hitting return will open the link under the point.
 (setq org-return-follows-link t)
 
-;; Start emacs fullscreen
+;; Start emacs fullscreen.
 (toggle-frame-fullscreen)
 
 ;; I like specifying case when typing file names. To be honest a good
@@ -286,6 +295,11 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
   (interactive)
   (insert (format-time-string "%Y-%m-%dT%H:%M:%SZ" (current-time) t)))
 
+;; TODO: Sometimes I'm recording something I did in the past and I
+;; want to enter accurate times for the events that transpired. It
+;; would be neat to be able to do that quickly instead of having to do
+;; some conversions in my head (since I try to record everything in
+;; UTC time)
 (global-set-key (kbd "C-c t") 'insert-timestamp)
 
 (defun insert-date ()
@@ -382,8 +396,13 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; I tend to be okay not using line numbers when coding (I did for a
 ;; while in fact) but they are useful if any sort of pair programming
 ;; is being done because then the other person can be like "I think we
-;; should edit line XYZ"
-(global-display-line-numbers-mode)
+;; should edit line XYZ" https://www.emacswiki.org/emacs/LineNumbers.
+;; TODO: Figure out how to install the latest emacs because linum-mode
+;; really is slow (on my work.org buffer the cursor has trouble
+;; moving)
+(if (version<= "26.0.50" emacs-version)
+    (global-display-line-numbers-mode)
+  (global-linum-mode 1))
 
 ;; TODO: Sometimes I want to "find" a specific file like how the find
 ;; command works. How could I do that with emacs? Should I just bite
@@ -447,9 +466,35 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; https://github.com/aterweele/emacs.d,
 ;; https://github.com/atw-gr/emacs.d
 
-
 ;; TODO: I had to delete every buffer who's file lived in the packerex
 ;; directory because I moved them to another directory and didn't want
 ;; name conflicts when I started using the files in the new directory
 ;; location. I would like to know of a way to quickly delete multiple
-;; buffers matching some sort of regex.
+;; buffers matching some sort of regex? Alternatively if I could run a
+;; command to delete a buffer which was associated with a file that no
+;; longer exists then that would be handy.
+
+;; TODO: Can I have emacs automatically delete buffers which haven't
+;; been used in X hours? It would also be nice to be able to manually
+;; say "delete all buffers that haven't been touched in Y hours".
+;; Because there are a lot of files I edit with the same name and so
+;; its a bit annoying to switch between them sometimes. Maybe I should
+;; just get some sort of fuzzy file matcher like helm or whatever
+;; because if that tool could do a fuzzy match on the entire file path
+;; that would be helpful (because emacs tries to be smart and give you
+;; the smallest prefix it needs to distinguish similarly named files
+;; but what I'd really like is for the prefix to include the name of
+;; the repository). Both of these things (deleting old buffers and
+;; having it so the project name was available when searching for a
+;; particular buffer) would be nice. EDIT: It looks like this can be
+;; handled by the "clean-buffer-list" function (although it only works
+;; on entire days). Apparently emacs also already will purge buffers
+;; every night at midnight which I didn't realize. I wonder if it
+;; still runs if the computer is asleep though? This bears more
+;; looking into.
+
+(add-hook 'js-mode-hook (lambda() (setq indent-tabs-mode nil)))
+
+(setq groovy-mode-hook (lambda() (setq indent-tabs-mode nil)))
+
+(setq dockerfile-mode-hook (lambda() (setq indent-tabs-mode nil)))
