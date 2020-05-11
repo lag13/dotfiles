@@ -1,0 +1,62 @@
+Cloudwatch alarms
+
+https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html
+
+Metric stuff has always been confusing to me I think because time is
+involved. I was creating a cloudwatch alarm to alert us if the number
+of cloudformation stacks went over a certain threshold so we'd get
+alerted and could request a service limit increase or look for stacks
+to delete. I think the Period had to be longer than the freqency at
+which metrics are emitted which I don't think is documented. WHY IS IT
+NOT DOCUMENTED?? There is apparently one datapoint per period on the
+graph. Data points to alarm is the number X data points which need to
+be above the threshold to trigger an alarm and evaluation period will
+consider the last at the last Y data points.
+
+For example, if:
+- period: 1 min
+- data points to alarm: 3
+- evaluation period: 10
+
+Then we will always be looking at a moving window of 10 minutes and if
+within that 10 minute period there are 3 data points above the
+threshold, then trigger the alert. OR
+
+if
+num_data_points_violating_threshold(get_data_points_from_past(evaluation_period *
+period)) > data_points_to_alarm THEN alert
+
+Again though, I think there's this seemingly undocumented part where
+the frequency of a metric being emitted should determine your period.
+Because when I did a period of 1 minute for the service limit then I'd
+see one data point every 30 minutes but it didn't seem to register
+with the alarm system most of the time. EDIT: Actually I think the
+alarm system would "see" the data again when the metric got emitted.
+i.e. if the metric gets emitted at 1:00 and every hour after then at
+1:00 the 1 minute period would return data but if we wait till 1:02
+then the data will no longer return.
+
+Also, I bet setting the period to a smaller time window than the
+frequency at which a metric gets emitted reveals how often that metric
+gets emitted.
+
+
+
+{
+    "region": "us-east-1",
+    "metrics": [
+        [ "AWS/TrustedAdvisor", "ServiceLimitUsage", "ServiceName", "CloudFormation", "ServiceLimit", "Stacks", "Region", "us-east-1", { "stat": "Average" } ]
+    ],
+    "view": "timeSeries",
+    "stacked": false,
+    "period": 3600,
+    "annotations": {
+        "horizontal": [
+            {
+                "label": "ServiceLimitUsage > 0.9 for 1 datapoints within 1 hour",
+                "value": 0.9
+            }
+        ]
+    },
+    "title": "cloudformation-stack-usage-percentage"
+}

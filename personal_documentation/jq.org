@@ -1,0 +1,44 @@
+JQ Examples:
+
+#+BEGIN_SRC bash
+  aws ec2 describe-instances --instance-ids $instance_ids_arg | \
+  # The reason I take the public IP over the private IP is that one time
+  # I tried to ssh into the instance i-065185d05903e64bb but I couldn't
+  # ssh using the private key but I could with the public one so I made
+  # the assumption that public IPs are more reliable for ssh'ing.
+  jq '.Reservations[].Instances[] |
+  {"IpAddress": (if .PublicIpAddress == null then .PrivateIpAddress else .PublicIpAddress end),
+   "InstanceId": .InstanceId,
+   "KeyName": (.KeyName |
+     if test("1/Guaranteed") then "Guaranteed Rate"
+     elif test("kubernetes.k8s") then "kops-prod"
+     elif test("terraform-") then "infrastructure"
+     else . end)
+  }'
+#+END_SRC
+
+
+I guess map(select()) will filter a list! Handy.
+#+BEGIN_SRC bash
+  cat markRobertsNewsroomContacts.json | \
+      jq 'map(select(."first-name" == "Hannah" and ."last-name" == "Chan")) |
+  map({"first-name",
+       "last-name",
+       email,
+       "phone-cell",
+       "phone-office",
+       address,
+       "employer-name",
+       "creation-date"}) |
+  sort_by(."creation-date")'
+#+END_SRC
+
+Get a list of instances and just print out their tags and instance IDs
+and private IPs:
+#+BEGIN_SRC bash
+aws ec2 describe-instances --filters Name=network-interface.vpc-id,Values=vpc-b6c7bbdd | \
+jq '.Reservations[].Instances[] | 
+{"tags": .Tags, 
+"InstanceId": .InstanceId,
+"PrivateIpAddress": .PrivateIpAddress}'
+#+END_SRC

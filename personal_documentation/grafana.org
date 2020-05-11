@@ -1,0 +1,12 @@
+** Alerting
+If you have an alert like:
+- Evaluate every: 1m
+- For: 5m
+- When avg() of query(A, 24h, now) is above 0
+
+
+That means that every minute we'll take the average for the past 24
+hours. If that average is above 0 then since "For" is set to 5m we'll
+wait another 5 minutes and if the average for the past 24 hours at 5
+minutes in the future is ALSO above 0 then we say there is an alert
+situation.

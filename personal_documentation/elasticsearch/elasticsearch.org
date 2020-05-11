@@ -1,0 +1,18 @@
+GET /_cat/health?v
+GET /_cat/indices?v
+
+/_cluster/health
+
+
+Most API requests look like:
+
+VERB /<INDEX>/<ENDPOINT>/<ID>
+
+INDEX: any lowercase name. And index stores "documents" which can then
+be searched on.
+
+ENDPOINTs:
+- _doc
+- _update
+- _bulk
+- _search

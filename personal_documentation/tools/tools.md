@@ -75,3 +75,24 @@ http://minimul.com/teaches/tmux.
 Command on linux by default which repeatedly runs a command and
 displays it's output. Good if you are waiting for something to happen
 and don't want to keep rerunning the command manually.
+
+### graphviz
+
+- https://www.graphviz.org/
+
+Open source tool for rendering graphs from a description language of
+some sort. First learned about it through land of lisp!
+
+### PlantUML
+
+- https://plantuml.com/
+- https://github.com/plantuml/plantuml
+
+For drawing diagrams. Kind of similar to graphviz I suppose.
+
+### Remark
+
+- https://remarkjs.com/#1
+- https://github.com/gnab/remark
+
+Tool for making slideshows off of markdown.

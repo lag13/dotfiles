@@ -1,0 +1,64 @@
+** Backend
+Where terraform stores it's state:
+https://www.terraform.io/docs/backends/index.html
+
+** Provider
+Sort of like a library. AWS is a provider and let's you create AWS
+resources: https://www.terraform.io/docs/providers/
+
+It appears that you can create your own providers:
+https://www.terraform.io/docs/extend/writing-custom-providers.html
+
+You can only have ONE version of a provider within a terraform module
+including any child modules which get used:
+https://github.com/hashicorp/terraform/issues/16641
+
+When you call a terraform module, all the stuff that the module does
+will get executed in the calling module. So if module "child" creates
+resources A, B, and C then the root module calling "child" will also
+create those resources.
+
+It is possible to have multiple modules within a single repository. A
+module really is just a collection of .tf files within a directory so
+any directory could be it's own module.
+
+** Module
+Also like a library but users can create them. For example you could
+create a module to create a queue and DLQ for said queue or something
+like that.
+
+All terraform you write is considered to be written inside a module.
+So if you are "just writing terraform" you are writing them inside the
+"root" module:
+https://www.terraform.io/docs/configuration/modules.html
+
+*** Input variables
+Parameters for a module just like parameters for a function.
+
+Access them by doing ~var.<var-name>~
+
+*** Output values
+output values are to a module as return values are to a function.
+
+*** Local values
+temporary variables
+
+** Provider vs Module
+I think the difference between a provider and a module is that if you
+create a provider you'll be writing go code that you can then,
+effectively, call by writing terraform. But if you write a module then
+it's all within terraform. Both are abstraction methods but they
+operate at different levels. Providers are about defining how to
+create individual resources and modules are about creating a set of
+resources to serve some purpose.
+
+** File structure
+- variables.tf - store input variables to a module
+- main.tf - store the main terraform code
+- output.tf - store the output variables from a module
+- default.auto.tfvars - default variable values
+  (https://www.terraform.io/docs/configuration/variables.html#variable-definition-precedence)
+
+I don't think you actually need to have these separate files though
+(except for .tfvars). You could just write everything in one big .tf
+file.

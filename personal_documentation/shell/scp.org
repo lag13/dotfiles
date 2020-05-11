@@ -1,0 +1,16 @@
+When specifying the recursive option the directory specified on the
+left side will be placed INSIDE the directory on the right side:
+
+scp -r root@10.1.41.130:/root/lucas-test-dir /home/ec2-user/
+
+The result of the above command will be the folder
+/home/ec2-user/lucas-test-dir being created. If the folder
+/home/ec2-user/lucas-test-dir already exists then matching files being
+copied over will replace the files already existing and their
+timestamps will be updated (i.e. there is no smart checking of "is
+this file different, if so copy the file" which makes sense). Files
+Other files already in /home/ec2-user/lucas-test-dir will be left
+alone.
+
+If you're copying a lot of files though you're better off using rsync
+as it will only copy what needs to be copied.

@@ -1,0 +1,3 @@
+history -d <num>
+
+delete a history entry
