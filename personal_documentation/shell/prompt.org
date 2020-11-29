@@ -1,0 +1,8 @@
+# https://stackoverflow.com/questions/226703/how-do-i-prompt-for-yes-no-cancel-input-in-a-linux-shell-script
+echo "Modify instance $inst to have these security groups?"
+select yn in "y" "n"; do
+    case $yn in
+	y ) aws ec2 modify-instance-attribute --instance-id $inst --groups $new_sgs; break;;
+	n ) break;;
+    esac
+done

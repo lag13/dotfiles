@@ -115,6 +115,8 @@
 " the commands. Once I built these macros, all I had to do was hit @a on every
 " line that needed to be updated. Woo!
 
+" set virtualedit=all is how you can make some ascii drawings.
+
 " }}}
 
 " Basic Settings {{{

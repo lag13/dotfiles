@@ -13,4 +13,25 @@ Other files already in /home/ec2-user/lucas-test-dir will be left
 alone.
 
 If you're copying a lot of files though you're better off using rsync
-as it will only copy what needs to be copied.
+as it will only copy what needs to be copied:
+https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps
+#+BEGIN_SRC bash
+  # Copies the ENTIRE directory src_dir INTO dest_dir meaning the
+  # structure will be like dest_dir/src_dir. Also creates dest_dir if it
+  # does not exist
+  rsync --archive --progress src_dir dest_dir
+
+  # Copies the CONTENTS of src_dir in to dest_dir and also creates it if
+  # it doesn't exist
+  rsync -a --progress src_dir/ dest_dir
+
+  # Either way, unless you're copying individual files (like if you
+  # specify one file or if you use a '*') rsync will be putting it
+  # inside of a directory called dest_dir.
+
+  # Specify what ssh thing to use. Also, do NOT use --compress unless
+  # the network connection is really bad, I was once copying files
+  # between EC2 instance on AWS and with --compress it took ~50 seconds
+  # for 1GB but without --compress it only took ~15 seconds.
+  rsync --archive --progress --rsh "ssh -i ~/.ssh/infrastructure.pem" ec2-user@10.10.62.64:/home/ec2-user/lucas-test-dir .
+#+END_SRC

@@ -8,7 +8,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(clean-buffer-list-delay-general 1)
+ '(clean-buffer-list-delay-general 7)
  '(grep-find-ignored-directories
    (quote
     ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "vendor")))
@@ -27,6 +27,10 @@
  )
 (put 'narrow-to-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
+
+;; https://www.emacswiki.org/emacs/MidnightMode
+(require 'midnight)
+(midnight-delay-set 'midnight-delay "9:00am")
 
 ;; Load packages. As of Emacs 25.1 the (package-initialize) function
 ;; will actually write a call to (package-initialize) in the init file
@@ -474,24 +478,11 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; command to delete a buffer which was associated with a file that no
 ;; longer exists then that would be handy.
 
-;; TODO: Can I have emacs automatically delete buffers which haven't
-;; been used in X hours? It would also be nice to be able to manually
-;; say "delete all buffers that haven't been touched in Y hours".
-;; Because there are a lot of files I edit with the same name and so
-;; its a bit annoying to switch between them sometimes. Maybe I should
-;; just get some sort of fuzzy file matcher like helm or whatever
-;; because if that tool could do a fuzzy match on the entire file path
-;; that would be helpful (because emacs tries to be smart and give you
-;; the smallest prefix it needs to distinguish similarly named files
-;; but what I'd really like is for the prefix to include the name of
-;; the repository). Both of these things (deleting old buffers and
-;; having it so the project name was available when searching for a
-;; particular buffer) would be nice. EDIT: It looks like this can be
-;; handled by the "clean-buffer-list" function (although it only works
-;; on entire days). Apparently emacs also already will purge buffers
-;; every night at midnight which I didn't realize. I wonder if it
-;; still runs if the computer is asleep though? This bears more
-;; looking into.
+;; Rename files:
+;; C-x d (dired mode)
+;; C-x C-q
+;; Edit files
+;; C-c C-c (or save buffer)
 
 (add-hook 'js-mode-hook (lambda() (setq indent-tabs-mode nil)))
 

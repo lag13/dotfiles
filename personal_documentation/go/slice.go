@@ -42,7 +42,7 @@ func main() {
 	fmt.Println(s[:1])
 	// removing various elements
 	fmt.Println("remove element 0:", removeElement(s, 0))
-	fmt.Println(s)
+	fmt.Println(s[0:0])
 	// arr := []string{"one"}
 	// half := len(arr) / 2
 	// fmt.Println(arr[:half])

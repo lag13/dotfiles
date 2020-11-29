@@ -63,3 +63,22 @@ aws s3 mv --recursive s3://lucas-eu-testing-attachments/folder s3://lucas-eu-tes
 Size of an s3 bucket: https://serverfault.com/questions/84815/how-can-i-get-the-size-of-an-amazon-s3-bucket
 
 aws cloudwatch get-metric-statistics --namespace AWS/S3 --start-time 2020-04-21T00:00:00 --end-time 2020-04-22T00:00:00 --period 86400 --statistics Average --region us-east-1 --metric-name BucketSizeBytes --dimensions Name=BucketName,Value=grinfrastructure Name=StorageType,Value=StandardStorage
+
+### EC2
+
+Gets the system log from an instance:
+
+aws ec2 get-console-output --instance-id i-086b5e8389e4eb224 | jq --raw-output .Output
+
+
+### Route53
+
+To associate a VPC with a private hosted zone
+(https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zone-private-associate-vpcs-different-accounts.html)
+these two commands need to be run:
+
+1. AWS_PROFILE=profile-for-hosted-zone aws route53 create-vpc-association-authorization --vpc VPCRegion=us-east-1,VPCId=vpc-0123456789abcdef0 --hosted-zone-id ABCDEFGHIJKL12345678
+2. AWS_PROFILE=profile-for-vpc aws route53 associate-vpc-with-hosted-zone --vpc VPCRegion=us-east-1,VPCId=vpc-0123456789abcdef0 --hosted-zone-id ABCDEFGHIJKL12345678
+
+The result is that then the VPC can resolve the dns records in the
+hosted zone.

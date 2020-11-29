@@ -1,3 +1,8 @@
 Find files newer than date:
 
 find . -newermt "2020-04-23 19:00"
+
+Run a command on certain files. For example, giving execute permission
+to all directories:
+
+find /some/path -type d -exec chmod o+x {} \;

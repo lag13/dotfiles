@@ -42,3 +42,11 @@ jq '.Reservations[].Instances[] |
 "InstanceId": .InstanceId,
 "PrivateIpAddress": .PrivateIpAddress}'
 #+END_SRC
+
+
+Sorting the json objects and then outputting non json by using a
+formatted string:
+#+BEGIN_SRC bash
+  aws ec2 describe-subnets --filters 'Name=tag:Name,Values=*private*' | \
+      jq --raw-output '.Subnets | sort_by(.AvailabilityZone) | .[] | "  - cidr: \(.CidrBlock)\n    name: \(.AvailabilityZone)\n    type: Private\n    zone: \(.AvailabilityZone)\n    id: \(.SubnetId)"'
+#+END_SRC

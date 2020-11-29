@@ -1,0 +1,50 @@
+# TODO: Ideally I'd like to use a m5a.xlarge instance type since it's
+# cheaper and better performing but I don't 100% understand the device
+# mapping stuff. On m4 instances if you specify the device as
+# /dev/xvdj when attaching a volume, then you'd see that device name
+# when doing a "lsblk" on the instance. But on m5a instances you only
+# see these /dev/nvme[0-26]n1 devices. These links will be helpful in
+# figuring this out:
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/nvme-ebs-volumes.html
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/device_naming.html
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html
+# https://medium.com/spaceapetech/how-to-consistently-mount-ec2-nvme-disks-364289540919
+# https://askubuntu.com/questions/1182111/mounting-a-drive-is-chaotic-with-the-two-nvme-ssd-drives
+# https://stackoverflow.com/questions/49891037/retrieve-correct-amazon-attached-ebs-device-from-instance-metadata-endpoint
+# https://superuser.com/questions/1541321/how-to-reliably-get-block-device-name-for-ec2-instance-store
+# https://binx.io/blog/2019/01/26/how-to-mount-an-ebs-volume-on-nvme-based-instance-types/
+# This seems potentially the most useful:
+# https://github.com/oogali/ebs-automatic-nvme-mapping. Actually this
+# seems to be a goldmine of good information:
+# https://github.com/coreos/bugs/issues/2399 This was a pretty nice
+# article:
+# https://www.alfredocambera.com/posts/how-to-map-ebs-block-devices-on-ubuntu-20-04-ec2-instances/
+
+# From reading those, it's sounding like amazon linux OS's will create
+# a symlink for you but we don't use amazon linux so we'll have to do
+# some extra hackery. lsblk --output +SERIAL outputs the volume ID so
+# we could determine the nvme device for which we'll point a symlink
+# called /dev/xvdj pointing to it. Also, just sharing, This command
+# can also be used to instead of the lsblk one: "udevadm info
+# --query=property --name=/dev/nvme0n1". If we're being really really
+# rubust, I think there are 4 potential states where we'd want to make
+# sure that the symlink is created and pointing at the right device:
+# EC2 instance is stopped/started (I think that messes things up
+# somehow? Or maybe it's fine?), If you do a "reboot" command is that
+# different than a stop/start?, Volume is detached/reattached (might
+# get assigned to a different device name), EC2 instance is started
+# for the first time. An alternative to creating the symlink is, I
+# think, to modify the systemd mounting unit
+# (https://github.com/Guaranteed-Rate/ansible-container-service/blob/a2e2e2a5db357f14c890b14ff20ac5d21d3970c2/templates/mount.j2#L5)
+# to mount based on the uuid of the volume (lsblk --output +UUID)
+# which will never change (the only thing I can think of that this
+# wouldn't be able to do is if we manually attached a different volume
+# at the same device location it wouldn't autmoatically mount but I
+# don't really think that's something t ocare about). The only problem
+# is we would need to create this systemd mount file when terraform is
+# running instead of in the AMI which would require some re-thinking.
+# In some ways it makes me wonder if the whole
+# ansible-container-service should just be in terraform. Random, I
+# learned that, apparently, adding lines to fstab is equivalent to
+# creating this systemd file:
+# https://wiki.archlinux.org/index.php/fstab

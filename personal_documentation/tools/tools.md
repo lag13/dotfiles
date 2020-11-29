@@ -50,6 +50,11 @@ Drive. Does not currently auto sync things but with a little scripting
 it could: https://github.com/rclone/rclone/issues/249. Works on any
 platform!
 
+Does a dry run syncing the contents of the local directory `~/Drive`
+to the root of the remote named `LucasGoogleDrive`:
+
+`rclone sync --progress --dry-run ~/Drive LucasGoogleDrive:`
+
 ### croc
 
 - https://github.com/schollz/croc
