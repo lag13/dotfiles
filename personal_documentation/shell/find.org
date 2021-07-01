@@ -2,6 +2,9 @@ Find files newer than date:
 
 find . -newermt "2020-04-23 19:00"
 
+Find files older than 30 days:
+find . -mtime +30 -print
+
 Run a command on certain files. For example, giving execute permission
 to all directories:
 

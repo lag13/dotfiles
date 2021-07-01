@@ -50,3 +50,75 @@ formatted string:
   aws ec2 describe-subnets --filters 'Name=tag:Name,Values=*private*' | \
       jq --raw-output '.Subnets | sort_by(.AvailabilityZone) | .[] | "  - cidr: \(.CidrBlock)\n    name: \(.AvailabilityZone)\n    type: Private\n    zone: \(.AvailabilityZone)\n    id: \(.SubnetId)"'
 #+END_SRC
+
+
+Act on an object if it does NOT have a key (you can see how to make it
+act on an object with a key too):
+
+echo '{"hey": "there", "buddy": "buddy"}'| jq 'select(has("hey") | not)'
+
+
+Return the UserName if the object does NOT have a
+PermissionsBoundaryArn OR if the PermissionsBoundaryArn is not what we
+expect
+#+BEGIN_SRC bash
+echo '{
+  "User": {
+    "UserName": "testing"
+  }
+}
+{
+  "User": {
+    "UserName": "testing2",
+    "PermissionsBoundary": {
+      "PermissionsBoundaryArn": "ignore-me"
+    }
+  }
+}
+{
+  "User": {
+    "UserName": "testing3",
+    "PermissionsBoundary": {
+      "PermissionsBoundaryArn": "notice-me"
+    }
+  }
+}' | \
+jq --raw-output '.User | 
+if has("PermissionsBoundary") | not then .UserName
+elif .PermissionsBoundary.PermissionsBoundaryArn | test("ignore-me") | not then .UserName
+else empty end'
+#+END_SRC
+
+
+Seeing which deployments are using a given secret. All the question
+marks seem to be a way of selecting deeper keys but first checking if
+the key exists (or maybe swallowing up the error):
+
+#+BEGIN_SRC bash
+  kubectl-v1.8 --context gr18prod --namespace devops-prod get deployments --output json | \
+      jq --raw-output '.items[] |
+  select(.spec.template.spec.containers[]?.env[]?.valueFrom?.secretKeyRef?.name? == "devops-ec2") |
+  .metadata.name'
+#+END_SRC
+
+
+UPDATE PARTS OF AN OBJECT!!! Also apparently doing [] on an object
+yields that object's values. Neat.
+
+echo '{
+  "apiVersion": "v1",
+  "data": {
+    "AWS_ACCESS_KEY_ID": "QUtJQVNPTUVUSElORw==",
+    "AWS_DEFAULT_REGION": "dXMtZWFzdC0x"
+  }
+}' | jq '.data[] |= @base64d'
+
+
+Gets all the roles which are assumable by non-AWS entities and prints
+that out in a more condensed format:
+
+aws --profile root iam list-roles | \
+jq '.Roles[] |
+.AssumeRolePolicyDocument.Statement |= map(select(.Principal | has("AWS"))) |
+select(.AssumeRolePolicyDocument.Statement | length > 0) |
+{Arn, "assumableBy": [.AssumeRolePolicyDocument.Statement[].Principal.AWS] | flatten}'

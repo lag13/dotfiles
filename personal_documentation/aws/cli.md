@@ -62,7 +62,11 @@ aws s3 mv --recursive s3://lucas-eu-testing-attachments/folder s3://lucas-eu-tes
 
 Size of an s3 bucket: https://serverfault.com/questions/84815/how-can-i-get-the-size-of-an-amazon-s3-bucket
 
-aws cloudwatch get-metric-statistics --namespace AWS/S3 --start-time 2020-04-21T00:00:00 --end-time 2020-04-22T00:00:00 --period 86400 --statistics Average --region us-east-1 --metric-name BucketSizeBytes --dimensions Name=BucketName,Value=grinfrastructure Name=StorageType,Value=StandardStorage
+
+Modified slightly to print out the number of GB:
+
+aws --profile dev-rate-secops cloudwatch get-metric-statistics --namespace AWS/S3 --start-time $(date --date "2 days ago" +%FT%T) --end-time $(date --utc +%FT%T) --period 86400 --statistics Average --region us-east-1 --metric-name BucketSizeBytes --dimensions Name=BucketName,Value=grsecurity-cloudflare-logs-rate.com Name=StorageType,Value=StandardStorage | jq .Datapoints[].Average | awk '{ print $1/1024/1024/1024 }'
+
 
 ### EC2
 

@@ -15,7 +15,7 @@
  '(groovy-indent-offset 2)
  '(package-selected-packages
    (quote
-    (groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode)))
+    (paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode)))
  '(send-mail-function (quote smtpmail-send-it))
  '(smtpmail-smtp-server "smtp.gmail.com")
  '(smtpmail-smtp-service 25))
@@ -134,7 +134,12 @@
 ;; be backwards compaitble.
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((shell . t)))
+ '((shell . t)
+   (plantuml . t)))
+
+;; Purpose is so that if I evaluate some plant-uml in a code block,
+;; the resulting image will be displayed
+(add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
 
 ;; TODO: Why is it done this way instead of with a hook? I commented this out since it seemed to mess up the interactive session if I ran it.
 ;; (eval-after-load "haskell-mode"
@@ -167,9 +172,6 @@
 
 ;; Hitting return will open the link under the point.
 (setq org-return-follows-link t)
-
-;; Start emacs fullscreen.
-(toggle-frame-fullscreen)
 
 ;; I like specifying case when typing file names. To be honest a good
 ;; reason I want this is probably so typing just 'D' can complete on
@@ -313,7 +315,24 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
   (interactive)
   (insert (format-time-string "%Y-%m-%d")))
 
+;; TODO: Give a C-u modification to this function which will allow you
+;; to insert the date X days ago. My use case here is that I wanted to
+;; record a list of support tickets we had received for the past 30
+;; days and when I was writing notes on that I wanted to just be able
+;; to say, "these are a list of support tickets from "X-30" to X" but
+;; I couldn't easily say that and ended up googling it. Speaking of
+;; googling... google has so much functionality to answer little
+;; questions like this without even going to a link, they just give
+;; you the answer. Could I add a "ask google" function which pastes
+;; that first response into the buffer if they have one.
 (global-set-key (kbd "C-c d") 'insert-date)
+
+;; TODO: Another date related thing is I think it could be nice to be
+;; able to count the number of weekdays between 2 dates. Again, this
+;; is motivated because I was seeing the number of support requests
+;; that came in over the past 30 days and I was curious how many of
+;; those 30 days were actual business days. Maybe that calculation is
+;; actually really simple though and I could just do it in my head.
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Grep-Searching.html
 (setq grep-save-buffers nil)
@@ -489,3 +508,55 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 (setq groovy-mode-hook (lambda() (setq indent-tabs-mode nil)))
 
 (setq dockerfile-mode-hook (lambda() (setq indent-tabs-mode nil)))
+
+;; TODO: I feel like it would be handy if ALT-Q would NOT wrap space
+;; delimited words if those words are enclosed in quotations or
+;; something like that. Then I could more easily put code snippets and
+;; not have to worry about it getting wrapped around when pressing
+;; alt-q. Also, it would be nice to be able to do numbered lists and
+;; stuff like that all within comments and have alt-q wrap things
+;; appropriately.
+
+
+(setq plantuml-jar-path "~/Downloads/plantuml.jar")
+(setq plantuml-default-exec-mode 'jar)
+;; So plantuml diagrams in org mode get displayed instantly
+(setq org-plantuml-jar-path (expand-file-name "~/Downloads/plantuml.jar"))
+(global-auto-revert-mode t)
+
+
+;; https://github.com/flyingmachine/emacs-for-clojure/blob/master/customizations/setup-clojure.el
+(add-hook 'clojure-mode-hook 'enable-paredit-mode)
+(add-hook 'cider-repl-mode-hook 'paredit-mode)
+;; https://www.emacswiki.org/emacs/ParEdit
+(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+
+(global-set-key (kbd "C-M-<backspace>") 'backward-kill-sexp)
+
+;; TODO: In emacs C-M-t can transpose s expressions
+;; (https://www.gnu.org/software/emacs/manual/html_node/emacs/Expressions.html)
+;; and C-M-d will go down into a s expression
+;; (https://www.masteringemacs.org/article/effective-editing-movement)
+;; but those commands don't work on ubuntu because the seem to be
+;; caught by the OS first. I ended up manually going to the keyboard
+;; shortcuts section and disabling them
+
+;; TODO: In paredit mode, how to delete the current s expression you
+;; are in all the way up to the top level?
+
+;; TODO: if you highlight entire s-expressions and press delete it
+;; does not actually work. Even for comments nothing happens! I think
+;; that would be nice if paredit was smart and detected that the
+;; deletion would maintain overall structure and let you do it if so.
+
+
+;; TODO: Be able to switch a variable nameb between different casings:
+;; camel, kebab, snake
+
+(global-so-long-mode 1)
+(put 'downcase-region 'disabled nil)

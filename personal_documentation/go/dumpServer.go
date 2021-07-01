@@ -18,9 +18,10 @@ func main() {
 			fmt.Fprintf(w, "error dumping raw request: %v", err)
 			return
 		}
+		log.Printf("IP of requestor: %q", r.RemoteAddr)
 		log.Printf("### New Request ###\n%s###################", rawRequest)
 		w.Write([]byte(r.URL.Path))
 	})
 	log.Print("starting server")
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("localhost:%d", *port), nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", *port), nil))
 }

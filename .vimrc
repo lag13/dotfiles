@@ -2361,7 +2361,7 @@ function! CreateAndSaveDirectory(...)
 endfunction
 command! -complete=file -nargs=? Write call CreateAndSaveDirectory(<f-args>)
 
-command! JsonPretty %!python -m json.tool
+command! JsonPretty %!jq .
 
 " }}}
 

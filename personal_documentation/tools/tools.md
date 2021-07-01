@@ -101,3 +101,17 @@ For drawing diagrams. Kind of similar to graphviz I suppose.
 - https://github.com/gnab/remark
 
 Tool for making slideshows off of markdown.
+
+### A little service for looking up good tools for the job
+https://landscape.cncf.io/
+
+### Document things in a reproducible manner
+https://nextjournal.com/
+
+I haven't actually tried this yet but Paul Rutledge recommended it.
+
+### Hey - load testing servers
+https://github.com/rakyll/hey
+
+### AD client
+https://directory.apache.org/studio/

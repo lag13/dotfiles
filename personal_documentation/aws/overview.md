@@ -25,8 +25,51 @@ This is AWS's name for the configuration for redis/memcached.
 EC2
 ---
 
-Servers/machines to rent. I think you'd have redis and memcached run on one of
-these servers.
+Servers/machines to rent. I think you'd have redis and memcached run
+on one of these servers.
+
+A t3a.xlarge instance type is one of those "burstable" instance types
+which has the potential to charge you more if you run out of CPU
+"credits". Each instance type will earn credits over time if they are
+below their "baseline" CPU, break even at the baseline, and spend
+credits above the basline. The number of CPU credits used is:
+num-cpus*overal-cpu-utilization-percent*num-minutes. So 2 CPUS which
+overall average 25% will run at 2 minutes to spend 1 CPU credit. The
+t3 instances operate in "unlimited" mode by default which basically
+means, as far as I'm concerned, that it will behave just like a
+m5a.xlarge instance except if it stays at above it's baseline CPU
+usage percent (which happens to be 40%:
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/burstable-credits-baseline-concepts.html#earning-CPU-credits)
+then we'll be charged an extra fee of 0.05 cents per vCPU per hour:
+(https://aws.amazon.com/ec2/pricing/on-demand/). It sounds like that
+is a flat rate so if you're even averaging 41% for a 24 hour period
+then this instance (since it has 4 vCPUs) would cost an extra 0.05*4
+per hour:
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/burstable-performance-instances-unlimited-mode-concepts.html
+It's good practice to calculate a "breakeven" CPU percentage i.e. the
+point at which a t3a.xlarge will cost the same as a m5a.xlarge.
+Apparently that percentage is 52.5%. If we need to deploy 3 of these
+in every account and we assume that the t3a.xlarge will come in at or
+below it's basline, then we'd save about 11 grand per year because: (*
+(- 0.172 0.1504) 24 365 3 20) (the 20 is our 20 AWS accounts). I
+suppose that is nothing to scoff at. If I choose this instance I feel
+like we should create an alert of some kind though to make sure we
+stay below that "breakeven" line. That though would incur an extra
+0.10 per alarm which totally negates the cost. So unless we have a
+quite strong assurance that these instances will not exceed 52.5% CPU
+on average then it seems simpler to just go with the m5a.xlarge.
+
+### Status codes
+https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/ts-elb-error-message.html
+
+- 502 on a load balanced application means that the load balancer was
+  not able to get an intelligent response from the application. It
+  probably means that the application is impacted in some way.
+- 503 most likely means that there are no healthy instances behind the
+  load balancer. Could also mean that the load balancer does not have
+  capacity to handle the request.
+- 504 the load balancer closed the connection because the application
+  took longer than the timeout configured on the load balancer.
 
 S3
 --

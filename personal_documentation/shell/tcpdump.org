@@ -1,0 +1,6 @@
+https://packetpushers.net/masterclass-tcpdump-basics/
+
+sudo tcpdump -i any host 10.10.194.181
+
+sudo tcpdump -i any port 30020
+
