@@ -18,7 +18,7 @@ this is one:
 page=0
 while true
 do
-    clone_strs=$(curl --silent --user 'lag13:OAUTHTOKEN \
+    clone_strs=$(curl --silent --user 'lag13:OAUTHTOKEN' \
 		      -H "Accept: application/vnd.github.v3+json" \
 		      'https://api.github.com/orgs/Guaranteed-Rate/repos?per_page=100&page='$page | \
 		     jq --raw-output '.[].ssh_url')

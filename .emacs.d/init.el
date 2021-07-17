@@ -2,21 +2,22 @@
 ;; user-init-file which gets dynamically set when emacs starts. I
 ;; believe that when emacs starts up it does something like "find the
 ;; first non empty file in the list (~/.emacs ~/.emacs.d/init.el).
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#2d3743" "#ff4242" "#74af68" "#dbdb95" "#34cae2" "#008b8b" "#00ede1" "#e1e1e0"])
  '(clean-buffer-list-delay-general 7)
+ '(custom-enabled-themes nil)
+ '(explicit-shell-file-name "bash")
  '(grep-find-ignored-directories
-   (quote
-    ("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "vendor")))
+   '("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "vendor"))
  '(groovy-indent-offset 2)
  '(package-selected-packages
-   (quote
-    (paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode)))
- '(send-mail-function (quote smtpmail-send-it))
+   '(vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
+ '(send-mail-function 'smtpmail-send-it)
  '(smtpmail-smtp-server "smtp.gmail.com")
  '(smtpmail-smtp-service 25))
 (custom-set-faces
@@ -31,6 +32,8 @@
 ;; https://www.emacswiki.org/emacs/MidnightMode
 (require 'midnight)
 (midnight-delay-set 'midnight-delay "9:00am")
+
+(toggle-frame-maximized)
 
 ;; Load packages. As of Emacs 25.1 the (package-initialize) function
 ;; will actually write a call to (package-initialize) in the init file
@@ -76,32 +79,10 @@
 	    (setq comment-start "// ")
 	    (setq comment-end "")))
 
-;; exec-path is like "PATH" but for emacs. When emacs tries to run a
-;; binary, it will search through exec-path to find it.
-(setq exec-path (append (list "/usr/local/bin")
-			exec-path))
-
-;; Need to set GOPATH so tools like goimports will work:
-;; https://www.emacswiki.org/emacs/ExecuteExternalCommand,
-;; http://ergoemacs.org/emacs/modernization_elisp_lib_problem.html,
-;; https://stackoverflow.com/questions/14074912/how-do-i-delete-the-newline-from-a-process-output,
-;; [[info:elisp#Regexp%20Backslash][info:elisp#Regexp Backslash]].
-;; TODO: I want this to work but for some reason when this code gets
-;; run as part of startup, it cannot find the go command but after I'm
-;; inside the editor running the command works as expected so for now
-;; I'll just hardcode the GOPATH.
-
-;; (setenv "GOPATH" (replace-regexp-in-string "\n*\\'" "" (shell-command-to-string "go env GOPATH")))
-
-(setenv "GOPATH" (concat (getenv "HOME") "/go"))
-
-(setq exec-path
-      (append (list (concat (getenv "GOPATH") "/bin"))
-	      exec-path))
-
-;; Have PATH be the same as exec-path. We do this because emacs will
-;; invoke a shell to run a program and the shell needs PATH set
-;; appropriately.
+;; Have PATH be the same as exec-path. We do this because sometimes
+;; emacs will invoke a shell to run a program and the shell needs PATH
+;; set appropriately to work. Figured it would be a good idea to have
+;; exec-path be the source of truth with all of that.
 (setenv "PATH" (mapconcat 'identity exec-path path-separator))
 
 ;; Go specific hooks
@@ -214,7 +195,16 @@
     (right-char)))
 
 ;; My first stab at emacs programming. Makes buffer switching with C-x
-;; <left>/<right> a little quicker when you need to repeat it.
+;; <left>/<right> a little quicker when you need to repeat it. TODO: I
+;; still don't fully understand how the "most recent buffer" or
+;; whatever happens. Sometimes it seems to work as expected but other
+;; times it I feel like it brings me to buffers I wouldn't expect (or
+;; want) like the completion buffer. I would like to get a better
+;; handle on that. TODO: I'm starting to play around with having using
+;; terminals via emacs and I think I'd like to avoid including them in
+;; the next/previous stuff or at least allow me to cycle through them
+;; which is not happening currently. I should definitely try to better
+;; understand how the next/previous buffers get determined.
 (global-set-key (kbd "<left>") 'lag13-left-char-or-previous-buffer)
 (global-set-key (kbd "<right>") 'lag13-right-char-or-next-buffer)
 
@@ -237,18 +227,18 @@
 ;; a game in emacs and my file contents got lost because I
 ;; accidentally started the game in the buffer containing the file,
 ;; the file was auto-saved, and I could not undo since starting the
-;; game disables it.
+;; game disables it. Reading this later on 2021-07-13 I'm having a bit
+;; of a laugh. What a uniquely emacs'y kind of problem to run into
+;; lol. Then again I have this TODO as well: TODO: Had an embarassing
+;; moment pair programming where the issue was actually fixed but I
+;; forgot to save the file so we thought it was not fixed. Look into
+;; saving the file automatically. Perhaps when I tab away from emacs
+;; or something.
 (setq auto-save-default nil)
 
-;; So when buffer names are created, they show up as (concat bufname
-;; uniquify-separator dir) instead of (concat bufname "<" dir ">")
-;; which is one less character to type.
-(setq uniquify-buffer-name-style 'post-forward)
-;; (setq uniquify-separator ";")
-
 ;; I've never had any use for specific settings for particular files
-;; or directories so I figured I'd disable those features.
-;; (setq enable-local-variables t)
+;; or directories so I figured I'd disable those features. (setq
+;; enable-local-variables t)
 (setq enable-dir-local-variables nil)
 
 ;; Highlight matches immediately as you type.
@@ -384,29 +374,18 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; (https://superuser.com/questions/67170/how-do-i-complete-file-paths-in-emacs)
 ;; which might be just what I need. Just need to think of a good
 ;; keybinding to use. There is also M-/ similar to vim's C-p and C-n
-;; commands. Maybe that's all I'll need.
-
+;; commands. Maybe that's all I'll need. Read this for inspiration:
+;; https://www.emacswiki.org/emacs/Completion#completion
 (global-set-key (kbd "M-\\") 'comint-dynamic-complete-filename)
-
-;; TODO: Speed up replacing a string with another string. Like could I
-;; highlight the two strings I need instead of typing them?
 
 ;; TODO: I should make sure that artist mode only uses spaces (no
 ;; tabs) so that I can copy the document elsewhere and the formatting
 ;; will not get messed up:
 ;; https://stackoverflow.com/questions/43976371/artist-mode-drawing-characters-disorder
 
-;; TODO: Command to cycle through files in a directory, handy when
-;; there are only a couple files in the directory and you want to move
-;; around between them. At this point I wonder if I should just get a
-;; more full featured file opener thingy.
-
 ;; TODO: Can I configure C-c C-c in org mode to not try to put the
 ;; output of a program into a table? I feel like the raw output would
 ;; be more useful.
-
-;; TODO: Learn how to increase the emacs font size for presentation
-;; purposes.
 
 ;; TODO: Learn from this guy: https://github.com/cgore He seems super
 ;; sharp and seems like a super lisp geek.
@@ -420,22 +399,12 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; while in fact) but they are useful if any sort of pair programming
 ;; is being done because then the other person can be like "I think we
 ;; should edit line XYZ" https://www.emacswiki.org/emacs/LineNumbers.
-;; TODO: Figure out how to install the latest emacs because linum-mode
-;; really is slow (on my work.org buffer the cursor has trouble
-;; moving)
-(if (version<= "26.0.50" emacs-version)
-    (global-display-line-numbers-mode)
-  (global-linum-mode 1))
+(global-display-line-numbers-mode)
 
-;; TODO: Sometimes I want to "find" a specific file like how the find
-;; command works. How could I do that with emacs? Should I just bite
-;; the bullet and install some sort of fuzzy file finder?
-
-;; TODO: Had an embarassing moment pair programming where the issue
-;; was actually fixed but I forgot to save the file so we thought it
-;; was not fixed. Look into saving the file automatically. Perhaps
-;; when I tab away from emacs or something.
-
+;; TODO: Sometimes I want to "find" a specific file like how the
+;; "find" command works. How could I do that with emacs? Should I just
+;; bite the bullet and install some sort of fuzzy file finder? It
+;; might be useful.
 
 ;; https://www.emacswiki.org/emacs/UnfillParagraph
 (defun unfill-paragraph (&optional region)
@@ -449,9 +418,9 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 
 ;; Yesterday (2019-03-14 i.e. pi day) I learned about tau
 ;; (https://tauday.com) and now I'm a tau convert. I can't say I've
-;; EVER needed to use pi before but I just wanted to write this down.
+;; EVER needed to use pi before within emacs but I just wanted to
+;; write this down.
 (setq tau (* 2 pi))
-
 ;; And of course: https://xkcd.com/1292/
 (setq pau (* 1.5 pi))
 
@@ -482,7 +451,6 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; this. Documenting things in org mode is just too much fun. Or
 ;; perhaps I'll just have to pick another language which is easier to
 ;; work with? Not sure.
-
 
 ;; TODO: projectile, helm, magit, tramp, eshell,
 ;; https://github.com/wasamasa/dotemacs,
@@ -517,13 +485,11 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; stuff like that all within comments and have alt-q wrap things
 ;; appropriately.
 
-
 (setq plantuml-jar-path "~/Downloads/plantuml.jar")
 (setq plantuml-default-exec-mode 'jar)
 ;; So plantuml diagrams in org mode get displayed instantly
 (setq org-plantuml-jar-path (expand-file-name "~/Downloads/plantuml.jar"))
 (global-auto-revert-mode t)
-
 
 ;; https://github.com/flyingmachine/emacs-for-clojure/blob/master/customizations/setup-clojure.el
 (add-hook 'clojure-mode-hook 'enable-paredit-mode)
@@ -538,25 +504,211 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 
 (global-set-key (kbd "C-M-<backspace>") 'backward-kill-sexp)
 
-;; TODO: In emacs C-M-t can transpose s expressions
-;; (https://www.gnu.org/software/emacs/manual/html_node/emacs/Expressions.html)
-;; and C-M-d will go down into a s expression
-;; (https://www.masteringemacs.org/article/effective-editing-movement)
-;; but those commands don't work on ubuntu because the seem to be
-;; caught by the OS first. I ended up manually going to the keyboard
-;; shortcuts section and disabling them
-
 ;; TODO: In paredit mode, how to delete the current s expression you
 ;; are in all the way up to the top level?
 
-;; TODO: if you highlight entire s-expressions and press delete it
-;; does not actually work. Even for comments nothing happens! I think
-;; that would be nice if paredit was smart and detected that the
-;; deletion would maintain overall structure and let you do it if so.
+;; TODO: In paredit mode, if you highlight entire s-expressions and
+;; press delete it does not actually work. Even for comments nothing
+;; happens! I think that would be nice if paredit was smart and
+;; detected that the deletion would maintain overall structure and let
+;; you do it if so.
 
-
-;; TODO: Be able to switch a variable nameb between different casings:
-;; camel, kebab, snake
+;; TODO: Be able to switch a variable name between different casings
+;; seems like it would be fun: camel, kebab, snake
 
 (global-so-long-mode 1)
 (put 'downcase-region 'disabled nil)
+
+;; TODO: Could we use magit to review PRs? I'm a lot faster when
+;; inside my editor instead of looking in the browser. Watch this
+;; video to get a general tour of the funcationality:
+;; https://www.youtube.com/watch?v=_zfvQkJsYwI&t=44s
+
+;; TODO: Get some documentation autocompletion going for terraform
+;; (and whatever else I can think of too for that matter). I feel like
+;; I've moved beyond the "I should just try to keep it all in my head"
+;; phase. Computers are here to make things easier and I should lean
+;; on them more. I also feel like constantly looking up things in the
+;; browser is inefficient.
+
+;; TODO: I really like the emacs help manual thingy (C-h i). I want to
+;; learn to use it better AND figure out if I can add manuals for
+;; anything??
+
+(defun lag13-term-toggle-line-char-mode ()
+  "Toggles between line and char mode in a terminal emulator so I
+only have to remember one command instead of two:
+https://www.masteringemacs.org/article/running-shells-in-emacs-overview"
+  (interactive)
+  (if (term-in-char-mode)
+      (term-line-mode)
+    (term-char-mode)))
+
+(setq
+ term-mode-hook
+ (lambda ()
+   (define-key term-mode-map (kbd "C-.") 'lag13-term-toggle-line-char-mode)
+   (define-key term-raw-map (kbd "C-.") 'lag13-term-toggle-line-char-mode)
+   ;; TODO: I need to figure out how to set this prompt appropriately.
+   ;; Right now it seems to match on blank lines too. No idea why.
+   (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
+   ;; So I can press C-c once in a terminal as god intended. The way
+   ;; this is working is that, as of emacs version 27.2, term.el
+   ;; explicitly calls (term-set-escape-char (or term-escape-char
+   ;; ?\C-c)) when that file gets evaluated so, since this hook
+   ;; executes before term.el gets evaluated, the escape char will NOT
+   ;; be bound to C-c and so C-c will be sent directly to the
+   ;; terminal.
+   (term-set-escape-char ?\C-x)
+   ;; Displaying line numbers appears to mess up the terminal
+   ;; emulation at least as of emacs version 27.2. Bash actually seems
+   ;; to work mostly fine (there are a couple oddities though) but zsh
+   ;; in particular is completely unusable and I'll see errors like
+   ;; 'error in process filter: Args out of range: " ", 0, -43'
+   (display-line-numbers-mode 0)))
+
+(defun lag13/replace-last-sexp ()
+  "Sometimes if I'm writing docs or whatever I just want to
+insert the value of an emacs expression and then get rid of the
+expression."
+  (interactive)
+  (let ((value (eval (elisp--preceding-sexp))))
+    (kill-sexp -1)
+    (insert (format "%S" value))))
+
+(global-set-key (kbd "C-x M-e") 'lag13/replace-last-sexp)
+
+;; TODO: Is there the equivalent of the "gf" command in emacs? I'm
+;; sure there must be. I feel like it would be nice to have that.
+
+;; TODO: For mode hooks the emacs info documentation reccomends that
+;; you modify hook variables by using add-hook but I feel like that's
+;; bad because then things are no longer idempotent? Or is there a
+;; cool way in emacs to first wipe out any customizations and THEN
+;; reload the init file?
+
+;; TODO: No biggie at all. I notice that when I play some of my
+;; terminal games whilst using the emacs terminal emulator, the cursor
+;; will show up even if on a normal terminal emulator this doesn't
+;; happen. I'm curious if anything can be done to remedy it.
+
+(defun lag13/get-buffer-major-mode (b)
+  (with-current-buffer b major-mode))
+
+(defun lag13/terminal-bufferp (b)
+  (eq 'term-mode (lag13/get-buffer-major-mode b)))
+
+(defun lag13/get-most-recent-terminal-buffer (buffers)
+  (car (seq-filter 'lag13/terminal-bufferp buffers)))
+
+(defun lag13/switch-to-most-recent-terminal-buffer ()
+  (interactive)
+  (let ((term-buffer (lag13/get-most-recent-terminal-buffer (buffer-list))))
+    (if term-buffer
+	(switch-to-buffer term-buffer)
+      (ansi-term explicit-shell-file-name))))
+
+;; TODO: Pick another key, this one seems to get used by some things
+;; like python and clojure. In general it kind of feels like bindings
+;; starting with C-c tend to end up in language specific modes.
+(global-set-key (kbd "C-c C-t") 'lag13/switch-to-most-recent-terminal-buffer)
+
+;; TODO: I learned about this other terminal emulator which claims to
+;; have better performance than the built in emacs ones:
+;; https://www.reddit.com/r/emacs/comments/jxt39s/why_does_emacs_dont_have_a_good_terminal_mode/
+;; https://github.com/akermu/emacs-libvterm. Might want to try it out
+;; sometime if I'm really hurting for better terminal performance.
+
+;; TODO: When running "saml2aws login" and it prompted me to choose
+;; the role I don't think it let me use the arrow keys (but I was able
+;; to use C-n/C-p) but when I did that it would re-print the choices
+;; which seems wrong. Can this be fixed? Should I try that "vterm"
+;; terminal emulator? I've also been having some trouble I guess with
+;; terraform because when I do a "terraform apply" sometimes I'll
+;; scroll up via keyboard commands but that might inadvertantly add
+;; some stuff to the buffer and then saying yes fails or something
+;; like that. Not sure... either way I just feel like I'm having
+;; trouble using the terminal emulator. Nothing major I suppose but
+;; just little things. Yeah and I notice that when I'm looking at a
+;; man page or output in "less" I can't properly delete things. Like
+;; if I do a search with / and then try to delete the characters just
+;; get displayed. I guess you can get around with going to line mode
+;; but that seems kind of janky tbh. Also, after pasting something and
+;; switching back to char mode, it seems that it just hints enter on
+;; the command which I do not want.
+;;
+;; ? Please choose the role  [Use arrows to move, type to filter]
+;;   Account: rate-iam (592986690814) / Okta-DeliveryLeads
+;;   Account: rate-iam (592986690814) / Okta-Developers
+;; > Account: rate-iam (592986690814) / Okta-GR-DataPlatformUsers
+;;   Account: rate-iam (592986690814) / Okta-GlobalAdmins
+;;   Account: rate-iam (592986690814) / Okta-NetworkAdmins
+;;   Account: rate-iam (592986690814) / Okta-SecurityAdmins
+;;   Account: rate-iam (592986690814) / Okta-SystemsTeam
+;; ? Please choose the role  [Use arrows to move, type to filter]
+;;   Account: rate-iam (592986690814) / Okta-DeliveryLeads
+;;   Account: rate-iam (592986690814) / Okta-Developers
+;;   Account: rate-iam (592986690814) / Okta-GR-DataPlatformUsers
+;; > Account: rate-iam (592986690814) / Okta-GlobalAdmins
+;;   Account: rate-iam (592986690814) / Okta-NetworkAdmins
+;;   Account: rate-iam (592986690814) / Okta-SecurityAdmins
+;;   Account: rate-iam (592986690814) / Okta-SystemsTeam
+
+;; TODO: I noticed that in the ansi-term emulator, the history seems
+;; to be different if you're in line mode vs char mode (i.e. if I do
+;; M-p in line mode different things show up when compared to doing
+;; C-p in char mode). Why is this? What is going on under the hood?
+
+;; Right now (2021-07-13) I want to experiment with having a buffer
+;; list that gets opened with the point focused on it and when I
+;; select a file to go to, the buffer list is NOT set itself as the
+;; last buffer I went to (i.e. I can do C-x b <enter> after selecting
+;; a buffer and know I'm going to the buffer before I opened the
+;; buffer list). bs-show seems to provide that functionality so I'm
+;; using it. My current use case for having a buffer list is when I'm
+;; in a situation where I remember I want to go to a file in a certain
+;; directory but I can't for the life of me remember the file. OR I
+;; want to go to any old file in a particular directory/project so I
+;; can do something there like run magit-status. TODO: Maybe more
+;; project awareness would also be a way to solve this so perhaps I
+;; should look into something like projectile.
+(global-set-key (kbd "C-x C-b") 'bs-show)
+
+;; TODO: I feel like when clojure is activated C-c C-z (which switches
+;; from the buffer to the repl) is not always accurate. Like I'll be
+;; in a repl in one project and it C-c C-z will take me to a file in a
+;; different project kind of thing. Keep an eye on this.
+
+;; TODO: I wish I understood the emacs mark better so I could better
+;; jump around files. Might be interesting to read up on that.
+
+;; TODO: Sometimes I feel like I copy something to multiple spots in
+;; emacs but have to delete something too but it's frustrating because
+;; whenever I delete the thing I overwrite what I copied. Is there a
+;; way to improve this somehow? I know M-y can take a negative
+;; argument to go backwards but is there a faster way? Or just better
+;; management of the kill ring in general? Or if we had registers to
+;; copy to like in vim that could solve this. Or if I knew of better
+;; ways to delete lots of text in emacs without actually copying it
+;; then that would work too.
+
+;; TODO: I think I'm really starting to miss some of the vim text
+;; objects and movements and things. Like commenting the current
+;; paragraph or moving to an indent level the same as your own. I want
+;; to think about learning if some of those things exist or finding a
+;; way to get them back somehow whether through evil mode or other
+;; ways.
+
+;; TODO: Have C-y in term-mode actually paste text. Also, I notice
+;; some weirdness when I switch to line mode to paste text in that I
+;; feel like if I switch back to char mode, the pasted text is not
+;; able to be interacted with which I think makes sense because that
+;; pasted text was never sent to the subprocess. Hmmmm.
+
+;; TODO: I would like to be able to scroll up the window in emacs just
+;; a little. How can I do this? Vim had the C-e and C-y commands.
+
+;; TODO: Sometimes I'll do C-x b and then start typing right away but
+;; then realize that the alternate buffer is the one I want to go to.
+;; Would be neat if I could just hit something like Shift-Enter and it
+;; would forget about what I typed and just bring me there.

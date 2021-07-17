@@ -6,7 +6,7 @@ https://developer.atlassian.com/blog/2016/02/best-way-to-store-dotfiles-git-bare
 Run these commands to set up a new machine. Note the `dotgit` command is an
 alias in `.bash_profile`:
 
-```
+```bash
 git clone --bare https://github.com/lag13/dotfiles.git $HOME/.dotgit
 alias dotgit='/usr/bin/git --git-dir=$HOME/.dotgit/ --work-tree=$HOME'
 dotgit config --local status.showUntrackedFiles no
@@ -14,9 +14,10 @@ dotgit checkout
 
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
-brew cask install emacs
+brew install --cask emacs
 
-brew install vim
+# If I use a standalone terminal application (as opposed to doing something like running a terminal emulator via emacs) I prefer using iterm2 on mac instead of the native terminal app because I had one experience surrounding the history feature of bash where what I was observing was NOT lining up with what the bash source code said should be happening (I was expecting that when I ran more than HISTSIZE commands, it would overwrite the ~/.bash_history file INSTEAD OF appending to it: https://unix.stackexchange.com/questions/226214/why-does-history-not-overwrite-but-append-when-histappend-is-set-to-off-in-bash/428208#428208). Turns out, the terminal mac app messes with the shell a bit (https://apple.stackexchange.com/a/219825) and that just made me not trust it because maybe it messes with other things and I'd prefer it if my tools don't mess with the behavior of other tools unless I explicitly say so.
+brew install --cask iterm2
 
 brew install go
 
@@ -24,22 +25,27 @@ go get golang.org/x/tools/cmd/goimports
 
 go get github.com/rogpeppe/godef
 
-brew cask install docker
+brew install --cask docker
 
-brew install terraform
+brew install warrensbox/tap/tfswitch
 
 brew install kubernetes-cli
 
 brew install awscli
 
-# When I tried to install clojure it failed and instructed me to install java first
-brew cask install java
+brew install rclone
 
-brew install clojure
+# When I tried to install clojure it failed and instructed me to install java first
+brew install openjdk@8
 
 brew install leiningen
 
 brew install plantuml
+
+brew install jq
+
+# For emacs to do spellcheck: https://emacs.stackexchange.com/questions/19175/where-is-ispell
+brew install ispell
 
 Ubuntu:
 

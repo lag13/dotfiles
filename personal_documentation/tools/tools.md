@@ -115,3 +115,9 @@ https://github.com/rakyll/hey
 
 ### AD client
 https://directory.apache.org/studio/
+
+### Gource
+
+Not useful per se but it's hilarous. You can visualize git commit's
+getting made to repos. Little avatars dash around beaming commits and
+files into existence.
