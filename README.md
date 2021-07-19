@@ -19,6 +19,9 @@ brew install --cask emacs
 # If I use a standalone terminal application (as opposed to doing something like running a terminal emulator via emacs) I prefer using iterm2 on mac instead of the native terminal app because I had one experience surrounding the history feature of bash where what I was observing was NOT lining up with what the bash source code said should be happening (I was expecting that when I ran more than HISTSIZE commands, it would overwrite the ~/.bash_history file INSTEAD OF appending to it: https://unix.stackexchange.com/questions/226214/why-does-history-not-overwrite-but-append-when-histappend-is-set-to-off-in-bash/428208#428208). Turns out, the terminal mac app messes with the shell a bit (https://apple.stackexchange.com/a/219825) and that just made me not trust it because maybe it messes with other things and I'd prefer it if my tools don't mess with the behavior of other tools unless I explicitly say so.
 brew install --cask iterm2
 
+# For compiling vterm: https://github.com/akermu/emacs-libvterm#installation
+brew install cmake
+
 brew install go
 
 go get golang.org/x/tools/cmd/goimports

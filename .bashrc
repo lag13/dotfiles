@@ -65,6 +65,13 @@ alias dotgit='git --git-dir=$HOME/.dotgit/ --work-tree=$HOME'
 export GOPATH=$HOME
 export PATH="$GOPATH/bin:$PATH"
 
+# https://github.com/akermu/emacs-libvterm#shell-side-configuration-files
+if [[ "$INSIDE_EMACS" = 'vterm' ]] \
+    && [[ -n ${EMACS_VTERM_PATH} ]] \
+    && [[ -f ${EMACS_VTERM_PATH}/etc/emacs-vterm-bash.sh ]]; then
+	source ${EMACS_VTERM_PATH}/etc/emacs-vterm-bash.sh
+fi
+
 work_stuff="$HOME/work-customizations"
 if [ -f "$work_stuff" ]
 then
