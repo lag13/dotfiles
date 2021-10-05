@@ -23,7 +23,8 @@ function dynamic_prompt() {
 	echo -n " $(tput setaf 1)[exit code: $curr_exit]$(tput sgr0)"
     fi
 }
-export PS1='\u \w$(dynamic_prompt)
+export PS1='
+\u \w$(dynamic_prompt)
 $ '
 
 # ignorespace makes it so commands leading with a space do not get
@@ -65,6 +66,12 @@ alias dotgit='git --git-dir=$HOME/.dotgit/ --work-tree=$HOME'
 export GOPATH=$HOME
 export PATH="$GOPATH/bin:$PATH"
 
+function export_vars_from_file () {
+    set -o allexport
+    source $1
+    set +o allexport
+}
+
 # https://github.com/akermu/emacs-libvterm#shell-side-configuration-files
 if [[ "$INSIDE_EMACS" = 'vterm' ]] \
     && [[ -n ${EMACS_VTERM_PATH} ]] \
@@ -72,8 +79,46 @@ if [[ "$INSIDE_EMACS" = 'vterm' ]] \
 	source ${EMACS_VTERM_PATH}/etc/emacs-vterm-bash.sh
 fi
 
+# TODO: My .bash_history got wiped out recently (today is 2021-07-21)
+# and I think it's because I had a terminal open from when I was
+# playing around with the history and it must have had a really small
+# HISTFILESIZE. Could I write something to backup the history on
+# exiting bash to help avoid little accidents like that? We could keep
+# like the latest 3 history's or something.
+
+
+# TODO: Does 'cd' keep a history of every directory it has cd'd to and
+# can I navigate it? It would be nice if it kept this history and you
+# could just traverse it at will
+
+# TODO: In bash theres C-w to delete the previous text up to the next
+# space character, is there something similar but deleting forwards?
+# Same with moving backwards and forwards to the next space for that
+# matter.
+
 work_stuff="$HOME/work-customizations"
 if [ -f "$work_stuff" ]
 then
     source "$HOME/work-customizations"
 fi
+
+# cd to the root of the company code
+alias cdc='cd $COMPANY_CODE_PATH'
+function getPathToRoot() {
+    if [ -d "${1}/.git" ]
+    then
+	echo "$1"
+	return
+    fi
+    getPathToRoot "../$1"
+}
+# cd to root of a repo
+alias cdr='cd $(getPathToRoot ".")'
+# cd to my directory of personal projects
+alias cdp='cd ~/src/github.com/lag13'
+
+# TODO: configure shells to write to append history regularly.
+# Rationale is that I could work for days at a time on something (so I
+# don'tclose my shells) and then I start up a new shell and it won't
+# have the history from the other shells because they never exited. I
+# suppose I could also just exit the shells regularly.

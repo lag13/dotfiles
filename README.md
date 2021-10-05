@@ -30,6 +30,8 @@ go get github.com/rogpeppe/godef
 
 brew install --cask docker
 
+brew install graphviz
+
 brew install warrensbox/tap/tfswitch
 
 brew install kubernetes-cli
@@ -49,6 +51,8 @@ brew install jq
 
 # For emacs to do spellcheck: https://emacs.stackexchange.com/questions/19175/where-is-ispell
 brew install ispell
+
+brew install ripgrep
 
 Ubuntu:
 
