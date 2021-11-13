@@ -21,6 +21,8 @@
  '(custom-safe-themes
    '("830877f4aab227556548dc0a28bf395d0abe0e3a0ab95455731c9ea5ab5fe4e1" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "2809bcb77ad21312897b541134981282dc455ccd7c14d74cc333b6e549b824f3" "c433c87bd4b64b8ba9890e8ed64597ea0f8eb0396f4c9a9e01bd20a04d15d358" "0fffa9669425ff140ff2ae8568c7719705ef33b7a927a0ba7c5e2ffcfac09b75" "835868dcd17131ba8b9619d14c67c127aa18b90a82438c8613586331129dda63" default))
  '(delete-selection-mode t)
+ '(eval-expression-print-length 100)
+ '(eval-expression-print-level 10)
  '(explicit-shell-file-name "bash")
  '(exwm-floating-border-color "#191b20")
  '(grep-find-ignored-directories
@@ -37,7 +39,7 @@
  '(mouse-wheel-scroll-amount '(1 ((shift) . 1) ((meta)) ((control) . text-scale)))
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
-   '(go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
+   '(web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
  '(pdf-view-midnight-colors (cons "#bbc2cf" "#282c34"))
  '(recentf-mode t)
  '(rustic-ansi-faces
@@ -574,24 +576,24 @@ expression."
 ;; history that if you type C-x C-f and then M-n, it will, by default,
 ;; try to find the file at the point.
 
-;; The vterm-mode-hook gets modified by the vterm-toggle package to
-;; call a function which modifies a list of vterm buffers internal to
-;; vterm but it only gets modified once the package gets used (i.e. if
-;; I tried running "M-x vterm" without ever using vterm-toggle then
-;; vterm-toggle would not see the vterm buffer for the purpose of the
-;; vterm-toggle-forward/backwards commands. Pretty minor edge case but
-;; just thought I'd get it out of the way. TODO: Would it make sense
-;; to add the hook adding bit to the autoloads portion of the code so
-;; this require is not necessary?
-(require 'vterm-toggle)
+;; ;; The vterm-mode-hook gets modified by the vterm-toggle package to
+;; ;; call a function which modifies a list of vterm buffers internal to
+;; ;; vterm but it only gets modified once the package gets used (i.e. if
+;; ;; I tried running "M-x vterm" without ever using vterm-toggle then
+;; ;; vterm-toggle would not see the vterm buffer for the purpose of the
+;; ;; vterm-toggle-forward/backwards commands. Pretty minor edge case but
+;; ;; just thought I'd get it out of the way. TODO: Would it make sense
+;; ;; to add the hook adding bit to the autoloads portion of the code so
+;; ;; this require is not necessary?
+;; (require 'vterm-toggle)
 
-(add-hook
- 'vterm-mode-hook
- (lambda ()
-   (define-key vterm-mode-map [(control return)] #'vterm-toggle-insert-cd)
-   (define-key vterm-mode-map (kbd "s-n") 'vterm-toggle-forward)
-   (define-key vterm-mode-map (kbd "s-p") 'vterm-toggle-backward)
-   (display-line-numbers-mode 0)))
+;; (add-hook
+;;  'vterm-mode-hook
+;;  (lambda ()
+;;    (define-key vterm-mode-map [(control return)] #'vterm-toggle-insert-cd)
+;;    (define-key vterm-mode-map (kbd "s-n") 'vterm-toggle-forward)
+;;    (define-key vterm-mode-map (kbd "s-p") 'vterm-toggle-backward)
+;;    (display-line-numbers-mode 0)))
 
 ;; Right now (2021-07-13) I want to experiment with having a buffer
 ;; list that: only includes file buffers, is sorted by buffers most
@@ -619,8 +621,8 @@ expression."
 ;; doing something like that.
 (global-set-key (kbd "C-x C-b") 'bs-show)
 
-(global-set-key (kbd "C-x C-p") 'vterm-toggle)
-(global-set-key (kbd "C-x p") 'vterm-toggle-cd)
+;; (global-set-key (kbd "C-x C-p") 'vterm-toggle)
+;; (global-set-key (kbd "C-x p") 'vterm-toggle-cd)
 
 ;; TODO: I feel like when clojure is activated C-c C-z (which switches
 ;; from the buffer to the repl) is not always accurate. Like I'll be
@@ -1295,3 +1297,9 @@ of automatically."
 ;; https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ&ab_channel=SystemCrafters
 ;; he got rid of the visual bell and replaced it with a little flash.
 ;; Think about doing this.
+
+;; TODO: Make expanding a macro a keybinding, seems like a useful
+;; thing to have at your fingertips within emacs.
+
+;; TODO: Make a something which will tell you if today is a bones or
+;; no bones day.
