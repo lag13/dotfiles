@@ -3,9 +3,8 @@
 ;; I figure I might be in emacs'land for quite a while so I want to
 ;; learn some elisp programming but I don't want to clutter up my
 ;; init.el file so I'll just put this stuff here. Part of this too
-;; will probably be me just messing around with programming concepts
-;; and doing what I do best: waxing poetic on what I think about
-;; various programming concepts.
+;; will probably be me just messing around and doing what I do best:
+;; waxing poetic on what I think about various programming concepts.
 
 ;; TODO: I don't know how much I should be adding these "require"
 ;; statements. I guess just as necessary? It's also got me wondering
@@ -19,6 +18,8 @@
 ;; action at a distance stuff. Or maybe some of them were installed by
 ;; default as part of emacs?
 (require 'benchmark)
+(require 'thunk)
+(require 'dom)
 
 (defun equal? (o1 o2)
   "Return t if two objects have a similar structure and contents.
@@ -48,11 +49,12 @@ work for hash tables but I want it to."
 (defun fixed-point (f x &optional n)
   "Finds the fixed point of F given initial input X. Optionally
 provide a max number N of iterations before the computed value is
-returned."
+returned.
+
+Related links:
+- https://github.com/RutledgePaulV/missing/blob/fb1b113ada2be09cf04f42022731ef317287adf6/src/missing/core.clj#L326-L341
+- https://gigamonkeys.com/book/loop-for-black-belts.html"
   (if (null n)
-      ;; Thank you
-      ;; https://gigamonkeys.com/book/loop-for-black-belts.html for
-      ;; the common lisp loop tutorial!
       (cl-loop for prev = x then next
 	       for next = (funcall f prev)
 	       until (equal? prev next)
@@ -63,6 +65,106 @@ returned."
 	     until (equal? prev next)
 	     finally return prev)))
 
+;; TODO: Writing this multi-arity defun macro was fun. Do some other
+;; macros to like maybe a defun-curried macro for example.
+
+(defun defun-multi-arity-helper-fn (name docstring multi-arity-forms)
+  (let ((defun-arg-name (gensym)))
+    (cl-flet ((multi-arity-form-to-cl-case-clause
+	       ;; Apparently the cl-* forms in elisp allow for
+	       ;; destructring of arguments like in clojure, neat:
+	       ;; https://www.gnu.org/software/emacs/manual/html_node/cl/Argument-Lists.html
+	       ;; It almost makes me just want to use cl-defun all the
+	       ;; time instead of defun... hmmm. Ah well! I'll keep it
+	       ;; in mind though.
+	       ((arglist &rest body))
+	       `(,(length arglist)
+		 (let ,(-map-indexed (lambda (index arglist-param)
+				       (list arglist-param `(nth ,index ,defun-arg-name)))
+				     arglist)
+		   ,@body))))
+      `(defun ,name (&rest ,defun-arg-name)
+	 ,docstring
+	 (cl-case (length ,defun-arg-name)
+	   ,@(-map #'multi-arity-form-to-cl-case-clause multi-arity-forms)
+	   (otherwise (error "multi arity function called with a number of arguments for which this function has no definition.")))))))
+
+(defmacro defun-multi-arity (name &optional docstring &rest fn-forms)
+  "Creates a function which can accept different numbers of
+parameters (i.e. \"arities\") when invoked. It's basically
+overloading a function based on the number of arguments. Under
+the hood, it dispatches to a different code path depending on how
+many arguments were passed into the multi-arity function.
+
+The original motivation for this (as are many other things in my
+travels) was clojure:
+https://clojure.org/guides/learn/functions#_multi_arity_functions
+More specifically, I wanted to make a \"lazy-range\" function and
+copy it's implementation from clojure's \"range\" function:
+https://github.com/clojure/clojure/blob/38bafca9e76cd6625d8dce5fb6d16b87845c8b9d/src/clj/clojure/core.clj#L3019-L3039
+but implementing that with a plain ol' defun plus &optional
+parameters felt a bit messy because you have to manually check
+how many arguments are passed and work accordingly AND, in this
+case, the first parameter has a different meaning when the
+function is invoked with more parameters and that made it feel
+hard to name the variable properly. For example, when you
+call (range 10), the first parameter \"10\" signifies the LAST
+number exclusive in the generated sequence but when invoking the
+function like (range 10 100), the number \"10\" now means the
+FIRST number inclusive in the range. So I wanted to name the
+variable something like \"max-or-min\" and that felt weird. Being
+able to define my own multi-arity functions fixes these problems.
+
+I also feel like being able to define a multi-arity function is a
+potentially cleaner way to define a recursive function which ends
+up having to accumulate a result in one of it's parameters. Such
+functions often have a clean interface which do NOT expose the
+accumulation parameter and then, inside, they define a function
+which has that extra accumulation parameter and just call out to
+that function."
+  (unless (stringp docstring)
+    (setq fn-forms (cons docstring fn-forms))
+    (setq docstring nil))
+  (defun-multi-arity-helper-fn name docstring fn-forms))
+
+(defun bad-defun-curried-helper-fn (name arglist docstring body)
+  `(defun ,name (,(car arglist)) ,docstring
+	  ,@(-reduce-r-from (lambda (arg acc)
+			     (list (append `(lambda (,arg)) acc)))
+			    body
+			    (cdr arglist))))
+
+(defmacro bad-defun-curried (name arglist &optional docstring &rest body)
+  "Used to define a function that is curried. Just made this for
+fun, in practice I don't think there's much use for it since
+invoking the curried function is so atrocious syntactically. For
+example:
+
+Given this function:
+
+(defun-curried lucas-test (x y z)
+  (+ x y z))
+
+To finally get a value, we must do:
+
+(funcall (funcall (lucas-test 1) 2) 3)
+
+*shudder*. I get the feeling there is a better way to do define
+this curried macro. Like maybe if a function takes 4 arguments we
+return a lambda with 4 optional arguments and if 0 get passed we
+return the same lambda, if 1 gets passed then we return a lambda
+of 3 arguments, if 2 get passed we return a lambda of 2
+arguments, etc... Then you could pass in as many values as you'd
+like without having to have all these funcall invocations."
+  (unless (stringp docstring)
+    (setq body (cons docstring body))
+    (setq docstring nil))
+  (bad-defun-curried-helper-fn name arglist docstring body))
+
+(bad-defun-curried lucas-test (x y z)
+  (+ x y z))
+
+(funcall (funcall (lucas-test 1) 2) 3)
 
 ;; TODO: Returning buffers with data feels kind of weird but also it
 ;; seems like a pattern with emacs so I guess it's okay. One thing I
@@ -114,7 +216,7 @@ wanted to make sure the temporary buffer gets deleted (I assume
 this is a good thing to do?) and I didn't want to write it all
 out every time. I just want to be more declarative with my code!"
   (let* ((buffer (url-retrieve-body-synchronously url))
-	 (dom 
+	 (dom
 	  (with-current-buffer
 	      buffer
 	    ;; TODO: I cannot for the life of me get the "base url"
@@ -140,7 +242,7 @@ Related links:
     (cond
      ;; Sometimes anchor tags don't have an href attribute hence nil
      ;; could get passed to this function. We could check for nil
-     ;; before passing it but it's to accept such a value.
+     ;; before passing it but it's convenient to accept such a value.
      ((null href)
       nil)
      ((string-match "^/" href)
@@ -157,7 +259,7 @@ Related links:
 	nil
 	nil
 	(url-host base-urlobj)
-	nil
+	(url-port base-urlobj)
 	(car (url-path-and-query href-urlobj))
 	nil
 	nil
@@ -169,7 +271,7 @@ Related links:
 	nil
 	nil
 	(url-host base-urlobj)
-	nil
+	(url-port base-urlobj)
 	(concat (car (url-path-and-query base-urlobj))
 		"/"
 		(car (url-path-and-query href-urlobj)))
@@ -183,7 +285,7 @@ Related links:
 	nil
 	nil
 	(url-host href-urlobj)
-	nil
+	(url-port base-urlobj)
 	(car (url-path-and-query href-urlobj))
 	nil
 	nil
@@ -291,6 +393,118 @@ later time."
       (fixed-point #'crawl-site-one-level (ht (url-or-hash-table :crawl-me)) depth-limit)
     (fixed-point #'crawl-site-one-level url-or-hash-table depth-limit)))
 
+(defun reload-webserver (handlers port)
+  "A utility function to reload a webserver. Useful for local
+testing."
+  (ws-stop-all)
+  (ws-start handlers port))
+
+(cl-defmacro with-webserver ((server handlers port) &rest body)
+  "Starts a web server (binding it to the variable SERVER) with
+HANDLERS and PORT, executes BODY, then stops the web server.
+Original motivation for writing this was I wanted to unit test a
+function which interacts with a web server and wanted to make
+sure the web server got spun down after the test ran.
+
+Note that `cl-defmacro' is used over `defmacro' for it's
+destructuring capabilities. The structure of this macro is
+similar to that of CL's with-open-file:
+http://clhs.lisp.se/Body/m_w_open.htm"
+  (declare (indent 1) (debug t))
+  `(let (,server)
+     (unwind-protect
+	 (progn
+	   (setq ,server (ws-start ,handlers ,port))
+	   ,@body)
+       (when ,server
+	 (ws-stop ,server)))))
+
+(defun array-last-item (arr)
+  "Returns the last item of an array. Pretty trivial but I just
+wanted it so I can be little more declaritive with my code.
+Original motiviation for this function's creation was to find out
+the port of a network process created by emacs which appears to
+be in the last element of the array generated by the function:
+
+(process-contact process :local)"
+  (aref arr (1- (length arr))))
+
+(defun network-process-local-port (network-server-process)
+  "Returns the local port of a network process created by
+`make-network-process'. Created because I wanted to spin up a web
+server during a unit test and have the port be randomly assigned
+which means I have to read the port back out during the test.
+
+Looks like I could also maybe use the
+`network-lookup-address-info' function here. Probably should...
+eh, it's fine."
+  (array-last-item (process-contact network-server-process :local)))
+
+(comment
+ (reload-webserver '(((:GET . "^/specific/path$") .
+		      (lambda (request)
+			(with-slots (process headers) request
+			  (ws-response-header process 200 '("Content-type" . "text/html"))
+			  (process-send-string process (concat "inside of a GET ONE with path " (cdr (assoc :GET headers)))))))
+		     ((:GET . "^/wow$") .
+		      (lambda (request)
+			(with-slots (process headers) request
+			  (ws-response-header process 200 '("Content-type" . "text/html"))
+			  (process-send-string process (concat "inside of a GET TWO with path " (cdr (assoc :GET headers))))
+			  (process-send-string process (pp-to-string (array-last-item (process-contact process :local))))
+			  (process-send-string process (pp-to-string (ws-port request)))
+			  (comment  (process-send-string process (pp-to-string request))))))
+		     ((:GET . "^/request-object$") .
+		      (lambda (request)
+			(with-slots (process headers) request
+			  (ws-response-header process 200 '("Content-type" . "text/html"))
+			  (process-send-string process (pp-to-string request)))))
+		     ((:POST . ".*") .
+		      (lambda (request)
+			(with-slots (process headers) request
+			  (ws-response-header process 200 '("Content-type" . "text/html"))
+			  (process-send-string process "inside of a post!")))))
+		   9000)
+
+ (setf (ws-handlers lucas-test) nil)
+
+ (with-webserver (server '(((:GET . "^/specific/path$") .
+			    (lambda (request)
+			      (with-slots (process headers) request
+				(ws-response-header process 200 '("Content-type" . "text/html"))
+				(process-send-string process (concat "inside of a GET ONE with path " (cdr (assoc :GET headers)))))))
+			   ((:GET . "^/wow$") .
+			    (lambda (request)
+			      (with-slots (process headers) request
+				(ws-response-header process 200 '("Content-type" . "text/html"))
+				(process-send-string process (concat "inside of a GET TWO with path " (cdr (assoc :GET headers))))
+				(process-send-string process (pp-to-string (array-last-item (process-contact process :local))))
+				(process-send-string process (pp-to-string (ws-port request)))
+				(comment  (process-send-string process (pp-to-string request))))))
+			   ((:GET . "^/request-object$") .
+			    (lambda (request)
+			      (with-slots (process headers) request
+				(ws-response-header process 200 '("Content-type" . "text/html"))
+				(process-send-string process (pp-to-string request)))))
+			   ((:POST . ".*") .
+			    (lambda (request)
+			      (with-slots (process headers) request
+				(ws-response-header process 200 '("Content-type" . "text/html"))
+				(process-send-string process "inside of a post!")))))
+			 t)
+		 (message (pp-to-string (network-process-local-port (slot-value server :process))))
+		 (while t (sit-for 1)))
+
+ )
+
+;; (slot-value (car ws-servers) :port)
+
+;; The built in testing framework for emacs is called ERT. There is a
+;; lovely info manual about it so give that a read for more detail.
+;; You can run ERT tests by running "M-x ert" and specifying which
+;; test to run. If the test fails you can press 'b' to view the
+;; backtrace or press 'd' to rerun the test with debugging enabled.
+
 ;; TODO: Defining a test in elisp is pretty straightforward actually,
 ;; the remaining work for me is twofold: ONE is that I should probably
 ;; setup a local webserver for testing instead of hitting an existing
@@ -305,9 +519,76 @@ later time."
 ;; documentation to better understand that.
 
 (ert-deftest crawl-site-test ()
-  "Playing around with the elisp testing framework ERT."
-  (should (equal? (crawl-site "https://tbaggery.com")
-		  #s(hash-table size 65 test equal rehash-size 1.5 rehash-threshold 0.8125 data ("https://tbaggery.com" ("https://tbaggery.com/" "https://tbaggery.com/2011/08/08/effortless-ctags-with-git.html" "https://tbaggery.com/2011/02/07/bundle-while-you-git.html" "https://tbaggery.com/2010/10/24/reduce-your-rails-schema-conflicts.html" "https://tbaggery.com/2010/03/04/smack-a-ho-st.html" "https://tbaggery.com/2010/02/28/episode-iv-a-new-pope.html" "https://tbaggery.com/page2") "https://tbaggery.com/" ("https://tbaggery.com/" "https://tbaggery.com/2011/08/08/effortless-ctags-with-git.html" "https://tbaggery.com/2011/02/07/bundle-while-you-git.html" "https://tbaggery.com/2010/10/24/reduce-your-rails-schema-conflicts.html" "https://tbaggery.com/2010/03/04/smack-a-ho-st.html" "https://tbaggery.com/2010/02/28/episode-iv-a-new-pope.html" "https://tbaggery.com/page2") "https://tbaggery.com/2011/08/08/effortless-ctags-with-git.html" ("https://tbaggery.com/") "https://tbaggery.com/2011/02/07/bundle-while-you-git.html" ("https://tbaggery.com/") "https://tbaggery.com/2010/10/24/reduce-your-rails-schema-conflicts.html" ("https://tbaggery.com/") "https://tbaggery.com/2010/03/04/smack-a-ho-st.html" ("https://tbaggery.com/") "https://tbaggery.com/2010/02/28/episode-iv-a-new-pope.html" ("https://tbaggery.com/") "https://tbaggery.com/page2" ("https://tbaggery.com/" "https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html" "https://tbaggery.com/2008/04/18/example-git-workflows-maintaining-a-long-lived-topic-branch.html" "https://tbaggery.com/2008/04/17/example-git-workflows-merging-a-contributor-via-pull.html" "https://tbaggery.com/2008/04/13/best-practices-for-contributing-to-rails-with-git.html" "https://tbaggery.com/2007/05/03/easy-ruby-examples.html" "https://tbaggery.com/page3") "https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html" ("https://tbaggery.com/") "https://tbaggery.com/2008/04/18/example-git-workflows-maintaining-a-long-lived-topic-branch.html" ("https://tbaggery.com/" "https://tbaggery.com/2008/04/17/example-git-workflows-merging-a-contributor-via-pull.html") "https://tbaggery.com/2008/04/17/example-git-workflows-merging-a-contributor-via-pull.html" ("https://tbaggery.com/") "https://tbaggery.com/2008/04/13/best-practices-for-contributing-to-rails-with-git.html" ("https://tbaggery.com/") "https://tbaggery.com/2007/05/03/easy-ruby-examples.html" ("https://tbaggery.com/") "https://tbaggery.com/page3" ("https://tbaggery.com/" "https://tbaggery.com/2007/02/11/auto-loading-ruby-code.html" "https://tbaggery.com/page2") "https://tbaggery.com/2007/02/11/auto-loading-ruby-code.html" ("https://tbaggery.com/"))))))
+  "Test out my function(s) which crawls a website. Motivation for
+creating this unit test (besides learning about the unit testing
+framework within emacs) was that I wanted to create lots of
+different implementations for this website crawler (just to
+experiment with different ideas and to explore what elisp can do)
+but before doing that I wanted to get this test in place to
+ensure that my different implementations were actually
+equivalent.
+
+An aside, I think there are two reasons I like writing tests:
+
+1. It gives me confidence that I can refactor or try different
+implementations of the code and things will still work.
+
+2. It serves as up-to-date documentation for how to call the
+function under test.
+
+TODO: I would be interested in getting emacs to ask for any
+arbitrary open port for these tests. Perhaps this could serve as
+motivation:
+https://github.com/eudoxia0/find-port/blob/master/src/find-port.lisp"
+  ;; Defining a couple functions to generate the web server handlers
+  ;; from the graph of links. I *think* you could say that the
+  ;; webserver and the graph of links are "isomorphic" structures
+  ;; because we have a function to transform the graph into the web
+  ;; server (these functions) and another function (our crawl-site
+  ;; function) to convert the webserver back into the links graph.
+  ;; Might be wrong but it sure sounds fun to say:
+  ;; https://en.wikipedia.org/wiki/Isomorphism
+  (cl-flet* ((generate-html
+	      (source-link outgoing-links)
+	      (xmlgen `(html
+			(body
+			 (h1 (concat "Welcome to page: " ,source-link))
+			 (a :href "https://google.com" "a link that should not be followed")
+			 (p "welcome to the page!")
+			 ,@(-map (lambda (outgoing-link)
+				   `(div (a :href ,outgoing-link ,outgoing-link)
+					 (hr)))
+				 outgoing-links)
+			 (div (p "bye now")
+			      (a :href "https://www.gnu.org/software/emacs/manual/html_node/elisp/index.html" "another link that should not be followed"))))))
+	     (generate-handlers
+	      (links-graph)
+	      (ht-map (lambda (source-link outgoing-links)
+			(let ((source-path (car (url-path-and-query (url-generic-parse-url source-link)))))
+			  `((:GET . ,(concat "^" source-path "$")) .
+			    (lambda (request)
+			      (with-slots (process headers) request
+				(ws-response-header process 200 '("Content-type" . "text/html"))
+				(process-send-string
+				 process
+				 ,(generate-html source-link outgoing-links)))))))
+		      links-graph)))
+    ;; Initially there are no handlers for the web server because we
+    ;; have to figure out what port the server is on so we can
+    ;; generate the graph of links so that we can generate the
+    ;; handlers.
+    (with-webserver (server nil t)
+      (let* ((port (network-process-local-port (ws-process server)))
+	     (links-graph (->> '(("/" . ("/one" "/two"))
+				 ("/one" . ("/" "/four"))
+				 ("/two" . ("/one" "/three"))
+				 ("/three" . ("/"))
+				 ("/four" . ()))
+			       (-tree-map (-partial #'concat "http://localhost:" (number-to-string port)))
+			       (ht<-alist))))
+	(setf (ws-handlers server) (generate-handlers links-graph))
+	(should (equal? (crawl-site (concat "http://localhost:" (number-to-string port)))
+			links-graph))))))
 
 ;; TODO: I feel like I wish that every (?) emacs function invocation
 ;; was timed because when I've been playing around with this,
@@ -326,14 +607,16 @@ later time."
  (length (ht-keys tmp))
  )
 
-;; TODO: I don't think my implementations for lazy stuff is very good
-;; or maybe it can't be helped? I say it because we have all these
-;; nested lambdas and having those nested invocations will quickly
-;; exceed the elisp variable max-lisp-eval-depth and the code will
-;; stop. What could we do to fix this? What do other implementations
-;; of lazy lists do? Should we modify the list as thunks are
-;; evaluated? So part of the list will be non-lazy and part will be
-;; and we just adapt lazy-car and lazy-cdr appropriately?
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Messing around with implementing lazy lists.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; TODO: Something which feels like an alternative (and already
+;; existing) way to do "infinite" stuff in elisp is this:
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Generators.html
+;; I'd be super interested in looking at that code too because I think
+;; they do continuation stuff and I was reading about that online but
+;; it would be cool to see a concrete implementation of it.
 (defmacro lazy-cons (car cdr)
   "Creates a lazy cons cell (i.e. a cons cell wrapped inside a
 thunk (i.e. an anonymous function with no args)) with CAR and
@@ -374,11 +657,15 @@ that need to be evaluated."
   `(thunk-delay (cons ,car ,cdr)))
 
 (defun lazy-car (l)
-  (car (thunk-force l)))
+  "Gets the CAR of a lazy list L. Returns nil if L is nil just
+like the car function."
+  (if (null l)
+      nil
+    (car (thunk-force l))))
 
 (defun lazy-cdr (l)
-  ;; Check for nil here so lazy-cdr behaves the same as cdr on a nil
-  ;; list, namely, it returns nil.
+  "Gets the CDR of lazy list L. Returns nil if L is nil just like
+the cdr function."
   (if (null l)
       nil
     (cdr (thunk-force l))))
@@ -387,7 +674,7 @@ that need to be evaluated."
   "Returns a lazy sequence of X, (F X), (F (F X)), etc... In
 mathematical terms I believe you would say it returns the
 \"orbit\" of X. Implementing this was inspired by the function
-\"iterate\" in clojure. 
+\"iterate\" in clojure.
 
 Related links:
 
@@ -402,93 +689,6 @@ Related links:
 ;; function like "reduce" and have it be more iterative then the rest
 ;; of these functions can build off that. They'll still be nice but
 ;; also be more efficient. Or, heck, maybe I just leave it alone!
-
-(defun lazy-nth (n l)
-  "Get the Nth element from lazy list L."
-  (if (zerop n)
-      (lazy-car l)
-    (lazy-nth (1- n) (lazy-cdr l))))
-
-(defun lazy-list-helper-fn (l)
-  (if (null l)
-      'nil
-    `(lazy-cons ,(car l) ,(lazy-list-fn (cdr l)))))
-
-(defmacro lazy-list (&rest objects)
-  (lazy-list-helper-fn objects))
-
-(defun lazy-take (n l)
-  (if (or (<= n 0)
-	   (null l))
-      nil
-    (lazy-cons (lazy-car l) (lazy-take (1- n) (lazy-cdr l)))))
-
-(defun lazy-list-to-list (l)
-  "Converts a lazy list to a list."
-  (if (null l)
-      nil
-    (cons (lazy-car l)
-	  (lazy-list-to-list (lazy-cdr l)))))
-
-(defun defun-multi-arity-helper-fn (name docstring multi-arity-forms)
-  (let ((defun-arg-name (gensym)))
-    (cl-flet ((multi-arity-form-to-cl-case-clause
-	       ;; Apparently the cl-* forms in elisp allow for
-	       ;; destructring of arguments like in clojure, neat:
-	       ;; https://www.gnu.org/software/emacs/manual/html_node/cl/Argument-Lists.html
-	       ;; It almost makes me just want to use cl-defun all the
-	       ;; time instead of defun... hmmm. Ah well! I'll keep it
-	       ;; in mind though.
-	       ((arglist &rest body))
-	       `(,(length arglist)
-		 (let ,(-map-indexed (lambda (index arglist-param)
-				       (list arglist-param `(nth ,index ,defun-arg-name)))
-				     arglist)
-		   ,@body))))
-      `(defun ,name (&rest ,defun-arg-name)
-	 ,docstring
-	 (cl-case (length ,defun-arg-name)
-	  ,@(-map #'multi-arity-form-to-cl-case-clause multi-arity-forms)
-	  (otherwise (error "multi arity function called with a number of arguments for which this function has no definition.")))))))
-
-(defmacro defun-multi-arity (name &optional docstring &rest fn-forms)
-  "Creates a function which can accept different numbers of
-parameters (i.e. \"arities\") when invoked. It's basically
-overloading a function based on the number of arguments. Under
-the hood, it dispatches to a different code path depending on how
-many arguments were passed into the multi-arity function.
-
-The original motivation for this (as are many other things in my
-travels) was clojure:
-https://clojure.org/guides/learn/functions#_multi_arity_functions
-More specifically, I wanted to make a \"lazy-range\" function and
-copy it's implementation from clojure's \"range\" function:
-https://github.com/clojure/clojure/blob/38bafca9e76cd6625d8dce5fb6d16b87845c8b9d/src/clj/clojure/core.clj#L3019-L3039
-but implementing that with a plain ol' defun plus &optional
-parameters felt a bit messy because you have to manually check
-how many arguments are passed and work accordingly AND, in this
-case, the first parameter has a different meaning when the
-function is invoked with more parameters and that made it feel
-hard to name the variable properly. For example, when you
-call (range 10), the first parameter \"10\" signifies the LAST
-number exclusive in the generated sequence but when invoking the
-function like (range 10 100), the number \"10\" now means the
-FIRST number inclusive in the range. So I wanted to name the
-variable something like \"max-or-min\" and that felt weird. Being
-able to define my own multi-arity functions fixes these problems.
-
-I also feel like being able to define a multi-arity function is a
-potentially cleaner way to define a recursive function which ends
-up having to accumulate a result in one of it's parameters. Such
-functions often have a clean interface which do NOT expose the
-accumulation parameter and then, inside, they define a function
-which has that extra accumulation parameter and just call out to
-that function."
-  (unless (stringp docstring)
-    (setq fn-forms (cons docstring fn-forms))
-    (setq docstring nil))
-  (defun-multi-arity-helper-fn name docstring fn-forms))
-
 (defun-multi-arity lazy-range
   "Basically the same implementation as clojure's \"range\"
 function. Other languages have a similarly named function too.
@@ -525,10 +725,165 @@ Related links:
        nil
      (lazy-cons start (lazy-range (+ start step) end step)))))
 
+(defun lazy-reduce-from (reducing-fn init l)
+  "The lazy equivalent of the dash feature's -reduce-from
+function."
+  (let ((acc init))
+    (while l
+      (setq acc (funcall reducing-fn acc (lazy-car l)))
+      (setq l (lazy-cdr l)))
+    acc))
+
+(defun lazy-reduce (reducing-fn l)
+  "The lazy equivalent of the dash feature's -reduce function."
+  (if l
+      (lazy-reduce-from reducing-fn (lazy-car l) (lazy-cdr l))
+    (reducing-fn)))
+
+(defun lazy-reduce-r-from (reducing-fn init l)
+  "The lazy equivalent of the dash feature's -reduce-r-from
+function which does the reduction on the list in reverse. Note
+that the reducing function signature has the accumulator
+parameter as the second argument instead of the first like the
+other reducing function. Strictly speaking, it doesn't have to be
+that way but it's done that way in haskell too with it's
+\"foldr\" function so I assume folks thought it made more sense.
+I suppose maybe they did it because you can envision the
+accumulated value coming down from the right side of the list,
+heading towards the original invocation of the reducing
+function."
+  (if l
+      (funcall reducing-fn
+	       (lazy-car l)
+	       (lazy-reduce-r-from reducing-fn init (lazy-cdr l)))
+    init))
+
+(defun-multi-arity lazy-reduce-clojure
+  "The lazy equivalent of a \"reduce\" function. Operates like
+clojure's reduce implementation minus the ability of the reducing
+function to call the function \"reduced\" to terminate the
+computation early: https://clojuredocs.org/clojure.core/reduce
+
+I remember when I initially saw clojure's reduce function (and
+maybe I saw something similar elsewhere?) I thought (as I have
+before with multiple arity functions) that the parameters were
+confusing. I think it was the fact that the function was new to
+me plus the fact that it could take up to 3 parameters and I kept
+forgetting which ones went where and it didn't help that the
+second parameter was different depending on if a third parameter
+was passed. I also thought that the whole business of the
+reducing function calling itself with no arguments when the list
+is empty just felt weird. Part of me likes it a little more now
+that I'm used to it but part of me also wants to keep it simpler.
+Still, I just wanted to define this because it feels so cool to
+use my home grown defun-multi-arity macro."
+  ((reducing-fn l)
+   (if l
+       (lazy-reduce reducing-fn (lazy-car l) (lazy-cdr l))
+     (reducing-fn)))
+  ((reducing-fn init l)
+   (let ((acc init))
+     (while l
+       (setq acc (funcall reducing-fn acc (lazy-car l)))
+       (setq l (lazy-cdr l)))
+     acc)))
+
+;; TODO: This was an initial implementation of the lazy-reduce-from
+;; function but it DOES NOT WORK even though I feel like it should.
+;; The reason it doesn't work is because it seems that you cannot bind
+;; a symbol XYZ to the value of another symbol XYZ in the lexical
+;; closure. I feel like it should work though since you can do
+;; something like (let ((x 1)) (let ((x (1+ x))) x)). I almost feel
+;; like that should be changed. I wonder if I'm right or there's
+;; something I'm missing.
 (comment
- (lazy-nth 10 (lazy-cons 1 (lazy-cons 2 (lazy-cons 3 ()))))
- (lazy-nth 200 (iterate #'1+ 0))
- ;; My original attempt at writing a lazy list macro. I want to
+ (defun lazy-reduce-from (reducing-fn init l)
+   "The lazy equivalent of the dash feature's -reduce-from
+function."
+   (cl-loop for acc = init then (funcall reducing-fn acc (lazy-car ll))
+	    for l = l then (lazy-cdr l)
+	    while l
+	    finally return acc)))
+
+(defun lazy-nth (n l)
+  "Get the Nth element from lazy list L. I would love to write it
+in a tail recursive manner (since I always feel like those
+implementations are clean), but unfortunately elisp doesn't do
+tail call optimization so, for large lists, it quickly exceeds
+the `max-lisp-eval-depth' variable and we'd error out."
+  (cl-loop for ll = l then (lazy-cdr ll)
+	   while ll
+	   repeat n
+	   finally return (lazy-car ll)))
+
+(defun lazy-list-helper-fn (l)
+  (if (null l)
+      'nil
+    `(lazy-cons ,(car l) ,(lazy-list-helper-fn (cdr l)))))
+
+(defmacro lazy-list (&rest objects)
+  (lazy-list-helper-fn objects))
+
+(defun lazy-take (n l)
+  (if (or (<= n 0)
+	   (null l))
+      nil
+    (lazy-cons (lazy-car l) (lazy-take (1- n) (lazy-cdr l)))))
+
+(defun lazy-list-to-list (l)
+  "Converts a lazy list to a list."
+  (cl-loop for ll = l then (lazy-cdr ll)
+	   while ll
+	   collect (lazy-car ll)))
+
+(defun lazy-map (f l)
+  (if l
+      (lazy-cons (funcall f (lazy-car l))
+		 (lazy-map f (lazy-cdr l)))
+    nil))
+
+(defun lazy-map-with-reduce (f l)
+  "Implementing the map function with a reduce just for fun."
+  (lazy-reduce-r-from (lambda (x acc) (lazy-cons (funcall f x) acc)) nil l))
+
+(defun lazy-filter (pred l)
+  "Filter list L, keeping only values for which PRED returns
+true."
+  (if l
+      (if (funcall pred (lazy-car l))
+	  (lazy-cons (lazy-car l) (lazy-filter pred (lazy-cdr l)))
+	(lazy-filter pred (lazy-cdr l)))
+    nil))
+
+(defun lazy-filter-with-reduce (pred l)
+  "Implementing the filter functionality with a reduce just for
+fun."
+  (lazy-reduce-r-from (lambda (x acc)
+			(if (funcall pred x)
+			    (lazy-cons x acc)
+			  acc))
+		      nil
+		      l))
+
+(defun complement (f)
+  "Returns a function which returns the opposite truth value of
+f. Inspired by https://clojuredocs.org/clojure.core/complement.
+Turns out this function already existed in the dash library under
+the name \"-not\" so I started using that instead. Still kept
+this around for fun though.
+
+This function is known as a combinator which is basically a
+function that returns another function:
+https://en.wikipedia.org/wiki/Combinatory_logic"
+  (lambda (&rest args)
+    (not (apply f args))))
+
+(defun lazy-remove (pred l)
+  "Opposite of `lazy-filter'."
+  (lazy-filter (-not pred) l))
+
+(comment
+ ;; My original attempt at writing the lazy list macro. I want to
  ;; understand in more depth why it didn't work. I figured out a
  ;; solution by leaning on a recursive function which generates the
  ;; list and I understand that but I wonder why the macro itself
@@ -539,7 +894,9 @@ Related links:
     `(lazy-cons ,(car objects) (lazy-list ,(cdr objects))))
  )
 
-
+;; TODO: I'm curious if I can define all this lazy functionality with
+;; something like a "generator" instead of the lazy list
+;; implementation.
 
 ;; TODO: How could we put some sort of test in place to make sure the
 ;; website crawler works as expected? I wonder what testing looks like
@@ -599,3 +956,10 @@ Related links:
 ;; TODO: Once we write a bunch of website crawling algorithms,
 ;; parallelize them to see what that looks like.
 
+
+;; TODO: In the file backquote.el the ` macro is defined. Originally I
+;; thought it was a reader macro but it turns out to be just a
+;; defalias: (defalias '\` (symbol-function 'backquote)). I wonder if
+;; I can define other things like that. I'm kind of fascinated
+;; honestly, using that backtick doesn't feel like calling a normal
+;; function and yet it's possible apparently.
