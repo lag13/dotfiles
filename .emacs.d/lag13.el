@@ -237,7 +237,18 @@ out every time. I just want to be more declarative with my code!"
 an absolute url.
 
 Related links:
-- https://url.spec.whatwg.org/"
+- https://url.spec.whatwg.org/
+
+TODO: I think a nice addition to this function would be the
+ability to \"normalize\" a url. For example google.com/hey and
+google.com/hey/../hey are the same url even though they look
+different. That makes my crawl site algorithm a little less than
+perfect. I think maybe this should be a separate function:
+https://en.wikipedia.org/wiki/URI_normalization
+
+TODO: I think another thing this function doesn't check for is if
+there is a relative link to another page and it ends in an anchor
+tag like hello/there#anchor."
   (let ((href-urlobj (url-generic-parse-url href)))
     (cond
      ;; Sometimes anchor tags don't have an href attribute hence nil
@@ -245,6 +256,7 @@ Related links:
      ;; before passing it but it's convenient to accept such a value.
      ((null href)
       nil)
+     ;; Checking for an absolute path check.
      ((string-match "^/" href)
       (url-recreate-url
        ;; I'm not sure why the creators of url-parse.el decided to get
@@ -264,7 +276,9 @@ Related links:
 	nil
 	nil
 	t)))
-     ((string-match "^\\." href)
+     ;; Checking for a relative url. This pattern is probably not all
+     ;; encompassing.
+     ((string-match "^[a-zA-Z-_./]+$" href)
       (url-recreate-url
        (url-parse-make-urlobj
 	(url-type base-urlobj)
@@ -587,7 +601,7 @@ https://github.com/eudoxia0/find-port/blob/master/src/find-port.lisp"
 			       (-tree-map (-partial #'concat "http://localhost:" (number-to-string port)))
 			       (ht<-alist))))
 	(setf (ws-handlers server) (generate-handlers links-graph))
-	(should (equal? (crawl-site (concat "http://localhost:" (number-to-string port)))
+	(should (equal? (crawl-site (concat "http://localhost:" (number-to-string port) "/"))
 			links-graph))))))
 
 ;; TODO: I feel like I wish that every (?) emacs function invocation
@@ -963,3 +977,134 @@ https://en.wikipedia.org/wiki/Combinatory_logic"
 ;; I can define other things like that. I'm kind of fascinated
 ;; honestly, using that backtick doesn't feel like calling a normal
 ;; function and yet it's possible apparently.
+
+
+(cl-defun daily-amount-to-pay (total-rent num-people num-days-in-month &optional (multiplier 1.0))
+  "Used to help let me know how much I have to pay daily
+depending on where I'm staying in NYC."
+  (* multiplier (/ total-rent num-people num-days-in-month)))
+
+(defmacro if-let-alist (alist then &rest else)
+  "I thought the `let-alist' macro was neat and had a situation
+where I needed to check if an alist existed before grabbing
+values from it. So, I made this macro to make my code a biiiiiet
+more concise (but also because writing macros is fun).
+
+An almost equivalent alternative to using this is to use the dash
+library functions like `-when-let':
+
+(-when-let ((&alist 'one 'two 'three) '((one . 1) (two . 2) (three . 3)))
+  (+ one two three))
+
+The main difference (besides of course having to explicitly
+declare which values from the alist you want to use) is that if a
+key doesn't exist, then the condition is deemed false:
+
+(-when-let ((&alist 'does-not-exist) '((hello . 1)))
+  'will-not-be-reached)"
+  (declare (indent 2))
+  `(if ,alist
+       (let-alist ,alist
+	 ,then)
+     ,@else))
+
+(defmacro when-let-alist (alist &rest body)
+  "These condition+binding things often seem to have an `if' and
+`when' variation so here is the `when' one! Funnily there doesn't
+seem to be an `unless' variation that I can see (I've checked in
+the dash library, clojure, and common lisp), I wonder why that
+is. Just not as  "
+  (declare (indent 1))
+  `(if-let-alist ,alist (progn ,@body)))
+
+(defun how-much-to-pay (start-date end-date person-staying-with)
+  (let* ((places-to-stay '(((people . ("Emily" "Evan"))
+			    (total-rent . 3400.0)
+			    (multiplier . 1.0))
+			   ((people . ("Jane" "Tori"))
+			    (total-rent . 3000.0)
+			    (multiplier . 1.25))
+			   ((people . ("Joe"))
+			    (total-rent . 2500.0)
+			    (multiplier . 1.25))
+			   ((people . ("Mom" "Dad"))
+			    (total-rent . 0.0)
+			    (multiplier . 0.0)))))
+
+    (-when-let ((&alist 'people 'total-rent 'multiplier)
+		(-find (lambda (place-to-stay)
+			 (-contains? (assoc 'people place-to-stay) person-staying-with))
+		       places-to-stay))
+      (* multiplier
+	 (/ total-rent
+	    (1+ (length people))
+	    28)))))
+
+(comment
+ 
+ (how-much-to-pay nil nil "Jane")
+ (when-let-alist (-find (lambda (place-to-stay)
+			     (-contains? (assoc 'people place-to-stay) person-staying-with))
+			   places-to-stay)
+      (* .multiplier
+	 (/ .total-rent
+	    (1+ (length .people))
+	    28)))
+
+ (decoded-time-add (iso8601-parse "2021-01-31")
+		   (make-decoded-time))
+
+ (lazy-list-to-list (lazy-take 31
+			       (lazy-map #'decoded-time-day
+					 (lazy-iterate (lambda (decoded-time)
+							 (decoded-time-add decoded-time
+									   (make-decoded-time :day 1)))
+						       (iso8601-parse "2021-01-31")))))
+
+
+
+ (when-let ((&alist 'people 'total-rent 'multiplier) (-find ....))
+   )
+
+ (-when-let ((&alist 'person 'hey) '((person . 100)
+				     (hey . 2)))
+   hey)
+
+
+
+ (calendar-extract-month '(1 2 2021))
+ (calendar-extract-day '(1 2 2021))
+ (calendar-extract-year '(1 2 2021))
+
+ (calendar-last-day-of-month 1 2021)
+ (calendar-leap-year-p 2021)
+
+ (calendar-generate-month 1 2021 0)
+
+ (decoded-time-add (iso8601-parse "2021-01-31")
+		   (make-decoded-time :month 1))(0 0 0 28 2 2021 nil nil nil)
+
+ (current-time)(24981 30269 753478 0)
+
+ (insert-date)
+
+ (insert-timestamp)
+
+ (current-time-string)
+
+ (length (decode-time))
+
+ (length (make-decoded-time :month 1))
+
+ (parse-time-string "2021-01-311")
+ (let ((decoded-time (iso8601-parse "2021-01-31")))
+   (setf (decoded-time-month decoded-time)
+	 (+ 1 (decoded-time-month decoded-time)))
+   )
+
+ ;; TODO: Given a range of dates and maybe just people I'm staying
+ ;; with, it would be cool to calculate just how much I have to pay.
+
+ `((:emily . ,(daily-amount-to-pay 3400.0 3))
+   (:joe . ,(daily-amount-to-pay 2000.0 2 1.25)))((:emily . 40.476190476190474) (:joe . 44.642857142857146))
+ )
