@@ -39,7 +39,7 @@
  '(mouse-wheel-scroll-amount '(1 ((shift) . 1) ((meta)) ((control) . text-scale)))
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
-   '(web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
+   '(xmlgen web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
  '(pdf-view-midnight-colors (cons "#bbc2cf" "#282c34"))
  '(recentf-mode t)
  '(rustic-ansi-faces
@@ -269,19 +269,23 @@ get the major mode of the current buffer."
 ;; benefit because I'm the only one editing files on my computer.
 (setq create-lockfiles nil)
 
-;; I tend to save files very often so auto-saving is not helping me
-;; much and I did just get bit in the butt for having it. I was making
-;; a game in emacs and my file contents got lost because I
-;; accidentally started the game in the buffer containing the file,
-;; the file was auto-saved, and I could not undo since starting the
-;; game disables it. Reading this later on 2021-07-13 I'm having a bit
-;; of a laugh. What a uniquely emacs'y kind of problem to run into
-;; lol. Then again I have this TODO as well: TODO: Had an embarassing
-;; moment pair programming where the issue was actually fixed but I
-;; forgot to save the file so we thought it was not fixed. Look into
-;; saving the file automatically. Perhaps when I tab away from emacs
-;; or something.
+;; The auto save feature that this variable controls creates SEPARATE
+;; files in which data is saved and I don't feel the need for such a
+;; feature and don't want those files hanging around anyway.
 (setq auto-save-default nil)
+
+;; Today is 2021-12-07 and I feel like as of recently (and on and off
+;; in prior months/years) I've been starting to feel the dreaded
+;; "emacs pinky" where the tendons on my left arm that attach to my
+;; pinky feel... sliiiighly painful (most likely because, while
+;; editing, that pinky holds down the ctrl key almost constantly). So
+;; I want to try eliminating the need to explicitly save my files as a
+;; first step towards alleviating this (since it's almost a habit to
+;; save a file immediately after I'm done typing). Eventually I'll
+;; probably switch to evil mode (I think I want to get back to vim
+;; like keybindings eventually anyway) but I'll start with this.
+(setq auto-save-visited-interval 1)
+(auto-save-visited-mode 1)
 
 ;; I've never had any use for specific settings for particular files
 ;; or directories so I figured I'd disable those features. (setq
@@ -1303,3 +1307,15 @@ of automatically."
 
 ;; TODO: Make a something which will tell you if today is a bones or
 ;; no bones day.
+
+;; TODO: Doing C-h F will lookup the entered "command" in the manual
+;; but there doesn't seem to be one for looking up any ol' "function"
+;; in the manual. Can that be remedied? My use case was that I knew
+;; that there was a url-retrieve function which limited the number of
+;; concurrent processes and I knew it was on the same manual page as
+;; url-retrieve but I couldn't conveniently get to that manual page!
+;; This was the one btw:
+;; https://www.gnu.org/software/emacs/manual/html_node/url/Retrieving-URLs.html
+
+;; TODO: I think with an idle timer I could legitimately create a
+;; screensaver within emacs. Make a screensaver!

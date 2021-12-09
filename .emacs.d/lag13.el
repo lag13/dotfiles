@@ -467,18 +467,23 @@ ways!"
 ;; emacs?
 
 (defun crawl-site-one-level-parallel (site-hash-table)
-  "Crawls one level of websites but does it in parallel. TODO:
-This does not actually work yet sadly. I spawn all the
-url-retreive calls fine but I'm having trouble figuring out how
-to wait for the results. It seems that if I just have a loop
-which constantly checks for the list to be populated with
-results, then it never finishes. I'm not sure but I suspect that
-since emacs is not multi-threaded the loop takes prescedence over
-EVERYTHING else including those callback functions so nothing
-ever gets done. If I add a sit-for call in that loop then it
-works actually but that feels hacky and besides, nothing goes any
-faster, it's actually a bit slower than the other
-implementations."
+  "Crawls one level of websites but tries to do it concurrently.
+This is my first attempt to do some concurrent stuff in emacs and
+it feels jaaaaanky. Maybe I just haven't found the right
+primitives or don't know how to properly piece things together or
+maybe I just don't fully understand what I have available but the
+primitives I found feel super... leaky. Like if you're not
+careful they won't work properly. Sometimes this implementation
+works more quickly than the others and other times it seems to
+take much much longer lol. Actually, on closer inspection, I
+think this implementation just straight up doesn't work 100%
+correctly so that's a shame! I say that because I crawled
+https://en.wikipedia.org/wiki/URI_normalization to a depth of 2
+and this version took waaaaaayyyy longer AND the hash table
+returned was not the same as a different implementation which I
+know works. I think perhaps the issue was that it spawned too
+many processes though and errors started happening. I should make
+a bounded implementation."
   (let* ((urls-to-crawl (ht-collect-keys (lambda (key val) (eq :crawl-me val)) site-hash-table))
 	 (discovered-urls (-repeat (length urls-to-crawl) :not-discovered))
 	 (async-buffers nil)
@@ -503,14 +508,35 @@ implementations."
     ;; called yet. Adding the loop to keep checking everything seems
     ;; to get us where we need to be. I still don't feel super
     ;; confident in it tbh but this feels good enough for these little
-    ;; playing around adventures of mine.
+    ;; playing around adventures of mine. EDIT: I've gained a little
+    ;; better knowledge of emacs's processing model and I think doing
+    ;; what I did here is correct and necessary. Calling
+    ;; accept-process-output is necessary for emacs to be able to
+    ;; consume the output from the network process which is getting
+    ;; the data from the website:
+    ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Output-from-Processes.html
+    ;; accept-process-output basically yields control to the process
+    ;; again. As we can see in that link, other functions like sit-for
+    ;; and sleep-for would also yield control in a similar manner. If
+    ;; we didn't use one of those functions then we'd have an infinite
+    ;; loop where we'd never get any new data on the wire and never
+    ;; process it. Perhaps we could simplify the condition a bit by
+    ;; defining a counter to be the number of urls to crawl and having
+    ;; each callback decrement said counter (which is safe to do
+    ;; because, again, elisp is single threaded) but I'll probably
+    ;; just leave this be for now. Heck! I could also do the updating
+    ;; of the hash table in the callbacks because, again, it's all
+    ;; single threaded! This implementation is kind of busted anyway
+    ;; though because it can spawn an infinite number of processes and
+    ;; that seems to give emacs some difficulties so I'll just leave
+    ;; it here for historical fun.
     (let ((every-url-retrieval-not-done t))
       (while every-url-retrieval-not-done
 	(setq every-url-retrieval-not-done nil)
 	(cl-mapc (lambda (proc discovered-urls)
 		   (when (eq discovered-urls :not-discovered)
 		     (setq every-url-retrieval-not-done t)
-		     (accept-process-output proc)))
+		     (accept-process-output proc 1)))
 		 (-map #'get-buffer-process async-buffers)
 		 discovered-urls)))
     (cl-mapc (lambda (url-to-crawl discovered-urls)
@@ -525,14 +551,68 @@ implementations."
 
 (defun crawl-site4 (url-or-hash-table &optional depth-limit)
   "Crawls a site starting from a given url. This version crawls
-  each individual \"level\" in parallel."
+  each individual \"level\" concurrently. But in my experience it
+  starts to fail if the concurrency grows unbounded."
   (if (stringp url-or-hash-table)
       (let ((normalized-url (url-recreate-url (url-normalize-url-for-sitecrawl (url-generic-parse-url url-or-hash-table)))))
 	(fixed-point #'crawl-site-one-level-parallel (ht (normalized-url :crawl-me)) depth-limit))
     (fixed-point #'crawl-site-one-level-parallel url-or-hash-table depth-limit)))
 
+(defun crawl-site-one-level-limited-parallel (site-hash-table)
+  "Crawls one level of websites but tries to do in parallel while
+limiting the amount of parallelism because in my previous
+implementation where the parallelism was not limited, that
+function failed sometimes presumably because emacs could not keep
+up but I didn't really dig into it.
+
+Originally I wanted to make use of the function
+`url-queue-retrieve' since it limits the parallelism for you but
+I don't think it's really viable here since everything happens
+with timers so I can't easily get a handle on the asyncronous
+process so I can call `accept-process-output' on it. I tried
+calling `accept-process-output' with no arguments since it says
+it will wait for any ol' process's output but it didn't seem to
+work."
+  (let* ((urls-to-crawl (ht-collect-keys (lambda (key val) (eq :crawl-me val)) site-hash-table))
+	 (counter 0)
+	 (max-parallel-processes 6)
+	 (num-executing-processes 0)
+	 (async-processes nil)
+	 (cur-async-process 0)
+	 (site-hash-table (ht-copy site-hash-table)))
+    (while (< counter (length urls-to-crawl))
+      (while (< num-executing-processes max-parallel-processes)
+	(setq num-executing-processes (1+ num-executing-processes))
+	(setq async-processes
+	      (append async-processes
+		      (list (url-retrieve (nth counter urls-to-crawl)
+					  (lambda (url-to-crawl)
+					    (let ((discovered-urls (-distinct (parse-buffer-as-html-and-get-urls-within-same-site (current-buffer) url-to-crawl))))
+					      (ht-set! site-hash-table url-to-crawl discovered-urls)
+					      (-each discovered-urls
+						(lambda (discovered-url)
+						  (unless (ht-contains? site-hash-table discovered-url)
+						    (ht-set! site-hash-table discovered-url :crawl-me)))))
+					    (setq counter (1+ counter))
+					    (setq num-executing-processes (1- num-executing-processes))))))))
+      (accept-process-output (get-buffer-process (nth cur-async-process async-processes)))
+      (setq cur-async-process (1+ cur-async-process)))
+    (message "counter %d" counter)
+    (message (pp-to-string async-processes))
+    site-hash-table))
+
+(defun crawl-site5 (url-or-hash-table &optional depth-limit)
+  "Crawls a site starting from a given url. This version crawls
+  each individual \"level\" concurrently while limiting the
+  concurrency."
+  (if (stringp url-or-hash-table)
+      (let ((normalized-url (url-recreate-url (url-normalize-url-for-sitecrawl (url-generic-parse-url url-or-hash-table)))))
+	(fixed-point #'crawl-site-one-level-queued-parallel (ht (normalized-url :crawl-me)) depth-limit))
+    (fixed-point #'crawl-site-one-level-queued-parallel url-or-hash-table depth-limit)))
+
 (comment
- (benchmark-elapse (setq tmp4 (crawl-site4 "https://en.wikipedia.org/wiki/Mathematics" 2)))
+ (benchmark-elapse (setq tmp4 (crawl-site4 "https://en.wikipedia.org/wiki/URI_normalization" 2)))
+ (benchmark-elapse (setq tmp (crawl-site "https://en.wikipedia.org/wiki/URI_normalization" 2)))
  (benchmark-elapse (setq tmp (crawl-site "http://learnyouahaskell.com/")))
  (benchmark-elapse (setq tmp4 (crawl-site4 "http://learnyouahaskell.com/")))
  (ht->alist tmp4)
@@ -589,7 +669,9 @@ http://clhs.lisp.se/Body/m_w_open.htm"
   "Returns the local port of a network process created by
 `make-network-process'. Created because I wanted to spin up a web
 server during a unit test and have the port be randomly assigned
-which means I have to read the port back out during the test.
+which means I have to read the port back out during the test and
+that logic was juuuust confusing enough to read that I wanted to
+wrap it up in a nice human readable name.
 
 Looks like I could also maybe use the
 `network-lookup-address-info' function here. Probably should...
@@ -650,7 +732,7 @@ eh, it's fine."
 			 t)
 		 (message (pp-to-string (network-process-local-port (slot-value server :process))))
 		 (while t (sit-for 1)))
- 
+
  )
 
 ;; (slot-value (car ws-servers) :port)
@@ -747,7 +829,7 @@ https://github.com/eudoxia0/find-port/blob/master/src/find-port.lisp"
 	(should (equal? (crawl-site url-to-crawl) links-graph))
 	(should (equal? (crawl-site2 url-to-crawl) links-graph))
 	(should (equal? (crawl-site3 url-to-crawl) links-graph))
-	;; (should (equal? (crawl-site4 url-to-crawl) links-graph))
+	(should (equal? (crawl-site4 url-to-crawl) links-graph))
 	))))
 
 ;; TODO: I feel like I wish that every (?) emacs function invocation
@@ -1377,3 +1459,159 @@ tough figuring out what the word is."
 ;; work for both hash tables and alists. In doing so I like the idea
 ;; of writing some generic axiomatic graph functions from which the
 ;; more complicated functions can be achieved.
+
+(defun elisp-intro-exercise-narrowing ()
+  "Displays the first 60 characters of the current buffer, even
+  if the buffer is narrowed somewhere else. An exercise that the
+  \"intro to elisp\" book proposes."
+  (interactive)
+  (save-restriction
+    (widen)
+    (message (buffer-substring-no-properties (point-min) 61))))
+
+;; For the last couple days (today is 2021-12-05) I've been working on
+;; creating a parallel implementation of the website crawler. I got AN
+;; implementation working but it seems buggy in that I've seen it not
+;; work when trying to crawl >50 links at the same time. It seems like
+;; perhaps I'm bumping up against some sort of limit and it causes the
+;; http requests to fail and also causes emacs to lock up more than
+;; usual. That is obviously not good but I also just don't feel
+;; confident in my knowledge of how my implementation works (it uses a
+;; function accept-process-output which seems to get things working
+;; but I don't fully understand everything that's going on). Since I
+;; don't feel like I understand concurrency/parallelism primitives
+;; well in emacs I'm taking a step back to try and grok that. So let's begin.
+
+;; First off, Emacs is SINGLE THREADED, so there is no true
+;; parallelism within emacs. In other words, if elisp code is
+;; executing, that is the ONLY elisp code that is executing. Some
+;; related links: https://tkf.github.io/2013/06/04/Emacs-is-dead.html,
+;; https://www.emacswiki.org/emacs/NoThreading,
+;; https://www.emacswiki.org/emacs/ConcurrentEmacs,
+;; https://nullprogram.com/blog/2018/05/31/ Although you'll probably
+;; never be as computationally efficient as something that can be
+;; truly multi-threaded, I think you can still get pretty far in terms
+;; of executing things at the "same time". There are "timers" which
+;; let you execute code after a configured amount of time has passed.
+;; A good generalized example of this is
+;; https://www.emacswiki.org/emacs/LaterDo. Note that if your code is
+;; being run by a timer, it is still the ONLY code that runs (since,
+;; again, emacs is single threaded) so if it hangs then emacs itself
+;; will hang. Part of me wonders if, under the hood in the C
+;; implementation, there might be some multi-threading going on so
+;; that input is constantly read (because you can type C-g to quit out
+;; of the current computation whenever) and timers execute accurately
+;; but then on the level of elisp it's always single threaded. Anyway.
+;; So there are timers. There are also "processes" where emacs can
+;; fork an external process. This process truly does run at the same
+;; time as emacs (which makes sense since it's a totally different
+;; process) but remember that any interaction with this process where
+;; you're using elisp to send/receive data with the process will be
+;; the ONLY THING that is happening in emacs land. For example, when
+;; spawning a process you can specify a "filter" (i.e. an elisp
+;; function) which will get invoked when the process outputs to stdout
+;; but that filter function will only get called at certain times in
+;; emacs land like when emacs is waiting for input. So, if you were to
+;; spawn a process then your code instantly goes into an infinite
+;; loop, then even if the external process is sending back data, your
+;; filter function will NEVER get called because that infinite loop is
+;; preventing it. Emacs recently introduced something they call
+;; "threads" which is another concurrency primitive where a thread can
+;; do it's thing and then "yield" control to another thread. All in
+;; all it feels like emacs does a lot of "cooperative" kinds of
+;; concurrency where code is very aware that if it's running, then
+;; other things are not and so it tries not to take up too much time
+;; and stuff like that.
+
+(defun mod-non-zero-based (base-num num modulo)
+  "Performs a modulus operation but with the range of numbers
+starting at an arbitrary base number BASE-NUM instead of 0 like
+it normally is. Written for the `caesar-cipher' algorithm because
+I had to repeat this computation and didn't like how confusing it
+looked."
+  (+ base-num (mod (- num base-num) (- modulo base-num))))
+
+(defun caesar-cipher (s shift)
+  "Created because cryptography is fun! Actually the original
+motivation for writing this was because on 2021-12-07 on my old
+macbook from college I found a file called \"ara\" (my first
+girlfriend's name) and it was a file that just contained the
+text:
+
+znxr vbh pneq 5000 cbvagf + svir qevaxf nyfb qenj fnvgnzn ba vg
+tvivat gur guhzof hc.
+
+and I wanted to know what it was. It felt like a caesar cipher so
+I wrote this function and then this snippet to generate all
+possible combinations:
+
+(dolist (s (cl-loop for shift from 0 to 25 collect (caesar-cipher \"znxr vbh pneq 5000 cbvagf + svir qevaxf nyfb qenj fnvgnzn ba vg tvivat gur guhzof hc.\" shift)))
+  (insert s)
+  (newline))
+
+and it turns out my hunch was right! The correct sentence was:
+
+make iou card 5000 points + five drinks also draw saitama on it
+giving the thumbs up.
+
+haha, I don't really remember the context around that but it
+warms my heart to see it. I hope she's doing well."
+  ;; TODO: Convert this to a threading macro but first write an elisp
+  ;; command that will do the conversion for us.
+  (concat
+   (-map (lambda (c)
+	   (cond
+	    ((and (>= c ?a)
+		  (<= c ?z))
+	     (mod-non-zero-based ?a (+ c shift) (1+ ?z)))
+	    ((and (>= c ?A)
+		  (<= c ?Z))
+	     (mod-non-zero-based ?A (+ c shift) (1+ ?Z)))
+	    (t c)))
+	 (append s nil))))
+
+;; TODO: I remember seeing a book in barnes and noble a while back
+;; about algorithms to generate mazes. I think I'd like to mess around
+;; with generating some mazes in emacs. I could even make it a minor
+;; mode (or whatever) where like C-n and C-p would not move the cursor
+;; if they're hitting a wall.
+
+(defun eval-infix-math-exp (exprs)
+  (let (operand-stack
+	operation-stack
+	(op-precedence '((+ . 0)
+			 (- . 0)
+			 (* . 1)
+			 (/ . 1))))
+    (push (pop exprs) operand-stack)
+    (push (pop exprs) operation-stack)
+    (while exprs
+      (if (listp (-first-item exprs))
+	  (push (eval-infix-math-exp (pop exprs)) operand-stack)
+	(push (pop exprs) operand-stack))
+      (when (or (null exprs)
+		(>= (alist-get (-first-item operation-stack) op-precedence)
+		    (alist-get (-first-item exprs) op-precedence)))
+	(let ((right (pop operand-stack))
+	      (op (pop operation-stack))
+	      (left (pop operand-stack)))
+	  (push (funcall op left right) operand-stack)))
+      (when exprs
+	(push (pop exprs) operation-stack)))
+    (while operation-stack
+      (let ((right (pop operand-stack))
+	    (op (pop operation-stack))
+	    (left (pop operand-stack)))
+	(push (funcall op left right) operand-stack)))
+    (pop operand-stack)))
+
+(defmacro infix-math (&rest exprs)
+  "A macro which allows you to write infix math expressions (i.e.
+what we're used to doing) and converts them to the appropriate
+lisp code. Just wrote it for fun."
+  `(eval-infix-math-exp ',exprs))
+
+;; (infix-math 1 + 2) -> (+ 1 2)
+;; (infix-math 1 + 2 * 3) -> (+ 1 (* 2 3))
+;; (infix-math 1 + 2 * 3 / 4 - 1) -> (- (+ 1 (/ (* 2 3) 4)) 1)
+;; (infix-math 1 + 2 * (3 - 4)) -> (+ 1 (* 2 (- 3 4)))
