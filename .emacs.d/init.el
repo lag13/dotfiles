@@ -36,6 +36,7 @@
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
+ '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(1 ((shift) . 1) ((meta)) ((control) . text-scale)))
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
@@ -74,13 +75,17 @@
 
 (toggle-frame-fullscreen)
 
+;; The order of these package related function calls I copied from
+;; here: https://melpa.org/#/getting-started
+(require 'package)
 ;; package-archives is a list of package archives to search through
 ;; when running commands like list-packages. The default package
 ;; archive is more strict to modify so I think more packages end up
 ;; getting added elsewhere such as http://melpa.org/packages/.
 (add-to-list
  'package-archives
- '("melpa" . "http://melpa.org/packages/"))
+ '("melpa" . "https://melpa.org/packages/"))
+(package-initialize)
 
 ;; Will install all the packages declared by this init file. This is
 ;; only useful for new computers which do not have my selected
@@ -773,6 +778,7 @@ better. Kind of makes it a bit more like fido honestly."
 
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
+(menu-bar-mode 0)
 
 ;; So I can paste over a highlighted area of text without overwriting
 ;; what I have copied.
