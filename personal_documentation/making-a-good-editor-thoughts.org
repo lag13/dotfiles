@@ -1,0 +1,126 @@
+* Preamble
+I want to try and make the "perfect" "text editor" (but really I
+mean "computing environment") and will (probably very slowly)
+accumulate my thoughts here. Mostly I believe the end product here
+will be a configuration of keybindings that feels more consistent
+and makes more sense at least to me.
+
+The motivation here is that I want my editor to be better. I want it
+to feel like there's less "distance" between what I think in my head
+and how that translates to characters/actions happening on the screen.
+I want to get rid of all these inconsistencies I've found when I've
+played around with vim and emacs. I want all the keybindings to make
+some sort of sense linguistically. I don't really feel like it will
+NECESSARILY make me a more efficient developer (after all, I've seen
+developers who just use basic editor features who are WAYYYY more
+efficient than me) but I think using a better editor will be more fun.
+Also, the keybindings were more consistent I'd have less crazy
+keybindings to remember (I'm looking at you emacs).
+
+In trying to make a better editor (remember, think "computing
+environment") I'm also hoping that it helps to clarify all the
+essential actions that text editor should do which (like the
+configuration consistency) will hopefully keep it all straight in my
+head!
+
+God, I read back what I write sometimes and I feel like I'm wayyyyyy
+too deep into this vim/emacs/editor stuff haha. Sometimes I don't even
+know if my criticisms/thoughts surrounding editors have any basis in
+reality anymore! Like, maybe if I used a text editor which was more
+mouse heavy it would all be fine and I would be pretty much just as
+productive? At this point I kind of enjoy thinking about this stuff
+though so I will press on!
+
+* Operators
+This is like a vim operator which would perform it's action on a "text
+object"
+- copy
+- delete
+- cut
+- replace (i.e. paste over)
+- comment/uncomment
+- evaluate (like for a repl)
+- upper/lower case region
+- narrow
+- size window
+- surround
+- transpose (be in between two text objects and it will switch them)
+- exchange (same as transpose but arbitrary text objects)
+  
+* Movements
+- character
+- word (maybe this should just be WORD? Do we need both?)
+- end of line
+- begging of line
+- entire line
+- sentence
+- paragraph
+- entire buffer
+- matching pairs of (), [], {}
+- up/down/previous/next indent level (also start/end current indent
+  level)
+- Traversing a tree structure. I've got lisp in mind but it could
+  probably work for other things too:
+  - up the tree one level
+  - down the tree one level (I guess to the closest node)
+  - to the next node on the current level
+  - to the previous node on the current level
+  - to the end of the current node
+  - to the start of the current node
+  - to the top level form
+- In a repl:
+  - The previous command's output
+  - The previous command's output PLUS the command itself
+
+* Text objects (anything that isn't already a motion)
+- email
+- url
+- number
+
+* Structured Editing (paredit basically)
+http://danmidwood.com/content/2014/11/21/animated-paredit.html
+- slurp
+- barf
+- raise
+- splice
+- split
+- join
+- convolute
+
+* Buffer
+- next/previous buffer
+- next/previous buffer in a grouped list. For example, I could have a
+  list of multiple shell buffers and traverse it.
+- fuzzy search buffers
+
+* Files
+- open file
+- fuzzy search files within a "project"
+- rename file (or make sure repl handles it)
+- remove file (or make sure repl handles it)
+
+* Windows
+- split window vertically
+- split window horizontally
+- close window
+- make window only window
+- make window larger
+- make window smaller
+- scroll window up/down by line
+- scroll window up/down by more
+
+* REPL
+- search backwards/forwards through previous commands
+- bring up previous/next command
+- enter a "copy" mode where you can leave the command line portion of
+  the repl to traverse all the output. Or maybe you don't even need
+  it?
+- open up a repl from any buffer (technically could just do a regular
+  buffer switch but I think a repl might be more important to get
+  loaded up quickly)
+
+* Miscellaneous
+- search
+- multiple cursors
+- record/execute macro
+- replace regex

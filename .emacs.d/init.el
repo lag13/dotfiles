@@ -40,7 +40,7 @@
  '(mouse-wheel-scroll-amount '(1 ((shift) . 1) ((meta)) ((control) . text-scale)))
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
-   '(xmlgen web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
+   '(evil xmlgen web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
  '(pdf-view-midnight-colors (cons "#bbc2cf" "#282c34"))
  '(recentf-mode t)
  '(rustic-ansi-faces
@@ -1325,3 +1325,70 @@ of automatically."
 
 ;; TODO: I think with an idle timer I could legitimately create a
 ;; screensaver within emacs. Make a screensaver!
+
+;; TODO: I just did the github ssh key setup for a new laptop I have.
+;; I think it could be cool if that setup could be automated entirely.
+;; Maybe I could write something in emacs? Or just a script?
+
+;; TODO: I built emacs on windows by using msys2 but I noticed that
+;; lots of info manuals (like if I do C-h i) are missing (even for
+;; emacs itself for instance). Learn about how to get those info
+;; manuals back. I do see what I think is those manuals in ls
+;; /msys64/mingw64/share/info/ so I'm not sure why it can't find them.
+;; The already compiled binary of emacs that I downloaded does NOT
+;; seem to have this issue IF you launch it via powershell but if I
+;; launch it via git bash, same issue. So weird. Anyway... I should
+;; stop looking at this and get back to other things. Maybe this is
+;; helpful:
+;; https://emacs.stackexchange.com/questions/10814/c-h-i-info-directory-is-nearly-empty.
+;; It CAN find the emacs manual though by doing M-x info-emacs-manual
+;; so it knows its there... it just doesn't show up in the info
+;; listing for some reason.
+
+;; TODO: It looks like C-) on windows does NOT work. Something about
+;; the OS using that key for something else. I looked at this briefly
+;; but couldn't follow the directions as listed:
+;; https://stackoverflow.com/questions/10644131/paredit-forward-slurp-c-does-not-work-for-emacs-on-windows-7
+
+;; TODO: I saw this and it just looked cool. Take a look!
+;; https://github.com/sachac/waveform-el In general, she seems super
+;; knowledgeable about emacs and I should probably check out our her
+;; stuff perhaps starting with https://sachachua.com/dotemacs/
+
+;; TODO: I was starting on my "trailhead" journey and it was defining
+;; terms like trail, module, etc... All in all the relationship was
+;; something like (borrowing haskell like syntax):
+;;
+;; Module = [Badge]
+;; Badge = Module | Project
+;; Module = [Unit]
+;; Unit = a subtopic in the module with a hands on challenge or a quiz at the end
+;; Project = list of instructions to follow which will ultimately produce something
+;;
+;; I'm not REALLY sure what I want here but I feel like writing things
+;; in that syntax is helpful to me and I think it would be nice to be
+;; able to write it as a regular data structure in lisp because... I
+;; don't know what I want to do with it but if something is just data
+;; then I can do... something with it!
+
+;; TODO: Is it possible to auto save a file after emacs loses focus
+;; (i.e. we switch to another app)? Not sure if I need to do it but
+;; I'm just curious if that kind of "hook" is available.
+
+;; TODO: Read this to understand it more:
+;; https://www.reddit.com/r/orgmode/comments/j253ya/org_modes_intended_indentation/
+;; That being said, I feel like having this makes org mode better
+;; behaved. Without it indentation is added by default by adding
+;; literal spaces when you're writing under a heading, that's annoying
+;; though because if you want to copy this data somewhere else then it
+;; will have that indentation too. Anyway, it seems good.
+(org-indent-mode 1)
+
+;; TODO: I've heard a couple mentions of org mode's "agenda" feature
+;; for managing the stuff you have to do next like meetings or just
+;; straight up todos. I wonder if I could integrate my work calendar
+;; with it somehow. I think I like the idea of pulling most everything
+;; into emacs. Even if it's not any more useful than using a separate
+;; application I think going through the process of integrating it
+;; with emacs would give me a better "low level" understanding of
+;; things
