@@ -3,7 +3,7 @@ I want to try and make the "perfect" "text editor" (but really I
 mean "computing environment") and will (probably very slowly)
 accumulate my thoughts here. Mostly I believe the end product here
 will be a configuration of keybindings that feels more consistent
-and makes more sense at least to me.
+and makes more sense (at least to me).
 
 The motivation here is that I want my editor to be better. I want it
 to feel like there's less "distance" between what I think in my head
@@ -14,7 +14,7 @@ some sort of sense linguistically. I don't really feel like it will
 NECESSARILY make me a more efficient developer (after all, I've seen
 developers who just use basic editor features who are WAYYYY more
 efficient than me) but I think using a better editor will be more fun.
-Also, the keybindings were more consistent I'd have less crazy
+Also, if the keybindings are more consistent I'd have less crazy
 keybindings to remember (I'm looking at you emacs).
 
 In trying to make a better editor (remember, think "computing
@@ -31,12 +31,45 @@ mouse heavy it would all be fine and I would be pretty much just as
 productive? At this point I kind of enjoy thinking about this stuff
 though so I will press on!
 
+* Explaining this to a non-programmer
+I wanted to adequately explain what I'm doing to a non-programmer
+friend of mine so I started writing this to be able to actually share
+with them instead of just having an exchange like, "what did you do
+last night?" to which I reply "oh.... (thinks for a bit about trying
+to talk about it then abandons the notion) I just chilled, not much
+happened".
+
+...
+
+I did some programming related stuff. So, when I program I use a piece
+of software called a "text editor" (think microsoft word but without
+the formatting, there are many of them out there) and I'm trying to
+come up with a consistent set of keybindings/shortcuts for my text
+editor AND make sure it has all the features I want. It's kind of a
+peaceful activity. Kind of gives a feeling of doing word games since
+I'm trying to map individual keys (like the 'e' key) to a behavior but
+there's a lot of keys and could be used for multiple behaviors (like
+maybe the 'e' key could be used to "erase" text or maybe it could be
+used to go to the "end" of a word).
+
+I could probably just use an editor that is more mouse heavy, but I
+like keyboard driven editors. Partly this could be a case of stockholm
+syndrome as I've been using them for almost all of my programming
+life. Partly it could be because I've never (at least as of
+2021-12-18) really owned a mouse in part because I've never had a
+proper desk setup so I'll often be programming on a couch or on the
+floor leaning up against the wall. Partly maybe I like it because it
+just looks cool sometimes. Part of me thinks it can make text editing
+more fun. Part of me thinks that it CAN be more efficient although
+I've never done tests of that so I really have no idea.
+
 * Operators
 This is like a vim operator which would perform it's action on a "text
 object"
 - copy
 - delete
 - cut
+- change/alter (i.e. delete then enter insert mode)
 - replace (i.e. paste over)
 - comment/uncomment
 - evaluate (like for a repl)
@@ -48,6 +81,8 @@ object"
 - exchange (same as transpose but arbitrary text objects)
   
 * Movements
+- search forwards/backwards
+- go forward to the 
 - character
 - word (maybe this should just be WORD? Do we need both?)
 - end of line
@@ -76,6 +111,7 @@ object"
 - email
 - url
 - number
+- current indent level
 
 * Structured Editing (paredit basically)
 http://danmidwood.com/content/2014/11/21/animated-paredit.html
@@ -119,8 +155,213 @@ http://danmidwood.com/content/2014/11/21/animated-paredit.html
   buffer switch but I think a repl might be more important to get
   loaded up quickly)
 
+* Undo
+I think I want a combination of vim and emacs's undo functionality:
+- A dedicated redo which a la vim
+- I think I still want emacs's undo chunking at least when I'm editing
+  more textual things because I feel like when I'm writing prose I'll
+  just sit in "insert" mode and mess around for a while so I want that
+  fine grained control.
+
 * Miscellaneous
-- search
+- highlight by char, line, and block
+- paste
 - multiple cursors
 - record/execute macro
 - replace regex
+
+* Key mappings
+I think I just want to start trying to map keys and see how it feels.
+I think, ultimately, when I have a sequence of keys to type, I don't
+want to have to have a shifted key in there.
+
+Okay so for a little while I was trying to do the above, namely, just
+writing out all the keys on the keyboard and trying to assign them to
+actions. I think what might help me here though is writing some code.
+I'm picturing that I have a map from actions I want to perform to
+another map who's keys are possible keybindings for those actions and
+who's values are an explanation as to why that keybinding was chosen.
+With this structure, we can kind of be fast and loose with assigning
+possible keybindings to actions (kind of a "no bad ideas" thing going
+on) and then we can let the algorithm generate all the possible
+keybindings and I can choose one which feels good:
+
+#+begin_src elisp
+  ;; TODO: Make it so the data structure passed into this function can
+  ;; indicate something along of the lines of: "this keybinding can get
+  ;; bound to this action if and only if this list of other keybindings
+  ;; get bound to these other actons"
+
+  ;; TODO: I feel like I'll want to build in the concept of "operators"
+  ;; vs "text objects/motions". Or... maybe I just call this function
+  ;; again with a different data structure which represents the text
+  ;; objects?
+
+  ;; TODO: I might need to build in the concept of a "sequence" of keys
+  ;; to press instead of just the string I have now.
+  (defun generate-possible-editor-keybindings (editor-behavior-to-possible-keybindings)
+    (let (res)
+      (cond
+       ((or (ht-empty? editor-behavior-to-possible-keybindings)
+            (-some #'ht-empty? (ht-values editor-behavior-to-possible-keybindings)))
+        nil)
+       ((equal 1 (ht-size editor-behavior-to-possible-keybindings))
+        (let ((action (ht-key editor-behavior-to-possible-keybindings)))
+          (ht-map (lambda (possible-keybinding _)
+                    (ht (possible-keybinding action)))
+                  (ht-get editor-behavior-to-possible-keybindings action))))
+       (t
+        (let* ((action (ht-key editor-behavior-to-possible-keybindings))
+               (keybindings (ht-get editor-behavior-to-possible-keybindings action)))
+          (ht-remove! editor-behavior-to-possible-keybindings action)
+          (dolist (keybinding (ht-keys keybindings))
+            (let ((copy (ht-deep-copy editor-behavior-to-possible-keybindings)))
+              ;; remove the keybinding we're assigning to an action
+              ;; from underneath all other actions
+              (ht-each (lambda (_ keybindings) (ht-remove! keybindings keybinding)) copy)
+              (let ((tmp (generate-possible-editor-keybindings copy)))
+                (-each tmp (lambda (keybindings->actions) (ht-set! keybindings->actions keybinding action)))
+                (setq res (append res tmp))))))
+        res))))
+
+  (ert-deftest generate-possible-editor-keybindings ()
+    "Tests out that my function for generating a bunch of
+  keybindings works as expected."
+    (should (set-equal? (generate-possible-editor-keybindings (ht)) nil))
+    (should (set-equal?
+             (generate-possible-editor-keybindings
+              (ht ("replace text"
+                   (ht ("s" "substitute")
+                       ("r" "replace")))
+                  ("search forwards"
+                   (ht ("s" "search")
+                       ("f" "find")))
+                  ("repeat last command"
+                   (ht ("r" "repeat")))
+                  ("forward to single char"
+                   (ht ("f" "forward")))))
+             nil))
+    (should (set-equal?
+             (generate-possible-editor-keybindings
+              (ht ("highlight text"
+                   (ht ("v" "visually select text")
+                       ("h" "highlight")
+                       ("s" "select text")))
+                  ("evaluate code"
+                   (ht ("v" "the \"v\" in \"evaluate\"")
+                       ("e" "evaluate")))
+                  ("replace text"
+                   (ht ("r" "replace")
+                       ("s" "substitute")))))
+             (list
+              (ht ("v" "highlight text")
+                  ("e" "evaluate code")
+                  ("r" "replace text"))
+              (ht ("v" "highlight text")
+                  ("e" "evaluate code")
+                  ("s" "replace text"))
+              (ht ("h" "highlight text")
+                  ("v" "evaluate code")
+                  ("r" "replace text"))
+              (ht ("h" "highlight text")
+                  ("v" "evaluate code")
+                  ("s" "replace text"))
+              (ht ("h" "highlight text")
+                  ("e" "evaluate code")
+                  ("r" "replace text"))
+              (ht ("h" "highlight text")
+                  ("e" "evaluate code")
+                  ("s" "replace text"))
+              (ht ("s" "highlight text")
+                  ("v" "evaluate code")
+                  ("r" "replace text"))
+              (ht ("s" "highlight text")
+                  ("e" "evaluate code")
+                  ("r" "replace text"))))))
+
+  ;; "zoom" could be a possible z keybinding too. That could mean
+  ;; narrowing or perhaps behavior similar to vim where you adjust the
+  ;; position of the window (in this sense I think of "zoom" as being
+  ;; kind of like a means of focusing on part of the buffer that is
+  ;; important to you, like you zoom with a camera to get a better look
+  ;; at something).
+
+  ;; "zenith" could be a possible keybinding too. It could mean to go
+  ;; "up" a structure to get to the zenith.
+
+
+  ;; The backspace key (although it's called delete on other keys) could
+  ;; be used to go "back" to the previous buffer like I had in my old
+  ;; vim config.
+  (let ((editor-behavior-to-possible-keybindings
+         (ht ("deletes a text object"
+              (ht ("d" "deletes")
+                  ("e" "erase")
+                  ("DEL" "delete/backspace key")))
+             ("cut text object"
+              (ht ("x" "looks like a pair of scissors also it is cut in most other programs")))
+             ("copies a text object"
+              (ht ("c" "copy")
+                  ("y" "yank the text out of a buffer")))
+             ("replaces a text object"
+              (ht ("r" "replace")
+                  ("s" "substitute")))
+             ("changes a text object"
+              (ht ("c" "change")
+                  ("m" "modify")))
+             ("evaluates a text object (for interpreted langauges)"
+              (ht ("e" "evaluate")
+                  ("v" "the \"v\" in \"eval\"")))
+             ("joins a text object into one line"
+              (ht ("z" "zips lines together")
+                  ("j" "join")
+                  ("y" "yolk as a verb means to join")))
+             ("searches forward"
+              (ht ("/" "the character is a \"forward slash\" so we have the word \"forward\" in there")
+                  ("s" "search")
+                  ("f" "find/forward and is also commonly used in other software")))
+             ("jumps to any character on the screen"
+              (ht ("z" "you \"zip\" around the buffer")
+                  ("j" "jump")))
+             ("quits out of whatever emacs is doing"
+              (ht ("C-g" "the key that emacs uses to do this")
+                  ("C-q" "stands for quit but uses the control key so it can consistently be used in any mode"))))))
+    (length (-filter (lambda (keybindings) (equal (ht-get keybindings "d") "deletes a text object")) (generate-possible-editor-keybindings editor-behavior-to-possible-keybindings))))
+#+end_src
+
+- q
+- w - move to the start of the next word
+- e - move to the end of the current word
+- r - replace text object with copied text
+- t
+- y
+- u - undo
+- i - insert mode at cursor
+- o - open line or maybe this could be "overwrite"? Instead of
+  replace assuming I want to have 'r' be a reverse search or something.
+- p - paste. But I wonder if I could find another use for this.
+- a - insert mode after cursor
+- s - 
+- d - delete text object
+- f
+- g
+- h - highlight?
+- j
+- k - the help pages? "knowledge" could be the mnemonic
+- l - maybe this could be open a line instead of o?
+- z
+- x - cut text object
+- c - copy text object
+- v - eval text object?
+- b - to the beginning of the current word
+- n
+- m - modify text object (i.e. delete it and enter insert mode)
+- [
+- ]
+- ;
+- '
+- . - repeat last action
+- , - repeat last movement?
+- /
+- BACKSPACE
+- SPACE

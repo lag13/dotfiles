@@ -22,6 +22,13 @@
 (require 'dom)
 (require 'iso8601)
 
+(defmacro comment (&rest body)
+  "Evaluates the body and yields nil. Borrowed from clojure:
+https://clojuredocs.org/clojure.core/comment
+
+Useful for adding code to a file which is illustrative but you
+don't want executed." nil)
+
 (defun array-last-item (arr)
   "Returns the last item of an array. Pretty trivial but I just
 wanted it so I can be little more declaritive with my code.
@@ -39,6 +46,27 @@ work for hash tables but I want it to."
   (if (and (ht? o1) (ht? o2))
       (ht-equal? o1 o2)
     (equal o1 o2)))
+
+(defun set-equal? (s1 s2)
+  "S1 and S2 will be lists but treat them as sets and determine
+equality."
+  (let ((-compare-fn #'equal?))
+    (and (null (-difference s1 s2))
+	 (null (-difference s2 s1)))))
+
+(defun ert-explain-set-equal? (s1 s2)
+  "Will help point out the differences in two sets in case there
+are some:
+https://www.gnu.org/software/emacs/manual/html_node/ert/Defining-Explanation-Functions.html"
+  (if (set-equal? s1 s2)
+      nil
+    (let ((-compare-fn #'equal?))
+      (-if-let (s1-not-in-s2 (-difference s1 s2))
+	  `(s1 has ,(length s1-not-in-s2) elements that s2 does not ,s1-not-in-s2)
+	(let ((s2-not-in-s1 (-difference s2 s1)))
+	  `(s2 has ,(length s2-not-in-s1) elements that s1 does not namely ,s2-not-in-s1))))))
+
+(put 'set-equal? 'ert-explainer 'ert-explain-set-equal?)
 
 ;; TODO: Apparently a fixed point can be thought of as a "periodic
 ;; point" (https://en.wikipedia.org/wiki/Periodic_point) with a period
@@ -180,10 +208,18 @@ like without having to have all these funcall invocations."
     (setq docstring nil))
   (bad-defun-curried-helper-fn name arglist docstring body))
 
-(bad-defun-curried lucas-test (x y z)
-  (+ x y z))
+(comment
+ (bad-defun-curried lucas-test (x y z)
+		    (+ x y z))
 
-(funcall (funcall (lucas-test 1) 2) 3)
+ (funcall (funcall (lucas-test 1) 2) 3))
+
+(defun truncate-decimal (f num-places)
+  (let ((decimal-shifter (expt 10 num-places)))
+    (-> f
+	(* decimal-shifter)
+	(ffloor)
+	(/ decimal-shifter))))
 
 ;; TODO: Returning buffers with data feels kind of weird but also it
 ;; seems like a pattern with emacs so I guess it's okay. One thing I
@@ -222,12 +258,6 @@ yet."
 		  (url-retrieve-synchronously url)
 		(buffer-string))))
     (substring resp (1+ (string-match "^$" resp)))))
-
-(defmacro comment (&rest body)
-  "Evaluates the body and yields nil. Borrowed from clojure:
-https://clojuredocs.org/clojure.core/comment Useful for adding
-code to a file which is illustrative but you don't want
-executed." nil)
 
 (defun parse-html-from-url (url)
   "Parses html from the data from a URL. I created this because
@@ -358,6 +388,42 @@ which is a function of two arguments: KEY and VALUE."
 		 (setq results (cons key results))))
 	     table)
     results))
+
+(defun ht-deep-copy (table)
+  "Does a deep copy of the hash table (i.e. if the values of the
+hash table are also hash tables, then it copies those as well).
+Created because I had a recursive algorithm I wanted to right
+which used a nested hash table and it was going to remove items
+which would need to be added back when it got back to the current
+level so I figured it was easier to just do a full copy."
+  (let ((res (ht)))
+    (ht-each (lambda (key value)
+	       (when (ht? value)
+		 (setq value (ht-deep-copy value)))
+	       (ht-set! res key value))
+	     table)
+    res))
+
+(defun deep-ht->alist (table)
+  "Does a deep conversion of a hash table to an alist. Just for
+fun and maybe it can help better visualize a \"hash\" table if
+there is a lot of nested (the printed form of a hash table is not
+super easy on the eyes)."
+  (ht-amap (if (ht? value)
+	       (cons key (deep-ht->alist value))
+	     (cons key value))
+	   table))
+
+(defun ht-key (table)
+  "Returns single key (which will be random of course because
+it's a hash table) from the hash table. Created because I was
+writing an algorithm where I needed a single key from a hash
+table but I felt bad calling (car (ht-keys h)) because that would
+build up an entire list just to get one item."
+  (catch 'stop-early
+    (ht-each (lambda (k _)
+	       (throw 'stop-early k))
+	     table)))
 
 (defun crawl-site-one-level (site-hash-table)
   "Grows the hash table by crawling all urls who's value
@@ -1610,8 +1676,88 @@ warms my heart to see it. I hope she's doing well."
 what we're used to doing) and converts them to the appropriate
 lisp code. Just wrote it for fun."
   `(eval-infix-math-exp ',exprs))
-
 ;; (infix-math 1 + 2) -> (+ 1 2)
 ;; (infix-math 1 + 2 * 3) -> (+ 1 (* 2 3))
 ;; (infix-math 1 + 2 * 3 / 4 - 1) -> (- (+ 1 (/ (* 2 3) 4)) 1)
 ;; (infix-math 1 + 2 * (3 - 4)) -> (+ 1 (* 2 (- 3 4)))
+
+(defun frequencies (lst)
+  "Returns a hash table indicating the frequencies of each
+element in LST."
+  (let ((freqs (ht)))
+    (cl-loop for elt in lst
+	     do (ht-set! freqs elt (1+ (ht-get freqs elt 0))))
+    freqs))
+
+(defun most-frequent (lst)
+  "Returns the most frequent element in LST."
+  (let (res
+	(highest-count 0))
+    (ht-each (lambda (elt count)
+	       (when (> count highest-count)
+		 (setq res elt)
+		 (setq highest-count count)))
+	     (frequencies lst))
+    res))
+
+(defun construct-google-search-url (query)
+  "Given a query QUERY which you would type into a google search
+on a browser, return a url representing the search that query
+would execute."
+  (concat "https://www.google.com/search?q="
+	  (combine-and-quote-strings
+	   (-map #'url-hexify-string (split-string query " "))
+	   "+")))
+
+(defun get-401k-limit-from-google (year)
+  "Tries to figure out the 401k limit by doing a google search
+and looking for the most freqently occurring number which has at
+least 5 digits. Use case was that I wanted to write a function
+which tells you what percentage of your salary should go towards
+your 401k in order to max it out and I thought, \"wouldn't it be
+cool if I didn't have to lookup the 401k amount every time, I
+could just input the year?\". Thus this function was born!
+
+Regex mostly came from https://regexr.com/3ivk1"
+  (float
+   (string-to-number
+    (most-frequent
+     (-map (lambda (matches)
+	     (replace-regexp--string "\\$\\|," "" (car matches)))
+	   (s-match-strings-all "\\$[1-9][0-9][0-9]?\\(,?[0-9]\\{3\\}\\)+\\(\\.[0-9]\\{0,2\\}\\)?"
+				(dom-texts (parse-html-from-url (construct-google-search-url (concat "401k " year " contribution limit"))))))))))
+
+(comment
+ (s-match-strings-all "\\$\\([0-9]\\{5\\}[0-9]*\\)"
+		      (dom-texts (parse-html-from-url (concat "https://www.google.com/search?q=401k+" year "+contribution+limit"))))
+ (s-match-strings-all "\\$?[1-9][0-9][0-9]?(,?[0-9])"
+		      "20000")
+ (get-401k-limit-from-google "2022")
+ (("$20,500" ",500") ("$20500" "500") ("$20,500" ",500") ("$20,500" ",500") ("$20,500" ",500") ("$20500" "500") ("$20,500" ",500") ("$20,500." ",500" ".") ("$61,000" ",000") ("$20,500." ",500" ".") ("$20,500" ",500") ("$20,500" ",500") ("$19,500" ",500") ("$20,500" ",500")))
+
+(defun retirement-account-contribution-percentages (&rest plist)
+  "Calculates what percentage of your salary you should
+contribute to your retirement accounts so you spread it out as
+much as you can over the year but still max it out. Assumes that
+the employer will limit your contributions once the limit is
+hit."
+  (let ((salary (plist-get plist :salary))
+	(company-contribution (plist-get plist :company-contribution))
+	(401k-limit (plist-get plist :401k-limit))
+	(annual-additions-limit (plist-get plist :annual-additions-limit)))
+    (cl-flet ((get-percentage
+	       (num)
+	       (ceiling (* 100 num))))
+      `(:401k-percentage
+	,(get-percentage (/ 401k-limit salary))
+	:after-tax-percentage
+	,(get-percentage (/ (- annual-additions-limit (+ 401k-limit company-contribution))
+						  salary))))))
+
+(comment
+ ;; https://www.google.com/search?q=what+is+the+maximum+annual+additions+limit+for+2022
+ (retirement-account-contribution-percentages :salary 170000.0
+					      :company-contribution 5000.0
+					      :401k-limit 20500.0
+					      :annual-additions-limit 61000.0)
+ )

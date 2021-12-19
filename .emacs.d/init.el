@@ -1,4 +1,3 @@
-
 ;; My Emacs configuration file. The path to this file is determined by
 ;; user-init-file which gets dynamically set when emacs starts. I
 ;; believe that when emacs starts up it does something like "find the
@@ -23,6 +22,9 @@
  '(delete-selection-mode t)
  '(eval-expression-print-length 100)
  '(eval-expression-print-level 10)
+ '(evil-cross-lines t)
+ '(evil-disable-insert-state-bindings t)
+ '(evil-want-fine-undo t)
  '(explicit-shell-file-name "bash")
  '(exwm-floating-border-color "#191b20")
  '(grep-find-ignored-directories
@@ -39,6 +41,7 @@
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(1 ((shift) . 1) ((meta)) ((control) . text-scale)))
  '(objed-cursor-color "#ff6c6b")
+ '(org-startup-indented t)
  '(package-selected-packages
    '(evil xmlgen web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
  '(pdf-view-midnight-colors (cons "#bbc2cf" "#282c34"))
@@ -1375,14 +1378,13 @@ of automatically."
 ;; (i.e. we switch to another app)? Not sure if I need to do it but
 ;; I'm just curious if that kind of "hook" is available.
 
-;; TODO: Read this to understand it more:
+;; TODO: I have this enabled but read this to understand it more:
 ;; https://www.reddit.com/r/orgmode/comments/j253ya/org_modes_intended_indentation/
 ;; That being said, I feel like having this makes org mode better
 ;; behaved. Without it indentation is added by default by adding
 ;; literal spaces when you're writing under a heading, that's annoying
 ;; though because if you want to copy this data somewhere else then it
 ;; will have that indentation too. Anyway, it seems good.
-(org-indent-mode 1)
 
 ;; TODO: I've heard a couple mentions of org mode's "agenda" feature
 ;; for managing the stuff you have to do next like meetings or just
@@ -1392,3 +1394,25 @@ of automatically."
 ;; application I think going through the process of integrating it
 ;; with emacs would give me a better "low level" understanding of
 ;; things
+
+;; TODO: I feel like I want org mode to be a little smarter. The
+;; specific use case I have in mind at the moment is that if I press
+;; return while editing a list, I want org mode to open up a new list
+;; item. If I hit return again it could exit the list.
+
+;; TODO: I think it would be cool if, from a documentation kind of
+;; standpoint, you were able to ask if a function has an "inverse"
+;; (like an isomorphic kind of thing) and it could tell you. Like the
+;; opposite of a split string algorithm would be one that joins
+;; strings.
+
+;; TODO: I'd like to review tim pope's plugins for vim to see if
+;; there's anything I can bring over for emacs. He just has so many
+;; good ideas!
+
+;; TODO: How do I do timer stuff in emacs? Use case was that at one of
+;; my companies we wanted to see how long a feature flag flip would
+;; actually take to take effect. I know I could just google a timer
+;; but I'm curious, I want to do everything in emacs!! lol.
+
+(load "~/.emacs.d/lag13")
