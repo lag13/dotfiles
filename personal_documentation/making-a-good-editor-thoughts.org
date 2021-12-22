@@ -199,85 +199,168 @@ keybindings and I can choose one which feels good:
 
   ;; TODO: I might need to build in the concept of a "sequence" of keys
   ;; to press instead of just the string I have now.
-  (defun generate-possible-editor-keybindings (editor-behavior-to-possible-keybindings)
+  (defun generate-possible-editor-keybindings (editor-behavior-to-possible-keys)
     (let (res)
       (cond
-       ((or (ht-empty? editor-behavior-to-possible-keybindings)
-            (-some #'ht-empty? (ht-values editor-behavior-to-possible-keybindings)))
+       ((or (ht-empty? editor-behavior-to-possible-keys)
+            (-some #'ht-empty? (ht-values editor-behavior-to-possible-keys)))
         nil)
-       ((equal 1 (ht-size editor-behavior-to-possible-keybindings))
-        (let ((action (ht-key editor-behavior-to-possible-keybindings)))
-          (ht-map (lambda (possible-keybinding _)
-                    (ht (possible-keybinding action)))
-                  (ht-get editor-behavior-to-possible-keybindings action))))
+       ((equal 1 (ht-size editor-behavior-to-possible-keys))
+        (let ((action (ht-key editor-behavior-to-possible-keys)))
+          (ht-map (lambda (possible-key _)
+                    (ht (action possible-key)))
+                  (ht-get editor-behavior-to-possible-keys action))))
        (t
-        (let* ((action (ht-key editor-behavior-to-possible-keybindings))
-               (keybindings (ht-get editor-behavior-to-possible-keybindings action)))
-          (ht-remove! editor-behavior-to-possible-keybindings action)
-          (dolist (keybinding (ht-keys keybindings))
-            (let ((copy (ht-deep-copy editor-behavior-to-possible-keybindings)))
-              ;; remove the keybinding we're assigning to an action
-              ;; from underneath all other actions
-              (ht-each (lambda (_ keybindings) (ht-remove! keybindings keybinding)) copy)
-              (let ((tmp (generate-possible-editor-keybindings copy)))
-                (-each tmp (lambda (keybindings->actions) (ht-set! keybindings->actions keybinding action)))
-                (setq res (append res tmp))))))
+        (let* ((action (ht-key editor-behavior-to-possible-keys))
+               (possible-keys (ht-get editor-behavior-to-possible-keys action)))
+          (ht-remove! editor-behavior-to-possible-keys action)
+          (dolist (possible-key (ht-keys possible-keys))
+            (let ((copy (ht-deep-copy editor-behavior-to-possible-keys))
+                  (also-must-bind (or (plist-get (ht-get possible-keys possible-key) :also-must-bind) (ht))))
+              ;; remove the keybinding we're assigning to an action from
+              ;; underneath all other actions
+              (ht-each (lambda (_action possible-keys) (ht-remove! possible-keys possible-key)) copy)
+              (let ((all-keybindings
+                     (-filter
+                      (lambda (actions->keys)
+                        (and
+                         ;; every other key must allow this key to be bound
+                         (-every (-lambda ((bound-action bound-key))
+                                   (-if-let* ((also-must-bind
+                                               (-> editor-behavior-to-possible-keys
+                                                   (ht-get bound-action)
+                                                   (ht-get bound-key)
+                                                   (plist-get :also-must-bind)))
+                                              (desired-key (ht-get also-must-bind action)))
+                                       (equal possible-key desired-key)
+                                     t))
+                                 (ht-items actions->keys))
+                         ;; every key in the mapping must honor this
+                         ;; key's "must bind" attribute.
+                         (-every (-lambda ((must-bind-action must-bind-key))
+                                   (equal must-bind-key (ht-get actions->keys must-bind-action must-bind-key)))
+                                 (ht-items also-must-bind))))
+                      (generate-possible-editor-keybindings copy))))
+                (-each all-keybindings
+                  (lambda (actions->keys)
+                    (ht-set! actions->keys action possible-key)))
+                (setq res (append res all-keybindings))))))
         res))))
 
   (ert-deftest generate-possible-editor-keybindings ()
-    "Tests out that my function for generating a bunch of
-  keybindings works as expected."
+    "Tests out the basic functionality of my function which
+  geneerates a bunch of key maps."
     (should (set-equal? (generate-possible-editor-keybindings (ht)) nil))
     (should (set-equal?
              (generate-possible-editor-keybindings
               (ht ("replace text"
-                   (ht ("s" "substitute")
-                       ("r" "replace")))
+                   (ht ("s" nil)
+                       ("r" nil)))
                   ("search forwards"
-                   (ht ("s" "search")
-                       ("f" "find")))
+                   (ht ("s" nil)
+                       ("f" nil)))
                   ("repeat last command"
-                   (ht ("r" "repeat")))
+                   (ht ("r" nil)))
                   ("forward to single char"
-                   (ht ("f" "forward")))))
+                   (ht ("f" nil)))))
              nil))
     (should (set-equal?
              (generate-possible-editor-keybindings
               (ht ("highlight text"
-                   (ht ("v" "visually select text")
-                       ("h" "highlight")
-                       ("s" "select text")))
+                   (ht ("v" nil)
+                       ("h" nil)
+                       ("s" nil)))
                   ("evaluate code"
-                   (ht ("v" "the \"v\" in \"evaluate\"")
-                       ("e" "evaluate")))
+                   (ht ("v" nil)
+                       ("e" nil)))
                   ("replace text"
-                   (ht ("r" "replace")
-                       ("s" "substitute")))))
+                   (ht ("r" nil)
+                       ("s" nil)))))
              (list
-              (ht ("v" "highlight text")
-                  ("e" "evaluate code")
-                  ("r" "replace text"))
-              (ht ("v" "highlight text")
-                  ("e" "evaluate code")
-                  ("s" "replace text"))
-              (ht ("h" "highlight text")
-                  ("v" "evaluate code")
-                  ("r" "replace text"))
-              (ht ("h" "highlight text")
-                  ("v" "evaluate code")
-                  ("s" "replace text"))
-              (ht ("h" "highlight text")
-                  ("e" "evaluate code")
-                  ("r" "replace text"))
-              (ht ("h" "highlight text")
-                  ("e" "evaluate code")
-                  ("s" "replace text"))
-              (ht ("s" "highlight text")
-                  ("v" "evaluate code")
-                  ("r" "replace text"))
-              (ht ("s" "highlight text")
-                  ("e" "evaluate code")
-                  ("r" "replace text"))))))
+              (ht ("highlight text" "v")
+                  ("evaluate code" "e")
+                  ("replace text" "r"))
+              (ht ("highlight text" "v")
+                  ("evaluate code" "e")
+                  ("replace text" "s"))
+              (ht ("highlight text" "h")
+                  ("evaluate code" "v")
+                  ("replace text" "r"))
+              (ht ("highlight text" "h")
+                  ("evaluate code" "v")
+                  ("replace text" "s"))
+              (ht ("highlight text" "h")
+                  ("evaluate code" "e")
+                  ("replace text" "r"))
+              (ht ("highlight text" "h")
+                  ("evaluate code" "e")
+                  ("replace text" "s"))
+              (ht ("highlight text" "s")
+                  ("evaluate code" "v")
+                  ("replace text" "r"))
+              (ht ("highlight text" "s")
+                  ("evaluate code" "e")
+                  ("replace text" "r")))))
+    ;; Checks that grouped bindings are correctly honored. Use case here
+    ;; is that some bindings only really make sense if a specific
+    ;; binding happens. Could be used to make sure shifted and unshifted
+    ;; key variants are always both bound which is good for making sure
+    ;; the keybindings "make sense". For example, 'u' could be "undo" in
+    ;; vim and 'U' could be "redo" but if the regular undo feature was
+    ;; bound to C-z then we probably wouldn't want to bind 'U' anymore.
+    (should (set-equal?
+             (generate-possible-editor-keybindings
+              (ht ("move cursor up one line"
+                   (ht ("p" nil)
+                       ("k" (list :also-must-bind
+                                  (ht ("move cursor left" "h")
+                                      ("move cursor down one line" "j")
+                                      ("move cursor right" "l"))))))
+                  ("move cursor down one line"
+                   (ht ("n" nil)
+                       ("j" (list :also-must-bind
+                                  (ht ("move cursor left" "h")
+                                      ("move cursor up one line" "k")
+                                      ("move cursor right" "l")))))
+                   )
+                  ("move cursor left"
+                   (ht ("b" nil)
+                       ("h" (list :also-must-bind
+                                  (ht ("move cursor down one line" "j")
+                                      ("move cursor up one line" "k")
+                                      ("move cursor right" "l"))))))
+                  ("move cursor right"
+                   (ht ("f" nil)
+                       ("l" (list :also-must-bind
+                                  (ht ("move cursor down one line" "j")
+                                      ("move cursor up one line" "k")
+                                      ("move cursor left" "h"))))))
+                  ("lookup documentation"
+                   (ht ("h" nil)
+                       ("k" nil)
+                       ("d" nil)))))
+             (list
+              (ht ("move cursor up one line" "p")
+                  ("move cursor down one line" "n")
+                  ("move cursor left" "b")
+                  ("move cursor right" "f")
+                  ("lookup documentation" "h"))
+              (ht ("move cursor up one line" "p")
+                  ("move cursor down one line" "n")
+                  ("move cursor left" "b")
+                  ("move cursor right" "f")
+                  ("lookup documentation" "k"))
+              (ht ("move cursor up one line" "p")
+                  ("move cursor down one line" "n")
+                  ("move cursor left" "b")
+                  ("move cursor right" "f")
+                  ("lookup documentation" "d"))
+              (ht ("move cursor up one line" "k")
+                  ("move cursor down one line" "j")
+                  ("move cursor left" "h")
+                  ("move cursor right" "l")
+                  ("lookup documentation" "d"))))))
+
 
   ;; "zoom" could be a possible z keybinding too. That could mean
   ;; narrowing or perhaps behavior similar to vim where you adjust the

@@ -62,9 +62,9 @@ https://www.gnu.org/software/emacs/manual/html_node/ert/Defining-Explanation-Fun
       nil
     (let ((-compare-fn #'equal?))
       (-if-let (s1-not-in-s2 (-difference s1 s2))
-	  `(s1 has ,(length s1-not-in-s2) elements that s2 does not ,s1-not-in-s2)
+	  `(s1 has these ,(length s1-not-in-s2) elements that s2 does not ,s1-not-in-s2)
 	(let ((s2-not-in-s1 (-difference s2 s1)))
-	  `(s2 has ,(length s2-not-in-s1) elements that s1 does not namely ,s2-not-in-s1))))))
+	  `(s2 has these ,(length s2-not-in-s1) elements that s1 does not namely ,s2-not-in-s1))))))
 
 (put 'set-equal? 'ert-explainer 'ert-explain-set-equal?)
 
@@ -1745,14 +1745,11 @@ hit."
 	(company-contribution (plist-get plist :company-contribution))
 	(401k-limit (plist-get plist :401k-limit))
 	(annual-additions-limit (plist-get plist :annual-additions-limit)))
-    (cl-flet ((get-percentage
-	       (num)
-	       (ceiling (* 100 num))))
-      `(:401k-percentage
-	,(get-percentage (/ 401k-limit salary))
-	:after-tax-percentage
-	,(get-percentage (/ (- annual-additions-limit (+ 401k-limit company-contribution))
-						  salary))))))
+    `(:401k-percentage
+      ,(/ 401k-limit salary)
+      :after-tax-percentage
+      ,(/ (- annual-additions-limit (+ 401k-limit company-contribution))
+	  salary))))
 
 (comment
  ;; https://www.google.com/search?q=what+is+the+maximum+annual+additions+limit+for+2022

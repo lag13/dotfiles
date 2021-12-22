@@ -20,7 +20,7 @@
  '(custom-safe-themes
    '("830877f4aab227556548dc0a28bf395d0abe0e3a0ab95455731c9ea5ab5fe4e1" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "2809bcb77ad21312897b541134981282dc455ccd7c14d74cc333b6e549b824f3" "c433c87bd4b64b8ba9890e8ed64597ea0f8eb0396f4c9a9e01bd20a04d15d358" "0fffa9669425ff140ff2ae8568c7719705ef33b7a927a0ba7c5e2ffcfac09b75" "835868dcd17131ba8b9619d14c67c127aa18b90a82438c8613586331129dda63" default))
  '(delete-selection-mode t)
- '(eval-expression-print-length 100)
+ '(eval-expression-print-length 1000)
  '(eval-expression-print-level 10)
  '(evil-cross-lines t)
  '(evil-disable-insert-state-bindings t)
@@ -43,7 +43,7 @@
  '(objed-cursor-color "#ff6c6b")
  '(org-startup-indented t)
  '(package-selected-packages
-   '(evil xmlgen web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
+   '(expand-region evil xmlgen web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
  '(pdf-view-midnight-colors (cons "#bbc2cf" "#282c34"))
  '(recentf-mode t)
  '(rustic-ansi-faces
@@ -1413,6 +1413,12 @@ of automatically."
 ;; TODO: How do I do timer stuff in emacs? Use case was that at one of
 ;; my companies we wanted to see how long a feature flag flip would
 ;; actually take to take effect. I know I could just google a timer
-;; but I'm curious, I want to do everything in emacs!! lol.
+;; but I'm curious, I want to do everything in emacs!! lol. One thing
+;; I might like this for honestly though is to have emacs tell me when
+;; I've been online for ~8 hours or something like that so I don't
+;; over work.
 
 (load "~/.emacs.d/lag13")
+
+(global-set-key (kbd "C-=") 'er/expand-region)
+(global-set-key (kbd "C-+") 'er/contract-region)
