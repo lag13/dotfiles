@@ -28,8 +28,12 @@ too deep into this vim/emacs/editor stuff haha. Sometimes I don't even
 know if my criticisms/thoughts surrounding editors have any basis in
 reality anymore! Like, maybe if I used a text editor which was more
 mouse heavy it would all be fine and I would be pretty much just as
-productive? At this point I kind of enjoy thinking about this stuff
-though so I will press on!
+productive? I'm probably making this all way too complicated honestly.
+As my buddy Sheng once said when introducing me to visual studio code
+(I'm paraphrasing): "it has a fuzzy file finder, a way to search for
+terms within a directory, and knowledge of languages which allow you
+to jump to definition and such. What more do you need?". At this point
+I kind of enjoy thinking about this stuff though so I will press on!
 
 * Explaining this to a non-programmer
 I wanted to adequately explain what I'm doing to a non-programmer
@@ -187,29 +191,22 @@ on) and then we can let the algorithm generate all the possible
 keybindings and I can choose one which feels good:
 
 #+begin_src elisp
-  ;; TODO: Make it so the data structure passed into this function can
-  ;; indicate something along of the lines of: "this keybinding can get
-  ;; bound to this action if and only if this list of other keybindings
-  ;; get bound to these other actons"
-
   ;; TODO: I feel like I'll want to build in the concept of "operators"
-  ;; vs "text objects/motions". Or... maybe I just call this function
-  ;; again with a different data structure which represents the text
-  ;; objects?
+  ;; vs "text objects/motions". At it's essence, different namespaces of
+  ;; keybindings I suppose. Or... maybe I just call this function again
+  ;; with a different data structure and I just know that it represents
+  ;; bindings in a different namespace? Feels like it could be nice to
+  ;; have them all in one place though.
 
   ;; TODO: I might need to build in the concept of a "sequence" of keys
   ;; to press instead of just the string I have now.
   (defun generate-possible-editor-keybindings (editor-behavior-to-possible-keys)
     (let (res)
       (cond
-       ((or (ht-empty? editor-behavior-to-possible-keys)
-            (-some #'ht-empty? (ht-values editor-behavior-to-possible-keys)))
+       ((-some #'ht-empty? (ht-values editor-behavior-to-possible-keys))
         nil)
-       ((equal 1 (ht-size editor-behavior-to-possible-keys))
-        (let ((action (ht-key editor-behavior-to-possible-keys)))
-          (ht-map (lambda (possible-key _)
-                    (ht (action possible-key)))
-                  (ht-get editor-behavior-to-possible-keys action))))
+       ((ht-empty? editor-behavior-to-possible-keys)
+        (list (ht)))
        (t
         (let* ((action (ht-key editor-behavior-to-possible-keys))
                (possible-keys (ht-get editor-behavior-to-possible-keys action)))
@@ -250,7 +247,7 @@ keybindings and I can choose one which feels good:
   (ert-deftest generate-possible-editor-keybindings ()
     "Tests out the basic functionality of my function which
   geneerates a bunch of key maps."
-    (should (set-equal? (generate-possible-editor-keybindings (ht)) nil))
+    (should (set-equal? (generate-possible-editor-keybindings (ht)) (list (ht))))
     (should (set-equal?
              (generate-possible-editor-keybindings
               (ht ("replace text"
@@ -378,38 +375,108 @@ keybindings and I can choose one which feels good:
   ;; vim config.
   (let ((editor-behavior-to-possible-keybindings
          (ht ("deletes a text object"
-              (ht ("d" "deletes")
-                  ("e" "erase")
-                  ("DEL" "delete/backspace key")))
+              (ht ("d" (list :rationale "deletes"))
+                  ("e" (list :rationale "erase"))
+                  ("DEL" (list :rationale "delete/backspace key"))))
              ("cut text object"
-              (ht ("x" "looks like a pair of scissors also it is cut in most other programs")))
+              (ht ("x" (list :rationale "looks like a pair of scissors also it is cut in most other programs"))))
              ("copies a text object"
-              (ht ("c" "copy")
-                  ("y" "yank the text out of a buffer")))
+              (ht ("c" (list :rationale "copy"))
+                  ("y" (list :rationale "yank the text out of a buffer"))))
              ("replaces a text object"
-              (ht ("r" "replace")
-                  ("s" "substitute")))
+              (ht ("r" (list :rationale "replace"))
+                  ("s" (list :rationale "substitute"))))
              ("changes a text object"
-              (ht ("c" "change")
-                  ("m" "modify")))
+              (ht ("c" (list :rationale "change"))
+                  ("m" (list :rationale "modify"))))
              ("evaluates a text object (for interpreted langauges)"
-              (ht ("e" "evaluate")
-                  ("v" "the \"v\" in \"eval\"")))
+              (ht ("e" (list :rationale "evaluate"))
+                  ("v" (list :rationale "the \"v\" in \"eval\""))))
              ("joins a text object into one line"
-              (ht ("z" "zips lines together")
-                  ("j" "join")
-                  ("y" "yolk as a verb means to join")))
+              (ht ("z" (list :rationale "zip lines together"))
+                  ("j" (list :rationale "join"))
+                  ("y" (list :rationale "yolk as a verb means to join"))))
+             ("move cursor up one line"
+              (ht ("p" (list :rationale "previous"))
+                  ("u" (list :rationale "up"))
+                  ("k" (list :rationale "the vim binding, no mnemonic but mechanically convenient"
+                             :also-must-bind (ht ("move cursor left" "h")
+                                                 ("move cursor down one line" "j")
+                                                 ("move cursor right" "l"))))))
+             ("move cursor down one line"
+              (ht ("n" (list :rationale "next"))
+                  ("d" (list :rationale "down"))
+                  ("j" (list :rationale "the vim binding, no mnemonic but mechanically convenient"
+                             :also-must-bind
+                             (ht ("move cursor left" "h")
+                                 ("move cursor up one line" "k")
+                                 ("move cursor right" "l")))))
+              )
+             ("move cursor left"
+              (ht ("b" (list :rationale "back"))
+                  ("l" (list :rationale "left"))
+                  ("h" (list :rationale "the vim binding, no mnemonic but mechanically convenient"
+                             :also-must-bind
+                             (ht ("move cursor down one line" "j")
+                                 ("move cursor up one line" "k")
+                                 ("move cursor right" "l"))))))
+             ("move cursor right"
+              (ht ("f" (list :rationale "forward"))
+                  ("r" (list :rationale "right"))
+                  ("l" (list :rationale "the vim binding, no mnemonic but mechanically convenient"
+                             :also-must-bind
+                             (ht ("move cursor down one line" "j")
+                                 ("move cursor up one line" "k")
+                                 ("move cursor left" "h"))))))
              ("searches forward"
-              (ht ("/" "the character is a \"forward slash\" so we have the word \"forward\" in there")
-                  ("s" "search")
-                  ("f" "find/forward and is also commonly used in other software")))
+              (ht ("/" (list :rationale
+                             "the character is a \"forward slash\" so we have the word \"forward\" in there"
+                             :also-must-bind
+                             (ht ("searches backwards" "?"))))
+                  ("s" (list :rationale "search"))
+                  ("f" (list :rationale "word could be find/forward and is also commonly used in other software"))))
+             ("searches backwards"
+              (ht ("?" (list :rationale
+                             "the shifted version of \"/\""
+                             :also-must-bind
+                             (ht ("searches forward" "/"))))
+                  ("r" (list :rationale "reverse search"))
+                  ("b" (list :rationale "backwards search"))
+                  ("S" (list :rationale "shifted version of 's'"
+                             :also-must-bind (ht ("searches forward" "s"))))
+                  ("F" (list :rationale "shifted version of 'f'"
+                             :also-must-bind (ht ("searches forward" "f"))))))
+             ("jumps forwards to a single character"
+              (ht ("f" (list :rationale "go forward to the next character. This is vim's keybinding as well"
+                             :also-must-bind (ht ("jumps backwards to a single character" "F"))))))
+             ;; vim also has a motion 't' to move to the character
+             ;; BEFORE the specified character but I've never found much
+             ;; use for this as a motion, it really just seems useful to
+             ;; me as a text object.
+             ("jumps backwards to a single character"
+              (ht ("F" (list :rationale "the shifted version of the 'f' binding. This is vim's keybinding as well"
+                             :also-must-bind (ht ("jumps forwards to a single character" "f"))))))
              ("jumps to any character on the screen"
-              (ht ("z" "you \"zip\" around the buffer")
-                  ("j" "jump")))
+              (ht ("z" (list :rationale "you \"zip\" around the buffer"))
+                  ("j" (list :rationale "jump"))))
+             ("highlight text"
+              (ht ("h" (list :rationale "highlight"))
+                  ("v" (list :rationale "visually show what area of text is about to be operated on"))
+                  ("s" (list :rationale "select text"))))
+             ("switch buffers"
+              (ht ("b" (list :rationale
+                             "buffer"))
+                  ("C-b" (list :rationale
+                               "buffer and it is a control chord so it can consistently be used in any scenario such as that of a REPL which will always be in insert mode"))
+                  ("C-SPC" (list :rationale
+                                 "buffer switching is so common and the space bar is a big key so it's mechanically very accessible. If we're really mnemonic hunting we could say we're launching a space ship to go to a new place"))))
+             ("execute editor command"
+              (ht ("M-x" (list :rationale
+                               "This is what emacs does already so it's consistent but it also seems like a fine mnemonic since the 'x' can mean \"execute\""))))
              ("quits out of whatever emacs is doing"
-              (ht ("C-g" "the key that emacs uses to do this")
-                  ("C-q" "stands for quit but uses the control key so it can consistently be used in any mode"))))))
-    (length (-filter (lambda (keybindings) (equal (ht-get keybindings "d") "deletes a text object")) (generate-possible-editor-keybindings editor-behavior-to-possible-keybindings))))
+              (ht ("C-g" (list :rationale "the key that emacs uses to do this"))
+                  ("C-q" (list :rationale "stands for quit but uses the control key so it can consistently be used in any mode")))))))
+    (length (-filter (lambda (keybindings) (equal (ht-get keybindings "deletes a text object") "d")) (generate-possible-editor-keybindings editor-behavior-to-possible-keybindings))))
 #+end_src
 
 - q

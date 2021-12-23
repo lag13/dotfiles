@@ -1422,3 +1422,10 @@ of automatically."
 
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C-+") 'er/contract-region)
+
+;; On a windows machine I kept accidentally doing this action because
+;; my palm would accidentally click the mouse. It would open a buffer
+;; menu which I have no use for. TODO: I would like to understand how
+;; keybinding works better. Like, usually I do the "kbd" thing but
+;; here I've just got []?
+(global-unset-key [C-down-mouse-1])

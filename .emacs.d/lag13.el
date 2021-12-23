@@ -1642,6 +1642,8 @@ warms my heart to see it. I hope she's doing well."
 ;; mode (or whatever) where like C-n and C-p would not move the cursor
 ;; if they're hitting a wall.
 
+;; TODO: Finish this and then write something which just builds the
+;; proper S expression that we can then let elisp evaluate.
 (defun eval-infix-math-exp (exprs)
   (let (operand-stack
 	operation-stack
@@ -1735,6 +1737,8 @@ Regex mostly came from https://regexr.com/3ivk1"
  (get-401k-limit-from-google "2022")
  (("$20,500" ",500") ("$20500" "500") ("$20,500" ",500") ("$20,500" ",500") ("$20,500" ",500") ("$20500" "500") ("$20,500" ",500") ("$20,500." ",500" ".") ("$61,000" ",000") ("$20,500." ",500" ".") ("$20,500" ",500") ("$20,500" ",500") ("$19,500" ",500") ("$20,500" ",500")))
 
+;; TODO: Finish this retirement account contribution percentage thing
+;; so it actually pulls the data from google.
 (defun retirement-account-contribution-percentages (&rest plist)
   "Calculates what percentage of your salary you should
 contribute to your retirement accounts so you spread it out as
@@ -1758,3 +1762,36 @@ hit."
 					      :401k-limit 20500.0
 					      :annual-additions-limit 61000.0)
  )
+
+;; TODO: I was playing the board game pandemic and was trying out a
+;; very heavy research station building strategy and I started
+;; wondering, "what is the most optimal placement of research stations
+;; such that the distance from each city on the board to a research
+;; station is minimized". Seems like a fun problem, I'd like to mess
+;; around with it.
+
+;; TODO: I started a new job and wanted to get a list of repos that a
+;; particular user has worked on in the past so I knew what repos to
+;; take a look at. Try to get this into emacs. I believe this is also
+;; a GH client someone wrote which might be better than trying to roll
+;; my own: https://github.com/sigma/gh.el
+(defun search-github-commits (token)
+  (let* ((url-request-method "GET")
+	 (base64 (concat "Basic "
+			 (base64-encode-string
+			  (concat "lgroenendaal-salesforce" ":" token))))
+	 (url-request-extra-headers (list (cons "Content Type" "application/json")
+					  (cons "Authorization" base64))))
+    (condition-case nil
+	(url-retrieve-body-synchronously-str "https://api.github.com/search/commits?q=author:jpalmour"))))
+
+
+(comment
+ ;; Copy down the html from someone's page like
+ ;; https://github.com/jpalmour?tab=overview&from=2021-07-01&to=2021-07-31
+ ;; and then run this to see what repos they've worked on recently...
+ ;; huh, that is so weird. When I expand the list of recent
+ ;; contributions I can still see a month like "December" in the UI
+ ;; but when I go to inspect the source it only shows the previous
+ ;; month??? Why is html so weird sometimes. I don't understand how I can see something in the UI but it's not in the page source.
+ (-distinct (-map (lambda (href) (concat "https://github.com/" (combine-and-quote-strings (-take 3 (split-string href  "/")) "/"))) (-filter (lambda (href) (string-match "^/sfdc-mc-mj/[^/]+" href)) (-map (lambda (anchor-tag) (dom-attr anchor-tag 'href)) (dom-by-tag (libxml-parse-html-region (point-min) (point-max)) 'a))))))
