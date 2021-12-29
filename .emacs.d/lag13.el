@@ -55,8 +55,7 @@ equality."
 	 (null (-difference s2 s1)))))
 
 (defun ert-explain-set-equal? (s1 s2)
-  "Will help point out the differences in two sets in case there
-are some:
+  "Points out the differences between two sets:
 https://www.gnu.org/software/emacs/manual/html_node/ert/Defining-Explanation-Functions.html"
   (if (set-equal? s1 s2)
       nil
@@ -379,6 +378,7 @@ it."
 BASE-URL."
   (parse-buffer-as-html-and-get-urls-within-same-site (url-retrieve-synchronously base-url) base-url))
 
+;; Expanding on the ht.el library.
 (defun ht-collect-keys (pred table)
   "Builds a list of all keys from TABLE that satisfy PRED,
 which is a function of two arguments: KEY and VALUE."
@@ -404,16 +404,6 @@ level so I figured it was easier to just do a full copy."
 	     table)
     res))
 
-(defun deep-ht->alist (table)
-  "Does a deep conversion of a hash table to an alist. Just for
-fun and maybe it can help better visualize a \"hash\" table if
-there is a lot of nested (the printed form of a hash table is not
-super easy on the eyes)."
-  (ht-amap (if (ht? value)
-	       (cons key (deep-ht->alist value))
-	     (cons key value))
-	   table))
-
 (defun ht-key (table)
   "Returns single key (which will be random of course because
 it's a hash table) from the hash table. Created because I was
@@ -424,6 +414,46 @@ build up an entire list just to get one item."
     (ht-each (lambda (k _)
 	       (throw 'stop-early k))
 	     table)))
+
+(defun ht-map-values (function table)
+  "Maps over the values of TABLE and applies FUNCTION to them,
+constructing a new hash table."
+  (let ((res (ht)))
+    (ht-each (lambda (k v)
+	       (ht-set! res k (funcall function v)))
+	     table)
+    res))
+
+(defun ht-map-keys (function table)
+  "Maps over the keys of TABLE and applies FUNCTION to them,
+constructing a new hash table."
+  (let ((res (ht)))
+    (ht-each (lambda (k v)
+	       (ht-set! res (funcall function k) v))
+	     table)
+    res))
+
+(defun ht-map-items (function table)
+  "Maps FUNCTION over TABLE and constructs a new hash table.
+FUNCTION is a function of two arguments which should return a
+CONS pair (key . value) which will be used to build up the new
+hash table."
+  (let ((res (ht)))
+    (ht-each (lambda (k v)
+	       (let ((new-item (funcall function k v)))
+		 (ht-set! res (car new-item) (cdr new-item))))
+	     table)
+    res))
+
+(defun deep-ht->alist (table)
+  "Does a deep conversion of a hash table to an alist. Just for
+fun and maybe it can help better visualize a \"hash\" table if
+there is a lot of nested (the printed form of a hash table is not
+super easy on the eyes)."
+  (ht-amap (if (ht? value)
+	       (cons key (deep-ht->alist value))
+	     (cons key value))
+	   table))
 
 (defun crawl-site-one-level (site-hash-table)
   "Grows the hash table by crawling all urls who's value
@@ -1642,30 +1672,29 @@ warms my heart to see it. I hope she's doing well."
 ;; mode (or whatever) where like C-n and C-p would not move the cursor
 ;; if they're hitting a wall.
 
-;; TODO: Finish this and then write something which just builds the
-;; proper S expression that we can then let elisp evaluate.
 (defun eval-infix-math-exp (exprs)
+  "Evaluates an infix math expression."
   (let (operand-stack
 	operation-stack
 	(op-precedence '((+ . 0)
 			 (- . 0)
 			 (* . 1)
 			 (/ . 1))))
-    (push (pop exprs) operand-stack)
-    (push (pop exprs) operation-stack)
+    (if (listp (-first-item exprs))
+	(push (eval-infix-math-exp (pop exprs)) operand-stack)
+      (push (pop exprs) operand-stack))
     (while exprs
+      (push (pop exprs) operation-stack)
       (if (listp (-first-item exprs))
 	  (push (eval-infix-math-exp (pop exprs)) operand-stack)
 	(push (pop exprs) operand-stack))
-      (when (or (null exprs)
-		(>= (alist-get (-first-item operation-stack) op-precedence)
-		    (alist-get (-first-item exprs) op-precedence)))
+      (when (and exprs
+		 (>= (alist-get (-first-item operation-stack) op-precedence)
+		     (alist-get (-first-item exprs) op-precedence)))
 	(let ((right (pop operand-stack))
 	      (op (pop operation-stack))
 	      (left (pop operand-stack)))
-	  (push (funcall op left right) operand-stack)))
-      (when exprs
-	(push (pop exprs) operation-stack)))
+	  (push (funcall op left right) operand-stack))))
     (while operation-stack
       (let ((right (pop operand-stack))
 	    (op (pop operation-stack))
@@ -1673,15 +1702,53 @@ warms my heart to see it. I hope she's doing well."
 	(push (funcall op left right) operand-stack)))
     (pop operand-stack)))
 
-(defmacro infix-math (&rest exprs)
+(defmacro infix-math-eval (&rest exprs)
   "A macro which allows you to write infix math expressions (i.e.
-what we're used to doing) and converts them to the appropriate
-lisp code. Just wrote it for fun."
+what we're used to doing) and evaluates them. Just for fun. Note
+that this is NOT as powerful as the one below."
   `(eval-infix-math-exp ',exprs))
-;; (infix-math 1 + 2) -> (+ 1 2)
-;; (infix-math 1 + 2 * 3) -> (+ 1 (* 2 3))
-;; (infix-math 1 + 2 * 3 / 4 - 1) -> (- (+ 1 (/ (* 2 3) 4)) 1)
-;; (infix-math 1 + 2 * (3 - 4)) -> (+ 1 (* 2 (- 3 4)))
+
+(defun infix-to-prefix (exprs)
+  "Converts an infix math expression into lisp's good ol' prefix
+notation."
+  (let (operand-stack
+	operation-stack
+	(op-precedence '((+ . 0)
+			 (- . 0)
+			 (* . 1)
+			 (/ . 1))))
+    (if (listp (-first-item exprs))
+	(push (infix-to-prefix (pop exprs)) operand-stack)
+      (push (pop exprs) operand-stack))
+    (while exprs
+      (push (pop exprs) operation-stack)
+      (if (listp (-first-item exprs))
+	(push (infix-to-prefix (pop exprs)) operand-stack)
+      (push (pop exprs) operand-stack))
+      (when (and exprs
+		 (>= (alist-get (-first-item operation-stack) op-precedence)
+		     (alist-get (-first-item exprs) op-precedence)))
+	(let ((right (pop operand-stack))
+	      (op (pop operation-stack))
+	      (left (pop operand-stack)))
+	  (push (list op left right) operand-stack))))
+    (while operation-stack
+      (let ((right (pop operand-stack))
+	    (op (pop operation-stack))
+	    (left (pop operand-stack)))
+	(push (list op left right) operand-stack)))
+    (pop operand-stack)))
+
+(defmacro infix-math (&rest exprs)
+  "Let's you do infix math! As opposed to the previous
+\"infix-math*\" macro, this one is more powerful because the
+previous macro did the work of actually evaluating the math
+expression. This macro on the other hand rewrites the math
+expression into something lisp can evaluate and let's the eval
+step of the REPL take care of it. It's more powerful because it
+allows arbitrary symbols to be used in the expression. Fun
+stuff!"
+  (infix-to-prefix exprs))
 
 (defun frequencies (lst)
   "Returns a hash table indicating the frequencies of each
@@ -1711,57 +1778,74 @@ would execute."
 	   (-map #'url-hexify-string (split-string query " "))
 	   "+")))
 
-(defun get-401k-limit-from-google (year)
-  "Tries to figure out the 401k limit by doing a google search
-and looking for the most freqently occurring number which has at
-least 5 digits. Use case was that I wanted to write a function
-which tells you what percentage of your salary should go towards
-your 401k in order to max it out and I thought, \"wouldn't it be
-cool if I didn't have to lookup the 401k amount every time, I
-could just input the year?\". Thus this function was born!
+;; TODO: Make a "get all regex with X words of context" function.
+;; Original motivator was that I was trying to find out the annual
+;; additions limits for 2022 and got a google query plus logic that
+;; worked but the 2021 limit and the 2022 limit both showed up the
+;; same amount of times in the result and I was curious if another way
+;; to figure out the correct figure is to look for words around it
+;; like "from" preceding a value will probably indicate that is the
+;; old contribution limit. Similarly, seeing the year 2022 within the
+;; context could indicate that the value is for year 2022. Correctly
+;; parsing these values from
+;; https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-401k-and-profit-sharing-plan-contribution-limits
+;; is probably what I want to try doing and then mess around with
+;; seeing how one could properly parse them from google as well.
 
-Regex mostly came from https://regexr.com/3ivk1"
-  (float
-   (string-to-number
-    (most-frequent
-     (-map (lambda (matches)
-	     (replace-regexp--string "\\$\\|," "" (car matches)))
-	   (s-match-strings-all "\\$[1-9][0-9][0-9]?\\(,?[0-9]\\{3\\}\\)+\\(\\.[0-9]\\{0,2\\}\\)?"
-				(dom-texts (parse-html-from-url (construct-google-search-url (concat "401k " year " contribution limit"))))))))))
+(defun get-monetary-amounts-from-html (html)
+  "Returns all the monetary figures from some parsed html.
+Original use case for this function is that I wanted to
+programatically find out retirement fund contribution limits by
+querying google so I could just run a function every year to tell
+me what I should be contributing instead of figuring it out
+myself. Pretty funny. I would use an API to get this info if I
+could but after a bit of googling I gave up. This is more fun
+anyway.
 
-(comment
- (s-match-strings-all "\\$\\([0-9]\\{5\\}[0-9]*\\)"
-		      (dom-texts (parse-html-from-url (concat "https://www.google.com/search?q=401k+" year "+contribution+limit"))))
- (s-match-strings-all "\\$?[1-9][0-9][0-9]?(,?[0-9])"
-		      "20000")
- (get-401k-limit-from-google "2022")
- (("$20,500" ",500") ("$20500" "500") ("$20,500" ",500") ("$20,500" ",500") ("$20,500" ",500") ("$20500" "500") ("$20,500" ",500") ("$20,500." ",500" ".") ("$61,000" ",000") ("$20,500." ",500" ".") ("$20,500" ",500") ("$20,500" ",500") ("$19,500" ",500") ("$20,500" ",500")))
+Regex came from https://regexr.com/3ivk1 but god, emacs' regex
+language is atrocious isn't it? Too many backslashes. TODO: Could
+we fix the regex stuff somehow? Like, does emacs have a different
+regex library which does not use so many backslashes?"
+  (-map (lambda (matches)
+	  (->> (car matches)
+	       (replace-regexp-in-string "\\$\\|," "")
+	       (string-to-number)
+	       (float)))
+	(s-match-strings-all "\\$\\(0\\|[1-9][0-9]\\{0,2\\}\\(,?[0-9]\\{3\\}\\)+\\)\\(\\.[0-9]\\{0,2\\}\\)?"
+			     (dom-texts html))))
 
-;; TODO: Finish this retirement account contribution percentage thing
-;; so it actually pulls the data from google.
 (defun retirement-account-contribution-percentages (&rest plist)
   "Calculates what percentage of your salary you should
-contribute to your retirement accounts so you spread it out as
-much as you can over the year but still max it out. Assumes that
-the employer will limit your contributions once the limit is
-hit."
+contribute to your retirement accounts."
   (let ((salary (plist-get plist :salary))
 	(company-contribution (plist-get plist :company-contribution))
 	(401k-limit (plist-get plist :401k-limit))
 	(annual-additions-limit (plist-get plist :annual-additions-limit)))
-    `(:401k-percentage
-      ,(/ 401k-limit salary)
-      :after-tax-percentage
-      ,(/ (- annual-additions-limit (+ 401k-limit company-contribution))
-	  salary))))
+    (append `(:401k-percentage
+	      ,(truncate-decimal (* 100 (/ 401k-limit salary)) 2)
+	      :after-tax-percentage
+	      ,(truncate-decimal (* 100 (/ (- annual-additions-limit (+ 401k-limit company-contribution))
+					   salary))
+				 2))
+	    plist)))
 
-(comment
- ;; https://www.google.com/search?q=what+is+the+maximum+annual+additions+limit+for+2022
- (retirement-account-contribution-percentages :salary 170000.0
-					      :company-contribution 5000.0
-					      :401k-limit 20500.0
-					      :annual-additions-limit 61000.0)
- )
+(defun what-percentage-to-contribute-to-retirement-accounts (salary year)
+  "A command to tell you what to percentage of your paycheck to
+contribute to your retirement funds."
+  ;; TODO: Default the year to the next year (this function assumes
+  ;; I'm planning for the upcoming year).
+  (interactive "nEnter your salary: 
+nEnter the year: ")
+  ;; TODO: AGAIN, get that threading macro converter thing written so
+  ;; I can easily convert stuff like this.
+  (let ((salary (float salary))
+	(401k-limit (most-frequent (get-monetary-amounts-from-html (parse-html-from-url (construct-google-search-url (format "401k contribution limit for %d" year))))))
+	(annual-additions-limit (apply #'max (get-monetary-amounts-from-html (parse-html-from-url (construct-google-search-url (format "what is the maximum annual additions limit contribution for %d" year)))))))
+    ;; TODO: Could I print out a table in a temporary buffer which
+    ;; will close if I hit 'q'? I'm curious if emacs has a standard
+    ;; way of doing that (rgrep does it for example) or if you have to
+    ;; build it yourself and if so, how.
+    (message (pp-to-string (retirement-account-contribution-percentages :salary salary :401k-limit 401k-limit :annual-additions-limit annual-additions-limit :company-contribution 5000.0)))))
 
 ;; TODO: I was playing the board game pandemic and was trying out a
 ;; very heavy research station building strategy and I started
@@ -1770,11 +1854,21 @@ hit."
 ;; station is minimized". Seems like a fun problem, I'd like to mess
 ;; around with it.
 
+;; TODO: Could I make emacs tell chrome to open a url and then get the
+;; data from that page? I'm picturing that doing something like this
+;; could be a hacky way to get around needing API credentials.
+
 ;; TODO: I started a new job and wanted to get a list of repos that a
 ;; particular user has worked on in the past so I knew what repos to
 ;; take a look at. Try to get this into emacs. I believe this is also
 ;; a GH client someone wrote which might be better than trying to roll
-;; my own: https://github.com/sigma/gh.el
+;; my own: https://github.com/sigma/gh.el. In displaying this data, it
+;; could be interesting to make a table with two coordinate headers
+;; (one would be the repos and the other would be months) the cells at
+;; each intersection would be how many times that repo was committed
+;; too. I think that would be a good representation for showing both
+;; overal frequency of contributions as well as which repos were
+;; worked on more recently.
 (defun search-github-commits (token)
   (let* ((url-request-method "GET")
 	 (base64 (concat "Basic "
@@ -1785,13 +1879,222 @@ hit."
     (condition-case nil
 	(url-retrieve-body-synchronously-str "https://api.github.com/search/commits?q=author:jpalmour"))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; SEQ STUFF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Messing around with the seq.el library by trying to make it's
+;; abstraction work for hash tables. This seq stuff is reminding me of
+;; clojure's seq abstraction (although maybe it just reminds me of
+;; that because they both use the word "seq").
+(cl-defmethod seq-into-sequence ((sequence hash-table))
+  (ht->alist sequence))
 
-(comment
- ;; Copy down the html from someone's page like
- ;; https://github.com/jpalmour?tab=overview&from=2021-07-01&to=2021-07-31
- ;; and then run this to see what repos they've worked on recently...
- ;; huh, that is so weird. When I expand the list of recent
- ;; contributions I can still see a month like "December" in the UI
- ;; but when I go to inspect the source it only shows the previous
- ;; month??? Why is html so weird sometimes. I don't understand how I can see something in the UI but it's not in the page source.
- (-distinct (-map (lambda (href) (concat "https://github.com/" (combine-and-quote-strings (-take 3 (split-string href  "/")) "/"))) (-filter (lambda (href) (string-match "^/sfdc-mc-mj/[^/]+" href)) (-map (lambda (anchor-tag) (dom-attr anchor-tag 'href)) (dom-by-tag (libxml-parse-html-region (point-min) (point-max)) 'a))))))
+;; I THINK that each of these sequence methods should first turn the
+;; hash table into a list because a hash table is literally not a
+;; sequence of items, it has no order. It feels sort of odd to define
+;; this function for hash tables since, if you pass one in, you're
+;; going to get a random value but clojure's "first" function works
+;; like this so it's not unheard of.
+(cl-defmethod seq-elt ((sequence hash-table) n)
+  (seq-elt (seq-into-sequence sequence) n))
+
+(cl-defmethod seq-length ((sequence hash-table))
+  (ht-size sequence))
+
+(cl-defmethod seq-do (function (sequence hash-table))
+  (let ((s (seq-into-sequence sequence)))
+    (seq-do function s)
+    s))
+
+(cl-defmethod seqp ((object hash-table)) t)
+
+(cl-defmethod seq-subseq ((sequence hash-table) start &optional end)
+  (seq-subseq (seq-into-sequence sequence) start end))
+
+(cl-defmethod seq-copy ((sequence hash-table))
+  (seq-into-sequence sequence))
+
+(cl-defmethod seq-into ((sequence hash-table) type)
+  (seq-into (seq-into-sequence sequence) type))
+
+(cl-defmethod seq-sort (pred (sequence hash-table))
+  "The seq.el documentation says that these \"seq-*\" functions
+are the ones that must be implemented by new seq types:
+
+- `seq-elt'
+- `seq-length'
+- `seq-do'
+- `seqp'
+- `seq-subseq'
+- `seq-into-sequence'
+- `seq-copy'
+- `seq-into'
+
+I was assuming that these were the \"axioms\" and that all other
+functionality in that file was implemented using these but that
+does not seem to be true. seq-sort for instance doesn't work for
+hash tables even after defining them so I'm kind of confused why
+those functions were singled out."
+  (seq-sort pred (seq-into-sequence sequence)))
+
+;; TODO: Can I create a "set" type in elisp? What would that look
+;; like?
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; table.el utility functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; I want to play around with turning data structures like lists or
+;; hashmaps (or whatever) into other, more visually consumable, things
+;; which in this case is the humble table. I guess I feel like there
+;; are lots of ways to model/display data and I want to be more
+;; proficient at it because I don't think I am but I think becoming
+;; more proficient would make me a better programmer. table.el seems
+;; to be a neat package for embedding text tables in any ol' emacs
+;; buffer so I'll be playing around with that.
+
+;; TODO: Should I define a macro to define "table" functions which
+;; first check to make sure that point is in a table before proceding?
+(defun table-goto-top-left-cell ()
+  "Goes to the top left cell within the table. table.el has a
+function to go to the top left corner but doesn't have this one
+which feels curious to me since I feel like it's useful to be
+able to move to this particular cell? My use case for this
+function is that whenever we move to a specific cell we'll first
+start by going to this cell and then moving forward by cell until
+we get to the one we want. Perhaps there's another way but I
+didn't see it offhand."
+  (unless (table--probe-cell) (error "Table not found here"))
+  (table-goto-top-left-corner)
+  ;; At first this was "next-line" and boy was I seeing some funky
+  ;; behavior that I still don't quite understand. The docs do say not
+  ;; to use next-line in elisp code but still, it was so funky!
+  (forward-line)
+  (forward-char))
+
+(defun table-set-cell-contents (string col row &optional justify)
+  "Inserts a string STRING at COL and ROW. The top left col is
+col == row == 0. I decided to place COL before ROW because the
+board games chess and go also seem to identify positions on the
+board by saying the col first followed by the row."
+  (unless (table--probe-cell) (error "Table not found here"))
+  (save-mark-and-excursion
+    (table-goto-top-left-cell)
+    (table-forward-cell (+ col (* row (-fifth-item (table-query-dimension)))))
+    (table-insert-sequence "" 1 42 394 'no-matter)	    
+    (table-insert-sequence string 1 0 0 (or justify 'left))))
+
+(defun table-set-row-contents (data row)
+  "Inserts the elements of DATA into row ROW of the table the
+point is in."
+  (cl-loop for i from 0 to (1- (length data))
+	   do (table-set-cell-contents (nth i data) i row)))
+
+(defun table-insert-from-data (data)
+  "Creates a table.el table and fills it with data. DATA is a
+list of lists and each inner list will be a row in the generated
+table."
+  (table-insert (length (car data)) (length data))
+  (cl-loop for row from 0 to (1- (length data))
+	   do (table-set-row-contents (nth row data) row)))
+
+(defun get-recent-repo-commit-stats ()
+  "Returns info about the recent repos someone has made commits
+to. It takes some manual setup before it can be called (it was
+made for a very specific and unimportant reason). It's also not
+entirely \"correct\" since it just looks for all repo links on a
+specific page instead of specifically looking for commits. Steps
+to calling it are:
+
+- Go to someone's github page like https://github.com/jpalmour
+- Expand their recent commit history as much as desired
+- In chrome do \"inspect element\"
+- Right click on the topmost <html> element and click \"copy element\"
+- Paste that into a new buffer
+- Run this function
+
+It's worth pointing out that you HAVE to do the \"inspect
+element\" view instead of the \"view source\" action because
+doing \"view source\" only shows the ORIGINAL source of the page
+not including any modifications which might have been made
+through javascript (in this case javascript seems to add more
+history to the page).
+
+The original motivation for this function was that I started a
+new job and I wanted to see what a fellow team mate was working
+on in recent months to get a sense of what repos I would be
+looking at. I originally wanted to write API calls (and still
+might) but I had initial trouble getting it to work so I quickly
+reverted to something that I felt confident would work."
+  (let* ((repos-worked-on
+	  (->> (dom-by-tag (libxml-parse-html-region (point-min) (point-max)) 'a)
+	       (-map (lambda (anchor-tag) (url-generic-parse-url (dom-attr anchor-tag 'href))))
+	       (-filter (lambda (urlobj) (string-match "^/sfdc-mc-mj/[^/]+" (car (url-path-and-query urlobj)))))
+	       (-map (lambda (urlobj)
+		       (setf (url-host urlobj) "github.com")
+		       (setf (url-type urlobj) "https")
+		       (setf (url-fullness urlobj) t)
+		       (setf (url-filename urlobj) (combine-and-quote-strings (-take 3 (split-string (url-filename urlobj) "/")) "/"))
+		       (url-recreate-url urlobj)))))
+	 (repos-recently-worked-on (-distinct repos-worked-on)))
+    (ht-map-items (lambda (repo freq)
+		    (cons repo (list :num-links freq
+				     :how-recent (seq-position repos-recently-worked-on repo))))
+		  (frequencies repos-worked-on))))
+
+;; TODO: Make a function which takes some html and returns all dom
+;; elements which appear AFTER some text that is visible on the
+;; screen. I feel like I'm not super familar with the structure of
+;; that data and thought this could be a neat potentially useful thing
+;; to know.
+
+;; TODO: I recently learned about the emacs feature called "table"
+;; (locate-library "table") which seems to be a mode independent
+;; method of having a table (contrast that with org mode's tables
+;; which require you to be in org mode), not sure on the history with
+;; that but either way, it has a function "table-insert-sequence"
+;; which can insert a sequence of numbers and even increment them as
+;; it goes across the cells and it got me thinking that it could be a
+;; cool way to do a visualization of the sieve of erastothenes (or
+;; whatever it's called) algorithm.
+
+;; TODO: Make hash tables implement the seq interface'y thing. I think
+;; that would be useful to be able to sort hash tables and such. I'd
+;; also like to revisit clojure sequences after this because I think
+;; I'd have a better appreciation for them.
+
+;; This seems like a fantastic overview of what this guy likes in
+;; clojure: https://blog.taylorwood.io/2017/09/15/year-behind.html
+
+;; TODO: I had an interesting thought. If, when defining a function,
+;; the types for each argument were distinct, why not allow the
+;; function to be called with either order of arguments? Could that
+;; help (functions could potentially work in more situations like
+;; threading macros) or would it just be confusing? See if we can try
+;; it out in emacs!
+
+;; I feel like hash tables and alists are better when both the keys
+;; and the values are data which could be "anything" where plists feel
+;; nice to represent "structs" which have defined static fields.
+
+;; TODO: Could I bring the "transducer"
+;; https://clojure.org/reference/transducers functionality from
+;; clojure into emacs? I'm curious what that would look like.
+
+;; TODO: I remember when I was learning some clojure I was confused
+;; about why, when I did a "map" operation over, let's say, a set, why
+;; does it return a list instead of a set? I still don't really know
+;; the answer but it feels like there must be a reason because I see
+;; emacs' implementation of a sequence seems to have similar
+;; functionality. What is going on here?
+
+;; TODO: At work today we wanted to diff a yaml file in something we
+;; knew that work and something we knew that didn't and try to find
+;; the differences. First off, learn how to do a basic diff in emacs
+;; instead of using the "diff" unix utility. Secondly though, I think
+;; it would be good to build a "structured diff" in emacs which could
+;; take yaml and tell you what is different since diffing a data
+;; structure line by line just seems silly.
+
+;; TODO: Other visualizations for data could be choropleth maps, pie
+;; charts, bar charts, some sort of pivot table like display of data.
+;; See what it takes to get emacs displaying these.

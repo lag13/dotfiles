@@ -229,13 +229,17 @@ keybindings and I can choose one which feels good:
                                                    (ht-get bound-key)
                                                    (plist-get :also-must-bind)))
                                               (desired-key (ht-get also-must-bind action)))
-                                       (equal possible-key desired-key)
+                                       (if (stringp desired-key)
+                                           (equal possible-key desired-key)
+                                         (-contains? desired-key possible-key))
                                      t))
                                  (ht-items actions->keys))
                          ;; every key in the mapping must honor this
                          ;; key's "must bind" attribute.
                          (-every (-lambda ((must-bind-action must-bind-key))
-                                   (equal must-bind-key (ht-get actions->keys must-bind-action must-bind-key)))
+                                   (if (stringp must-bind-key)
+                                       (equal must-bind-key (ht-get actions->keys must-bind-action must-bind-key))
+                                     (-contains? must-bind-key (ht-get actions->keys must-bind-action must-bind-key))))
                                  (ht-items also-must-bind))))
                       (generate-possible-editor-keybindings copy))))
                 (-each all-keybindings
@@ -307,19 +311,18 @@ keybindings and I can choose one which feels good:
     ;; bound to C-z then we probably wouldn't want to bind 'U' anymore.
     (should (set-equal?
              (generate-possible-editor-keybindings
-              (ht ("move cursor up one line"
+              (ht ("move cursor down one line"
+                   (ht ("n" nil)
+                       ("j" (list :also-must-bind
+                                  (ht ("move cursor left" "h")
+                                      ("move cursor up one line" "k")
+                                      ("move cursor right" "l"))))))
+                  ("move cursor up one line"
                    (ht ("p" nil)
                        ("k" (list :also-must-bind
                                   (ht ("move cursor left" "h")
                                       ("move cursor down one line" "j")
                                       ("move cursor right" "l"))))))
-                  ("move cursor down one line"
-                   (ht ("n" nil)
-                       ("j" (list :also-must-bind
-                                  (ht ("move cursor left" "h")
-                                      ("move cursor up one line" "k")
-                                      ("move cursor right" "l")))))
-                   )
                   ("move cursor left"
                    (ht ("b" nil)
                        ("h" (list :also-must-bind
@@ -337,26 +340,62 @@ keybindings and I can choose one which feels good:
                        ("k" nil)
                        ("d" nil)))))
              (list
-              (ht ("move cursor up one line" "p")
-                  ("move cursor down one line" "n")
+              (ht ("move cursor down one line" "n")
+                  ("move cursor up one line" "p")
                   ("move cursor left" "b")
                   ("move cursor right" "f")
                   ("lookup documentation" "h"))
-              (ht ("move cursor up one line" "p")
-                  ("move cursor down one line" "n")
+              (ht ("move cursor down one line" "n")
+                  ("move cursor up one line" "p")
                   ("move cursor left" "b")
                   ("move cursor right" "f")
                   ("lookup documentation" "k"))
-              (ht ("move cursor up one line" "p")
-                  ("move cursor down one line" "n")
+              (ht ("move cursor down one line" "n")
+                  ("move cursor up one line" "p")
                   ("move cursor left" "b")
                   ("move cursor right" "f")
                   ("lookup documentation" "d"))
-              (ht ("move cursor up one line" "k")
-                  ("move cursor down one line" "j")
+              (ht ("move cursor down one line" "j")
+                  ("move cursor up one line" "k")
                   ("move cursor left" "h")
                   ("move cursor right" "l")
-                  ("lookup documentation" "d"))))))
+                  ("lookup documentation" "d")))))
+    (should (set-equal?
+             (generate-possible-editor-keybindings
+              (ht ("move cursor down one line"
+                   (ht ("j" (list :also-must-bind
+                                  (ht ("move cursor left" '("h" "l"))
+                                      ("move cursor up one line" "k")
+                                      ("move cursor right" '("l" ";")))))))
+                  ("move cursor up one line"
+                   (ht ("k" (list :also-must-bind
+                                  (ht ("move cursor left" '("h" "l"))
+                                      ("move cursor down one line" "j")
+                                      ("move cursor right" '("l" ";")))))))
+                  ("move cursor left"
+                   (ht ("h" (list :also-must-bind
+                                  (ht ("move cursor down one line" "j")
+                                      ("move cursor up one line" "k")
+                                      ("move cursor right" "l"))))
+                       ("l" nil)))
+                  ("move cursor right"
+                   (ht ("l" (list :also-must-bind
+                                  (ht ("move cursor down one line" "j")
+                                      ("move cursor up one line" "k")
+                                      ("move cursor left" "h"))))
+                       (";" (list :also-must-bind
+                                  (ht ("move cursor down one line" "j")
+                                      ("move cursor up one line" "k")
+                                      ("move cursor left" "l"))))))))
+             (list
+              (ht ("move cursor down one line" "j")
+                  ("move cursor up one line" "k")
+                  ("move cursor left" "h")
+                  ("move cursor right" "l"))
+              (ht ("move cursor down one line" "j")
+                  ("move cursor up one line" "k")
+                  ("move cursor left" "l")
+                  ("move cursor right" ";"))))))
 
 
   ;; "zoom" could be a possible z keybinding too. That could mean
@@ -396,22 +435,22 @@ keybindings and I can choose one which feels good:
               (ht ("z" (list :rationale "zip lines together"))
                   ("j" (list :rationale "join"))
                   ("y" (list :rationale "yolk as a verb means to join"))))
-             ("move cursor up one line"
-              (ht ("p" (list :rationale "previous"))
-                  ("u" (list :rationale "up"))
-                  ("k" (list :rationale "the vim binding, no mnemonic but mechanically convenient"
-                             :also-must-bind (ht ("move cursor left" "h")
-                                                 ("move cursor down one line" "j")
-                                                 ("move cursor right" "l"))))))
              ("move cursor down one line"
               (ht ("n" (list :rationale "next"))
                   ("d" (list :rationale "down"))
                   ("j" (list :rationale "the vim binding, no mnemonic but mechanically convenient"
                              :also-must-bind
-                             (ht ("move cursor left" "h")
+                             (ht ("move cursor left" '("h" "l"))
                                  ("move cursor up one line" "k")
-                                 ("move cursor right" "l")))))
+                                 ("move cursor right" '("l" ";"))))))
               )
+             ("move cursor up one line"
+              (ht ("p" (list :rationale "previous"))
+                  ("u" (list :rationale "up"))
+                  ("k" (list :rationale "the vim binding, no mnemonic but mechanically convenient"
+                             :also-must-bind (ht ("move cursor left" '("h" "l"))
+                                                 ("move cursor down one line" "j")
+                                                 ("move cursor right" '("l" ";")))))))
              ("move cursor left"
               (ht ("b" (list :rationale "back"))
                   ("l" (list :rationale "left"))
@@ -427,7 +466,23 @@ keybindings and I can choose one which feels good:
                              :also-must-bind
                              (ht ("move cursor down one line" "j")
                                  ("move cursor up one line" "k")
-                                 ("move cursor left" "h"))))))
+                                 ("move cursor left" "h"))))
+                  (";" (list :rationale "as long as it is bound with j, k, and l then the right hand literally rests on these keys"
+                             :also-must-bind (ht ("move cursor down one line" "j")
+                                                 ("move cursor up one line" "k")
+                                                 ("move cursor left" "l"))))))
+             ("move cursor forward one word"
+              (ht ("w" (list :rationale "word"))))
+             ("move cursor backwards one word"
+              (ht ("W" (list :rationale "shifted version of 'w'"
+                             :also-must-bind (ht ("move cursor forward one word" "w"))))
+                  ("b" (list :rationale "backwards"))))
+             ("move forwards by expression"
+              (ht ("s" (list :rationale "could stand for \"structure\". Also, S-expression is the lispy term for any sort of expression in lisp"
+                             :also-must-bind (ht ("move backwards by expression" "S"))))))
+             ("move backwards by expression"
+              (ht ("S" (list :rationale "the shifted version of 's'"
+                             :also-must-bind (ht ("move forwards by expression" "s"))))))
              ("searches forward"
               (ht ("/" (list :rationale
                              "the character is a \"forward slash\" so we have the word \"forward\" in there"
@@ -463,6 +518,22 @@ keybindings and I can choose one which feels good:
               (ht ("h" (list :rationale "highlight"))
                   ("v" (list :rationale "visually show what area of text is about to be operated on"))
                   ("s" (list :rationale "select text"))))
+             ("undo change"
+              (ht ("u" (list :rationale "undo"))))
+             ("redo change"
+              (ht ("U" (list :rationale "the shifted version of 'u'"
+                             :also-must-bind (ht ("undo change" "u"))))))
+             ("paste"
+              (ht ("p" (list :rationale "paste"))))
+             ("use register for text"
+              (ht ("C-r" (list :rationale "r for register and it could be consistent in insert mode"))))
+             ("go to definition"
+              (ht ("D" (list :rationale "definition"))
+                  ("S" (list :rationale "source code"))
+                  ("M-." (list :rationale "this is the binding emacs uses"))))
+             ("lookup documentation on"
+              (ht ("D" (list :rationale "documentation. Use an uppercase instead of a lowercase because one won't likely need to quickly type characters after"))
+                  ("K" (list :rationale "knowledge. Use an uppercase instead of a lowercase because one won't likely need to quickly type characters after"))))
              ("switch buffers"
               (ht ("b" (list :rationale
                              "buffer"))

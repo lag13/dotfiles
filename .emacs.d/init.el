@@ -1429,3 +1429,42 @@ of automatically."
 ;; keybinding works better. Like, usually I do the "kbd" thing but
 ;; here I've just got []?
 (global-unset-key [C-down-mouse-1])
+
+;; TODO: Another thought (which I may have already had lol) in the
+;; interest of code splunking. If I see something which I think is
+;; useful, I think it would be nice to "mark" the buffer I'm in so I
+;; know to return to it. Maybe if the buffers were displayed in a
+;; tabline across the top then that tab could be highlighted.
+
+;; TODO: I think somehow my "buffer-file-coding-system" variable is
+;; set to utf-8-unix. I say this because I was noticing those carriage
+;; return characters (displayed as ^M) in my windows files but when I
+;; opened emacs without any configuration, "buffer-file-coding-system"
+;; was set to utf-8-dos. I'm not sure where this gets set but sniff it
+;; out.
+
+;; TODO: It's really so frustrating sometimes how much time I end up
+;; fighting with my editor sometimes. Sometimes it's not even that any
+;; thing is SUPER wrong per se but something is not right and I want
+;; to figure out why so I get distracted. Like with why the normal
+;; info documentation isn't showing up on this windows version of
+;; emacs or why the carriage return character is getting displayed on
+;; windows in my configured emacs but not an emacs without
+;; configuration. Maybe other editors would be like this too but it
+;; feels like other editors might just be more... polished or
+;; something. Emacs and vim allow so much customization (especially
+;; emacs) that I feel like it might be tougher to track down what the
+;; problem is but with another editor that is more managed, maybe that
+;; isn't the case? Maybe I should check out visual studio code, I get
+;; the impression that it "just works".
+
+;; TODO: Mess around with trying to get a feature where I can
+;; temporarily make a specific window the largest and only window but
+;; then I can revert later:
+;; https://stackoverflow.com/questions/7641755/maximizing-restoring-a-window-in-emacs
+
+;; TODO: I think that for code splunking it could be helpful to be
+;; able to have point on a place in a git managed file and have it
+;; generate the "permalink" for that spot in the file. Furthermore,
+;; emacs could then open that link locally instead of opening up the
+;; link in github.
