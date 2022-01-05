@@ -378,7 +378,9 @@ it."
 BASE-URL."
   (parse-buffer-as-html-and-get-urls-within-same-site (url-retrieve-synchronously base-url) base-url))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Expanding on the ht.el library.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun ht-collect-keys (pred table)
   "Builds a list of all keys from TABLE that satisfy PRED,
 which is a function of two arguments: KEY and VALUE."
@@ -445,15 +447,31 @@ hash table."
 	     table)
     res))
 
-(defun deep-ht->alist (table)
+(defun ht-deep-ht->alist (table)
   "Does a deep conversion of a hash table to an alist. Just for
 fun and maybe it can help better visualize a \"hash\" table if
 there is a lot of nested (the printed form of a hash table is not
 super easy on the eyes)."
   (ht-amap (if (ht? value)
-	       (cons key (deep-ht->alist value))
+	       (cons key (ht-deep-ht->alist value))
 	     (cons key value))
 	   table))
+
+(defun ht->list-of-lists (table)
+  "Similar to `ht->alist' but turns the hash table into a list of
+lists instead of a list of cons cells. It's worth pointing out
+that alists are sometimes just lists of two element lists so this
+function could probably technically be called ht->alist as well
+but I like the definition of alists better when the cdr is the
+value:
+https://www.gnu.org/software/emacs/manual/html_node/elisp/Association-List-Type.html
+
+This was created because I created a function
+`table-insert-from-data' to convert lisp data into a table that
+gets displayed on screen and that function expects a list of
+lists so I need to be able to turn a hash table into that if I
+want display hash tables as data!"
+  (ht-map (lambda (k v) (list k v)) table))
 
 (defun crawl-site-one-level (site-hash-table)
   "Grows the hash table by crawling all urls who's value
@@ -1503,37 +1521,6 @@ reason. Feels like it takes more mental gymnastics or something."
 		  '(())
 		  lists)))
 
-(defun crossword-brute-enumerate-words ()
-  "Sometimes you get to a point in a crossword where you have an
-unfinished word with only a couple blank spots and you can't come
-up with the answer but you suspect that you could recognize the
-answer if it was shown to you. I wrote this function to help with
-that.
-
-TODO: I just did it for this one word. How do we generalize this
-though? We could generalize it for the number of blank spots AND
-have it work for any word with letters in differing locations.
-Maybe the input could be something like:
-
-\"ga__ry\"
-
-and it tries to fill in the blank spots. Or it would be cool if
-we could get even more granualar and specify a set of letters we
-want to fill in a certain spot (because we typically can narrow
-down which letters just \"don't fit\" based on our english
-knowledge).
-
-Also it would be cool to lookup these words in the dictionary to
-filter out any non-words. That feels a little like cheating but
-maybe it could be a last resort sort of thing if it's really
-tough figuring out what the word is."
-  (let ((acc nil)
-	(alphabet "abcdefghijklmnopqrstuvwxyz"))
-    (cl-loop for i across alphabet
-	     do (cl-loop for j across alphabet
-			 do (setq acc (cons (concat "ga" (char-to-string i) (char-to-string j) "ry") acc))))
-    acc))
-
 ;; TODO: It known far and wide that I like coming up with different
 ;; implementations for functions. Normally I'll just write them next
 ;; to eachother and append a number to the function name and maybe
@@ -1937,6 +1924,19 @@ hash tables even after defining them so I'm kind of confused why
 those functions were singled out."
   (seq-sort pred (seq-into-sequence sequence)))
 
+;; TODO: Should we get this function added to seq.el? Seems
+;; potentially useful?
+(defun seq-filter-indexed (pred sequence)
+  "Filters a sequence using PRED which a function of two
+arguments: the element from SEQUENCE and the index of the element
+in SEQUENCE."
+  (let (res)
+    (seq-do-indexed (lambda (elt index)
+		      (when (funcall pred elt index)
+			(push elt res)))
+		    sequence)
+    (nreverse res)))
+
 ;; TODO: Can I create a "set" type in elisp? What would that look
 ;; like?
 
@@ -1971,15 +1971,18 @@ didn't see it offhand."
   (forward-line)
   (forward-char))
 
+(defun table-goto-table-cell (col row)
+  "Goes to a specific cell in the table as set by COL and ROW."
+  (table-goto-top-left-cell)
+  (table-forward-cell (+ col (* row (-fifth-item (table-query-dimension))))))
+
 (defun table-set-cell-contents (string col row &optional justify)
   "Inserts a string STRING at COL and ROW. The top left col is
 col == row == 0. I decided to place COL before ROW because the
 board games chess and go also seem to identify positions on the
 board by saying the col first followed by the row."
-  (unless (table--probe-cell) (error "Table not found here"))
   (save-mark-and-excursion
-    (table-goto-top-left-cell)
-    (table-forward-cell (+ col (* row (-fifth-item (table-query-dimension)))))
+    (table-goto-table-cell col row)
     (table-insert-sequence "" 1 42 394 'no-matter)	    
     (table-insert-sequence string 1 0 0 (or justify 'left))))
 
@@ -1996,6 +1999,32 @@ table."
   (table-insert (length (car data)) (length data))
   (cl-loop for row from 0 to (1- (length data))
 	   do (table-set-row-contents (nth row data) row)))
+
+(defun every-nth-item (n start list)
+  "Returns every N'th item in LIST starting at index START."
+  (cl-loop for i = start then (+ i n)
+	   until (>= i (length list))
+	   collect (nth i list)))
+
+(defun plist->values (plist)
+  "Converts a plist PLIST into a regular list of it's values."
+  (seq-filter-indexed (lambda (_elt index)
+			(zerop (mod (1+ index) 2)))
+		      plist))
+
+(defun plist->keys (plist)
+  "Converts a plist PLIST into a regular list of it's keys. Does
+it in a different manner than the above just for fun."
+  (-select-by-indices (-iterate (lambda (index)
+				  (+ index 2))
+				0
+				(/ (length plist) 2))
+		      plist))
+
+(defun plist->property-names (plist)
+  "Same exact thing as `plist->keys' just with a different name
+and implementation."
+  (every-nth-item 2 0 plist))
 
 (defun get-recent-repo-commit-stats ()
   "Returns info about the recent repos someone has made commits
@@ -2098,3 +2127,135 @@ reverted to something that I felt confident would work."
 ;; TODO: Other visualizations for data could be choropleth maps, pie
 ;; charts, bar charts, some sort of pivot table like display of data.
 ;; See what it takes to get emacs displaying these.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; paper mario bath math minor mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar paper-mario-bath-math-num-goombas 0
+  "The number of goombas in the bath.")
+
+(defun paper-mario-bath-math-sub1 ()
+  (interactive)
+  (setq paper-mario-bath-math-num-goombas (1- paper-mario-bath-math-num-goombas))
+  (message "%d" paper-mario-bath-math-num-goombas))
+
+(defun paper-mario-bath-math-reset ()
+  (interactive)
+  (setq paper-mario-bath-math-num-goombas 0)
+  (message "%d" paper-mario-bath-math-num-goombas))
+
+(defun paper-mario-bath-math-add1 ()
+  (interactive)
+  (setq paper-mario-bath-math-num-goombas (1+ paper-mario-bath-math-num-goombas))
+  (message "%d" paper-mario-bath-math-num-goombas))
+
+(defvar paper-mario-bath-math-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "q") #'paper-mario-bath-math-sub1)
+    (define-key map (kbd "r") #'paper-mario-bath-math-reset)
+    (define-key map (kbd "p") #'paper-mario-bath-math-add1)
+    map))
+
+;; TODO: Make this minor mode also properly override the keybindings
+;; that evil-mode makes (just for fun). I think it would also be neat
+;; to have the counter appear large on the screen instead of just a
+;; tiny number in the corner.
+(define-minor-mode paper-mario-bath-math-mode
+  "Correctly count the goombas in this mini game:
+https://mariopartylegacy.com/paper-mario-the-origami-king/guides/walkthrough/shy-guys-finish-last/
+
+Originally created because my sister and I were having a bit of
+trouble doing the harder difficulty of this challenge and I wanted to
+make it easier. In this case one person can just keep track of goombas
+coming in and the other person can keep track of goombas leaving.
+
+This ended not really being useful actually because we kept
+misclicking lol and we got better at just doing it in our heads
+anyway but it was pretty fun to make so I'm keeping it.
+
+I made this a minor mode because that seems like a way to
+basically temporarily create key bindings (i.e. I can enable this
+minor mode to get the keybindings I want and then disable the
+minor mode and the old keybindings won't be disturbed)."
+  :lighter "PAPER MARIO BATH MATH"
+  :keymap paper-mario-bath-math-mode-map)
+
+(defun crossword-brute-enumerate-words ()
+  "Sometimes you get to a point in a crossword where you have an
+unfinished word with only a couple blank spots and you can't come
+up with the answer but you suspect that you could recognize the
+answer if it was shown to you. I wrote this function to help with
+that.
+
+TODO: I just did it for this one word. How do we generalize this
+though? We could generalize it for the number of blank spots AND
+have it work for any word with letters in differing locations.
+Maybe the input could be something like:
+
+\"ga__ry\"
+
+and it tries to fill in the blank spots. Or it would be cool if
+we could get even more granualar and specify a set of letters we
+want to fill in a certain spot (because we typically can narrow
+down which letters just \"don't fit\" based on our english
+knowledge).
+
+Also it would be cool to lookup these words in the dictionary to
+filter out any non-words. That feels a little like cheating but
+maybe it could be a last resort sort of thing if it's really
+tough figuring out what the word is."
+  (let ((acc nil)
+	(alphabet "abcdefghijklmnopqrstuvwxyz"))
+    (cl-loop for i across alphabet
+	     do (cl-loop for j across alphabet
+			 do (setq acc (cons (concat "ga" (char-to-string i) (char-to-string j) "ry") acc))))
+    acc))
+
+(defun seq-remove-first (pred seq)
+  "Removes the first item from SEQ for which PRED returns
+non-nil."
+  (let (res
+	removed)
+    (seq-doseq (elt seq)
+      (if (and (not removed)
+	       (funcall pred elt))
+	  (setq removed t)
+	(push elt res)))
+    (nreverse res)))
+
+(defun seq-remove-first-elt (seq elt)
+  "Removes from SEQ the first occurrence of ELT."
+  (seq-remove-first (lambda (elt2) (equal elt elt2)) seq))
+
+(defun permutations (list)
+  "Returns all permutations of LIST."
+  ;; Fun fact, if I remove the if and then branch and leave (let (res
+  ;; '(()))) then this seems to be the powerset function.
+  (if (null list)
+      '(())
+    (let (res)
+      (seq-do (lambda (elt)
+		(setq res (append res
+				  (seq-map (lambda (perm) (cons elt perm)) (permutations (seq-remove-first-elt list elt))))))
+	      ;; Makes it so we don't generate duplicates which would
+	      ;; happen there are repeated elements.
+	      (seq-uniq list))
+      res)))
+
+;; TODO: Make a function to generate permutations of letters which
+;; will help with the app "word collect". The function would probably
+;; take info such as the number of letters in the word, word that
+;; precedes the desired word alphabetically, and word that follows the
+;; desired word alphabetically.
+
+;; TODO: I notice that evil's "gd" behaves differently than emacs' M-.
+;; Why is this? I think M-. seems better at least for elisp code
+;; because I wanted to get to the definition of "seq-into" and when I
+;; used M-. it gave me a couple options, namely, my definition in this
+;; file and the one in seq-25.el but when I did "gd" it just went to
+;; the one defined in this file.
+
+;; TODO: I've been doing salesforce trailmaps about accessibility
+;; (screenreaders, making sure webpages can be navigated with a
+;; keyboard, etc...) and it's making me wonder about what it would
+;; look like to make emacs more accessible.
