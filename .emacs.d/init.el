@@ -25,6 +25,7 @@
  '(evil-cross-lines t)
  '(evil-disable-insert-state-bindings t)
  '(evil-exchange-highlight-face 'link)
+ '(evil-kill-on-visual-paste nil)
  '(evil-want-fine-undo nil)
  '(evil-want-keybinding nil)
  '(explicit-shell-file-name "bash")
@@ -48,6 +49,7 @@
    '(evil-visualstar evil-exchange evil-surround evil-indent-plus evil-numbers orderless evil-args evil-nerd-commenter evil-commentary evil-collection rg deadgrep vertico helm ivy projectile fsharp-mode expand-region evil xmlgen web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
  '(pdf-view-midnight-colors (cons "#bbc2cf" "#282c34"))
  '(recentf-mode t)
+ '(rg-command-line-flags '("--hidden"))
  '(rustic-ansi-faces
    ["#282c34" "#ff6c6b" "#98be65" "#ECBE7B" "#51afef" "#c678dd" "#46D9FF" "#bbc2cf"])
  '(send-mail-function 'smtpmail-send-it)
@@ -1500,6 +1502,7 @@ of automatically."
 ;; the output of rg to do a search and replace thing? I think I need
 ;; to review search and replace stuff.
 (define-key evil-normal-state-map (kbd "s") #'rg-project)
+(define-key evil-normal-state-map (kbd "S") #'rg)
 
 ;; Argument text objects. TODO: I notice that if an argument is a
 ;; string with a "," in it then it doesn't work. Could we make it
@@ -1516,6 +1519,8 @@ of automatically."
 ;; prefix.
 (evil-define-key '(normal visual) 'global "+" #'evil-numbers/inc-at-pt)
 (evil-define-key '(normal visual) 'global "-" #'evil-numbers/dec-at-pt)
+
+
 
 ;; TODO: I'm not sure if there are emacs/evil motions to move by
 ;; indentation level even though I feel like there should be? After
@@ -1554,6 +1559,11 @@ of automatically."
 ;; Just gotta have it!
 (global-evil-visualstar-mode)
 
+;; TODO: See todos in this file, I think it's best that I add the
+;; functionality I'm achieving in this file by making an addition to
+;; evil-mode itself.
+(load "~/.emacs.d/evil-cutlass")
+
 ;; TODO: https://github.com/PythonNut/evil-easymotion is listed in
 ;; doom emacs and apparently it's built on
 ;; https://github.com/abo-abo/avy. What's the relationship there?
@@ -1574,10 +1584,6 @@ of automatically."
 ;; if I do C-u M-. then it'll let me type out the thing I want to
 ;; lookup the definition of. Not so with evil's "gd"
 
-;; TODO: Make things like d and c NOT copy text as inspired by:
-;; https://github.com/svermeulen/vim-cutlass this could help:
-;; https://stackoverflow.com/questions/37787393/change-dd-command-in-evil-mode-to-not-write-to-clipboard
-
 ;; TODO: Get a replace/substitute operator so we can paste over things
 ;; without having to leave normal mode.
 
@@ -1595,21 +1601,23 @@ of automatically."
 ;; there was some more insight into HOW the variable in question got
 ;; set. Like I feel like I wish that there was just more of a paper
 ;; trail with all this stuff that I could look back through to easily
-;; figure it out. This was my original writing on this, feel my
-;; frustration! It's really so frustrating sometimes how much time I
-;; end up fighting with my editor sometimes. Sometimes it's not even
-;; that any thing is SUPER wrong per se but something is not right and
-;; I want to figure out why so I get distracted. Like with why the
-;; normal info documentation isn't showing up on this windows version
-;; of emacs or why the carriage return character is getting displayed
-;; on windows in my configured emacs but not an emacs without
-;; configuration. Maybe other editors would be like this too but it
-;; feels like other editors might just be more... polished or
-;; something. Emacs and vim allow so much customization (especially
-;; emacs) that I feel like it might be tougher to track down what the
-;; problem is but with another editor that is more managed, maybe that
-;; isn't the case? Maybe I should check out visual studio code, I get
-;; the impression that it "just works".
+;; figure it out. I wonder if this could help at all?
+;; https://github.com/noctuid/annalist.el. What follows is my original
+;; writing on this, feel my frustration! It's really so frustrating
+;; sometimes how much time I end up fighting with my editor sometimes.
+;; Sometimes it's not even that any thing is SUPER wrong per se but
+;; something is not right and I want to figure out why so I get
+;; distracted. Like with why the normal info documentation isn't
+;; showing up on this windows version of emacs or why the carriage
+;; return character is getting displayed on windows in my configured
+;; emacs but not an emacs without configuration. Maybe other editors
+;; would be like this too but it feels like other editors might just
+;; be more... polished or something. Emacs and vim allow so much
+;; customization (especially emacs) that I feel like it might be
+;; tougher to track down what the problem is but with another editor
+;; that is more managed, maybe that isn't the case? Maybe I should
+;; check out visual studio code, I get the impression that it "just
+;; works".
 
 ;; TODO: I think I want my emacs to start saving sessions so that when
 ;; I open it again it will have all the files I had open before. I
@@ -3189,3 +3197,62 @@ of automatically."
 ;; https://www.emacswiki.org/emacs/CategoryWebBrowser they mention
 ;; https://github.com/emacs-eaf/emacs-application-framework which
 ;; feels quite interesting.
+
+;; TODO: I did a ripgrep in a new repo I was exploring and basically
+;; it returned a lot of test and non-test files and I only wanted to
+;; look at the non-test files so I copied that ripgrep output to a
+;; file and did a "keep-lines" for just the files in question and then
+;; did "gf" on each one and poked around. I also felt like, "what if I
+;; wanted to do a follow up grep in just these files?". I don't know,
+;; just got me curious how doing that might be possible. In my head, I
+;; feel like what is on the page is structured data and I want to be
+;; able to better manipulate it. Oh woa, I found this for a way to do
+;; search and replace with the grep output it's built into emacs:
+;; https://github.com/mhayashi1120/Emacs-wgrep I wonder if there are
+;; other goodies related to what I want.
+
+;; TODO: I would love to get word wrapping stuff better handled in
+;; emacs. Pressing M-q as I type has become a habit but I don't think
+;; I want to use it when I'm typing out things that I could
+;; potentially copy and share with other folks. Also, the word
+;; wrapping, if it is there, just looks bad sometimes! For instance,
+;; in markdown that's viewed on github if you have a long line on a
+;; numbered list, the wrapped around portion will appear at an indent
+;; equal to the text above. On emacs it just wraps to the beginning of
+;; the next line. Ugly!
+
+;; TODO: This seems to be another guy also demoing the same
+;; embark+friends commands that I saw in another video:
+;; https://www.youtube.com/watch?v=5ffb2at2d7w&ab_channel=MikeZamansky
+;; I think his blog on emacs is probably worth checking out.
+
+;; TODO: I noticed that the evil binding "] SPC" did not work in a
+;; buffer called "asdf" that I opened. I assume that this buffer
+;; didn't really have a mode and so evil didn't bind some stuff? Also,
+;; I think wherever the unimpaired functionality is coming from, it's
+;; not complete. I feel like I want to look into this more and figure
+;; out what's going on.
+
+;; TODO: I think I like emacs M-f/M-b motions for moving the cursor by
+;; words better than vim. Like if you have hello.there.everyone then
+;; it just moves over the words pretty much but vim will move on the
+;; '.' characters too which makes it slower. I think I like those
+;; motions from emacs for quickly motoring over on the same line and
+;; it seems easier than vim because the motion feels more predictable.
+
+;; TODO: An evil text object for the entire buffer
+
+;; TODO: Just for fun, would it be possible to hack emacs such that it
+;; is a lisp 1 instead of a lisp 2? I feel like it could be.
+
+;; TODO: I like projectile's ability to switch between buffers in the
+;; same project, could we also have the ability to switch between
+;; buffers within or beneath the current directory? My use case was
+;; exploring some of the installed emacs packages (the evil mode
+;; packages) and I knew I had opened a file but I couldn't remember
+;; the name and wished I could do a "switch to buffer within this
+;; directory" action.
+
+;; TODO: Feels like having a "statement" text object would be
+;; something useful. Oftentimes a statment is just one line but
+;; oftentimes it might get spread out over several.

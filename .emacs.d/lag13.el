@@ -1372,6 +1372,8 @@ is. Just not as  "
   "Does a case insensitive comparison of strings."
   (string= (downcase s1) (downcase s2)))
 
+;; TODO: I think it would be neat to make this function interactive
+;; with a date picker.
 (defun couch-surfing-cost (start-date end-date person-staying-with)
   "A function to help calculate how much money I should be paying
 my friends/family when I stay with them starting on START-DATE

@@ -316,3 +316,19 @@ end
 
 ## Search for a string in all past commits
 `git rev-list --all | xargs git grep something`
+
+## author vs commiter
+Turns out git distinguishes between who "authored" the commit and the
+commiter is whoever brought the code into the repo:
+https://stackoverflow.com/questions/18750808/difference-between-author-and-committer-in-git
+https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables
+
+I came across this situation where I as groenendaal92@gmail.com did a
+"git commit" (which I think made me the "author") and then as my
+salesforce github account I did a "git push" which made the salesforce
+user the "author".
+
+## specify ssh key when doing git push
+https://stackoverflow.com/questions/7927750/specify-an-ssh-key-for-git-push-for-a-given-domain
+
+GIT_SSH_COMMAND='ssh -i ~/.ssh/lag13_gh_key' git push
