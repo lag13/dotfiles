@@ -15,48 +15,110 @@
  '(bookmark-save-flag 1)
  '(bs-attributes-list '(("File" 12 12 left bs--get-file-name)))
  '(bs-string-current "/")
- '(completion-styles '(basic partial-completion emacs22 flex))
- '(custom-enabled-themes '(solarized-dark-high-contrast))
+ '(centaur-tabs-cycle-scope 'tabs)
+ '(centaur-tabs-set-bar 'under)
+ '(centaur-tabs-show-count t)
+ '(compilation-message-face 'default)
+ '(cua-global-mark-cursor-color "#3cafa5")
+ '(cua-normal-cursor-color "#8d9fa1")
+ '(cua-overwrite-cursor-color "#c49619")
+ '(cua-read-only-cursor-color "#93a61a")
+ '(custom-enabled-themes '(vscode-dark-plus))
  '(custom-safe-themes
-   '("830877f4aab227556548dc0a28bf395d0abe0e3a0ab95455731c9ea5ab5fe4e1" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "2809bcb77ad21312897b541134981282dc455ccd7c14d74cc333b6e549b824f3" "c433c87bd4b64b8ba9890e8ed64597ea0f8eb0396f4c9a9e01bd20a04d15d358" "0fffa9669425ff140ff2ae8568c7719705ef33b7a927a0ba7c5e2ffcfac09b75" "835868dcd17131ba8b9619d14c67c127aa18b90a82438c8613586331129dda63" default))
+   '("a226e096b9c4924c93b920ba50e545fb2d37c6d95d6b62b44e62cb6f03b081fa" "97db542a8a1731ef44b60bc97406c1eb7ed4528b0d7296997cbb53969df852d6" "da186cce19b5aed3f6a2316845583dbee76aea9255ea0da857d1c058ff003546" "23c806e34594a583ea5bbf5adf9a964afe4f28b4467d28777bcba0d35aa0872e" "e19ac4ef0f028f503b1ccafa7c337021834ce0d1a2bca03fcebc1ef635776bea" "d6844d1e698d76ef048a53cefe713dbbe3af43a1362de81cdd3aefa3711eae0d" "333958c446e920f5c350c4b4016908c130c3b46d590af91e1e7e2a0611f1e8c5" "f6665ce2f7f56c5ed5d91ed5e7f6acb66ce44d0ef4acfaa3a42c7cfe9e9a9013" "cf922a7a5c514fad79c483048257c5d8f242b21987af0db813d3f0b138dfaf53" "4b0e826f58b39e2ce2829fab8ca999bcdc076dec35187bf4e9a4b938cb5771dc" "7a7b1d475b42c1a0b61f3b1d1225dd249ffa1abb1b7f726aec59ac7ca3bf4dae" "c5ded9320a346146bbc2ead692f0c63be512747963257f18cc8518c5254b7bf5" "0d01e1e300fcafa34ba35d5cf0a21b3b23bc4053d388e352ae6a901994597ab1" "830877f4aab227556548dc0a28bf395d0abe0e3a0ab95455731c9ea5ab5fe4e1" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "2809bcb77ad21312897b541134981282dc455ccd7c14d74cc333b6e549b824f3" "c433c87bd4b64b8ba9890e8ed64597ea0f8eb0396f4c9a9e01bd20a04d15d358" "0fffa9669425ff140ff2ae8568c7719705ef33b7a927a0ba7c5e2ffcfac09b75" "835868dcd17131ba8b9619d14c67c127aa18b90a82438c8613586331129dda63" default))
  '(delete-selection-mode t)
+ '(desktop-save-mode t)
  '(eval-expression-print-length 1000)
  '(eval-expression-print-level 10)
  '(evil-cross-lines t)
  '(evil-disable-insert-state-bindings t)
  '(evil-exchange-highlight-face 'link)
  '(evil-kill-on-visual-paste nil)
+ '(evil-replace-with-register-indent t)
+ '(evil-replace-with-register-key "s")
+ '(evil-search-module 'evil-search)
  '(evil-want-fine-undo nil)
  '(evil-want-keybinding nil)
  '(explicit-shell-file-name "bash")
  '(exwm-floating-border-color "#191b20")
+ '(fci-rule-color "#56697A")
  '(grep-find-ignored-directories
    '("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "vendor"))
  '(groovy-indent-offset 2)
  '(help-window-select t)
+ '(highlight-changes-colors '("#e2468f" "#7a7ed2"))
+ '(highlight-symbol-colors
+   '("#3c6f408d329d" "#0c4a45f64ce3" "#486e33913532" "#1fac3bea568d" "#2ec943ac3324" "#449935a7314d" "#0b04411b5986"))
+ '(highlight-symbol-foreground-color "#9eacac")
+ '(highlight-tail-colors ((("#283637") . 0) (("#25373e") . 20)))
  '(history-delete-duplicates t)
+ '(hl-bg-colors
+   '("#936d00" "#a72e01" "#ae1212" "#a81761" "#3548a2" "#0069b0" "#008981" "#687f00"))
+ '(hl-fg-colors
+   '("#002732" "#002732" "#002732" "#002732" "#002732" "#002732" "#002732" "#002732"))
+ '(hl-paren-colors '("#3cafa5" "#c49619" "#3c98e0" "#7a7ed2" "#93a61a"))
  '(icomplete-compute-delay 0.0)
  '(icomplete-mode nil)
  '(initial-buffer-choice "~/.emacs.d/init.el")
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
+ '(lsp-ui-doc-border "#9eacac")
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(1 ((shift) . 1) ((meta)) ((control) . text-scale)))
+ '(nrepl-message-colors
+   '("#ec423a" "#db5823" "#c49619" "#687f00" "#c3d255" "#0069b0" "#3cafa5" "#e2468f" "#7a7ed2"))
  '(objed-cursor-color "#ff6c6b")
  '(org-startup-indented t)
  '(package-selected-packages
-   '(evil-visualstar evil-exchange evil-surround evil-indent-plus evil-numbers orderless evil-args evil-nerd-commenter evil-commentary evil-collection rg deadgrep vertico helm ivy projectile fsharp-mode expand-region evil xmlgen web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
+   '(solaire-mode vscode-dark-plus-theme powershell evil-replace-with-register centaur-tabs multiple-cursors evil-mc evil-multiedit evil-visualstar evil-exchange evil-surround evil-indent-plus evil-numbers orderless evil-args evil-nerd-commenter evil-commentary evil-collection rg deadgrep vertico helm ivy projectile fsharp-mode expand-region evil xmlgen web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
  '(pdf-view-midnight-colors (cons "#bbc2cf" "#282c34"))
+ '(pos-tip-background-color "#01323d")
+ '(pos-tip-foreground-color "#9eacac")
+ '(projectile-indexing-method 'alien)
  '(recentf-mode t)
  '(rg-command-line-flags '("--hidden"))
  '(rustic-ansi-faces
    ["#282c34" "#ff6c6b" "#98be65" "#ECBE7B" "#51afef" "#c678dd" "#46D9FF" "#bbc2cf"])
+ '(savehist-autosave-interval 15)
+ '(savehist-mode t)
  '(send-mail-function 'smtpmail-send-it)
+ '(smartrep-mode-line-active-bg (solarized-color-blend "#93a61a" "#01323d" 0.2))
  '(smtpmail-smtp-server "smtp.gmail.com")
  '(smtpmail-smtp-service 25)
+ '(term-default-bg-color "#002732")
+ '(term-default-fg-color "#8d9fa1")
+ '(vc-annotate-background "#1D252C")
+ '(vc-annotate-background-mode nil)
+ '(vc-annotate-color-map
+   (list
+    (cons 20 "#8BD49C")
+    (cons 40 "#abcd93")
+    (cons 60 "#cbc68b")
+    (cons 80 "#EBBF83")
+    (cons 100 "#e5ae6f")
+    (cons 120 "#df9e5b")
+    (cons 140 "#D98E48")
+    (cons 160 "#dc885f")
+    (cons 180 "#df8376")
+    (cons 200 "#E27E8D")
+    (cons 220 "#df7080")
+    (cons 240 "#dc6274")
+    (cons 260 "#D95468")
+    (cons 280 "#b35365")
+    (cons 300 "#8d5163")
+    (cons 320 "#675160")
+    (cons 340 "#56697A")
+    (cons 360 "#56697A")))
+ '(vc-annotate-very-old-color nil)
  '(vterm-max-scrollback 100000)
- '(vterm-toggle-hide-method 'reset-window-configration))
+ '(vterm-toggle-hide-method 'reset-window-configration)
+ '(weechat-color-list
+   '(unspecified "#002732" "#01323d" "#ae1212" "#ec423a" "#687f00" "#93a61a" "#936d00" "#c49619" "#0069b0" "#3c98e0" "#a81761" "#e2468f" "#008981" "#3cafa5" "#8d9fa1" "#60767e"))
+ '(xterm-color-names
+   ["#01323d" "#ec423a" "#93a61a" "#c49619" "#3c98e0" "#e2468f" "#3cafa5" "#faf3e0"])
+ '(xterm-color-names-bright
+   ["#002732" "#db5823" "#62787f" "#60767e" "#8d9fa1" "#7a7ed2" "#9eacac" "#ffffee"]))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -199,12 +261,6 @@
 
 ;; Hitting return will open the link under the point.
 (setq org-return-follows-link t)
-
-;; I like specifying case when typing file names. To be honest a good
-;; reason I want this is probably so typing just 'D' can complete on
-;; "Dockerfile" and it won't match on something else like
-;; "docker-compose.yml".
-(setq read-file-name-completion-ignore-case nil)
 
 ;; Although, from a computing standpoint, two spaces separating
 ;; sentences probably makes more sense, because then programs like
@@ -1391,10 +1447,6 @@ of automatically."
 ;; don't know what I want to do with it but if something is just data
 ;; then I can do... something with it!
 
-;; TODO: Is it possible to auto save a file after emacs loses focus
-;; (i.e. we switch to another app)? Not sure if I need to do it but
-;; I'm just curious if that kind of "hook" is available.
-
 ;; TODO: I have this enabled but read this to understand it more:
 ;; https://www.reddit.com/r/orgmode/comments/j253ya/org_modes_intended_indentation/
 ;; That being said, I feel like having this makes org mode better
@@ -1481,28 +1533,39 @@ of automatically."
 ;; universe, I might have created something like doom emacs had it not
 ;; already been there.
 (evil-mode 1)
+
 ;; I am only one man so I have not read EVERYTHING that this does but
 ;; it seems to be a fantastic package which makes sure that evil mode
 ;; is consistently used in "all" emacs modes. Go community!
 (evil-collection-init)
-;; TODO: It would seem that this package does NOT define commented
-;; sections of code as a text object. Perhaps I'll make a PR. I'll
-;; probably just use
-;; https://github.com/redguardtoo/evil-nerd-commenter instead for the
-;; time being since it seems like that does have a comment text object
-;; but I think it'd be a fun PR to make regardless.
-;; (evil-commentary-mode)
+
+(require 'evil-nerd-commenter-operator)
+(evil-define-key '(normal visual) 'global "gc" #'evilnc-comment-operator)
+;; TODO: I feel like the comment object for
+;; https://github.com/redguardtoo/evil-nerd-commenter should default
+;; to operating line-wise since that's the structure of line-wise
+;; comments by definition. I tried my hand on doing that but it wasn't
+;; working like I was expecting. At the end of the day I want "dic" to
+;; delete ALL lines that the comment occupied. If I do "cic" I want it
+;; to leave me with ONE empty line where the comment once was I'm not
+;; sure why this is.
+(define-key evil-inner-text-objects-map "c" #'evilnc-outer-commenter)
+
 (define-key evil-motion-state-map (kbd "SPC") #'switch-to-buffer)
 (evil-global-set-key 'motion (kbd "C-SPC") #'projectile-switch-to-buffer)
-;; projectile also has a "project wide grep" command but I feel like
-;; it's kind of lame because it defaults to non-regex searches AND
-;; doesn't let you filter by file type. RG on the other hand feels
-;; super polished and has all these default search commands it's
-;; defined. It seems pretty clean honestly. TODO: Can I somehow use
-;; the output of rg to do a search and replace thing? I think I need
-;; to review search and replace stuff.
-(define-key evil-normal-state-map (kbd "s") #'rg-project)
-(define-key evil-normal-state-map (kbd "S") #'rg)
+
+;; projectile also has a "project wide grep" command but it's pretty
+;; lame because it defaults to non-regex searches (with no way to
+;; configure it) AND it doesn't let you filter by file type (which I
+;; think is handy). I also tried deadgrep but I didn't care for it's
+;; interface (perhaps I'm too used to using a compilation-mode based
+;; search interface). I also tried the other ripgrep integration that
+;; projectile integrates with
+;; (https://github.com/nlamirault/ripgrep.el) but it seemed less
+;; polished as the one I neded up with
+;; (https://github.com/dajva/rg.el) which has lots of nice features
+;; like a built in project wide search!
+(define-key evil-normal-state-map "S" #'rg-menu)
 
 ;; Argument text objects. TODO: I notice that if an argument is a
 ;; string with a "," in it then it doesn't work. Could we make it
@@ -1520,7 +1583,7 @@ of automatically."
 (evil-define-key '(normal visual) 'global "+" #'evil-numbers/inc-at-pt)
 (evil-define-key '(normal visual) 'global "-" #'evil-numbers/dec-at-pt)
 
-
+(evil-define-key '(normal visual) 'global "Q" #'query-replace)
 
 ;; TODO: I'm not sure if there are emacs/evil motions to move by
 ;; indentation level even though I feel like there should be? After
@@ -1534,17 +1597,75 @@ of automatically."
 ;; https://github.com/nixin72/block-nav.el
 
 ;; These bindings were listed in doom's documentation and I rather
-;; liked them over the defaults from the package itself.
+;; liked them over the defaults from the package itself. TODO: I
+;; notice that if I do "dii" then it ends up leaving one empty line
+;; instead of deleting everything. Similarly, if I do "cii" there ends
+;; up being TWO empty lines and we are in insert mode. It feels like
+;; there is an off by one error here. I noticed the same thing with
+;; the comment text objects too in
+;; https://github.com/redguardtoo/evil-nerd-commenter. It looks like
+;; within evil mode they use this "bounds-of-thing-at-point" function
+;; within the library thingatpt.el. I wonder if these should be
+;; expanding that library instead, the comments make it sound like
+;; you're able to define other "things".
+
+;; TODO: Speaking of that thingatpt.el library, I think there are some
+;; other useful text objects that could be created using what is
+;; already defined. It looks like the key to do this (or at least this
+;; is the way evil seems to do it) is to define a function called:
+;; "forward-comment &optional count" and then you can call
+;; (bounds-of-thing-at-point 'comment) and it would work.
+
+;; Got the mappings from what the OG plugin
+;; https://github.com/michaeljsmith/vim-indent-object lays out.
 (define-key evil-inner-text-objects-map "i" 'evil-indent-plus-i-indent)
-(define-key evil-outer-text-objects-map "i" 'evil-indent-plus-a-indent)
-(define-key evil-inner-text-objects-map "k" 'evil-indent-plus-i-indent-up)
-(define-key evil-outer-text-objects-map "k" 'evil-indent-plus-a-indent-up)
-(define-key evil-inner-text-objects-map "j" 'evil-indent-plus-i-indent-up-down)
-(define-key evil-outer-text-objects-map "j" 'evil-indent-plus-a-indent-up-down)
+(define-key evil-outer-text-objects-map "i" 'evil-indent-plus-i-indent-up)
+(define-key evil-outer-text-objects-map "I" 'evil-indent-plus-i-indent-up-down)
+
+;; TODO: This is my attempt to define more text objects like how evil
+;; does it with some of the THINGS that thingpat already knows about.
+;; The inner one seems to work no problem but the
+;; evil-select-an-object doesn't work for some reason. I think the
+;; problem is that the function evil-bounds-of-not-thing-at-point
+;; needs to work and I think in order for that to work, a function
+;; "forward-THING" must be defined AND it has to return a number.
+(evil-define-text-object evil-inner-url (count &optional beg end type)
+  "Select inner url."
+  (evil-select-inner-object 'url beg end type count))
+(evil-define-text-object evil-a-url (count &optional beg end type)
+  "Select an url."
+  (evil-select-an-object 'url beg end type count))
+(define-key evil-inner-text-objects-map "u" 'evil-inner-url)
+(define-key evil-outer-text-objects-map "u" 'evil-a-url)
+
+(defun lag13-evil-macro-on-visual-selection ()
+  "Makes it a bit quicker to execute a macro on multiple visually
+selected lines."
+  (interactive)
+  (let ((evil-ex-initial-input "normal @"))
+    (call-interactively #'evil-ex)))
+
+(define-key evil-visual-state-map "@" #'lag13-evil-macro-on-visual-selection)
+
+;; TODO: Figure out how to get this working. I'm not sure how to
+;; straight up execute a desired EX command. I can load it up, but
+;; loading it up and then executing it is different. I don't think I
+;; have a lot of use for this tbh but I had it in my old config and it
+;; seems like a fun exercise to get it working in emacs too.
+(defun lag13-evil-dot-on-visual-selection ()
+  "Makes it a bit quicker to execute a dot command on multiple
+lines."
+  (interactive)
+  (let ((evil-ex-initial-input "normal ."))
+    (call-interactively #'evil-ex)))
+(define-key evil-visual-state-map "." #'lag13-evil-dot-on-visual-selection)
 
 ;; TODO: See if we want https://github.com/cute-jumper/evil-embrace.el
 ;; at any point for additional surrounding power.
 (global-evil-surround-mode 1)
+
+(define-key evil-motion-state-map "H" #'evil-first-non-blank)
+(define-key evil-motion-state-map "L" #'evil-last-non-blank)
 
 ;; TODO: https://github.com/Dewdrops/evil-exchange says that the "cx"
 ;; binding that vim exchange is traditionally bound to in vim is not
@@ -1584,9 +1705,6 @@ of automatically."
 ;; if I do C-u M-. then it'll let me type out the thing I want to
 ;; lookup the definition of. Not so with evil's "gd"
 
-;; TODO: Get a replace/substitute operator so we can paste over things
-;; without having to leave normal mode.
-
 ;; TODO: I feel like I want to be able to paste text from past copied
 ;; text by searching it using the same completion facilities that I
 ;; get when switching buffers or looking up commands.
@@ -1619,11 +1737,6 @@ of automatically."
 ;; check out visual studio code, I get the impression that it "just
 ;; works".
 
-;; TODO: I think I want my emacs to start saving sessions so that when
-;; I open it again it will have all the files I had open before. I
-;; shouldn't be worrying about too many files accumulating anyway
-;; because of that midnight thing.
-
 ;; TODO: I think I'd like to bind C-[ and C-] to some functionality.
 ;; It would seem that C-[ is the same as ESC though so I need to do
 ;; something more. I think this is a way around it:
@@ -1639,10 +1752,10 @@ of automatically."
 (setq projectile-switch-project-action #'projectile-switch-to-buffer)
 
 ;; The inspiration for using vertico was:
-
+;;
 ;; 1. I've wanted a minibuffer completion thing that stacks the
 ;; results vertically since it's easier to read than horizontally
-
+;;
 ;; 2. I briefly briefly (i.e. like over 1 hour) tried ivy and helm and
 ;; liked vertico better out-of-the-box than the other two. One reason
 ;; for that is because it used emacs' built in completion capabilities
@@ -1661,7 +1774,7 @@ of automatically."
 ;; I am a fan of using the "built in" stuff as much as possible and
 ;; only going outside for truly new things. Helm didn't work out of
 ;; the box for things like M-x so that's a drawback to it as well.
-
+;;
 ;; 3. I was trying out projectile while using icomplete and noticed
 ;; that if I ran the projectile-switch-to-buffer command and hit RET
 ;; WITHOUT entering anything, then I'd get the error
@@ -3148,7 +3261,8 @@ of automatically."
 ;; Whether that be a list of words in a dictionary, looking up
 ;; definitions to get words (thesaurus style), filtering down
 ;; available functions, filtering down available namespaces in a
-;; language, etc...
+;; language, etc... EDIT: Looks like thre's a function called
+;; "completing-read" which I think does what I'm curious about.
 
 ;; TODO: Thoughts about getting dumb jump to run more quickly in the
 ;; monolith. So I think I've confirmed that the regex which dumb jump
@@ -3196,7 +3310,8 @@ of automatically."
 ;; functional web browser within emacs. On
 ;; https://www.emacswiki.org/emacs/CategoryWebBrowser they mention
 ;; https://github.com/emacs-eaf/emacs-application-framework which
-;; feels quite interesting.
+;; feels quite interesting. I also see this video:
+;; https://www.youtube.com/watch?v=y1k_lA2VUYg&ab_channel=AnandTamariya
 
 ;; TODO: I did a ripgrep in a new repo I was exploring and basically
 ;; it returned a lot of test and non-test files and I only wanted to
@@ -3243,7 +3358,9 @@ of automatically."
 ;; TODO: An evil text object for the entire buffer
 
 ;; TODO: Just for fun, would it be possible to hack emacs such that it
-;; is a lisp 1 instead of a lisp 2? I feel like it could be.
+;; is a lisp 1 instead of a lisp 2? I feel like parts of it could be.
+;; I feel like every time you define something you just have to store
+;; the value in both slots.
 
 ;; TODO: I like projectile's ability to switch between buffers in the
 ;; same project, could we also have the ability to switch between
@@ -3255,4 +3372,252 @@ of automatically."
 
 ;; TODO: Feels like having a "statement" text object would be
 ;; something useful. Oftentimes a statment is just one line but
-;; oftentimes it might get spread out over several.
+;; oftentimes it might get spread out over several. Like this one
+;; specifically for python for example:
+;; https://github.com/wbolster/evil-text-object-python
+
+;; TODO: I noticed that the top of my init file was mysteriously
+;; getting deleted sometimes and although I still don't understand WHY
+;; it is happening, I think I can trigger it happening if I type
+;; something like:
+;;
+;; d C-h k d
+;;
+;; So it would seem that getting help on evil operators does not work
+;; properly (or perhaps I have some customizations which messes stuff
+;; up somehow).
+
+;; TODO: It looks like (warning: very rough understanding here) the
+;; way that evil mode gets bindings like "dd" and "yy" working is that
+;; the function evil-operator-range will bind things to the map
+;; evil-operator-shortcut-map temporarily as the operator is
+;; executing. I bring this up because I wanted to add a commentary
+;; text object "gc" to https://github.com/linktohack/evil-commentary
+;; like Tim Pope has defined for his vim plugin but with this
+;; functionality that is seemingly built into evil, I don't think I
+;; can do that.
+
+;; TODO: I notice that the "i(" text object doesn't work when the
+;; parentheses are within comments and the open and closed parentheses
+;; are on different lines. I wonder why this is?
+
+;; TODO: I feel like I've said this many times throughtout the TODOs
+;; of this file but I want to say it again. I feel like the main
+;; editor things I want to get down pat are: 1. Have a better method
+;; for exploring new code. I feel like right now I'll hop around a lot
+;; and I'll see areas which, in hindsight, are points of interest that
+;; I should keep open in a small window or something so I can quickly
+;; refer back to it but during the code exploration I hop around so
+;; quickly sometimes that I don't even know what file I'm in. There
+;; could be two points of interest which are literally one page scroll
+;; away from eachother but I don't know that and the only way I know
+;; how to find is by doing a "jump to definition" if I can remember
+;; the function name OR by spamming C-o until I end up where I was
+;; before. And it doesn't help too that the "previous/next-buffer"
+;; commands are local to a window because sometimes I'll have splits
+;; and I'll do previous/next-buffer but it will take me somewhere
+;; totally unexpected. Yeah... I bet a lot of improving this will be
+;; coming up with a better method of code searching but at the same
+;; time I feel like I should be able to lean on emacs somehow to help
+;; me (either with builtin functionality or writing something). 2.
+;; Project wide search and replace. 3. Some sort of consistant way to
+;; navigate structured text. Navigating lisp'y things is pretty much
+;; there but I'd like one for indentation as well and then I'd be
+;; curious to see if the bindings I can come up with can be somewhat
+;; consistant between the two. 4. A text object for a "top level form"
+;; (i.e. probably a function). 5. Multiple cursors 6. Fuzzy file
+;; search inside ENTIRE project (i.e. ctrl-p like functionality)
+
+;; TODO: Doing :global//whatever doesn't seem to work when there are
+;; multiple lines in the search pattern. Is this typical? I was trying
+;; to cleanup the output from a command which had a lot of those
+;; colore terminal characters and it was easier to just do a visual
+;; star highlight (as opposed to trying to get the regex working
+;; properly) and try to run the global command but it wasn't working.
+
+;; TODO: I want to be able to better sift through a json object in
+;; emacs. Like, I ran a: npm audit --json command and I wanted to do
+;; something like "look for all packages with high severity and see
+;; which packages brought those in or if they are in the root
+;; project.json". Could be cool to have something interactive (in
+;; general I feel like I'm starting to want more dwim sorts of things)
+;; but maybe I just need to learn how to do json stuff in emacs.
+
+;; TODO: I feel like it should be more possible in an interactive
+;; environment to doing some computation, pause it, do something else,
+;; then resume that computation. Like maybe in emacs we start telling
+;; it to do a query replace and we've typed in a really complicated
+;; regex but then we realize we want to do something else. What do we
+;; do? Ideally I feel like we could pause it and come back to it but
+;; right now I feel like I have to quit out of the query replace
+;; entirely and start that flow over again later. All these things use
+;; the minibuffer so surely it feels like, at the very least, the text
+;; I typed could be saved and then recalled?
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Mode Line stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(line-number-mode 0)
+
+(defvar lag13-mode-line-buffer-identification
+  (propertized-buffer-identification "%b")
+  "My version of the `mode-line-buffer-identification'. The only
+difference is that mine does not include padding which I want
+because I want to try having a more concise modeline.")
+
+;; Tell what mode I'm in purely based on the cursor.
+(setq evil-mode-line-format nil)
+(setq evil-emacs-state-cursor 'hollow)
+
+(defun lag13-mode-line-project-info ()
+  "Returns information about the current project."
+  (format "[%s]" (projectile-project-name)))
+
+;; Straight up modifying the mode line to include just the info I
+;; want. I looked through the default value of the modeline and
+;; removed anything I didn't feel I wanted.
+(setq mode-line-format
+      '("%e"
+	mode-line-mule-info
+	mode-line-client
+	mode-line-modified
+	mode-line-remote
+	" "
+	mode-line-position
+	" "
+	lag13-mode-line-buffer-identification
+	" "
+	(:eval (lag13-mode-line-project-info))
+	vc-mode
+	mode-line-end-spaces
+	))
+
+;; TODO: Modify the mode-line-inactive face so that it is more obvious
+;; which window is active and which is not.
+
+;; TODO: I feel like saving the recent ripgrep search in a register "g
+;; seems like a good idea. Because sometimes I do a ripgrep and then
+;; want to go into wgrep mode to do search and replace stuff but I
+;; might have to type out the regex again to get it.
+
+;; TODO: How do we do ripgrep in multiple directories?
+
+;; TODO: doing the command "dap" in an org mode document does not seem
+;; to be working like I expect it to. If you are at the end of a '*'
+;; header, then doing "dap" also targets the NEXT header down. Not
+;; sure what's up with that.
+
+;; More and more lately I'm feeling like if there's ANY way to help
+;; add more context to what I'm doing, that will help me. In this
+;; case, I feel like I'll jump around too quickly and I don't even
+;; know what files I've looked at or how many I've looked at. It could
+;; feel like I've looked at 10 different files in a project when
+;; really I've only looked at 2 simply because I'm too focused on the
+;; content instead of the file names. Maybe that means I just need to
+;; slow down... but I'm not so sure. Adding another sensory cue (i.e.
+;; showing the files up top) is going to be my attempt to solve for
+;; it. TODO: I'd be curious to see how easy it would be to bend emacs'
+;; default tab-line feature to do what I want instead of using
+;; centaur-tabs. I mean, I guess centaur tabs is just leaning on
+;; tab-line anyway but still, I'm curious about the internals.
+(require 'centaur-tabs)
+(centaur-tabs-mode 1)
+(centaur-tabs-headline-match)
+;; TODO: Only add the buffers to the list of previously visited
+;; buffers if you do something within that buffer or remain on that
+;; buffer for more than X seconds or something like that.
+(define-key evil-normal-state-map (kbd "<C-tab>") 'centaur-tabs-forward)
+(define-key evil-normal-state-map (kbd "<S-C-tab>") 'centaur-tabs-backward)
+
+;; TODO: It would be interesting to compare centaur with emacs' built
+;; in global-tab-line-mode
+
+;; TODO: If I have a vertically split window and 5 tabs open (or at
+;; least enough to cover >=3/4 of the screen) and I navigate to the
+;; final tab, the beginning tab gets shifted out of view, I don't like
+;; that. Could we try to keep all tabs in view? Or at least give an
+;; indication when tabs are hidden?
+
+;; TODO: Would it be worth making a PR to add this to the centaur
+;; repo? Maybe it could be the default behavior?
+(setq centaur-tabs-tab-label-function
+      (lambda (cur-tab)
+	(cl-flet ((get-tab-filename
+		   (tab)
+		   (-if-let (buf-file-name (buffer-file-name (centaur-tabs-tab-value tab)))
+		       (file-name-nondirectory buf-file-name))))
+	  (let ((cur-tab-filename (get-tab-filename cur-tab)))
+	    (if (or (not cur-tab-filename)
+		    (> (seq-count (lambda (filename) (equal cur-tab-filename filename))
+				  (->> (centaur-tabs-tab-tabset cur-tab)
+				       (centaur-tabs-view)
+				       (seq-map #'get-tab-filename)))
+		       1))
+		(buffer-name (centaur-tabs-tab-value cur-tab))
+	      cur-tab-filename)))))
+
+;; TODO: Looks like centaur-tabs-buffer-groups does not assign
+;; magit-revision-mode to the "Emacs" tab group which happens with
+;; other magit buffers. Seems like I should make a PR to fix that.
+;; Might be worth changing the check to be (string-prefix-p "magit"
+;; (format "%s" major-mode)) or maybe just add another line to the
+;; check.
+
+;; TODO: The function centaur-tabs-hide-tab tries to hide magit
+;; buffers but misses a lot of them because a lot of them will have a
+;; file extensions which seems to be the name of the project. So fix
+;; that or at least ask about it.
+
+;; Like many things it is, strictly speaking, unnecessary but I think
+;; it's a useful action to have! I think the only thing really going
+;; for it over using more primitive actions (like 'c'hanging a text
+;; object then pasting or 'v'isually highlighting a region then
+;; pasting) is that it will automatically indent the pasted code.
+(require 'evil-replace-with-register)
+(evil-replace-with-register-install)
+
+;; ' is easier to reach on my keyboard than `
+(define-key evil-motion-state-map "'" 'evil-goto-mark)
+(define-key evil-motion-state-map "`" 'evil-goto-mark-line)
+
+;; TODO: There are a couple TODOs on
+;; https://github.com/noctuid/targets.el to implement an "entire
+;; buffer" text object as well as a "line" text object (I know we have
+;; a repeated operator key to do a line but these are dedicated ones
+;; and I think the "inner" text object copies by characters).
+;; https://www.reddit.com/r/emacs/comments/3ctjsv/evil_ilal_and_ieae_textobjects/
+;; https://github.com/supermomonga/evil-textobj-entire
+
+;; TODO: Could be useful to store the last emacs minibuffer code
+;; evaluation in a register?
+
+;; TODO: When switching projects in projectile, can the projects be
+;; ordered by most recently used? They seem to just be sorted
+;; alphabetically or something.
+
+;; TODO: The g; command is very handy to go back to previous changes.
+;; I feel like it would also be useful to have a similar command which
+;; goes back to a previous change that happened somewhere NOT
+;; currently on screen so we don't have to spam g; if we've made lot's
+;; of changes on screen and want to go somewhere farther away. In this
+;; line of thinking... would it be helpful to highlight areas of the
+;; buffer where changes have happened recently? i.e. where g; would
+;; jump to?
+
+;; TODO: I feel like I need a jump list per buffer. Because sometimes
+;; I know I want to go go back to place I've been in the file before
+;; so I spam C-o but if I've jumped between files then I'll have to
+;; iterate through that stuff first.
+
+;; TODO: Tim Pope had a vim plugin to try and figure out what the
+;; indentation style SHOULD be based on the file that is being read. I
+;; would love something like that. This is motivated by the fact that
+;; I'm editing some javascript and my emacs indentation settings are
+;; not the same as what this project wants (I use spaces they use
+;; tabs) and I just feel to lazy to try and figure out how to fix it
+;; myself. I just want it to work!
+
+;; TODO: Could we create a binding to repeat the last emacs command
+;; invocation (i.e. whatever was run with M-x)? I know vim has @: to
+;; repeat the last ex command so it would seem fitting to allow the
+;; same with emacs. Just seems like a fun thing to try.
