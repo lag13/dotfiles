@@ -12,12 +12,16 @@
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["#2d3743" "#ff4242" "#74af68" "#dbdb95" "#34cae2" "#008b8b" "#00ede1" "#e1e1e0"])
+ '(awesome-tray-mode-line-active-color "#2fafff")
+ '(awesome-tray-mode-line-inactive-color "#323232")
+ '(beacon-color "#cc6666")
  '(bookmark-save-flag 1)
  '(bs-attributes-list '(("File" 12 12 left bs--get-file-name)))
  '(bs-string-current "/")
  '(centaur-tabs-cycle-scope 'tabs)
  '(centaur-tabs-set-bar 'under)
  '(centaur-tabs-show-count t)
+ '(clean-buffer-list-delay-general 5)
  '(compilation-message-face 'default)
  '(cua-global-mark-cursor-color "#3cafa5")
  '(cua-normal-cursor-color "#8d9fa1")
@@ -25,7 +29,8 @@
  '(cua-read-only-cursor-color "#93a61a")
  '(custom-enabled-themes '(vscode-dark-plus))
  '(custom-safe-themes
-   '("a226e096b9c4924c93b920ba50e545fb2d37c6d95d6b62b44e62cb6f03b081fa" "97db542a8a1731ef44b60bc97406c1eb7ed4528b0d7296997cbb53969df852d6" "da186cce19b5aed3f6a2316845583dbee76aea9255ea0da857d1c058ff003546" "23c806e34594a583ea5bbf5adf9a964afe4f28b4467d28777bcba0d35aa0872e" "e19ac4ef0f028f503b1ccafa7c337021834ce0d1a2bca03fcebc1ef635776bea" "d6844d1e698d76ef048a53cefe713dbbe3af43a1362de81cdd3aefa3711eae0d" "333958c446e920f5c350c4b4016908c130c3b46d590af91e1e7e2a0611f1e8c5" "f6665ce2f7f56c5ed5d91ed5e7f6acb66ce44d0ef4acfaa3a42c7cfe9e9a9013" "cf922a7a5c514fad79c483048257c5d8f242b21987af0db813d3f0b138dfaf53" "4b0e826f58b39e2ce2829fab8ca999bcdc076dec35187bf4e9a4b938cb5771dc" "7a7b1d475b42c1a0b61f3b1d1225dd249ffa1abb1b7f726aec59ac7ca3bf4dae" "c5ded9320a346146bbc2ead692f0c63be512747963257f18cc8518c5254b7bf5" "0d01e1e300fcafa34ba35d5cf0a21b3b23bc4053d388e352ae6a901994597ab1" "830877f4aab227556548dc0a28bf395d0abe0e3a0ab95455731c9ea5ab5fe4e1" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "2809bcb77ad21312897b541134981282dc455ccd7c14d74cc333b6e549b824f3" "c433c87bd4b64b8ba9890e8ed64597ea0f8eb0396f4c9a9e01bd20a04d15d358" "0fffa9669425ff140ff2ae8568c7719705ef33b7a927a0ba7c5e2ffcfac09b75" "835868dcd17131ba8b9619d14c67c127aa18b90a82438c8613586331129dda63" default))
+   '("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "7397cc72938446348521d8061d3f2e288165f65a2dbb6366bb666224de2629bb" "a226e096b9c4924c93b920ba50e545fb2d37c6d95d6b62b44e62cb6f03b081fa" "97db542a8a1731ef44b60bc97406c1eb7ed4528b0d7296997cbb53969df852d6" "da186cce19b5aed3f6a2316845583dbee76aea9255ea0da857d1c058ff003546" "23c806e34594a583ea5bbf5adf9a964afe4f28b4467d28777bcba0d35aa0872e" "e19ac4ef0f028f503b1ccafa7c337021834ce0d1a2bca03fcebc1ef635776bea" "d6844d1e698d76ef048a53cefe713dbbe3af43a1362de81cdd3aefa3711eae0d" "333958c446e920f5c350c4b4016908c130c3b46d590af91e1e7e2a0611f1e8c5" "f6665ce2f7f56c5ed5d91ed5e7f6acb66ce44d0ef4acfaa3a42c7cfe9e9a9013" "cf922a7a5c514fad79c483048257c5d8f242b21987af0db813d3f0b138dfaf53" "4b0e826f58b39e2ce2829fab8ca999bcdc076dec35187bf4e9a4b938cb5771dc" "7a7b1d475b42c1a0b61f3b1d1225dd249ffa1abb1b7f726aec59ac7ca3bf4dae" "c5ded9320a346146bbc2ead692f0c63be512747963257f18cc8518c5254b7bf5" "0d01e1e300fcafa34ba35d5cf0a21b3b23bc4053d388e352ae6a901994597ab1" "830877f4aab227556548dc0a28bf395d0abe0e3a0ab95455731c9ea5ab5fe4e1" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "2809bcb77ad21312897b541134981282dc455ccd7c14d74cc333b6e549b824f3" "c433c87bd4b64b8ba9890e8ed64597ea0f8eb0396f4c9a9e01bd20a04d15d358" "0fffa9669425ff140ff2ae8568c7719705ef33b7a927a0ba7c5e2ffcfac09b75" "835868dcd17131ba8b9619d14c67c127aa18b90a82438c8613586331129dda63" default))
+ '(debug-on-quit nil)
  '(delete-selection-mode t)
  '(desktop-save-mode t)
  '(eval-expression-print-length 1000)
@@ -37,11 +42,17 @@
  '(evil-replace-with-register-indent t)
  '(evil-replace-with-register-key "s")
  '(evil-search-module 'evil-search)
+ '(evil-search-wrap-ring-bell t)
  '(evil-want-fine-undo nil)
  '(evil-want-keybinding nil)
  '(explicit-shell-file-name "bash")
  '(exwm-floating-border-color "#191b20")
- '(fci-rule-color "#56697A")
+ '(fci-rule-color "#01323d")
+ '(flycheck-color-mode-line-face-to-color 'mode-line-buffer-id)
+ '(flymake-error-bitmap '(flymake-double-exclamation-mark modus-themes-fringe-red))
+ '(flymake-note-bitmap '(exclamation-mark modus-themes-fringe-cyan))
+ '(flymake-warning-bitmap '(exclamation-mark modus-themes-fringe-yellow))
+ '(frame-background-mode 'dark)
  '(grep-find-ignored-directories
    '("SCCS" "RCS" "CVS" "MCVS" ".src" ".svn" ".git" ".hg" ".bzr" "_MTN" "_darcs" "{arch}" "vendor"))
  '(groovy-indent-offset 2)
@@ -50,13 +61,44 @@
  '(highlight-symbol-colors
    '("#3c6f408d329d" "#0c4a45f64ce3" "#486e33913532" "#1fac3bea568d" "#2ec943ac3324" "#449935a7314d" "#0b04411b5986"))
  '(highlight-symbol-foreground-color "#9eacac")
- '(highlight-tail-colors ((("#283637") . 0) (("#25373e") . 20)))
+ '(highlight-tail-colors
+   '(("#01323d" . 0)
+     ("#687f00" . 20)
+     ("#008981" . 30)
+     ("#0069b0" . 50)
+     ("#936d00" . 60)
+     ("#a72e01" . 70)
+     ("#a81761" . 85)
+     ("#01323d" . 100)))
  '(history-delete-duplicates t)
  '(hl-bg-colors
    '("#936d00" "#a72e01" "#ae1212" "#a81761" "#3548a2" "#0069b0" "#008981" "#687f00"))
  '(hl-fg-colors
    '("#002732" "#002732" "#002732" "#002732" "#002732" "#002732" "#002732" "#002732"))
  '(hl-paren-colors '("#3cafa5" "#c49619" "#3c98e0" "#7a7ed2" "#93a61a"))
+ '(hl-todo-keyword-faces
+   '(("HOLD" . "#c0c530")
+     ("TODO" . "#feacd0")
+     ("NEXT" . "#b6a0ff")
+     ("THEM" . "#f78fe7")
+     ("PROG" . "#00d3d0")
+     ("OKAY" . "#4ae2f0")
+     ("DONT" . "#70b900")
+     ("FAIL" . "#ff8059")
+     ("BUG" . "#ff8059")
+     ("DONE" . "#44bc44")
+     ("NOTE" . "#d3b55f")
+     ("KLUDGE" . "#d0bc00")
+     ("HACK" . "#d0bc00")
+     ("TEMP" . "#ffcccc")
+     ("FIXME" . "#ff9077")
+     ("XXX+" . "#ef8b50")
+     ("REVIEW" . "#6ae4b9")
+     ("DEPRECATED" . "#bfd9ff")))
+ '(ibuffer-deletion-face 'modus-themes-mark-del)
+ '(ibuffer-filter-group-name-face 'modus-themes-pseudo-header)
+ '(ibuffer-marked-face 'modus-themes-mark-sel)
+ '(ibuffer-title-face 'default)
  '(icomplete-compute-delay 0.0)
  '(icomplete-mode nil)
  '(initial-buffer-choice "~/.emacs.d/init.el")
@@ -64,11 +106,20 @@
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
  '(lsp-ui-doc-border "#9eacac")
+ '(message-log-max 10000)
+ '(mode-line-format
+   '("%e" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote " " mode-line-position " " mode-line-buffer-identification " "
+     (:eval
+      (projectile-project-name))
+     vc-mode mode-line-end-spaces))
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(1 ((shift) . 1) ((meta)) ((control) . text-scale)))
  '(nrepl-message-colors
    '("#ec423a" "#db5823" "#c49619" "#687f00" "#c3d255" "#0069b0" "#3cafa5" "#e2468f" "#7a7ed2"))
  '(objed-cursor-color "#ff6c6b")
+ '(orderless-matching-styles
+   '(orderless-regexp orderless-literal orderless-initialism orderless-strict-initialism orderless-strict-leading-initialism orderless-strict-full-initialism orderless-prefixes))
+ '(org-src-block-faces 'nil)
  '(org-startup-indented t)
  '(package-selected-packages
    '(solaire-mode vscode-dark-plus-theme powershell evil-replace-with-register centaur-tabs multiple-cursors evil-mc evil-multiedit evil-visualstar evil-exchange evil-surround evil-indent-plus evil-numbers orderless evil-args evil-nerd-commenter evil-commentary evil-collection rg deadgrep vertico helm ivy projectile fsharp-mode expand-region evil xmlgen web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
@@ -88,33 +139,33 @@
  '(smtpmail-smtp-service 25)
  '(term-default-bg-color "#002732")
  '(term-default-fg-color "#8d9fa1")
- '(vc-annotate-background "#1D252C")
+ '(vc-annotate-background nil)
  '(vc-annotate-background-mode nil)
  '(vc-annotate-color-map
-   (list
-    (cons 20 "#8BD49C")
-    (cons 40 "#abcd93")
-    (cons 60 "#cbc68b")
-    (cons 80 "#EBBF83")
-    (cons 100 "#e5ae6f")
-    (cons 120 "#df9e5b")
-    (cons 140 "#D98E48")
-    (cons 160 "#dc885f")
-    (cons 180 "#df8376")
-    (cons 200 "#E27E8D")
-    (cons 220 "#df7080")
-    (cons 240 "#dc6274")
-    (cons 260 "#D95468")
-    (cons 280 "#b35365")
-    (cons 300 "#8d5163")
-    (cons 320 "#675160")
-    (cons 340 "#56697A")
-    (cons 360 "#56697A")))
+   '((20 . "#cc6666")
+     (40 . "#de935f")
+     (60 . "#f0c674")
+     (80 . "#b5bd68")
+     (100 . "#8abeb7")
+     (120 . "#81a2be")
+     (140 . "#b294bb")
+     (160 . "#cc6666")
+     (180 . "#de935f")
+     (200 . "#f0c674")
+     (220 . "#b5bd68")
+     (240 . "#8abeb7")
+     (260 . "#81a2be")
+     (280 . "#b294bb")
+     (300 . "#cc6666")
+     (320 . "#de935f")
+     (340 . "#f0c674")
+     (360 . "#b5bd68")))
  '(vc-annotate-very-old-color nil)
  '(vterm-max-scrollback 100000)
  '(vterm-toggle-hide-method 'reset-window-configration)
  '(weechat-color-list
    '(unspecified "#002732" "#01323d" "#ae1212" "#ec423a" "#687f00" "#93a61a" "#936d00" "#c49619" "#0069b0" "#3c98e0" "#a81761" "#e2468f" "#008981" "#3cafa5" "#8d9fa1" "#60767e"))
+ '(window-divider-mode nil)
  '(xterm-color-names
    ["#01323d" "#ec423a" "#93a61a" "#c49619" "#3c98e0" "#e2468f" "#3cafa5" "#faf3e0"])
  '(xterm-color-names-bright
@@ -126,6 +177,8 @@
  ;; If there is more than one, they won't work right.
  )
 
+(load "~/.emacs.d/lag13")
+
 ;; NEAT COMMANDS:
 ;; C-h K/F - like their lowercase variants but opens any info docs.
 
@@ -135,8 +188,35 @@
 ;; Pressing M-n with the cursor on a link/file while doing a C-x C-f
 ;; will autofill that link/file.
 
-(put 'narrow-to-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
+;; For some reason setting visual-bell to t didn't have any effect but
+;; luckly I can configure something else. Thank you
+;; https://www.emacswiki.org/emacs/AlarmBell for inspiration.
+(defun lag13-ding-flash ()
+  (dolist (face '(centaur-tabs-unselected centaur-tabs-selected mode-line mode-line-inactive))
+    ;; TODO: Instead of invert-face, I wonder what it would look on if
+    ;; we made the background color literally the "opposite" color of
+    ;; whatever is being shown.
+    (invert-face face)
+    (run-with-timer 0.1 nil #'invert-face face)))
+(setq visible-bell nil
+      ring-bell-function 'lag13-ding-flash)
+
+;; Enable ALL the disabled things!
+;; https://www.emacswiki.org/emacs/DisabledCommands
+(setq disabled-command-function nil)
+
+;; TODO: See what commands are disabled.
+(defun lag13-enable-all-commands ()
+  "Enable all commands, reporting on which were disabled."
+  (interactive)
+  (with-output-to-temp-buffer "*Commands that were disabled*"
+    (mapatoms
+     (function
+      (lambda (symbol)
+	(when (get symbol 'disabled)
+	  (put symbol 'disabled nil)
+	  (prin1 symbol)
+	  (princ "\n")))))))
 
 ;; https://www.emacswiki.org/emacs/MidnightMode TODO: Interesting
 ;; thing I noticed. This midnight mode cleared all the buffers
@@ -173,6 +253,31 @@
 ;; style which is pretty neat! Good for when I know a couple words in
 ;; what I'm searching for but don't know their order.
 (setq completion-styles '(basic partial-completion flex orderless))
+;; TODO: Trying out just nuking this so we have the same completion
+;; for everything and then I can add to it where I feel it's helpful.
+;; I think my ideal completion engine is one that does flex but the
+;; earlier results are always the ones that have less distance between
+;; the consecutive letters followed by orderless I suppose. Also maybe
+;; prioritizing files that START with what is being typed (i.e. if you
+;; had secret.txt and cool-secret.txt, typing "secret" would always
+;; put "secret.txt" first because it matches at the beginning (or
+;; maybe at word boundaries generally). I also notice that the builtin
+;; flex seems to function better (for me at least) than orderless's
+;; flex at least to me. For example, I wrote a completing-read wrapper
+;; to show me the absolute file names of buffers (in the situation
+;; where I know I've opened some stuff from a particular directory but
+;; can't remember the file name but remember the directory so I can
+;; type the directory and go from there) and some files were in a
+;; directory "misc" so I typed that and the builtin flex matched those
+;; first, perfect, the orderless though matched some MUCH longer file
+;; paths where the "misc" were separated by >=4 chars each. No bueno.
+(setq completion-category-defaults nil)
+;; TODO: Improve the face contrast for things highlighted with the
+;; default completion mechanism. It seems a lot weaker than what
+;; orderless has for highlighting. Or just figure out how to get
+;; exactly what I want from orderless which seems to do pretty well
+;; highlighting'wise.
+(setq completion-styles '(orderless))
 
 (add-hook 'c-mode-common-hook
 	  (lambda()
@@ -207,38 +312,18 @@
 ;; haskell-process-args-ghci would be useful? I think ghci runs by
 ;; default for interactive haskell in emacs.
 
-;; https://orgmode.org/worg/org-contrib/babel/languages.html#configure.
-;; TODO: I'm still kind of confused how this works. For example I was
-;; able to run an elisp code snippet even though I don't currently see
-;; that as a potential language in org-babel-load-languages but I did
-;; see it earlier. Also I *swear* I did not have to add support for
-;; shell before and it magically started working but later when I
-;; tried that was not the case and I had to do something like this.
-
-;; TODO: Before emacs 26 it complains about "ob-shell" not being
-;; loadable but apparently ob-sh works and on emacs 26 it complains
-;; about ob-sh not being loadable. Maybe I should just stick with
-;; emacs 26 and not care about backwards compatability, either way
-;; though I wanted to make a note that maybe I should modify this to
-;; be backwards compaitble.
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((shell . t)
-   (plantuml . t)))
-
 ;; Purpose is so that if I evaluate some plant-uml in a code block,
 ;; the resulting image will be displayed
 (add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images)
 
-;; TODO: Why is it done this way instead of with a hook? I commented this out since it seemed to mess up the interactive session if I ran it.
 ;; (eval-after-load "haskell-mode"
 ;;   '(define-key haskell-mode-map (kbd "C-c C-c") 'haskell-compile))
 
-;; Enables creating interactive shell stuff
-(add-hook 'haskell-mode-hook #'interactive-haskell-mode)
-(eval-after-load "haskell-mode"
-  '(define-key haskell-mode-map (kbd "C-`") 'haskell-interactive-bring))
-(setq haskell-process-type 'stack-ghci)
+;; ;; Enables creating interactive shell stuff
+;; (add-hook 'haskell-mode-hook #'interactive-haskell-mode)
+;; (eval-after-load "haskell-mode"
+;;   '(define-key haskell-mode-map (kbd "C-`") 'haskell-interactive-bring))
+;; (setq haskell-process-type 'stack-ghci)
       
 ;; ;; Haskell specific hooks
 ;; (add-hook 'haskell-mode-hook
@@ -425,31 +510,24 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
   (interactive)
   (insert (format-time-string "%Y-%m-%dT%H:%M:%SZ" (current-time) t)))
 
-;; TODO: Sometimes I'm recording something I did in the past and I
-;; want to enter accurate times for the events that transpired. It
-;; would be neat to be able to do that quickly instead of having to do
-;; some conversions in my head (since I try to record everything in
-;; UTC time)
+;; Sometimes I record timestamps when I do things.
 (global-set-key (kbd "C-c t") 'insert-timestamp)
 
-(defun insert-date ()
+(defun lag13-insert-date ()
   "Inserts the current date. As opposed to `insert-timestamp' I
   insert the local date since I'm usually just recording when I
   work on things"
   (interactive)
   (insert (format-time-string "%Y-%m-%d")))
 
-;; TODO: Give a C-u modification to this function which will allow you
-;; to insert the date X days ago. My use case here is that I wanted to
-;; record a list of support tickets we had received for the past 30
-;; days and when I was writing notes on that I wanted to just be able
-;; to say, "these are a list of support tickets from "X-30" to X" but
-;; I couldn't easily say that and ended up googling it. Speaking of
-;; googling... google has so much functionality to answer little
-;; questions like this without even going to a link, they just give
-;; you the answer. Could I add a "ask google" function which pastes
-;; that first response into the buffer if they have one.
-(global-set-key (kbd "C-c d") 'insert-date)
+;; TODO: At some point I wanted to insert a date X days ago. It would
+;; be cool if I could have emacs do it but at the time I just ended up
+;; googling it and it made me thing. Goggle has so much functionality
+;; to answer little questions like this and oftentimes it seems that
+;; they just display the result at the top of the page. Could we make
+;; a "let-google-figure-it-out" sort of package to do some of those
+;; things?
+(global-set-key (kbd "C-c d") 'lag13-insert-date)
 
 ;; TODO: Another date related thing is I think it could be nice to be
 ;; able to count the number of weekdays between 2 dates. Again, this
@@ -469,7 +547,6 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; 2. After doing that run the save-some-buffers command which will
 ;; save modified file buffers.
 
-
 ;; How to work with org mode tables: C-c | to create a table, if a
 ;; table does not have a header then you can open up a line below the
 ;; row you want for a header and type |-<TAB>.
@@ -481,8 +558,9 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; often enough to warrant a default behavior which I will probably
 ;; never remember.
 
-;; TODO: Make an escape and unescape function similar to tpope's [y
-;; and ]y commands in https://github.com/tpope/vim-unimpaired
+;; TODO: Make a PR to add escape and unescape function similar to
+;; tpope's [y and ]y commands in
+;; https://github.com/tpope/vim-unimpaired
 
 ;; TODO: Make artist-mode's C-n the same as picture-mode's C-n in the
 ;; sense that it appends to the buffer. Why would it not do this by
@@ -507,9 +585,6 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; TODO: Learn from this guy: https://github.com/cgore He seems super
 ;; sharp and seems like a super lisp geek.
 
-;; TODO: Prevent emacs quitting when Cmd-Q is hit, I just did that
-;; accidentally and its a little annoying.
-
 ;; TODO: Configure terraform so it runs terraform fmt on save.
 
 ;; I tend to be okay not using line numbers when coding (I did for a
@@ -517,14 +592,6 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; is being done because then the other person can be like "I think we
 ;; should edit line XYZ" https://www.emacswiki.org/emacs/LineNumbers.
 (global-display-line-numbers-mode)
-
-;; TODO: Sometimes I want to "find" a specific file like how the
-;; "find" command works. How could I do that with emacs? Should I just
-;; bite the bullet and install some sort of fuzzy file finder? It
-;; might be useful especially when working in large projects. I wonder
-;; if projectile could come in handy here too for this. Or maybe dired
-;; can help out somehow?
-;; https://www.masteringemacs.org/article/working-multiple-files-dired
 
 ;; https://www.emacswiki.org/emacs/UnfillParagraph
 (defun unfill-paragraph (&optional region)
@@ -535,13 +602,12 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
         (emacs-lisp-docstring-fill-column t))
     (fill-paragraph nil region)))
 
-
 ;; Yesterday (2019-03-14 i.e. pi day) I learned about tau
 ;; (https://tauday.com) and now I'm a tau convert. I can't say I've
 ;; EVER needed to use pi before within emacs but I just wanted to
 ;; write this down.
 (setq tau (* 2 pi))
-;; And of course: https://xkcd.com/1292/
+;; And of course pau: https://xkcd.com/1292/
 (setq pau (* 1.5 pi))
 
 ;; TODO: It would be cool if whenever I type in an orgmode buffer it
@@ -572,7 +638,7 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; perhaps I'll just have to pick another language which is easier to
 ;; work with? Not sure.
 
-;; TODO: projectile, helm, magit, tramp, eshell,
+;; TODO: See if there's anything good in these repos:
 ;; https://github.com/wasamasa/dotemacs,
 ;; https://github.com/aterweele/emacs.d,
 ;; https://github.com/atw-gr/emacs.d
@@ -633,7 +699,6 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 ;; seems like it would be fun: camel, kebab, snake
 
 (global-so-long-mode 1)
-(put 'downcase-region 'disabled nil)
 
 ;; TODO: Could we use magit to review PRs? I think I'm a lot faster
 ;; looking at code when inside my editor instead of looking in the
@@ -650,7 +715,8 @@ https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators. "
 
 ;; TODO: I really like the emacs help manual thingy (C-h i). I want to
 ;; learn to use it better AND figure out if I can add manuals for
-;; anything/everything??
+;; anything/everything?? Like, are their manuals for other unix
+;; utilities as well?
 
 (defun lag13/replace-last-sexp ()
   "Sometimes if I'm writing docs or whatever I just want to
@@ -703,10 +769,7 @@ expression."
 ;; that exists in a certain directory but I can't for the life of me
 ;; remember the file name OR I want to open up any old file in a
 ;; particular directory/project so I can do something there like run
-;; magit-status. TODO: Maybe more project awareness could be a way to
-;; solve both of these problems so perhaps I should look into
-;; something like projectile which I think might solve other things I
-;; was thinking about too. TODO: It could be interesting to also come
+;; magit-status. TODO: It could be interesting to also come
 ;; up with another minibuffer thing (maybe the key binding could be
 ;; C-x f) which completes on full filenames just to see what goes into
 ;; doing something like that.
@@ -736,31 +799,6 @@ expression."
 ;; THAT REGISTERS SHOULD MAYBE BE USED TO REPEATEDLY JUMP BACK TO A
 ;; PARTICULAR SPOT.
 
-;; TODO: Sometimes I feel like I copy something to multiple spots in
-;; emacs but have to delete something too but it's frustrating because
-;; whenever I delete the thing I overwrite what I copied. Is there a
-;; way to improve this somehow? I know M-y can take a negative
-;; argument to go backwards but is there a faster way? Or just better
-;; management of the kill ring in general? Or if we had registers to
-;; copy to like in vim that could solve this. Or if I knew of better
-;; ways to delete lots of text in emacs without actually copying it
-;; then that would work too.
-
-;; TODO: I think I'm really starting to miss some of the vim text
-;; objects and movements and things. Like commenting the current
-;; paragraph or moving to an indent level the same as your own. I want
-;; to think about learning if some of those things exist or finding a
-;; way to get them back somehow whether through evil mode or other
-;; ways.
-
-;; TODO: At some point I was watching a talk about CIDER and the
-;; presenter mentioned I believe this package avy:
-;; https://emacsredux.com/blog/2015/07/19/ace-jump-mode-is-dead-long-live-avy/
-;; I should check it out for the purpose of navigating more
-;; efficiently in emacs. I think ace jump was the original
-;; implementation of this sort of idea but now avy is the cool new
-;; thing.
-
 ;; TODO: I want to learn about how to send email through emacs and
 ;; what that all involves to set that up.
 
@@ -777,11 +815,6 @@ expression."
 ;; which "splits lines automatically when they get too long". Maybe
 ;; that could help? It also mentions "visual line" mode which also
 ;; seems maybe related.
-
-;; Some info about ido, incomplete, fido:
-;; https://lists.gnu.org/archive/html/emacs-devel/2019-11/msg00197.html
-;; Had a lot of neat things:
-;; https://karthinks.com/software/more-batteries-included-with-emacs/
 
 ;; TODO: I accidentally typed C-\ and it was prompting me to input
 ;; text in another language! The first one offerred was
@@ -866,25 +899,9 @@ better. Kind of makes it a bit more like fido honestly."
 ;; what I have copied.
 (delete-selection-mode 1)
 
-;; TODO: I think it could be nice to have the inactive buffers display
-;; in a slightly darker background active one. On a related note,
-;; maybe something like https://github.com/hlissner/emacs-solaire-mode
-;; could be nice?
-
 ;; TODO: I would love it if M-. would jump to the definition of an
 ;; elisp function even if said function was written in C. How can we
 ;; make that happen? Do I have to compile emacs from source?
-
-;; TODO: I think it would be cool if the uniquify feature for making
-;; buffer names unique could be aware of projects and then add the
-;; project name to the buffer name within the <>. Or maybe I just
-;; won't have any need for this if I install projectile :shrug:. At
-;; the end of the day I just want to improve my buffer switching.
-
-;; TODO: Seems like the magit status buffer is being listed by the
-;; bs-show buffer list. I'll have to dig into that logic to figure out
-;; why that is because I'd prefer it if there are ONLY real files
-;; getting shown.
 
 ;; TODO: Have C-c C-n/C-p in vterm also put me in copy mode. I don't
 ;; think I'd have another reason to look back at a previous command
@@ -916,24 +933,6 @@ better. Kind of makes it a bit more like fido honestly."
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Window-History.html
 ;; ALSO might be cool if I could have a next-buffer that only works
 ;; within a project sort of feature.
-
-;; TODO: I wonder if saving which files Emacs had open (so if I stop
-;; emacs and start it up again it will load those same files) would be
-;; a useful feature for me to employ.
-
-;; TODO: I learned from section 8.5 of the emacs manual about
-;; minibuffer history that when doing C-x b it keeps track of your
-;; arguments which seems like another neat way to switch back to
-;; previous buffers you've been to instead of doing the C-x
-;; <left/right>. Maybe I'd even prefer it since I think that will be
-;; independent of any windows. Anyway. Just wanted to note this here
-;; because I think there could be some extra configuring I want to do
-;; like erasing duplicate entries in that history or something. I
-;; notice that when I do a bookmark-set command and go back through
-;; the history it's not JUST past bookmark names that show up, it's
-;; also other stuff and I'm curious what it would take to make ONLY
-;; bookmarks show up in the history. Some autocomplete here could be
-;; nice too. Wonder what that would take to do.
 
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 
@@ -984,29 +983,12 @@ better. Kind of makes it a bit more like fido honestly."
 ;; loop when editing. I haven't even used clojure that much but it's
 ;; making me want it more.
 
-;; TODO: Do I want that expand-region package? Seems potentially
-;; useful. Although if I go the vim route I don't think I'd have any
-;; use for it.
-
 ;; TODO: It would be nice to be able to go to all places in code where
 ;; some function gets called. Is that kind of functionality built in?
 ;; Maybe the dumb-jump package has info about that?
 
-;; TODO: If I do rgrep with the cursor on a url it tries to like ping
-;; that url? What's up with that?
-
-;; TODO: Should I install ripgrep or ag to speed up rgrep? I think it
-;; would be nice in general to mess around with that tool and see all
-;; what it can do.
-
-;; TODO: In org mode how do I search in JUST the headers? Can I?
-
-;; TODO: Make it consistent how links get opened across different
-;; modes. Also, would be cool if the link opening would also search
-;; forward for the next link by default I think.
-
-;; TODO: If I do utilize "dumb jump" in terraform on a local variable,
-;; it appears to still look for an actual variable (like in a
+;; TODO: If utilize "dumb jump" in terraform on a local variable, it
+;; appears to still look for an actual variable (like in a
 ;; variables.tf file). I think it could be improved to look for a
 ;; locals block in the current directory.
 
@@ -1015,12 +997,18 @@ better. Kind of makes it a bit more like fido honestly."
 
 ;; Making the text a little bigger. This might mean that I'm getting
 ;; old (cur date is 2021-08-01).
-(set-face-attribute 'default nil :height 140)
+(set-face-attribute 'default nil :height 120)
+;; Trying out the font used by visual studio code because it felt more
+;; readable than the default emacs font.
+(set-face-attribute 'default nil :family "Consolas")
 
 ;; TODO: It would be neat to have a "search text only" option when
 ;; looking at an html document in emacs. Just sounds like a cool idea.
 ;; Would also be nice then to extend that with a "regex search text
-;; only".
+;; only". I feel like there could be some other ways to limit searches
+;; to certain parts of a buffer which could be good like only search
+;; in comments or only search in strings or only search in org mode
+;; headers.
 
 (defun lag13/delete-all-whitespace ()
   "Created and used when I wrote a function in clojure to pull
@@ -1043,14 +1031,6 @@ newlines and I wanted to collapse them."
 ;; I wonder if I can use both somehow? It seems fun to try at any
 ;; rate: https://www.emacswiki.org/emacs/KeyChord
 
-;; TODO: I feel like I should try out multiple cursors or something
-;; like http://emacsrocks.com/e08.html to more efficiently change
-;; multiple occurrences of something. Or maybe string replace is just
-;; fine? http://emacsrocks.com/e13.html. Actually multiple cursors
-;; seem superior here since any cool editing stuff will then happen in
-;; multiple places (like if you're making changes in paredit:
-;; http://emacsrocks.com/e14.html )
-
 ;; TODO: I think it would be cool to, when you're in a project or
 ;; file, type the name of a function to jump to and you will jump
 ;; there. I guess ido mode can do this somehow:
@@ -1066,15 +1046,6 @@ newlines and I wanted to collapse them."
 ;; TODO: I'd like to get better at working with html. I honestly don't
 ;; have a use case at the moment but it seems like it would be fun!
 ;; http://emacsrocks.com/e12.html
-
-;; TODO: Query replace can do a lot more than just replacing things
-;; one at a time I'm realizing look into that.
-
-;; TODO: The more I think about doing more structured editing, the
-;; more I feel like all text sort of operations have so much room for
-;; improvement! Like instead of a generic string replace I want to be
-;; able to rename a function and have emacs be aware enough to be able
-;; to replace that function usage everywhere!
 
 ;; TODO: that vterm copy command function doesn't appear to be able to
 ;; copy a multi-line command.
@@ -1107,10 +1078,6 @@ newlines and I wanted to collapse them."
 ;; kept the old one commented out and then I wanted to comment out the
 ;; old one and re-eval it.
 
-;; TODO: Increase the size of the *Messages* buffer. There was one
-;; time where cider threw some stacktrace stuff and it totally filled
-;; the buffer which seems to only accomodate 1000 lines.
-
 ;; TODO: I feel like this behavior of the DEL key should be default in
 ;; paredit. Should I suggest this to the maintainer?
 (defun lag13/paredit-delete-region-or-backward ()
@@ -1119,10 +1086,13 @@ newlines and I wanted to collapse them."
       (paredit-delete-region (point) (mark))
     (paredit-backward-delete)))
 
-;; TODO: I'd like to better understand the nuances of when I should
-;; use eval-after-load vs. using add-hook. They seem similar in the
-;; problems they solve. I used eval-after-load here since that is what
-;; the source code advised.
+;; I believe that a good candidate for using eval-after-load is making
+;; keybindings within a mode. Because the keybindings of a mode are
+;; defined only initially when the mode's code is loaded (i.e. there
+;; is only one copy of the keymap). You could put the keybinding in a
+;; mode hook too but it would just be overkill because you'd be
+;; redefining the same key every time you start paredit mode in a new
+;; buffer.
 (eval-after-load 'paredit
   '(progn
      (define-key paredit-mode-map (kbd "DEL")
@@ -1130,7 +1100,6 @@ newlines and I wanted to collapse them."
 
 ;; TODO: I feel like I'd like to have the option of killing backwards
 ;; in paredit. Keep an eye on that thought to see if it's legitimate.
-
 
 ;; TODO: I think this page of gif's
 ;; http://danmidwood.com/content/2014/11/21/animated-paredit.html
@@ -1161,12 +1130,6 @@ newlines and I wanted to collapse them."
 ;; TODO: I wonder if it would be nice to be able to search through the
 ;; kill ring in an icomplete sor of way and the text you find gets
 ;; yanked.
-
-;; TODO: Maybe, if I do a C-x b, configure left and right arrows to do
-;; their buffer switching thing. Motivation is I saw myself once
-;; switch to the previous buffer thinking it was the one I wanted to
-;; go to only to realize that it wasn't and I wished I could just hit
-;; <left> since I knew it would have been there.
 
 ;; TODO: I would love if the cider repl had a reverse search feature
 ;; just like bash repls. Is that a shortcoming of nrepl? Or maybe the
@@ -1256,24 +1219,15 @@ newlines and I wanted to collapse them."
 ;; TODO: How do you play music in emacs? Can you? The thought that
 ;; jumped into my head was that there's that M-r command in paredit
 ;; mode which deletes it's siblings and "raises" it up to the level of
-;; the parent (also deleting the parent). Pretty brutal honestly. But
-;; what if every time I hit it it would play the beginning of "you
-;; raise me up" by Josh Groban. That would be pretty funny.
-
-;; TODO: I think turning on whitespace mode seems like a potentially
-;; good idea because then I can see tabs vs spaces which is useful
-;; because sometimes I unintentionally mix them up when I don't want
-;; to.
+;; the parent (also deleting the parent). Pretty brutal honestly
+;; (killing your parent that is). But what if every time I hit it it
+;; would play the beginning of "you raise me up" by Josh Groban. That
+;; would be pretty funny. Maybe this could help:
+;; https://github.com/emacs-tw/awesome-emacs#music. Or maybe this
+;; could be useful? https://github.com/mrBliss/helm-rhythmbox
 
 (blink-cursor-mode 0)
-;; TODO: Turn this off in vterm mode unless copy mode is on.
 (global-hl-line-mode t)
-
-;; TODO: I think there's a bug in cider-jack-in. I renamed a directory
-;; via dired and then when I tried to do cider-jack-in on that
-;; directory it complained that it couldn't find the directory and
-;; referenced the old directory that I renamed. Doing a C-x C-v on the
-;; file and then running cider-jack-in got things flowing again.
 
 ;; TODO: Emacs really struggles with longs lines. Apparently when you
 ;; open a file with really long lines it will try and detect it and
@@ -1320,14 +1274,6 @@ newlines and I wanted to collapse them."
 ;; between expected and actual and I don't get to see what the
 ;; original input was. What is doing that? I want to fix it.
 
-;; TODO: One time when using magit something weird happened where the
-;; minibuffer kind of got stuck? By "stuck" I mean a shadow of my
-;; cursor was always in the minibuffer and when I would switch window
-;; focus it would travel through the minibuffer and this error message
-;; was happening: user-error: Cannot invoke transient magit-commit
-;; while minibuffer is active. I was using version "27.2" of emacs and
-;; version magit-20210701.2128 of magit.
-
 ;; Manually invoke company mode completions
 (setq company-idle-delay 0.0)
 (defun lag13/company-mode-customizations ()
@@ -1362,30 +1308,10 @@ of automatically."
 
 ;; (yas-global-mode 1)
 
-
-;; TODO: I'm watching
-;; https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ&ab_channel=SystemCrafters
-;; and he uses ivy to do code completion in the minibuffer. At first I
-;; thought to myself, "I feel like icomplete gives me everything I
-;; need" but then I was looking at the ivy UI and it displays the list
-;; of options vertically instead of horizaontally and I feel like that
-;; alone makes me kind of want it because sometimes if I see
-;; myselection a couple choices away, horizontally it's kind of hard
-;; to guage since each choice takes up a different amount of space but
-;; if they were stacked vertically that would be much simpler I think.
-
 ;; TODO: For that golang table driven test yasnippet, make it so it is
 ;; more dynamic (i.e. upon expansion, it will ask how many function
 ;; arguments will be there and work appropriately). Perhaps this could
 ;; help: https://github.com/joaotavora/yasnippet/issues/348
-
-;; TODO: in
-;; https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ&ab_channel=SystemCrafters
-;; he got rid of the visual bell and replaced it with a little flash.
-;; Think about doing this.
-
-;; TODO: Make expanding a macro a keybinding, seems like a useful
-;; thing to have at your fingertips within emacs.
 
 ;; TODO: Make a something which will tell you if today is a bones or
 ;; no bones day.
@@ -1447,14 +1373,6 @@ of automatically."
 ;; don't know what I want to do with it but if something is just data
 ;; then I can do... something with it!
 
-;; TODO: I have this enabled but read this to understand it more:
-;; https://www.reddit.com/r/orgmode/comments/j253ya/org_modes_intended_indentation/
-;; That being said, I feel like having this makes org mode better
-;; behaved. Without it indentation is added by default by adding
-;; literal spaces when you're writing under a heading, that's annoying
-;; though because if you want to copy this data somewhere else then it
-;; will have that indentation too. Anyway, it seems good.
-
 ;; TODO: I've heard a couple mentions of org mode's "agenda" feature
 ;; for managing the stuff you have to do next like meetings or just
 ;; straight up todos. I wonder if I could integrate my work calendar
@@ -1467,17 +1385,15 @@ of automatically."
 ;; TODO: I feel like I want org mode to be a little smarter. The
 ;; specific use case I have in mind at the moment is that if I press
 ;; return while editing a list, I want org mode to open up a new list
-;; item. If I hit return again it could exit the list.
+;; item. If I hit return again it could exit the list. This would
+;; behave more consistantly with other editing things I feel.
 
 ;; TODO: I think it would be cool if, from a documentation kind of
 ;; standpoint, you were able to ask if a function has an "inverse"
 ;; (like an isomorphic kind of thing) and it could tell you. Like the
 ;; opposite of a split string algorithm would be one that joins
-;; strings.
-
-;; TODO: I'd like to review tim pope's plugins for vim to see if
-;; there's anything I can bring over for emacs. He just has so many
-;; good ideas!
+;; strings (<-- that was what motivated me to write this actually
+;; because the naming in emacs is weird).
 
 ;; TODO: How do I do timer stuff in emacs? Use case was that at one of
 ;; my companies we wanted to see how long a feature flag flip would
@@ -1487,16 +1403,12 @@ of automatically."
 ;; I've been online for ~8 hours or something like that so I don't
 ;; over work.
 
-(load "~/.emacs.d/lag13")
-
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C-+") 'er/contract-region)
 
 ;; On a windows machine I kept accidentally doing this action because
 ;; my palm would accidentally click the mouse. It would open a buffer
-;; menu which I have no use for. TODO: I would like to understand how
-;; keybinding works better. Like, usually I do the "kbd" thing but
-;; here I've just got []?
+;; menu which I have no use for.
 (global-unset-key [C-down-mouse-1])
 
 ;; TODO: Another thought (which I may have already had lol) in the
@@ -1505,13 +1417,6 @@ of automatically."
 ;; know to return to it. Maybe if the buffers were displayed in a
 ;; tabline across the top then that tab could be highlighted.
 
-;; TODO: I think somehow my "buffer-file-coding-system" variable is
-;; set to utf-8-unix. I say this because I was noticing those carriage
-;; return characters (displayed as ^M) in my windows files but when I
-;; opened emacs without any configuration, "buffer-file-coding-system"
-;; was set to utf-8-dos. I'm not sure where this gets set but sniff it
-;; out.
-
 ;; TODO: Mess around with trying to get a feature where I can
 ;; temporarily make a specific window the largest and only window but
 ;; then I can revert later:
@@ -1519,19 +1424,18 @@ of automatically."
 
 ;; TODO: I think that for code splunking it could be helpful to be
 ;; able to have point on a place in a git managed file and have it
-;; generate the "permalink" for that spot in the file. Furthermore,
-;; emacs could then open that link locally instead of opening up the
-;; link in github.
+;; generate the "permalink" for that spot in the file. Because
+;; sometimes I want to show some code to my coworker and the fastest
+;; way to me feels like to do something like this.
 
-;; I think I've given vanilla emacs a fair shot I've used it for at
-;; least 2 years as of 2022-01-04) and I want that I want my vim
-;; editing back! TODO: make this sentence funnier like the intro quote
-;; in doom emacs. Thanks to https://github.com/hlissner/doom-emacs for
-;; some great documentation and inspirations on what evil packages to
-;; add. Honestly, part of me wonders if I should just start using that
-;; configuration framework! I get the feeling that in another
-;; universe, I might have created something like doom emacs had it not
-;; already been there.
+;; I think I've given vanilla emacs a fair shot (I've used it for at
+;; least 2 years as of 2022-01-04) and I want my vim editing back!
+;; It's time to return to the dark side. Thanks to
+;; https://github.com/hlissner/doom-emacs for some great documentation
+;; and inspirations on what evil packages to add. Honestly, part of me
+;; wonders if I should just start using that configuration framework
+;; lol. I get the feeling that, in another universe, I might have
+;; created something like doom emacs had it not already been there.
 (evil-mode 1)
 
 ;; I am only one man so I have not read EVERYTHING that this does but
@@ -1554,18 +1458,41 @@ of automatically."
 (define-key evil-motion-state-map (kbd "SPC") #'switch-to-buffer)
 (evil-global-set-key 'motion (kbd "C-SPC") #'projectile-switch-to-buffer)
 
-;; projectile also has a "project wide grep" command but it's pretty
-;; lame because it defaults to non-regex searches (with no way to
-;; configure it) AND it doesn't let you filter by file type (which I
-;; think is handy). I also tried deadgrep but I didn't care for it's
-;; interface (perhaps I'm too used to using a compilation-mode based
-;; search interface). I also tried the other ripgrep integration that
-;; projectile integrates with
-;; (https://github.com/nlamirault/ripgrep.el) but it seemed less
-;; polished as the one I neded up with
-;; (https://github.com/dajva/rg.el) which has lots of nice features
-;; like a built in project wide search!
+;; I tried two other packages before settling on
+;; https://github.com/dajva/rg.el.
+;; https://github.com/nlamirault/ripgrep.el just seemed much less
+;; polished so that's a no. I also tried
+;; https://github.com/Wilfred/deadgrep and initially I didn't like it
+;; but perhaps I'm just too used to the compilation-mode style
+;; interface and it was also before I started using evil-collection so
+;; maybe it's worth a retry. TODO: Try out deadgrep again, see if I
+;; like it.
 (define-key evil-normal-state-map "S" #'rg-menu)
+
+(rg-define-search lag13-rg-literal-project
+  "Search for a literal string within the current project"
+  :format literal
+  :dir project)
+
+(defun lag13-rg-visual-dwim (beg end)
+  "Does a literal search for the visually selected region."
+  (interactive "r")
+  (evil-exit-visual-state)
+  (lag13-rg-literal-project (buffer-substring-no-properties beg end) "*"))
+
+(define-key evil-visual-state-map "S" #'lag13-rg-visual-dwim)
+
+;; TODO: rg let's you list the available buffers in ibuffer mode but I
+;; think it would also be nice to start a completing-read session and
+;; let the user select the buffer.
+(defun lag13-rg-switch-buffer ()
+  (interactive)
+  (let (res)
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+	(when (equal major-mode 'rg-mode)
+	  (push (buffer-name buf) res))))
+    (switch-to-buffer-other-window (completing-read "RG buffer: " res))))
 
 ;; Argument text objects. TODO: I notice that if an argument is a
 ;; string with a "," in it then it doesn't work. Could we make it
@@ -1579,7 +1506,9 @@ of automatically."
 ;; feel like that package could be an appropriate place to add number
 ;; text objects. Potential text objects could be "in" to select a
 ;; number MINUS any prefix like "0x" and "an" could be to include that
-;; prefix.
+;; prefix. This could be helpful in figuring out how to create those
+;; text objects:
+;; https://github.com/noctuid/targets.el#method-for-implementing-text-objects-using-things
 (evil-define-key '(normal visual) 'global "+" #'evil-numbers/inc-at-pt)
 (evil-define-key '(normal visual) 'global "-" #'evil-numbers/dec-at-pt)
 
@@ -1609,13 +1538,6 @@ of automatically."
 ;; expanding that library instead, the comments make it sound like
 ;; you're able to define other "things".
 
-;; TODO: Speaking of that thingatpt.el library, I think there are some
-;; other useful text objects that could be created using what is
-;; already defined. It looks like the key to do this (or at least this
-;; is the way evil seems to do it) is to define a function called:
-;; "forward-comment &optional count" and then you can call
-;; (bounds-of-thing-at-point 'comment) and it would work.
-
 ;; Got the mappings from what the OG plugin
 ;; https://github.com/michaeljsmith/vim-indent-object lays out.
 (define-key evil-inner-text-objects-map "i" 'evil-indent-plus-i-indent)
@@ -1628,7 +1550,9 @@ of automatically."
 ;; evil-select-an-object doesn't work for some reason. I think the
 ;; problem is that the function evil-bounds-of-not-thing-at-point
 ;; needs to work and I think in order for that to work, a function
-;; "forward-THING" must be defined AND it has to return a number.
+;; "forward-THING" must be defined AND it has to return a number. This
+;; will help:
+;; https://github.com/noctuid/targets.el#method-for-implementing-text-objects-using-things
 (evil-define-text-object evil-inner-url (count &optional beg end type)
   "Select inner url."
   (evil-select-inner-object 'url beg end type count))
@@ -1660,22 +1584,39 @@ lines."
     (call-interactively #'evil-ex)))
 (define-key evil-visual-state-map "." #'lag13-evil-dot-on-visual-selection)
 
-;; TODO: See if we want https://github.com/cute-jumper/evil-embrace.el
-;; at any point for additional surrounding power.
+;; I'm modifying these keybindings to make "gs" take the place of "ys"
+;; which then means I'll use "gs" in visual mode instead of "S" which
+;; frees up "S" to do something else I want. Also, fun fact, the way
+;; in which evil-surround is setup (at least as of 2022-01-27) is to
+;; add "s" to the operator pending map which defaults to the same
+;; action "evil-surround-edit" which will check to see what operator
+;; was called and perform the appropriate action. So if you type 'd'
+;; then it will do a delete, 'c' will cause a change, OTHERWISE it
+;; adds surrounding characters. Yes you read that right, "otherwise".
+;; That means you can invoke other operators to do surround stuff too
+;; like gUsiw". Quirky. TODO: Using "gs" doesn't seem to complete like
+;; "ys" does. It throws an error for some reason.
+(with-eval-after-load 'evil-surround
+  (evil-define-key 'normal evil-surround-mode-map "gs" #'evil-surround-edit)
+  (evil-define-key 'normal evil-surround-mode-map "gS" #'evil-Surround-edit)
+  (evil-define-key 'visual evil-surround-mode-map "gs" #'evil-surround-region)
+  (evil-define-key 'visual evil-surround-mode-map "gS" #'evil-Surround-region)
+  (evil-define-key 'visual evil-surround-mode-map "S" nil))
 (global-evil-surround-mode 1)
 
 (define-key evil-motion-state-map "H" #'evil-first-non-blank)
 (define-key evil-motion-state-map "L" #'evil-last-non-blank)
 
-;; TODO: https://github.com/Dewdrops/evil-exchange says that the "cx"
-;; binding that vim exchange is traditionally bound to in vim is not
-;; possible in emacs and yet it is? I'm confused by that blurb in
-;; their README. Understand it better. Also, that code which seems to
-;; make this cx thing work feels super hacky, can it be improved
-;; somehow? TODO: Also, the vim-exchange docs say that if one region
-;; is completely contained within the other, then the containing
-;; region will replace. I don't think this behaves in that manner.
-(evil-exchange-cx-install)
+;; TODO: Also, the vim-exchange docs say that if one region is
+;; completely contained within the other, then the containing region
+;; will replace. I don't think this behaves in that manner.
+(require 'evil-exchange)
+(evil-exchange-install)
+
+;; Since "gx" is being overwritten by evil-exchange I'll remap it's
+;; functionality to this keybinding (evil-downcase) which I don't use
+;; much anyway
+(define-key evil-normal-state-map "gu" #'browse-url-at-point)
 
 ;; Just gotta have it!
 (global-evil-visualstar-mode)
@@ -1685,17 +1626,33 @@ lines."
 ;; evil-mode itself.
 (load "~/.emacs.d/evil-cutlass")
 
+;; It would seem that when setting evil-search-module to evil-search,
+;; which I want to do so I get those "gn" text objects, the function
+;; evil-ex-search gets called and the ONLY thing it does when a search
+;; wraps is display a message saying "Search wrapped". This is a shame
+;; because it's very easy to miss this. It's also a bit surprising
+;; because if evil-search-module is set to the default "isearch" then
+;; it calls out to evil-search which will call the ding function if
+;; the search wraps and a setting is configured. It's just odd that
+;; within the same module there's a way to have it ding or not. So
+;; I've gotta use some advice! TODO: Make a PR to get this added to
+;; evil mode. It seems like it should and the change should be easy,
+;; there is already a configuration option evil-search-wrap-ring-bell
+;; which we could probably use.
+(defun lag13-make-evil-search-ding-on-wraparound (evil-ex-search-fn &rest args)
+  (let ((start-point (point)))
+    (apply evil-ex-search-fn args)
+    (when (or (and (equal evil-ex-search-direction 'forward)
+		   (<= (point) start-point))
+	      (and (equal evil-ex-search-direction 'backward)
+		   (>= (point) start-point)))
+      (ding))))
+(advice-add 'evil-ex-search :around #'lag13-make-evil-search-ding-on-wraparound)
+
 ;; TODO: https://github.com/PythonNut/evil-easymotion is listed in
 ;; doom emacs and apparently it's built on
 ;; https://github.com/abo-abo/avy. What's the relationship there?
 ;; Which one should I get?
-
-;; TODO: Bring in https://github.com/noctuid/targets.el for my ol'
-;; friend targets.vim.
-
-;; TODO: Might need to look at this for multiple cursors in emacs:
-;; https://github.com/gabesoft/evil-mc Or maybe we need just the
-;; vanilla emacs one? Not sure
 
 ;; TODO: It's kind of a bummer now that doing "C-h k" doesn't work as
 ;; effectively when you've got operators like "y" AND "ys" defined. Is
@@ -1750,6 +1707,50 @@ lines."
 ;; list of files. I need to work on that too but that's a separate
 ;; thing.back to a project 
 (setq projectile-switch-project-action #'projectile-switch-to-buffer)
+
+;; Around 2022-01-31 I started noticing that my emacs would hang for a
+;; couple seconds when trying to open a file for the first time from
+;; the results of doing a https://github.com/dajva/rg.el search. I ran
+;; the command toggle-debug-on-quit and hit C-g during the next lag
+;; and saw this:
+;;
+;; call-process("C:\\Program Files\\Git\\usr\\bin\\bash.exe" nil (t "c:/Users/lgroenendaal/AppData/Local/Temp/scor48hAj...") nil "-c" "git submodule --quiet foreach 'echo $displaypath' ...")
+;; call-process-shell-command("git submodule --quiet foreach 'echo $displaypath' ..." nil (t "c:/Users/lgroenendaal/AppData/Local/Temp/scor48hAj..."))
+;; shell-command("git submodule --quiet foreach 'echo $displaypath' ..." t "*projectile-files-errors*")
+;; projectile-files-via-ext-command("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/" "git submodule --quiet foreach 'echo $displaypath' ...")
+;; projectile-get-immediate-sub-projects("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
+;; projectile-get-all-sub-projects("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
+;; projectile-get-sub-projects-files("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/" git)
+;; projectile-dir-files-alien("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
+;; projectile-project-files("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
+;; projectile-project-dirs("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
+;; projectile-current-project-dirs()
+;; compilation-find-file-projectile-find-compilation-buffer(#f(compiled-function (marker filename directory &rest formats) "Find a buffer for file FILENAME.\nIf FILENAME is not found at all, ask the user where to find it.\nPop up the buffer containing MARKER and scroll to MARKER if we ask\nthe user where to find the file.\nSearch the directories in `compilation-search-path'.\nA nil in `compilation-search-path' means to try the\n\"current\" directory, which is passed in DIRECTORY.\nIf DIRECTORY is relative, it is combined with `default-directory'.\nIf DIRECTORY is nil, that means use `default-directory'.\nFORMATS, if given, is a list of formats to reformat FILENAME when\nlooking for it: for each element FMT in FORMATS, this function\nattempts to find a file whose name is produced by (format FMT FILENAME)." #<bytecode 0x94eade4af1>) #<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil)
+;; apply(compilation-find-file-projectile-find-compilation-buffer #f(compiled-function (marker filename directory &rest formats) "Find a buffer for file FILENAME.\nIf FILENAME is not found at all, ask the user where to find it.\nPop up the buffer containing MARKER and scroll to MARKER if we ask\nthe user where to find the file.\nSearch the directories in `compilation-search-path'.\nA nil in `compilation-search-path' means to try the\n\"current\" directory, which is passed in DIRECTORY.\nIf DIRECTORY is relative, it is combined with `default-directory'.\nIf DIRECTORY is nil, that means use `default-directory'.\nFORMATS, if given, is a list of formats to reformat FILENAME when\nlooking for it: for each element FMT in FORMATS, this function\nattempts to find a file whose name is produced by (format FMT FILENAME)." #<bytecode 0x94eade4af1>) (#<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil))
+;; compilation-find-file(#<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil)
+;; apply(compilation-find-file #<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil nil)
+;; compilation-next-error-function(0 nil)
+;; next-error-internal()
+;; compile-goto-error(return)
+;; funcall-interactively(compile-goto-error return)
+;; call-interactively(compile-goto-error nil nil)
+;; command-execute(compile-goto-error)
+;;
+;; From there I figured out that the reason this is slow is because
+;; projectile adds advice around the compilation-find-file function
+;; which will first load all directories within the project and add it
+;; to the search path. Apparently the motivation was that
+;; compilation-mode doesn't work well with java stack traces:
+;; https://github.com/bbatsov/projectile/issues/331. I don't want it
+;; here though so I'm removing it. Note that without that advice (i.e.
+;; the more vanilla behavior) selecting a new buffer takes 0.316906
+;; seconds but with that advice it takes a whopping 1.445613. So yeah,
+;; I don't want it. Timings achieved by running this code:
+;; (benchmark-elapse (compile-goto-error))
+(add-hook
+ 'projectile-mode-hook
+ (lambda ()
+   (advice-remove 'compilation-find-file #'compilation-find-file-projectile-find-compilation-buffer)))
 
 ;; The inspiration for using vertico was:
 ;;
@@ -3355,8 +3356,6 @@ lines."
 ;; motions from emacs for quickly motoring over on the same line and
 ;; it seems easier than vim because the motion feels more predictable.
 
-;; TODO: An evil text object for the entire buffer
-
 ;; TODO: Just for fun, would it be possible to hack emacs such that it
 ;; is a lisp 1 instead of a lisp 2? I feel like parts of it could be.
 ;; I feel like every time you define something you just have to store
@@ -3452,11 +3451,24 @@ lines."
 ;; right now I feel like I have to quit out of the query replace
 ;; entirely and start that flow over again later. All these things use
 ;; the minibuffer so surely it feels like, at the very least, the text
-;; I typed could be saved and then recalled?
+;; I typed could be saved and then recalled? Or like, I try to switch
+;; buffers but then don't realize that the buffer I'm looking for
+;; isn't loaded so I quit and run the find-file command and have to
+;; retype what I had just typed before. It would be nice to keep the
+;; same minibuffer contents but just switch the command they're
+;; getting passed to. I wonder if enabling this could help
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Recursive-Mini.html
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Mode Line stuff
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; I also used the customize interface to change the value of
+;; mode-line-format to include just the info I want (I looked through
+;; the default value and took what I thought would be useful). I used
+;; the customize interface because when I tried just setq, it only
+;; changed it for this buffer but not others and I didn't bother
+;; investigating further because using customize "just worked".
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (line-number-mode 0)
 
 (defvar lag13-mode-line-buffer-identification
@@ -3465,35 +3477,62 @@ lines."
 difference is that mine does not include padding which I want
 because I want to try having a more concise modeline.")
 
-;; Tell what mode I'm in purely based on the cursor.
+;; The default value for this is "%12b" but I didn't want all that
+;; padding. Originally I tried setq but it would seem that this
+;; variable is buffer local and so doing that only changed that
+;; buffer. Using setq-default like this seems to have worked.
+(setq-default mode-line-buffer-identification
+	      (propertized-buffer-identification "%b"))
+
+;; Tell what mode I'm in purely based on the cursor. TODO: I think it
+;; would be neat to indicate what type of visual mode we're in too
+;; based on some difference we apply to the cursor. Not very
+;; important, just think it would be neat.
 (setq evil-mode-line-format nil)
 (setq evil-emacs-state-cursor 'hollow)
 
-(defun lag13-mode-line-project-info ()
-  "Returns information about the current project."
-  (format "[%s]" (projectile-project-name)))
+(defun lag13-adjust-color-brightness (color-str multiplier)
+  "Takes a color string (like #005aa3) and uniformly adjusts each
+component of the color string with MULTIPLIER which effectively
+brightens/darkens the color. Originally created because I was
+using the vscode-dark-plus theme and wanted to make the
+mode-line-inactive face even darker."
+  (->> color-str
+       (color-name-to-rgb)
+       (seq-map (lambda (c) (* multiplier c)))
+       (apply #'color-rgb-to-hex)))
 
-;; Straight up modifying the mode line to include just the info I
-;; want. I looked through the default value of the modeline and
-;; removed anything I didn't feel I wanted.
-(setq mode-line-format
-      '("%e"
-	mode-line-mule-info
-	mode-line-client
-	mode-line-modified
-	mode-line-remote
-	" "
-	mode-line-position
-	" "
-	lag13-mode-line-buffer-identification
-	" "
-	(:eval (lag13-mode-line-project-info))
-	vc-mode
-	mode-line-end-spaces
-	))
+(defun lag13-modify-face-brightness (face face-attribute multiplier)
+  "Modifies the brightness of a particular face's attribute. See
+`lag13-adjust-color-brightness' for why I created this."
+  (set-face-attribute
+   face
+   nil
+   face-attribute
+   (lag13-adjust-color-brightness (face-attribute face face-attribute) multiplier)))
 
-;; TODO: Modify the mode-line-inactive face so that it is more obvious
-;; which window is active and which is not.
+;; I wanted the mode lines to be a bit darker for this theme and for
+;; the contrast to be greater between active and inactive mode lines.
+;; Not sure if this is the "right" way to do it but it works! TODO:
+;; How to have this run every time a theme is selected? Is there a
+;; hook for that?
+(when (equal (car custom-enabled-themes) 'vscode-dark-plus)
+  ;; Original colors for this theme
+  (comment
+   (set-face-background 'mode-line "#007acc")
+   (set-face-background 'mode-line-inactive  "#005aa3")
+   )
+  (lag13-modify-face-brightness 'mode-line :background 0.7)
+  (lag13-modify-face-brightness 'mode-line-inactive :background 0.3))
+
+;; TODO: I think I want the buffer name in the mode line to be JUST
+;; the file name if it is unique within a project in order to save
+;; screen real estate.
+
+;; TODO: I think I'd like to experiment with highlighting the buffer
+;; name in the mode line differently so it stands out more from the
+;; rest of the mode line. Right now it feels kind of hard to tell at a
+;; glance where I am.
 
 ;; TODO: I feel like saving the recent ripgrep search in a register "g
 ;; seems like a good idea. Because sometimes I do a ripgrep and then
@@ -3521,6 +3560,36 @@ because I want to try having a more concise modeline.")
 ;; centaur-tabs. I mean, I guess centaur tabs is just leaning on
 ;; tab-line anyway but still, I'm curious about the internals.
 (require 'centaur-tabs)
+;; I'm used to the default behavior of emacs where, if I kill a
+;; buffer, it will open the last buffer shown in that window (or
+;; something like that). I feel like that is more useful too than
+;; centaur's default behavior where it tries to show a buffer within
+;; the current tab group because if I'm already doing a lot of work
+;; in a particular project/tab-group then centaur's behavior will
+;; happen naturally and if I've only viewed one buffer in a tab
+;; group then killed it, I'm not sure I'm doing enough work in there
+;; anyway such that it should try to keep me there.
+(add-hook
+ 'centaur-tabs-mode-hook
+ (lambda ()
+   (remove-hook 'kill-buffer-hook 'centaur-tabs-buffer-track-killed)
+   ;; TODO: Would it be worth making a PR to add this to the centaur
+   ;; repo? Maybe it could be the default behavior?
+   (setq centaur-tabs-tab-label-function
+	 (lambda (cur-tab)
+	   (cl-flet ((get-tab-filename
+		      (tab)
+		      (-if-let (buf-file-name (buffer-file-name (centaur-tabs-tab-value tab)))
+			  (file-name-nondirectory buf-file-name))))
+	     (let ((cur-tab-filename (get-tab-filename cur-tab)))
+	       (if (or (not cur-tab-filename)
+		       (> (seq-count (lambda (filename) (equal cur-tab-filename filename))
+				     (->> (centaur-tabs-tab-tabset cur-tab)
+					  (centaur-tabs-view)
+					  (seq-map #'get-tab-filename)))
+			  1))
+		   (buffer-name (centaur-tabs-tab-value cur-tab))
+		 cur-tab-filename)))))))
 (centaur-tabs-mode 1)
 (centaur-tabs-headline-match)
 ;; TODO: Only add the buffers to the list of previously visited
@@ -3538,23 +3607,30 @@ because I want to try having a more concise modeline.")
 ;; that. Could we try to keep all tabs in view? Or at least give an
 ;; indication when tabs are hidden?
 
-;; TODO: Would it be worth making a PR to add this to the centaur
-;; repo? Maybe it could be the default behavior?
-(setq centaur-tabs-tab-label-function
-      (lambda (cur-tab)
-	(cl-flet ((get-tab-filename
-		   (tab)
-		   (-if-let (buf-file-name (buffer-file-name (centaur-tabs-tab-value tab)))
-		       (file-name-nondirectory buf-file-name))))
-	  (let ((cur-tab-filename (get-tab-filename cur-tab)))
-	    (if (or (not cur-tab-filename)
-		    (> (seq-count (lambda (filename) (equal cur-tab-filename filename))
-				  (->> (centaur-tabs-tab-tabset cur-tab)
-				       (centaur-tabs-view)
-				       (seq-map #'get-tab-filename)))
-		       1))
-		(buffer-name (centaur-tabs-tab-value cur-tab))
-	      cur-tab-filename)))))
+;; TODO: Continue this experiment. I want to try replacing the stuff I
+;; did with that bs-show stuff with this because I think it will feel
+;; more natural.
+(defun lag13-switch-buffer-on-complete-filepath ()
+  (let* ((buffer-alist (->> (buffer-list)
+			    (seq-filter #'buffer-file-name)
+			    (seq-map (lambda (b) (cons (buffer-file-name b) b)))))
+	 (presorted-completions (seq-map #'car buffer-alist))
+	 ;; Seems that we have to do all this nonsense just to get
+	 ;; completion to not alphabetically sort the list I give
+	 ;; it... Seems like too much. Thanks for these links for
+	 ;; inspiration:
+	 ;; https://emacs.stackexchange.com/questions/41801/how-to-stop-completing-read-ivy-completing-read-from-sorting,
+	 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffer-List.html,
+	 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion.html,
+	 ;; https://kisaragi-hiu.com/emacs-completion-metadata
+	 (completion-table
+	  (lambda (string pred action)
+	    (if (eq action 'metadata)
+		'(metadata (category . buffer)
+			   (display-sort-function . identity)
+			   (cycle-sort-function . identity))
+	      (complete-with-action action presorted-completions string pred)))))
+    (switch-to-buffer (cdr (assoc (completing-read "Buffer: " completion-table) buffer-alist)))))
 
 ;; TODO: Looks like centaur-tabs-buffer-groups does not assign
 ;; magit-revision-mode to the "Emacs" tab group which happens with
@@ -3580,7 +3656,7 @@ because I want to try having a more concise modeline.")
 (define-key evil-motion-state-map "'" 'evil-goto-mark)
 (define-key evil-motion-state-map "`" 'evil-goto-mark-line)
 
-;; TODO: There are a couple TODOs on
+;; TODO: There are a couple todos on
 ;; https://github.com/noctuid/targets.el to implement an "entire
 ;; buffer" text object as well as a "line" text object (I know we have
 ;; a repeated operator key to do a line but these are dedicated ones
@@ -3621,3 +3697,217 @@ because I want to try having a more concise modeline.")
 ;; invocation (i.e. whatever was run with M-x)? I know vim has @: to
 ;; repeat the last ex command so it would seem fitting to allow the
 ;; same with emacs. Just seems like a fun thing to try.
+
+;; straight.el seems to be all the rage so I thought I'd give it a
+;; shot. The real motivation for installing this though is that I
+;; wanted to install https://github.com/noctuid/targets.el but it is
+;; not a melpa package (see
+;; https://github.com/noctuid/targets.el/issues/29).
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+;; TODO: I wonder what significance the first symbol has to the
+;; overall function of straight.el. I used a dummy symbol before and
+;; this still worked which makes sense to me since we're specifying a
+;; literal repo from where to get it. I guess the symbol must just
+;; serve an organizational purpose for straight.el.
+(straight-use-package
+ '(targets :type git :host github :repo "noctuid/targets.el"))
+(require 'targets)
+;; I'm used to typing "ib" to select parentheses so want it to be able
+;; to do target'y things.
+(setq targets-user-text-objects '((paren "(" ")" pair :more-keys "b")))
+;; Pretty neat! Not sure if I'll use it but they let you have one
+;; keybinding work for multiple kinds of text objects:
+;; https://github.com/noctuid/targets.el#targets-define-composite-to
+(setq targets-composite-text-objects
+      '((all-quotes
+	  (("\"" "\"" quote)
+	   ("'" "'" quote)
+	   ("`" "`" quote)
+	   ("‘" "’" quote)
+	   ("“" "”" quote))
+	  :bind t
+	  :keys "q")))
+(define-key evil-visual-state-map (kbd "RET") #'targets-last-text-object)
+(define-key evil-operator-state-map (kbd "RET") #'targets-last-text-object)
+(targets-setup t
+               :inside-key nil
+               :around-key nil
+               :remote-key nil)
+
+;; This is easier to reach than % and I don't really use marks anyway.
+;; Mnemonic is "[m]atching"
+(define-key evil-motion-state-map "m" #'evil-jump-item)
+(define-key evil-normal-state-map "m" #'evil-jump-item)
+;; Retain original set mark behavior just in case
+(define-key evil-normal-state-map "M" #'evil-set-marker)
+
+;; TODO: This seems to be a neat assortment of packages:
+;; https://two-wrongs.com/why-you-should-buy-into-the-emacs-platform.
+;; I'm particularly curious about the calc package to do unit
+;; conversions inside of emacs because I like the idea of being able
+;; to do it within emacs instead of constantly googling.
+
+;; TODO: I think I should start looking into improving emacs' startup
+;; speed. Obviously it's not a huge priority but with desktop mode,
+;; starting up probably takes like 30 seconds. Without desktop mode I
+;; think it takes like 10 seconds.
+
+;; TODO: Mess around with https://github.com/gabesoft/evil-mc (this is
+;; the one we need for evil mode) and see if it can be improved. I was
+;; noticing that my rebind of 'x' to cut text just straight up didn't
+;; work and I feel like I noticed other jankiness with it and it made
+;; me curious about what the implementation looks like. Not urgent at
+;; all. Multiple cursors is definitely something which is neat but
+;; it's not at all necessary when you have features like macros,
+;; search+replace, using the "gn" text object for quick search+replace
+;; things, and visual block mode.
+
+;; TODO: I think the emacs' completion framework does NOT show ALL
+;; potential completions as you type, I think it only shows
+;; completions for the next one in the completion styles list that
+;; displays a result. Like if you have a file "some-secret.txt" and
+;; "secret.txt" and you type "secret" then it will only show the
+;; latter for my current completion-styles setting of (basic
+;; partial-completion flex orderless). Could we fix this somehow? Or
+;; maybe we just simplify the completion-styles setting? I guess my
+;; issue is that I had a couple files which started with the word
+;; "secret" and another that started with "_secret" and I was looking
+;; for that "_secret" one but couldn't find it when typing "secret"
+;; and got confused and felt it would have been nice if that result
+;; was also displayed.
+
+;; TODO: This seems neat: https://github.com/wellle/context.vim I
+;; think I might enjoy trying to port that over to emacs assuming
+;; something like it doesn't already exist. I think it would be super
+;; cool to also somehow combine that plugin with the grep
+;; functionality within emacs because then you can see which top level
+;; form the items matched against.
+
+;; TODO: I think I should extend the visual start plugin so that it
+;; works for g* as well mostly for completeness. The use case is if
+;; you were searching for a string but also wanted to include
+;; substring matches.
+
+;; TODO: I think swiper or ivy or something has a thing where you do a
+;; completing read on the lines in the current file and let's you jump
+;; to them and I'm curious if something like that is actually useful
+;; or if it's just another way to do a regular' ol search. I will say
+;; that I think being able to do my completion styles (like orderless)
+;; could be useful for me because I'll often remember a little phrase
+;; I have typed before and I want to find it but cannot.
+
+;; TODO: I want to improve my fuzzy file finding capabilities in
+;; emacs. Projectile seems fine but I want to be able to use it
+;; anywhere like in the current directory or in any old directory
+;; which is NOT a project. Maybe I'll have to look into
+;; https://github.com/bling/fzf.el or something. It appears that fzf
+;; is a way to do essentially the "completing-read" emacs function but
+;; for command line shells which feels super handy honestly. So you
+;; could do something like: cat file.txt | fzf and then start typing
+;; and it will filter for whatever you type. I wonder if there's
+;; another way to do fuzzy file finding in emacs but this seems neat.
+;; Heck, or maybe I do want to give helm another shot:
+;; https://github.com/ibmandura/helm-fzf/blob/master/helm-fzf.el, they
+;; seem to be able to do so many different types of completions. Like
+;; wow, so many: http://tuhdo.github.io/helm-intro.html. I should
+;; honestly probably take a look at helm for all the things I might
+;; want to complete on. Off the top of my head I could see these being
+;; things: copied text, shell history, buffers, buffers within a
+;; project, all files beneath a directory, files within just one
+;; directory, recorded macros, executed M-x commands, eval'd lisp
+;; code, the jump list(?), looking up help documentation on things
+;; like functions or variables (for emacs and other languages I
+;; suppose), complete on buffers but include the directory path as a
+;; searchable unit (for situations where I forget the file name but
+;; know it's in a certain directory), history of searches
+
+;; TODO: It would be interesting to have a search which would search
+;; for different cases of a base word. Like searching for the word
+;; "complete" would also match "completion".
+
+;; TODO: I feel like this person has some cool stuff in their emacs
+;; config: https://github.com/abo-abo/oremacs
+
+;; TODO: Could emacs be used to take screenshots and annotate them?
+;; Motivation is that the snip and sketch tool doesn't let one draw
+;; rectangles by default so I always: take the screenshot, open the
+;; screenshot in the snip and sketch app, tell the snip and sketch app
+;; to open this file in Paint, draw the rectangle, save, go to the
+;; file in a file explorer, copy the file, and (finally) upload it.
+;; It's just a pretty hairy process and it would be nice if I didn't
+;; have to have 3 apps (snip and sketch, paint, and file explorer)
+;; just to annotate some screenshot.
+
+;; TODO: The default comment for an ssh config file is ';' instead of
+;; '#'. What's up with that? Fix it.
+
+;; TODO: the rg plugin defines a couple searches to do a ripgrep for
+;; the last isearch'd thing. I should make a PR to define some rg
+;; searches that work for evil mode or something. Or maybe I just need
+;; to start using vim's insert mode bindings (because then I can just
+;; start a search and insert the text from the / register).
+
+;; TODO: What if your editor could tell where your looking and jump to
+;; that spot? Crazy idea (I'd need to get some sort of equipment) but
+;; I think it would be super fun to mess around with.
+
+;; TODO: Could we configure ripgrep to not even bother checking
+;; minified files? Or maybe we can configure the ripgrep plugin to
+;; only display a certain line length? Because if it hits a minified
+;; file and starts showing results, it is very possible that emacs
+;; just dies.
+
+;; TODO: Feel like I've written something like this. I've been
+;; noticing that when I do an evil search, some of the past highlights
+;; remain highlighted even if I search for something else. I think it
+;; happens when I'm in buffer A, do a search, go to buffer B, do
+;; different search, go back to buffer A and the original search terms
+;; are still highlighted. It would be neat I think if there was a key
+;; to jump to highlighted things.
+
+;; TODO: I'm curious about this package:
+;; https://www.reddit.com/r/emacs/comments/gmh8bs/beta_testers_ann_lets_make_emacs_better/
+
+;; TODO: Maybe flash the cursor or an area around the cursor when
+;; going to the next search? I say that because on 2022-01-31 I had an
+;; rg search (so already the search terms were highlighted) and then I
+;; wanted to search for just the regex \<2\> (i.e. very tiny) and a
+;; couple times I lost track of where the cursor was. I feel like
+;; there was a vim talk where a guy did this.
+
+;; TODO: Can I count the number of search results when doing a regular
+;; ol' evil search?
+
+;; TODO: Is there a way to do an rg search for a set of things to
+;; appear in a line? Effectively (assuming you're searching for 3
+;; terms) you'd do the first search, get the result lines, then do the
+;; rg on those lines and you're left with the lines that only have
+;; those 3 terms. Maybe there's just a regex to do this too, in my
+;; head it seemed like chaining together the rg searches would be
+;; faster though but maybe I'm wrong. My use case was that I wanted to
+;; search for lines containing "AsyncRequestStatusTypeID" and "2" and
+;; I didn't think the order particularly mattered.
+
+;; TODO: The indicator in compilation mode which points out which
+;; match we're on is not particularly obvious and, at a glance, looks
+;; similar to the markers which show that the line is wrapped. Can we
+;; fix this?
+
+;; TODO: Go to the first/last error in the compilation buffer and go
+;; to the current one (like if we navigated away and wanted to go back
+;; to it).
+
+;; TODO: Another guy which probably has a lot of good config:
+;; https://www.youtube.com/watch?v=46w9e4GAjsU&ab_channel=ProtesilaosStavrou

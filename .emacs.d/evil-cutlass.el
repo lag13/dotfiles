@@ -124,4 +124,8 @@ always cuts text)."
 (advice-add 'evil-delete :around #'evil-cutlass-delete-advice)
 (evil-define-key '(normal visual) 'global "x" #'evil-cutlass-cut)
 
+;; TODO: Get this issue deleted because it doesn't seem to be valid (I
+;; was able to advise just fine and not break anything):
+;; https://github.com/emacs-evil/evil/issues/1326
+
 (provide 'evil-cutlass)

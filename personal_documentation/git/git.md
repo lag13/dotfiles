@@ -317,6 +317,28 @@ end
 ## Search for a string in all past commits
 `git rev-list --all | xargs git grep something`
 
+## Search for a string in just the head commit of all branches
+
+```
+#!/bin/bash
+
+# Convenience because I was developing this script in a different
+# directory than the one I was doing the git grep's from
+starting_dir="/src/github.com/lag13/cool-repo-name/"
+pushd $starting_dir >/dev/null
+
+shas_and_branches="$(git ls-remote --heads)"
+
+while IFS= read -r line; do
+    sha=$(echo "$line" | awk '{ print $1 }')
+    branch=$(echo "$line" | awk '{ print $2 }')
+    res=$(git grep "package-I-am-curious-about" "$sha" | grep 'package\.json')
+    echo "$branch: $res"
+done <<< "$shas_and_branches"
+
+popd >/dev/null
+```
+
 ## author vs commiter
 Turns out git distinguishes between who "authored" the commit and the
 commiter is whoever brought the code into the repo:

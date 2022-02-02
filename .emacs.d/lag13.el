@@ -21,6 +21,7 @@
 (require 'thunk)
 (require 'dom)
 (require 'iso8601)
+(require 'dash)
 
 (defmacro comment (&rest body)
   "Evaluates the body and yields nil. Borrowed from clojure:
@@ -2179,7 +2180,7 @@ I made this a minor mode because that seems like a way to
 basically temporarily create key bindings (i.e. I can enable this
 minor mode to get the keybindings I want and then disable the
 minor mode and the old keybindings won't be disturbed)."
-  :lighter "PAPER MARIO BATH MATH"
+  :lighter " PAPER MARIO BATH MATH"
   :keymap paper-mario-bath-math-mode-map)
 
 (defun crossword-brute-enumerate-words ()
@@ -2261,3 +2262,131 @@ non-nil."
 ;; (screenreaders, making sure webpages can be navigated with a
 ;; keyboard, etc...) and it's making me wonder about what it would
 ;; look like to make emacs more accessible.
+
+;; TODO: I was fixing a bunch of linting errors and they had a rough
+;; format of:
+;;
+;; filename1:
+;;       line-num: string about the problem
+;;       ...
+;;
+;; filename2:
+;;       lin-num: string about the problem
+;;       ...
+;;
+;; I was wondering how I might parse such a data structure. In
+;; particular the problem I was trying to solve was that there were a
+;; bunch of linting errors about blank lines that the linter didn't
+;; want being there (also for some reason the linter refused to fix
+;; them which seems ridiculous to me because it was able to fix other
+;; things it complained about, but I digress). To fix those errors I
+;; made a macro which I would execute per file which would just go to
+;; the offending line and delete it. I could only execute it for one
+;; file at a time though and was hence wondering if I could somehow
+;; parse the entire file of linting errors, pick out the "empty line"
+;; errors and fix those all in one go.
+
+;; TODO: I had to make a similar change (basically just replacing one
+;; line with another) in multiple files and make PRs for them all. I
+;; don't know if I was tired but when I was doing this I just remember
+;; thinking that I was gonna miss a repo (there were like 6) and just
+;; wished there was a better way to make this change rather than
+;; having to do it manually, doing which involves steps:
+;; - Checkout main branch
+;; - pull latest changes
+;; - create new branch
+;; - make the change
+;; - commit the change
+;; - write the commit message
+;; - push the change
+
+(defun lag13-generate-debug-around-advice (fn-sym)
+  "Returns a function which can be used as :around advice for
+another function. Initially created because I wanted to find out
+what arguments were being passed to a function a couple calls
+down the chain.
+
+Originally I wrote this because I wanted to see what gets passed to
+the `evil-ex-execute' function because I was trying to bind a key
+which would execute an EX command and thought that was the function I
+needed to call. When I debugged that function call the printed output
+was something like:
+
+(:fn-call
+ (evil-ex-execute
+  #(\"normal yy\" 0 1
+    (ex-index 1)
+    1 2
+    (ex-index 2)
+    2 3
+    (ex-index 3)
+    3 4
+    (ex-index 4)
+    4 5
+    (ex-index 5)
+    5 6
+    (ex-index 6)
+    6 7
+    (ex-index 7)
+    7 8
+    (ex-index 8)
+    8 9
+    (ex-index 9)))
+ :fn-result nil)
+
+which is very confusing to me. I don't really know what to make of it
+but I THINK that when you type in the minibuffer, evil mode adds this
+extra stuff. Might be the evil-ex-update function.
+
+I should probably just learn emacs' built in debugging features lol.
+But doing this advice stuff is fun!"
+  (lambda (fn &rest args)
+    "Prints out the function invocation as well as the function's return value."
+    (let* ((orig-args (copy-tree args))
+	   (fn-call (cons fn-sym orig-args))
+	   (res (apply fn args)))
+      (ignore-errors
+	(message (pp-to-string (list :fn-call fn-call
+				     :fn-result res))))
+      res)))
+
+(defun lag13-toggle-debug-fn (fn-sym)
+  "Toggles adding the debugging advice to a function."
+  (let ((advice-fn (lag13-generate-debug-around-advice fn-sym)))
+    (if (advice-member-p advice-fn fn-sym)
+	(advice-remove fn-sym advice-fn)
+      (advice-add fn-sym :around advice-fn))))
+
+(defun lag13-remove-all-advice (symbol)
+  "A convenience function to remove all advice from another
+function."
+  (advice-mapc (lambda (advice _props) (advice-remove symbol advice))
+	       symbol))
+
+(defun lag13-set-nth (xs n x)
+  "A simple function to test my function which toggles adding the
+advice which debugs."
+  (setf (car (nthcdr n xs)) x)
+  xs)
+(lag13-toggle-debug-fn 'lag13-set-nth)
+
+;; TODO: Occasionally I've tried to time myself in some editing
+;; activity, performing it in a couple different ways to see which way
+;; was faster (<--- this miiiiight be an indication that I'm a bit
+;; crazy and too in the weeds with this editing stuff lol) but it's a
+;; bit clunky to press "start" on my phone and when I'm done press
+;; "stop". I feel like this could be automated. Like, I could say
+;; "start the timing" and then it would wait for me to start typing at
+;; which point it would actually start the timer. THEN when the text
+;; being edited has reached the desired state (which means I also must
+;; set the desired final state) then the timer will automatically
+;; stop. Seems fun! I'd be curious to implement something like that.
+
+;; TODO: Write something in emacs to try base64 decode all of the
+;; secret values present in a k8s string. I had a use case for it sort
+;; of in the sense that I had a k8s secret and wanted to decode it's 5
+;; individual secrets.
+
+;; TODO: Checkout
+;; https://www.youtube.com/watch?v=QU1pPzEGrqw&ab_channel=ClearCode.
+;; Seems like it would be pretty cool.
