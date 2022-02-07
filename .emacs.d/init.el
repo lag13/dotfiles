@@ -19,6 +19,7 @@
  '(bs-attributes-list '(("File" 12 12 left bs--get-file-name)))
  '(bs-string-current "/")
  '(centaur-tabs-cycle-scope 'tabs)
+ '(centaur-tabs-mode t nil (centaur-tabs))
  '(centaur-tabs-set-bar 'under)
  '(centaur-tabs-show-count t)
  '(clean-buffer-list-delay-general 5)
@@ -43,6 +44,7 @@
  '(evil-replace-with-register-key "s")
  '(evil-search-module 'evil-search)
  '(evil-search-wrap-ring-bell t)
+ '(evil-undo-system 'undo-tree)
  '(evil-want-fine-undo nil)
  '(evil-want-keybinding nil)
  '(explicit-shell-file-name "bash")
@@ -105,10 +107,15 @@
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
+ '(js-indent-level 8)
+ '(js-js-switch-tabs t)
  '(lsp-ui-doc-border "#9eacac")
  '(message-log-max 10000)
  '(mode-line-format
-   '("%e" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote " " mode-line-position " " mode-line-buffer-identification " "
+   '(""
+     (eldoc-mode-line-string
+      (" " eldoc-mode-line-string " "))
+     "%e" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote " " mode-line-position " " mode-line-buffer-identification " "
      (:eval
       (projectile-project-name))
      vc-mode mode-line-end-spaces))
@@ -117,8 +124,7 @@
  '(nrepl-message-colors
    '("#ec423a" "#db5823" "#c49619" "#687f00" "#c3d255" "#0069b0" "#3cafa5" "#e2468f" "#7a7ed2"))
  '(objed-cursor-color "#ff6c6b")
- '(orderless-matching-styles
-   '(orderless-regexp orderless-literal orderless-initialism orderless-strict-initialism orderless-strict-leading-initialism orderless-strict-full-initialism orderless-prefixes))
+ '(orderless-matching-styles '(orderless-regexp orderless-literal))
  '(org-src-block-faces 'nil)
  '(org-startup-indented t)
  '(package-selected-packages
@@ -127,8 +133,10 @@
  '(pos-tip-background-color "#01323d")
  '(pos-tip-foreground-color "#9eacac")
  '(projectile-indexing-method 'alien)
+ '(projectile-mode t nil (projectile))
  '(recentf-mode t)
- '(rg-command-line-flags '("--hidden"))
+ '(rg-command-line-flags '("--max-columns 1000" "--hidden"))
+ '(rg-ignore-case 'force)
  '(rustic-ansi-faces
    ["#282c34" "#ff6c6b" "#98be65" "#ECBE7B" "#51afef" "#c678dd" "#46D9FF" "#bbc2cf"])
  '(savehist-autosave-interval 15)
@@ -176,6 +184,24 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+;; straight.el seems to be all the rage so I thought I'd give it a
+;; shot. The real motivation for installing this though is that I
+;; wanted to install https://github.com/noctuid/targets.el but it is
+;; not a melpa package (see
+;; https://github.com/noctuid/targets.el/issues/29).
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
 (load "~/.emacs.d/lag13")
 
@@ -279,6 +305,14 @@
 ;; highlighting'wise.
 (setq completion-styles '(orderless))
 
+;; TODO: Even though I set these, it seems that if I have a situation
+;; like FIRST.SecondThird and I try to complete with FIR.*thir then it
+;; does not match. Why is that? Note that I'm using just orderless as
+;; my only completion framework.
+(setq completion-ignore-case t)
+(setq read-file-name-completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
+
 (add-hook 'c-mode-common-hook
 	  (lambda()
 	    (setq comment-start "// ")
@@ -324,7 +358,7 @@
 ;; (eval-after-load "haskell-mode"
 ;;   '(define-key haskell-mode-map (kbd "C-`") 'haskell-interactive-bring))
 ;; (setq haskell-process-type 'stack-ghci)
-      
+
 ;; ;; Haskell specific hooks
 ;; (add-hook 'haskell-mode-hook
 ;; 	  (lambda ()
@@ -340,9 +374,6 @@
 ;; By default restclient mode does not define a file type where it
 ;; will be triggered.
 (add-to-list 'auto-mode-alist (cons "\\.http\\'" 'restclient-mode))
-
-;; I'm not interested in eldoc mode
-(global-eldoc-mode 0)
 
 ;; Hitting return will open the link under the point.
 (setq org-return-follows-link t)
@@ -1111,7 +1142,7 @@ newlines and I wanted to collapse them."
 ;; BACKWARDS:
 ;; C-M-a - beggining of defun
 ;; C-M-b - move over S expression
-;; C-M-u - Move up out of the enclosing list 
+;; C-M-u - Move up out of the enclosing list
 ;; C-M-p - Move backwards down into the next list
 ;; FORWARDS:
 ;; C-M-e - end of defun
@@ -1406,9 +1437,9 @@ of automatically."
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C-+") 'er/contract-region)
 
-;; On a windows machine I kept accidentally doing this action because
-;; my palm would accidentally click the mouse. It would open a buffer
-;; menu which I have no use for.
+;; On a windows machine I kept accidentally executing this keybinding
+;; because my palm would accidentally click the mouse. It would open a
+;; buffer menu which I have no use for.
 (global-unset-key [C-down-mouse-1])
 
 ;; TODO: Another thought (which I may have already had lol) in the
@@ -1428,15 +1459,124 @@ of automatically."
 ;; sometimes I want to show some code to my coworker and the fastest
 ;; way to me feels like to do something like this.
 
-;; I think I've given vanilla emacs a fair shot (I've used it for at
-;; least 2 years as of 2022-01-04) and I want my vim editing back!
-;; It's time to return to the dark side. Thanks to
-;; https://github.com/hlissner/doom-emacs for some great documentation
-;; and inspirations on what evil packages to add. Honestly, part of me
-;; wonders if I should just start using that configuration framework
-;; lol. I get the feeling that, in another universe, I might have
-;; created something like doom emacs had it not already been there.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; EVIL MODE: Something wicked this way comes
+;;
+;; I've given vanilla emacs a fair shot (I've used it for at least 2
+;; years as of 2022-01-04) and I want my vim editing back! It's time
+;; to return to the dark side, it's time to embrace evil-mode. Thanks
+;; to https://github.com/hlissner/doom-emacs for some great
+;; documentation and inspirations on what evil packages to add.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'evil)
 (evil-mode 1)
+
+;; Emacs' undo system is... fine and I have gotten used to it (here's
+;; a great writeup on it
+;; https://www.reddit.com/r/emacs/comments/6yzwic/how_emacs_undo_works/)
+;; but it does get unwieldy to use once the undo chain gets really
+;; long so I want a more vim like editing experience and that means
+;; giving undo-tree a shot! I really liked the philosophy of undo-fu
+;; too (especially considering the saga which followed of me debugging
+;; an oddity I observed with undo-tree) so I might go back to it but
+;; representing undo's as a tree just makes sense so let's try that first.
+(require 'undo-tree)
+(global-undo-tree-mode)
+(add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
+;; Remove this command remapping so I can rebind C-/ to just the undo
+;; command so I can do regular undo's while in insert mode and, after
+;; leaving insert mode, the whole thing will just be treated as one
+;; undoable unit. Side note, Why does undo-tree do this remap binding
+;; anyway? They already bind C-/ after all. Man, what a saga this
+;; was... I noticed that when using undo-tree SOMETIMES when after
+;; exiting insert mode, the entire insert mode session was not
+;; undoable as a single unit. I didn't like that because I kind of got
+;; used to being able to mess about in insert mode and undo at will
+;; but know that when exiting insert mode the whole thing would just
+;; be undoable as one unit. I think it was actually on an old TODO
+;; list of mine for vim! It turns out that this would happen if did an
+;; undo within insert mode. I typed a bunch of stuff in insert mode
+;; and went back to normal mode, the entire insert mode session was
+;; not undoable as one chunk. was in insert mode and wrote a bunch of
+;; stuff and did undo a couple of times, then EVERY undoable unit was
+;; undoable from and exited insert mode then that was all undoable as
+;; one chunk. So far so good. Then I noticed that if I added an undo
+;; command within that insert mode session, after exiting insert mode
+;; ALL the undoable units within insert mode were undoable from normal
+;; mode.
+(define-key undo-tree-map [remap undo] nil)
+(define-key undo-tree-map (kbd "C-/") nil)
+;; Man, I swear that manually turning off undo-tree before entering
+;; insert and then turning it on after worked but apparently not.
+;; Piece of shit. I think the way to actually get this working in the
+;; way I kind of want then I probably need to try and bind C-/ to just
+;; regular undo but I was having trouble with that too. Something
+;; about remapping is making this difficult... piece of shit. Piece of
+;; shit. I think the solution here for me (if I really want this
+;; still) is to bind Turn off/on undo-tree-mode when entering/exiting
+;; insert mode so evil is guaranteed to treat the entire insert mode
+;; activity as one undoable chunk. Normally this is how evil-mode
+;; already behaves (assuming evil-want-fine-undo is nil) because evil
+;; saves the value of buffer-undo-list before insertion mode and
+;; reverts buffer-undo-list after (plus modifies it to include the
+;; newly added text). The problem is that undo-tree gets around this
+;; because it maintains it's own internal data structure (called
+;; buffer-undo-tree) for undo's, so even though evil reverts
+;; buffer-undo-list, it does not touch buffer-undo-tree and thus, back
+;; in normal mode, undo will traverse every change made in insert
+;; mode. Note that this copying from buffer-undo-list to
+;; buffer-undo-tree only happens when executing an undo/redo within
+;; insert mode, so if you don't do that then you'll probably never
+;; observe this behavior. It could also happen if undo-tree-limit is
+;; null, you leave emacs in insert mode, and don't do anything for 5
+;; seconds. As I'm writing this I'm kind of confused because I would
+;; think that when evil-mode messes with buffer-undo-list, undo-tree
+;; wouldn't know how to interpret that kind of history rewrite, but in
+;; practice it doesn't seem to care.
+;;
+;; Also, I was hoping I could toggle undo tree by using the insert
+;; state's entry/exit hooks but they're not unusable here because we
+;; need to turn off undo-tree BEFORE/AFTER the undo chunking stuff
+;; happens and that happens in the insert state entry/exit body code
+;; but the order of code execution when changing states is:
+;; entry-state-body, run-entry-hooks, run-exit-hooks, exit-state-body.
+;; TODO: PR material. This all feels like something that evil mode
+;; should handle or at least mention because it kind of nullifies the
+;; evil-want-fine-undo setting. Plus it would be nice to put the
+;; undo-tree enabling/disabling right next to the undo chunking stuff.
+;; Or perhaps we could add new hooks that run at the times I need and
+;; add this code there? Or (perhaps the best solution actually because
+;; then undo-tree's undo style is used all the time unlike what I've
+;; got here where emacs style undoing is done while in insert mode but
+;; undo-tree is used otherwise) bind and restore buffer-undo-list as
+;; part of the undo chunking code. Assuming this is all something the
+;; maintainers would even want, at the very least though it feels
+;; worth mentioning.
+;; (add-hook
+;;  'evil-normal-state-entry-hook
+;;  (lambda ()
+;;    (message "entering normal state and turning on undo tree, evil-undo-list-pointer is %s" (not (null evil-undo-list-pointer)))
+;;    (turn-on-undo-tree-mode 1)))
+;; (add-hook
+;;  'evil-insert-state-entry-hook
+;;  (lambda ()
+;;    (message "entering insert state, evil-undo-list-pointer is %s" (not (null evil-undo-list-pointer)))))
+;; (add-hook
+;;  'evil-insert-state-exit-hook
+;;  (lambda ()
+;;    (message "exiting insert state, evil-undo-list-pointer is %s" (not (null evil-undo-list-pointer)))))
+;; (add-hook
+;;  'evil-normal-state-exit-hook
+;;  (lambda ()
+;;    (when (eq evil-next-state 'insert)
+;;      (message "exiting normal state and turning off undo tree, evil-undo-list-pointer is %s" (not (null evil-undo-list-pointer)))
+;;      (undo-tree-mode 0))))
+;; (add-hook
+;;  'evil-visual-state-exit-hook
+;;  (lambda ()
+;;    (when (eq evil-next-state 'insert)
+;;      (message "exiting visual state and turning off undo tree, evil-undo-list-pointer is %s" (not (null evil-undo-list-pointer)))
+;;      (undo-tree-mode 0))))
 
 ;; I am only one man so I have not read EVERYTHING that this does but
 ;; it seems to be a fantastic package which makes sure that evil mode
@@ -1445,7 +1585,7 @@ of automatically."
 
 (require 'evil-nerd-commenter-operator)
 (evil-define-key '(normal visual) 'global "gc" #'evilnc-comment-operator)
-;; TODO: I feel like the comment object for
+;; TODO: PR material. I feel like the comment object for
 ;; https://github.com/redguardtoo/evil-nerd-commenter should default
 ;; to operating line-wise since that's the structure of line-wise
 ;; comments by definition. I tried my hand on doing that but it wasn't
@@ -1455,44 +1595,53 @@ of automatically."
 ;; sure why this is.
 (define-key evil-inner-text-objects-map "c" #'evilnc-outer-commenter)
 
+;; TODO: I wonder what significance the first symbol has to the
+;; overall function of straight.el. I used a dummy symbol before and
+;; this still worked which makes sense to me since we're specifying a
+;; literal repo from where to get it. I guess the symbol must just
+;; serve an organizational purpose for straight.el.
+(straight-use-package
+ '(targets :type git :host github :repo "noctuid/targets.el"))
+(require 'targets)
+;; I'm used to typing "ib" to select parentheses so want it to be able
+;; to do target'y things.
+(setq targets-user-text-objects '((paren "(" ")" pair :more-keys "b")))
+;; Pretty neat! Not sure if I'll use it but they let you have one
+;; keybinding work for multiple kinds of text objects:
+;; https://github.com/noctuid/targets.el#targets-define-composite-to
+(setq targets-composite-text-objects
+      '((all-quotes
+	  (("\"" "\"" quote)
+	   ("'" "'" quote)
+	   ("`" "`" quote)
+	   ("‘" "’" quote)
+	   ("“" "”" quote))
+	  :bind t
+	  :keys "q")))
+(define-key evil-visual-state-map (kbd "RET") #'targets-last-text-object)
+(define-key evil-operator-state-map (kbd "RET") #'targets-last-text-object)
+(targets-setup t
+               :inside-key nil
+               :around-key nil
+               :remote-key nil)
+
+;; Like many things it is, strictly speaking, unnecessary but I think
+;; it's a useful action to have! I think the only thing really going
+;; for it over using more primitive actions (like 'c'hanging a text
+;; object then pasting or 'v'isually highlighting a region then
+;; pasting) is that it will automatically indent the pasted code.
+(require 'evil-replace-with-register)
+(evil-replace-with-register-install)
+
+;; ' is easier to reach on my keyboard than `
+(define-key evil-motion-state-map "'" 'evil-goto-mark)
+(define-key evil-motion-state-map "`" 'evil-goto-mark-line)
+
 (define-key evil-motion-state-map (kbd "SPC") #'switch-to-buffer)
 (evil-global-set-key 'motion (kbd "C-SPC") #'projectile-switch-to-buffer)
 
-;; I tried two other packages before settling on
-;; https://github.com/dajva/rg.el.
-;; https://github.com/nlamirault/ripgrep.el just seemed much less
-;; polished so that's a no. I also tried
-;; https://github.com/Wilfred/deadgrep and initially I didn't like it
-;; but perhaps I'm just too used to the compilation-mode style
-;; interface and it was also before I started using evil-collection so
-;; maybe it's worth a retry. TODO: Try out deadgrep again, see if I
-;; like it.
-(define-key evil-normal-state-map "S" #'rg-menu)
-
-(rg-define-search lag13-rg-literal-project
-  "Search for a literal string within the current project"
-  :format literal
-  :dir project)
-
-(defun lag13-rg-visual-dwim (beg end)
-  "Does a literal search for the visually selected region."
-  (interactive "r")
-  (evil-exit-visual-state)
-  (lag13-rg-literal-project (buffer-substring-no-properties beg end) "*"))
-
-(define-key evil-visual-state-map "S" #'lag13-rg-visual-dwim)
-
-;; TODO: rg let's you list the available buffers in ibuffer mode but I
-;; think it would also be nice to start a completing-read session and
-;; let the user select the buffer.
-(defun lag13-rg-switch-buffer ()
-  (interactive)
-  (let (res)
-    (dolist (buf (buffer-list))
-      (with-current-buffer buf
-	(when (equal major-mode 'rg-mode)
-	  (push (buffer-name buf) res))))
-    (switch-to-buffer-other-window (completing-read "RG buffer: " res))))
+;; TODO: PR material. Add functionality to the rg package so we can
+;; tell it to do whole word searches.
 
 ;; Argument text objects. TODO: I notice that if an argument is a
 ;; string with a "," in it then it doesn't work. Could we make it
@@ -1501,7 +1650,7 @@ of automatically."
 (define-key evil-outer-text-objects-map "a" #'evil-outer-arg)
 (define-key evil-normal-state-map "ga" #'evil-jump-out-args)
 
-;; Bring back vim's C-a/C-x commands. TODO:
+;; Bring back vim's C-a/C-x commands. TODO: PR material.
 ;; https://github.com/cofi/evil-numbers is where this comes from and I
 ;; feel like that package could be an appropriate place to add number
 ;; text objects. Potential text objects could be "in" to select a
@@ -1511,8 +1660,6 @@ of automatically."
 ;; https://github.com/noctuid/targets.el#method-for-implementing-text-objects-using-things
 (evil-define-key '(normal visual) 'global "+" #'evil-numbers/inc-at-pt)
 (evil-define-key '(normal visual) 'global "-" #'evil-numbers/dec-at-pt)
-
-(evil-define-key '(normal visual) 'global "Q" #'query-replace)
 
 ;; TODO: I'm not sure if there are emacs/evil motions to move by
 ;; indentation level even though I feel like there should be? After
@@ -1525,19 +1672,16 @@ of automatically."
 ;; https://gitlab.com/emacs-stuff/indent-tools/,
 ;; https://github.com/nixin72/block-nav.el
 
-;; These bindings were listed in doom's documentation and I rather
-;; liked them over the defaults from the package itself. TODO: I
-;; notice that if I do "dii" then it ends up leaving one empty line
-;; instead of deleting everything. Similarly, if I do "cii" there ends
-;; up being TWO empty lines and we are in insert mode. It feels like
-;; there is an off by one error here. I noticed the same thing with
-;; the comment text objects too in
+;; TODO: PR material. I notice that if I do "dii" then it ends up
+;; leaving one empty line instead of deleting everything. Similarly,
+;; if I do "cii" there ends up being TWO empty lines and we are in
+;; insert mode. It feels like there is an off by one error here. I
+;; noticed the same thing with the comment text objects too in
 ;; https://github.com/redguardtoo/evil-nerd-commenter. It looks like
 ;; within evil mode they use this "bounds-of-thing-at-point" function
 ;; within the library thingatpt.el. I wonder if these should be
 ;; expanding that library instead, the comments make it sound like
 ;; you're able to define other "things".
-
 ;; Got the mappings from what the OG plugin
 ;; https://github.com/michaeljsmith/vim-indent-object lays out.
 (define-key evil-inner-text-objects-map "i" 'evil-indent-plus-i-indent)
@@ -1586,30 +1730,49 @@ lines."
 
 ;; I'm modifying these keybindings to make "gs" take the place of "ys"
 ;; which then means I'll use "gs" in visual mode instead of "S" which
-;; frees up "S" to do something else I want. Also, fun fact, the way
-;; in which evil-surround is setup (at least as of 2022-01-27) is to
-;; add "s" to the operator pending map which defaults to the same
-;; action "evil-surround-edit" which will check to see what operator
-;; was called and perform the appropriate action. So if you type 'd'
-;; then it will do a delete, 'c' will cause a change, OTHERWISE it
-;; adds surrounding characters. Yes you read that right, "otherwise".
-;; That means you can invoke other operators to do surround stuff too
-;; like gUsiw". Quirky. TODO: Using "gs" doesn't seem to complete like
-;; "ys" does. It throws an error for some reason.
+;; frees up "S" to do something else I want. As neat as I think it is
+;; to combine an operator (like 'y') with a non-text object (like 's')
+;; to make a completely new binding (because it opens the possibility
+;; for so many other keybindings!) I don't care for it because then
+;; you need a unique binding for things to work in visual mode (so
+;; that is not consistant) PLUS it makes it hard to get C-h help on a
+;; key (i.e. if you try to do "C-h ys" you'll never get to the "s"
+;; because it'll match on the "y" first). Anyway... Also, fun fact,
+;; the way in which evil-surround is setup (at least as of 2022-01-27)
+;; is to add "s" to the operator pending map which defaults to the
+;; same action "evil-surround-edit" which will check to see what
+;; operator was called and perform the appropriate action. So if you
+;; type 'd' then it will do a delete, 'c' will cause a change,
+;; OTHERWISE it adds surrounding characters. Yes you read that right,
+;; "otherwise". That means you can invoke other operators to do
+;; surround stuff too like g~siw". Quirky
 (with-eval-after-load 'evil-surround
-  (evil-define-key 'normal evil-surround-mode-map "gs" #'evil-surround-edit)
-  (evil-define-key 'normal evil-surround-mode-map "gS" #'evil-Surround-edit)
+  (evil-define-key 'normal evil-surround-mode-map "gs" #'evil-surround-region)
+  (evil-define-key 'normal evil-surround-mode-map "gS" #'evil-Surround-region)
   (evil-define-key 'visual evil-surround-mode-map "gs" #'evil-surround-region)
   (evil-define-key 'visual evil-surround-mode-map "gS" #'evil-Surround-region)
   (evil-define-key 'visual evil-surround-mode-map "S" nil))
 (global-evil-surround-mode 1)
 
+;; I feel like this is a better use for these keys.
 (define-key evil-motion-state-map "H" #'evil-first-non-blank)
 (define-key evil-motion-state-map "L" #'evil-last-non-blank)
+;; This is easier to reach than % and I don't really use marks anyway.
+;; Mnemonic is "[m]atching"
+(define-key evil-motion-state-map "m" #'evil-jump-item)
+(define-key evil-normal-state-map "m" #'evil-jump-item)
+;; Retain original set mark behavior just in case
+(define-key evil-normal-state-map "M" #'evil-set-marker)
+;; I don't really use the default H, M, L behavior but let's keep it
+;; around just in case.
+(define-key evil-motion-state-map "gh" 'evil-window-top)
+(define-key evil-motion-state-map "gm" 'evil-window-middle)
+(define-key evil-motion-state-map "gl" 'evil-window-bottom)
 
-;; TODO: Also, the vim-exchange docs say that if one region is
-;; completely contained within the other, then the containing region
-;; will replace. I don't think this behaves in that manner.
+;; TODO: PR material. Also, the vim-exchange docs say that if one
+;; region is completely contained within the other, then the
+;; containing region will replace. I don't think this behaves in that
+;; manner. Maybe I should try to get that fixed.
 (require 'evil-exchange)
 (evil-exchange-install)
 
@@ -1621,10 +1784,16 @@ lines."
 ;; Just gotta have it!
 (global-evil-visualstar-mode)
 
-;; TODO: See todos in this file, I think it's best that I add the
-;; functionality I'm achieving in this file by making an addition to
-;; evil-mode itself.
+;; TODO: PR material. See todos in this file, I think it's best that I
+;; add the functionality I'm achieving in this file by making an
+;; addition to evil-mode itself.
 (load "~/.emacs.d/evil-cutlass")
+
+;; I'm a fan of shifted letters to do "opposite" sort of things. I
+;; also think it's kind of weird the inconsistancy of keybindings for
+;; the default undo/redo (undo being an unshifed "u" where redo is a
+;; ctrl chord).
+(define-key evil-normal-state-map "U" #'evil-redo)
 
 ;; It would seem that when setting evil-search-module to evil-search,
 ;; which I want to do so I get those "gn" text objects, the function
@@ -1635,10 +1804,10 @@ lines."
 ;; it calls out to evil-search which will call the ding function if
 ;; the search wraps and a setting is configured. It's just odd that
 ;; within the same module there's a way to have it ding or not. So
-;; I've gotta use some advice! TODO: Make a PR to get this added to
-;; evil mode. It seems like it should and the change should be easy,
-;; there is already a configuration option evil-search-wrap-ring-bell
-;; which we could probably use.
+;; I've gotta use some advice! TODO: PR material. Make a PR to get
+;; this added to evil mode. It seems like it should and the change
+;; should be easy, there is already a configuration option
+;; evil-search-wrap-ring-bell which we could probably use.
 (defun lag13-make-evil-search-ding-on-wraparound (evil-ex-search-fn &rest args)
   (let ((start-point (point)))
     (apply evil-ex-search-fn args)
@@ -1653,10 +1822,6 @@ lines."
 ;; doom emacs and apparently it's built on
 ;; https://github.com/abo-abo/avy. What's the relationship there?
 ;; Which one should I get?
-
-;; TODO: It's kind of a bummer now that doing "C-h k" doesn't work as
-;; effectively when you've got operators like "y" AND "ys" defined. Is
-;; there a way to improve on that?
 
 ;; TODO: How do I go to definition of something I type? Like in emacs
 ;; if I do C-u M-. then it'll let me type out the thing I want to
@@ -1696,17 +1861,11 @@ lines."
 
 ;; TODO: I think I'd like to bind C-[ and C-] to some functionality.
 ;; It would seem that C-[ is the same as ESC though so I need to do
-;; something more. I think this is a way around it:
+;; something more. I think this is a way around it though:
 ;; https://emacs.stackexchange.com/questions/7832/how-to-bind-c-for-real
-
-(projectile-mode 1)
-(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-;; TODO: Revisit this to see if I like it. Originally I did it because
-;; I was working in a really large repo so switching to another
-;; project would just cause things to hang while it tried to get the
-;; list of files. I need to work on that too but that's a separate
-;; thing.back to a project 
-(setq projectile-switch-project-action #'projectile-switch-to-buffer)
+;; It all seems rather annoying though. C-] IS escape by definition
+;; and there also just seems to be a lot of old cruft with emacs'
+;; keybinding stuff.
 
 ;; Around 2022-01-31 I started noticing that my emacs would hang for a
 ;; couple seconds when trying to open a file for the first time from
@@ -1738,7 +1897,7 @@ lines."
 ;;
 ;; From there I figured out that the reason this is slow is because
 ;; projectile adds advice around the compilation-find-file function
-;; which will first load all directories within the project and add it
+;; which will first load ALL directories within the project and add it
 ;; to the search path. Apparently the motivation was that
 ;; compilation-mode doesn't work well with java stack traces:
 ;; https://github.com/bbatsov/projectile/issues/331. I don't want it
@@ -1751,11 +1910,20 @@ lines."
  'projectile-mode-hook
  (lambda ()
    (advice-remove 'compilation-find-file #'compilation-find-file-projectile-find-compilation-buffer)))
+(projectile-mode 1)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+;; TODO: Revisit this to see if I like it. Originally I did it because
+;; I was working in a really large repo so switching to another
+;; project would just cause things to hang while it tried to get the
+;; list of files. I need to work on that too but that's a separate
+;; thing.back to a project
+(setq projectile-switch-project-action #'projectile-switch-to-buffer)
 
 ;; The inspiration for using vertico was:
 ;;
 ;; 1. I've wanted a minibuffer completion thing that stacks the
-;; results vertically since it's easier to read than horizontally
+;; results vertically since it's easier to read than horizontally like
+;; icomplete does.
 ;;
 ;; 2. I briefly briefly (i.e. like over 1 hour) tried ivy and helm and
 ;; liked vertico better out-of-the-box than the other two. One reason
@@ -1773,8 +1941,9 @@ lines."
 ;; opposite could be true too lol, smaller things like a single
 ;; package can have more agility than a big thing like emacs). Still,
 ;; I am a fan of using the "built in" stuff as much as possible and
-;; only going outside for truly new things. Helm didn't work out of
-;; the box for things like M-x so that's a drawback to it as well.
+;; only going outside for truly novel things. Helm didn't work out of
+;; the box for things like M-x so that was a dealbreaker. The whole
+;; interface just felt different too.
 ;;
 ;; 3. I was trying out projectile while using icomplete and noticed
 ;; that if I ran the projectile-switch-to-buffer command and hit RET
@@ -1816,9 +1985,9 @@ lines."
 ;; https://github.com/minad/cape which were written by the same person
 ;; that did vertico.
 
-;; TODO: dumb jump doesn't support "rg" for some regex's which
-;; confuses me, I guess I thought it would just work for whatever the
-;; underlying tool is?
+;; TODO: PR material. dumb jump doesn't support "rg" for some regex's
+;; which confuses me, I guess I thought it would just work for
+;; whatever the underlying tool is?
 (setq dumb-jump-find-rules
       '((:type "function" :supports ("ag" "grep" "rg" "git-grep") :language "elisp"
 				   :regex "\\\((defun|cl-defun)\\s+JJJ\\j"
@@ -3252,36 +3421,25 @@ lines."
 ;; there might be a lot of junk you don't care about and they just
 ;; clutter up the buffer list.
 
-;; TODO: I want to look into how emacs does find file and find buffer
-;; commands more. Like, couldn't they essentially be almost exactly
-;; the same where you: 1. Get a list of the thing in question 2.
-;; Filter the list? 2 would be the same for both so really 1 is the
-;; only unique thing. Do they both do that? If not, why not? It feels
-;; so simple and consistant! This operation would be useful really for
-;; anything collection of information that you want to filter down.
-;; Whether that be a list of words in a dictionary, looking up
-;; definitions to get words (thesaurus style), filtering down
-;; available functions, filtering down available namespaces in a
-;; language, etc... EDIT: Looks like thre's a function called
-;; "completing-read" which I think does what I'm curious about.
-
-;; TODO: Thoughts about getting dumb jump to run more quickly in the
-;; monolith. So I think I've confirmed that the regex which dumb jump
-;; executes is just slow with rg. I suspect that it literally takes
-;; too long for rg to scan the files but I'm not sure yet. I want to
-;; investigate more. Part of me suspects that parameters don't filter
-;; by files? Or even if they do does it really just take that long?? EDIT: Confirmed, it looks like the rg command is:
-
+;; TODO: PR material. Thoughts about getting dumb jump to run more
+;; quickly in the monolith. So I think I've confirmed that the regex
+;; which dumb jump executes is just slow with rg. I suspect that it
+;; literally takes too long for rg to scan the files but I'm not sure
+;; yet. I want to investigate more. Part of me suspects that
+;; parameters don't filter by files? Or even if they do does it really
+;; just take that long?? EDIT: Confirmed, it looks like the rg command
+;; is:
+;;
 ;; rg --color never --no-heading --line-number -U --pcre2 let\\s\+asOption\\b.\*\\\=\|member\(\\b.\+\\.\|\\s\+\)asOption\\b.\*\\\=\|type\\s\+asOption\\b.\*\\\= d:/inetpub
-
+;;
 ;; While the git grep command is:
-
+;;
 ;; git grep --color=never --line-number --untracked -E let\\s\+asOption\\b.\*\\\=\|member\(\\b.\+\\.\|\\s\+\)asOption\\b.\*\\\=\|type\\s\+asOption\\b.\*\\\= -- d\:/inetpub/\*.fs d\:/inetpub/\*.fsi d\:/inetpub/\*.fsx
-
+;;
 ;; I think the actual regex is this when I remove extra backslashes:
-
+;;
 ;; let\s+asOption\b.*\=|member(\b.+\.|\s+)asOption\b.*\=|type\s+asOption\b.*\='
-
+;;
 ;; We have a couple solutions to get implemented here and I think
 ;; they're all separate things to implement. First and foremost, we
 ;; should get that "--type fsharp" filter added to the ripgrep
@@ -3296,16 +3454,12 @@ lines."
 ;; just automatically considered? It doesn't seem like the regex is
 ;; unique between commands or anything like that. I'll have to ask the
 ;; maintainer.
-
+;;
 ;; So, it looks like they do already add the appropriate --type
 ;; extension for rg but a certain field has to be set in the
 ;; dumb-jump-language-file-exts data structure. Again, is there a
 ;; reason why some of this stuff is not set already? It seems like it
 ;; should just default to working?
-
-;; TODO: Do the bindings myself:
-;; (evilnc-default-hotkeys)
-;; (evil-global-set-key 'normal "gc" #'evilnc-comment-operator)
 
 ;; TODO: I'd be curious about what it would take to get fully
 ;; functional web browser within emacs. On
@@ -3318,14 +3472,10 @@ lines."
 ;; it returned a lot of test and non-test files and I only wanted to
 ;; look at the non-test files so I copied that ripgrep output to a
 ;; file and did a "keep-lines" for just the files in question and then
-;; did "gf" on each one and poked around. I also felt like, "what if I
-;; wanted to do a follow up grep in just these files?". I don't know,
-;; just got me curious how doing that might be possible. In my head, I
-;; feel like what is on the page is structured data and I want to be
-;; able to better manipulate it. Oh woa, I found this for a way to do
-;; search and replace with the grep output it's built into emacs:
-;; https://github.com/mhayashi1120/Emacs-wgrep I wonder if there are
-;; other goodies related to what I want.
+;; did "gf" on each one and poked around. I just feel like there
+;; should be a better way to remove those files I don't want from the
+;; results? It's structured data after all, I should be able to mess
+;; with it.
 
 ;; TODO: I would love to get word wrapping stuff better handled in
 ;; emacs. Pressing M-q as I type has become a habit but I don't think
@@ -3342,12 +3492,14 @@ lines."
 ;; https://www.youtube.com/watch?v=5ffb2at2d7w&ab_channel=MikeZamansky
 ;; I think his blog on emacs is probably worth checking out.
 
-;; TODO: I noticed that the evil binding "] SPC" did not work in a
-;; buffer called "asdf" that I opened. I assume that this buffer
-;; didn't really have a mode and so evil didn't bind some stuff? Also,
-;; I think wherever the unimpaired functionality is coming from, it's
-;; not complete. I feel like I want to look into this more and figure
-;; out what's going on.
+;; TODO: PR material. I noticed that the evil binding "] SPC" did not
+;; work in a buffer called "asdf" that I opened. I assume that this
+;; buffer didn't really have a mode and so evil didn't bind some
+;; stuff? Also, I think wherever the unimpaired functionality is
+;; coming from, it's not complete (for example there's a command in
+;; unimpaired to go to the next file in the current directory or
+;; something which I don't think evil stuff defines). I feel like I
+;; want to look into this more and figure out what's going on.
 
 ;; TODO: I think I like emacs M-f/M-b motions for moving the cursor by
 ;; words better than vim. Like if you have hello.there.everyone then
@@ -3375,22 +3527,22 @@ lines."
 ;; specifically for python for example:
 ;; https://github.com/wbolster/evil-text-object-python
 
-;; TODO: I noticed that the top of my init file was mysteriously
-;; getting deleted sometimes and although I still don't understand WHY
-;; it is happening, I think I can trigger it happening if I type
-;; something like:
+;; TODO: PR material. I noticed that the top of my init file was
+;; mysteriously getting deleted sometimes and although I still don't
+;; understand WHY it is happening, I think I can trigger it happening
+;; if I type something like:
 ;;
 ;; d C-h k d
 ;;
 ;; So it would seem that getting help on evil operators does not work
 ;; properly (or perhaps I have some customizations which messes stuff
-;; up somehow).
+;; up somehow). I bet I could figure this out and fix it.
 
-;; TODO: It looks like (warning: very rough understanding here) the
-;; way that evil mode gets bindings like "dd" and "yy" working is that
-;; the function evil-operator-range will bind things to the map
-;; evil-operator-shortcut-map temporarily as the operator is
-;; executing. I bring this up because I wanted to add a commentary
+;; TODO: PR material. It looks like (warning: very rough understanding
+;; here) the way that evil mode gets bindings like "dd" and "yy"
+;; working is that the function evil-operator-range will bind things
+;; to the map evil-operator-shortcut-map temporarily as the operator
+;; is executing. I bring this up because I wanted to add a commentary
 ;; text object "gc" to https://github.com/linktohack/evil-commentary
 ;; like Tim Pope has defined for his vim plugin but with this
 ;; functionality that is seemingly built into evil, I don't think I
@@ -3398,7 +3550,8 @@ lines."
 
 ;; TODO: I notice that the "i(" text object doesn't work when the
 ;; parentheses are within comments and the open and closed parentheses
-;; are on different lines. I wonder why this is?
+;; are on different lines. I wonder why this is? Just curious. This
+;; does work in vim (although not as well).
 
 ;; TODO: I feel like I've said this many times throughtout the TODOs
 ;; of this file but I want to say it again. I feel like the main
@@ -3446,27 +3599,30 @@ lines."
 ;; environment to doing some computation, pause it, do something else,
 ;; then resume that computation. Like maybe in emacs we start telling
 ;; it to do a query replace and we've typed in a really complicated
-;; regex but then we realize we want to do something else. What do we
-;; do? Ideally I feel like we could pause it and come back to it but
-;; right now I feel like I have to quit out of the query replace
-;; entirely and start that flow over again later. All these things use
-;; the minibuffer so surely it feels like, at the very least, the text
-;; I typed could be saved and then recalled? Or like, I try to switch
-;; buffers but then don't realize that the buffer I'm looking for
-;; isn't loaded so I quit and run the find-file command and have to
-;; retype what I had just typed before. It would be nice to keep the
-;; same minibuffer contents but just switch the command they're
-;; getting passed to. I wonder if enabling this could help
+;; regex but then we realize we want to do something else before
+;; coming back to this regex. What do we do? (side note, would
+;; continuations be helpful here? i.e. you take a continuation at that
+;; point in time, exit, do something else, then evaluate your saved
+;; continuation?). Ideally I feel like we could pause it and come back
+;; to it but right now I feel like I have to quit out of the query
+;; replace entirely and start that flow over again later. All these
+;; things use the minibuffer so surely it feels like, at the very
+;; least, the text I typed could be saved and then recalled? Or like,
+;; I try to switch buffers but then don't realize that the buffer I'm
+;; looking for isn't loaded so I quit and run the find-file command
+;; and have to retype what I had just typed before. It would be nice
+;; to keep the same minibuffer contents but just switch the command
+;; they're getting passed to. I wonder if enabling this could help
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Recursive-Mini.html
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Mode Line stuff
+;; mode line stuff
 ;;
-;; I also used the customize interface to change the value of
-;; mode-line-format to include just the info I want (I looked through
-;; the default value and took what I thought would be useful). I used
-;; the customize interface because when I tried just setq, it only
-;; changed it for this buffer but not others and I didn't bother
+;; i also used the customize interface to change the value of
+;; mode-line-format to include just the info i want (i looked through
+;; the default value and took what i thought would be useful). i used
+;; the customize interface because when i tried just setq, it only
+;; changed it for this buffer but not others and i didn't bother
 ;; investigating further because using customize "just worked".
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (line-number-mode 0)
@@ -3484,10 +3640,7 @@ because I want to try having a more concise modeline.")
 (setq-default mode-line-buffer-identification
 	      (propertized-buffer-identification "%b"))
 
-;; Tell what mode I'm in purely based on the cursor. TODO: I think it
-;; would be neat to indicate what type of visual mode we're in too
-;; based on some difference we apply to the cursor. Not very
-;; important, just think it would be neat.
+;; Tell what mode I'm in purely based on the cursor.
 (setq evil-mode-line-format nil)
 (setq evil-emacs-state-cursor 'hollow)
 
@@ -3539,12 +3692,13 @@ mode-line-inactive face even darker."
 ;; want to go into wgrep mode to do search and replace stuff but I
 ;; might have to type out the regex again to get it.
 
-;; TODO: How do we do ripgrep in multiple directories?
+;; TODO: How do we do ripgrep in multiple directories? Occasionally I
+;; feel like I want to do this.
 
-;; TODO: doing the command "dap" in an org mode document does not seem
-;; to be working like I expect it to. If you are at the end of a '*'
-;; header, then doing "dap" also targets the NEXT header down. Not
-;; sure what's up with that.
+;; TODO: PR material. doing the command "dap" in an org mode document
+;; does not seem to be working like I expect it to. If you are at the
+;; end of a '*' header, then doing "dap" also targets the NEXT header
+;; down. Not sure what's up with that.
 
 ;; More and more lately I'm feeling like if there's ANY way to help
 ;; add more context to what I'm doing, that will help me. In this
@@ -3555,10 +3709,7 @@ mode-line-inactive face even darker."
 ;; content instead of the file names. Maybe that means I just need to
 ;; slow down... but I'm not so sure. Adding another sensory cue (i.e.
 ;; showing the files up top) is going to be my attempt to solve for
-;; it. TODO: I'd be curious to see how easy it would be to bend emacs'
-;; default tab-line feature to do what I want instead of using
-;; centaur-tabs. I mean, I guess centaur tabs is just leaning on
-;; tab-line anyway but still, I'm curious about the internals.
+;; it.
 (require 'centaur-tabs)
 ;; I'm used to the default behavior of emacs where, if I kill a
 ;; buffer, it will open the last buffer shown in that window (or
@@ -3573,8 +3724,14 @@ mode-line-inactive face even darker."
  'centaur-tabs-mode-hook
  (lambda ()
    (remove-hook 'kill-buffer-hook 'centaur-tabs-buffer-track-killed)
-   ;; TODO: Would it be worth making a PR to add this to the centaur
-   ;; repo? Maybe it could be the default behavior?
+   ;; TODO: PR material. Would it be worth making a PR to add this to
+   ;; the centaur repo? Maybe it could be the default behavior? TODO:
+   ;; There is a bug somewhere in this. I'm in the monolith with all
+   ;; those little sub projects and somehow the QueryEngineAPITests.cs
+   ;; file for smoke and regression show the full buffername even
+   ;; though the tab (we're using centaur's default tab thingy) only
+   ;; shows one of those buffers at a time (I think centaur finds the
+   ;; project earlier on).
    (setq centaur-tabs-tab-label-function
 	 (lambda (cur-tab)
 	   (cl-flet ((get-tab-filename
@@ -3592,14 +3749,11 @@ mode-line-inactive face even darker."
 		 cur-tab-filename)))))))
 (centaur-tabs-mode 1)
 (centaur-tabs-headline-match)
-;; TODO: Only add the buffers to the list of previously visited
-;; buffers if you do something within that buffer or remain on that
-;; buffer for more than X seconds or something like that.
+;; TODO: PR material. Only add the buffers to the list of previously
+;; visited buffers if you do something within that buffer or remain on
+;; that buffer for more than X seconds or something like that.
 (define-key evil-normal-state-map (kbd "<C-tab>") 'centaur-tabs-forward)
 (define-key evil-normal-state-map (kbd "<S-C-tab>") 'centaur-tabs-backward)
-
-;; TODO: It would be interesting to compare centaur with emacs' built
-;; in global-tab-line-mode
 
 ;; TODO: If I have a vertically split window and 5 tabs open (or at
 ;; least enough to cover >=3/4 of the screen) and I navigate to the
@@ -3632,31 +3786,19 @@ mode-line-inactive face even darker."
 	      (complete-with-action action presorted-completions string pred)))))
     (switch-to-buffer (cdr (assoc (completing-read "Buffer: " completion-table) buffer-alist)))))
 
-;; TODO: Looks like centaur-tabs-buffer-groups does not assign
-;; magit-revision-mode to the "Emacs" tab group which happens with
-;; other magit buffers. Seems like I should make a PR to fix that.
-;; Might be worth changing the check to be (string-prefix-p "magit"
-;; (format "%s" major-mode)) or maybe just add another line to the
-;; check.
+;; TODO: PR material. Looks like centaur-tabs-buffer-groups does not
+;; assign magit-revision-mode to the "Emacs" tab group which happens
+;; with other magit buffers. Seems like I should make a PR to fix
+;; that. Might be worth changing the check to be (string-prefix-p
+;; "magit" (format "%s" major-mode)) or maybe just add another line to
+;; the check.
 
-;; TODO: The function centaur-tabs-hide-tab tries to hide magit
-;; buffers but misses a lot of them because a lot of them will have a
-;; file extensions which seems to be the name of the project. So fix
-;; that or at least ask about it.
+;; TODO: PR material. The function centaur-tabs-hide-tab tries to hide
+;; magit buffers but misses a lot of them because a lot of them will
+;; have a file extensions which seems to be the name of the project.
+;; So fix that or at least ask about it.
 
-;; Like many things it is, strictly speaking, unnecessary but I think
-;; it's a useful action to have! I think the only thing really going
-;; for it over using more primitive actions (like 'c'hanging a text
-;; object then pasting or 'v'isually highlighting a region then
-;; pasting) is that it will automatically indent the pasted code.
-(require 'evil-replace-with-register)
-(evil-replace-with-register-install)
-
-;; ' is easier to reach on my keyboard than `
-(define-key evil-motion-state-map "'" 'evil-goto-mark)
-(define-key evil-motion-state-map "`" 'evil-goto-mark-line)
-
-;; TODO: There are a couple todos on
+;; TODO: PR material. There are a couple todos on
 ;; https://github.com/noctuid/targets.el to implement an "entire
 ;; buffer" text object as well as a "line" text object (I know we have
 ;; a repeated operator key to do a line but these are dedicated ones
@@ -3665,20 +3807,20 @@ mode-line-inactive face even darker."
 ;; https://github.com/supermomonga/evil-textobj-entire
 
 ;; TODO: Could be useful to store the last emacs minibuffer code
-;; evaluation in a register?
+;; evaluation in a register for easy future pasting? This reminds me
+;; too that maybe I just want the ability to, in insert mode, search
+;; through recent history and paste that (like C-r in a shell)
 
-;; TODO: When switching projects in projectile, can the projects be
-;; ordered by most recently used? They seem to just be sorted
-;; alphabetically or something.
+;; TODO: PR material. When switching projects in projectile, can the
+;; projects be ordered by most recently used? They seem to just be
+;; sorted alphabetically or something.
 
-;; TODO: The g; command is very handy to go back to previous changes.
-;; I feel like it would also be useful to have a similar command which
-;; goes back to a previous change that happened somewhere NOT
-;; currently on screen so we don't have to spam g; if we've made lot's
-;; of changes on screen and want to go somewhere farther away. In this
-;; line of thinking... would it be helpful to highlight areas of the
-;; buffer where changes have happened recently? i.e. where g; would
-;; jump to?
+;; TODO: Make a hydra sort of thing where, after typing g;, I could
+;; just keep hitting ';' to keep going back to older changes.
+
+;; TODO: I wonder if it could be useful to have a gi sort of
+;; keybinding which would KEEP jumping back to previous places that I
+;; was in insert mode
 
 ;; TODO: I feel like I need a jump list per buffer. Because sometimes
 ;; I know I want to go go back to place I've been in the file before
@@ -3697,61 +3839,6 @@ mode-line-inactive face even darker."
 ;; invocation (i.e. whatever was run with M-x)? I know vim has @: to
 ;; repeat the last ex command so it would seem fitting to allow the
 ;; same with emacs. Just seems like a fun thing to try.
-
-;; straight.el seems to be all the rage so I thought I'd give it a
-;; shot. The real motivation for installing this though is that I
-;; wanted to install https://github.com/noctuid/targets.el but it is
-;; not a melpa package (see
-;; https://github.com/noctuid/targets.el/issues/29).
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-;; TODO: I wonder what significance the first symbol has to the
-;; overall function of straight.el. I used a dummy symbol before and
-;; this still worked which makes sense to me since we're specifying a
-;; literal repo from where to get it. I guess the symbol must just
-;; serve an organizational purpose for straight.el.
-(straight-use-package
- '(targets :type git :host github :repo "noctuid/targets.el"))
-(require 'targets)
-;; I'm used to typing "ib" to select parentheses so want it to be able
-;; to do target'y things.
-(setq targets-user-text-objects '((paren "(" ")" pair :more-keys "b")))
-;; Pretty neat! Not sure if I'll use it but they let you have one
-;; keybinding work for multiple kinds of text objects:
-;; https://github.com/noctuid/targets.el#targets-define-composite-to
-(setq targets-composite-text-objects
-      '((all-quotes
-	  (("\"" "\"" quote)
-	   ("'" "'" quote)
-	   ("`" "`" quote)
-	   ("‘" "’" quote)
-	   ("“" "”" quote))
-	  :bind t
-	  :keys "q")))
-(define-key evil-visual-state-map (kbd "RET") #'targets-last-text-object)
-(define-key evil-operator-state-map (kbd "RET") #'targets-last-text-object)
-(targets-setup t
-               :inside-key nil
-               :around-key nil
-               :remote-key nil)
-
-;; This is easier to reach than % and I don't really use marks anyway.
-;; Mnemonic is "[m]atching"
-(define-key evil-motion-state-map "m" #'evil-jump-item)
-(define-key evil-normal-state-map "m" #'evil-jump-item)
-;; Retain original set mark behavior just in case
-(define-key evil-normal-state-map "M" #'evil-set-marker)
 
 ;; TODO: This seems to be a neat assortment of packages:
 ;; https://two-wrongs.com/why-you-should-buy-into-the-emacs-platform.
@@ -3774,31 +3861,18 @@ mode-line-inactive face even darker."
 ;; search+replace, using the "gn" text object for quick search+replace
 ;; things, and visual block mode.
 
-;; TODO: I think the emacs' completion framework does NOT show ALL
-;; potential completions as you type, I think it only shows
-;; completions for the next one in the completion styles list that
-;; displays a result. Like if you have a file "some-secret.txt" and
-;; "secret.txt" and you type "secret" then it will only show the
-;; latter for my current completion-styles setting of (basic
-;; partial-completion flex orderless). Could we fix this somehow? Or
-;; maybe we just simplify the completion-styles setting? I guess my
-;; issue is that I had a couple files which started with the word
-;; "secret" and another that started with "_secret" and I was looking
-;; for that "_secret" one but couldn't find it when typing "secret"
-;; and got confused and felt it would have been nice if that result
-;; was also displayed.
+;; TODO: PR material (technically new codebase material). This seems
+;; neat: https://github.com/wellle/context.vim I think I might enjoy
+;; trying to port that over to emacs assuming something like it
+;; doesn't already exist. I think it would be super cool to also
+;; somehow combine that plugin with the grep functionality within
+;; emacs because then you can see which top level form the items
+;; matched against.
 
-;; TODO: This seems neat: https://github.com/wellle/context.vim I
-;; think I might enjoy trying to port that over to emacs assuming
-;; something like it doesn't already exist. I think it would be super
-;; cool to also somehow combine that plugin with the grep
-;; functionality within emacs because then you can see which top level
-;; form the items matched against.
-
-;; TODO: I think I should extend the visual start plugin so that it
-;; works for g* as well mostly for completeness. The use case is if
-;; you were searching for a string but also wanted to include
-;; substring matches.
+;; TODO: PR material. I think I should extend the visual start plugin
+;; so that it works for g* as well mostly for completeness. The use
+;; case is if you were searching for a string but also wanted to
+;; include substring matches.
 
 ;; TODO: I think swiper or ivy or something has a thing where you do a
 ;; completing read on the lines in the current file and let's you jump
@@ -3831,7 +3905,10 @@ mode-line-inactive face even darker."
 ;; like functions or variables (for emacs and other languages I
 ;; suppose), complete on buffers but include the directory path as a
 ;; searchable unit (for situations where I forget the file name but
-;; know it's in a certain directory), history of searches
+;; know it's in a certain directory), history of searches, a bunch of
+;; important links (like maybe for work) which I can then have emacs
+;; open (or figure out more why chrome doesn't seem to want to
+;; remember some of the links I've been to).
 
 ;; TODO: It would be interesting to have a search which would search
 ;; for different cases of a base word. Like searching for the word
@@ -3853,21 +3930,15 @@ mode-line-inactive face even darker."
 ;; TODO: The default comment for an ssh config file is ';' instead of
 ;; '#'. What's up with that? Fix it.
 
-;; TODO: the rg plugin defines a couple searches to do a ripgrep for
-;; the last isearch'd thing. I should make a PR to define some rg
-;; searches that work for evil mode or something. Or maybe I just need
-;; to start using vim's insert mode bindings (because then I can just
-;; start a search and insert the text from the / register).
+;; TODO: PR material? the rg plugin defines a couple searches to do a
+;; ripgrep for the last isearch'd thing. I should make a PR to define
+;; some rg searches that work for evil mode or something? Or maybe I
+;; just need to start using vim's insert mode bindings (because then I
+;; can just start a search and insert the text from the / register).
 
 ;; TODO: What if your editor could tell where your looking and jump to
 ;; that spot? Crazy idea (I'd need to get some sort of equipment) but
 ;; I think it would be super fun to mess around with.
-
-;; TODO: Could we configure ripgrep to not even bother checking
-;; minified files? Or maybe we can configure the ripgrep plugin to
-;; only display a certain line length? Because if it hits a minified
-;; file and starts showing results, it is very possible that emacs
-;; just dies.
 
 ;; TODO: Feel like I've written something like this. I've been
 ;; noticing that when I do an evil search, some of the past highlights
@@ -3882,10 +3953,12 @@ mode-line-inactive face even darker."
 
 ;; TODO: Maybe flash the cursor or an area around the cursor when
 ;; going to the next search? I say that because on 2022-01-31 I had an
-;; rg search (so already the search terms were highlighted) and then I
-;; wanted to search for just the regex \<2\> (i.e. very tiny) and a
-;; couple times I lost track of where the cursor was. I feel like
-;; there was a vim talk where a guy did this.
+;; rg search (so already the search terms were highlighted which makes
+;; it a bit harder to see the cursor) and then I wanted to search for
+;; just the regex \<2\> (i.e. very tiny) and a couple times I lost
+;; track of where the cursor was. I feel like there was a vim talk
+;; where a guy did this, yeah I think it was this guy, Damien Conway:
+;; https://www.youtube.com/watch?v=aHm36-na4-4&ab_channel=O%27Reilly
 
 ;; TODO: Can I count the number of search results when doing a regular
 ;; ol' evil search?
@@ -3905,9 +3978,196 @@ mode-line-inactive face even darker."
 ;; similar to the markers which show that the line is wrapped. Can we
 ;; fix this?
 
-;; TODO: Go to the first/last error in the compilation buffer and go
-;; to the current one (like if we navigated away and wanted to go back
-;; to it).
+;; TODO: How do I go to the first/last error in the compilation buffer
+;; and go to the current one (like if we navigated away and wanted to
+;; go back to it).
 
 ;; TODO: Another guy which probably has a lot of good config:
 ;; https://www.youtube.com/watch?v=46w9e4GAjsU&ab_channel=ProtesilaosStavrou
+
+;; TODO: I think I would like orderless to have a completion mode
+;; where the text written after a separator can start ANYWHERE in the
+;; next word. For example if we have first.secondthird then I can type
+;; fir.thir and it would complete. As it stands now I don't think that
+;; exists. Flex is an option but I'm starting to think that perhaps it
+;; is too powerful for it's own good. The closest feature is
+;; orderless-prefixes but it only allows for letters that start
+;; EXACTLY after the separator. Worth pointing out that I feel like
+;; orderless completion when writing lisp functions in the minibuffer
+;; seems not so good it feels like it matches too much and I can't
+;; select. Something closer to baisc completion might be better.
+
+;; TODO: I was playing around with eshell and wanted to have better
+;; filename completion. By default (assuming you set completion-styles
+;; to "basic") it feels like it's gonna behave pretty much like bash.
+;; But I think I'd like something better. It feels kind of annoying
+;; when there are two completion candidates and I have to use the
+;; mouse to click on the one I want OR just keep typing. I'm so used
+;; to vertico I think I'd like something like that. I think this
+;; package might be able to help, check it out:
+;; https://github.com/minad/corfu
+
+;; TODO: Check this out
+;; https://github.com/emacs-tree-sitter/elisp-tree-sitter
+
+;; TODO: PR material. I think I found a bug in the rg.el plugin. I'm
+;; not sure what is happening but it seems that when the search
+;; pattern starts with a '/' then nothing will be returned even if
+;; there are matches. For example if /hello/there is in a file then
+;; "hello/there" will match but searching for "/hello/there" will not.
+
+;; TODO: Can I tell evil to do literal searches by default or
+;; something? Or at least auto-escape when I paste something in?
+
+;; TODO: I've probably said this before but this guy has a lot of
+;; useful stuff. This is one I saw the title of today (perspective)
+;; which I feel like would be useful in achieving my goal of being
+;; better able to explore new code:
+;; https://www.youtube.com/watch?v=uyMdDzjQFMU&ab_channel=SystemCrafters
+
+;; TODO: I feel like I remember a keybinding in vim to go to the first
+;; occurrence of a symbol within the current file. I guess it was like
+;; gd? I feel though like it could be nice to have 'gd' look in the
+;; current file before it goes traipsing about the entire filesystem.
+;; Salvation could be closer than it thinks.
+
+;; TODO: I think being able to fold code on indentation level could be
+;; a helpful tool in better understanding what a file contains.
+
+;; TODO: I think it would be helpful to me if, when jumping to
+;; definition or something, it could alert me if I stay in the same
+;; buffer vs go to a new one. I suppose I could just slow down too...
+;; I should probably just pay more attention.
+
+;; TODO: I notice with emacs' eshell doing C-c C-c doesn't seem to
+;; kill the underlying process. I have no idea why this is. Is it
+;; something to do with me running emacs on windows? I wouldn't think
+;; so since it's a shell written entirely within emacs. So strange
+;; though... I feel like I want to figure this out since I think it
+;; could be neat to try it.
+
+;; TODO: Could it be possible to say "git checkout the commit for this
+;; branch corresponding to a date". Use case is that we have smoke
+;; tests which run every day and, when debugging them, it feels like
+;; it would be cool to checkout the exact version that failed. It is
+;; pretty easy to just find the commit too but still! Seems neat.
+
+;; TODO: Be able to tell rg to search in ALL files (right now it
+;; respects .gitignore and such).
+
+;; TODO: Get that evil diff plugin which lets you diff visual lines.
+
+;; TODO: If I leave the state of being fullscreen (with
+;; toggle-frame-fullscreen) then there is that ugly white bar at the
+;; top of emacs where I can minimize it or close it (all that jazz). I
+;; think I want to learn if I can either remove it or at least
+;; colorize it. This might be helpful:
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Frame-Layout.html
+
+;; TODO: inspiration? https://codeinthehole.com/tips/vim-lists/
+
+;; TODO: vim like keybindings in browser. surfkeys:
+;; https://www.youtube.com/watch?v=E-ZbrtoSuzw&ab_channel=Leeren
+;; https://chrome.google.com/webstore/detail/surfingkeys/gfbliohnnapiefjpjlpjnehglfpaknnc?hl=en-US
+
+;; TODO: I feel like it could be useful to have a keybinding which
+;; adds the current location to the jump list. Like maybe I'm just
+;; gonna spam j to get where I want to go (I sometimes think that's
+;; quicker still than figuring out the "optimal" way to get there) but
+;; know I want to return to this position after I do whatever I'm
+;; doing elsewhere.
+
+;; TODO: I kind of feel like an initial n command should add to the
+;; jumplist and then repeated spams of it should not. If you're
+;; repeating the 'n' command then that gives me the impression that
+;; you haven't found what you were looking for so why remember all
+;; those extra spots you know?
+
+;; Doing g; will put the cursor one character past the end of the most
+;; recent change (at least for typing). Repeated uses of g; will jump
+;; back to older changes but will SKIP a previous change if these
+;; ranges overlap:
+;;
+;; [cur-change-start - glc-default-span, cur-change-end + glc-default-span]
+;; [prev-change-start, prev-change-end]
+;;
+;; I think so at least. Honestly, it feels like this feature could use
+;; some polishing. Basically I feel like vim just does it better.
+;; First off, if I do a paste, then that seems to generate two changes
+;; to jump back through for some reason (in standard vim it's just
+;; one). If I do M-q (or gwip) then the beginning of every line in the
+;; paragraph (except the first line) is a place to jump to (very
+;; annoying and vim does not do this either). Uncommenting text with
+;; gc I have no idea what's happening sometimes it doesn't even seem
+;; to register as a change (which really makes no sense to me since
+;; it's something that can be undone). TODO: PR material. Investigate
+;; this weirdness I'm observing with the goto-last-change feature. An
+;; initial finding:
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Undo.html
+;; buffer-undo-list is a big list of different things (it seems fairly
+;; complicated, not sure why) BUT it seems that each undoable chunk is
+;; delimited by nil values. I think goto-chg.el tries to visit EVERY
+;; position in this buffer-undo-list variable when I kind of feel like
+;; it should just visit the first item after a nil.
+
+;; https://www.emacswiki.org/emacs/AutoFillMode
+(setq comment-auto-fill-only-comments t)
+(auto-fill-mode 1)
+
+;; I tried two other packages before settling on
+;; https://github.com/dajva/rg.el.
+;; https://github.com/nlamirault/ripgrep.el just seemed much less
+;; polished so that's a no. I also tried
+;; https://github.com/Wilfred/deadgrep and initially I didn't like it
+;; but perhaps I'm just too used to the compilation-mode style
+;; interface and it was also before I started using evil-collection so
+;; maybe it's worth a retry. TODO: Try out deadgrep again, see if I
+;; like it. I mean, with a name like that it has to be good.
+(define-key evil-normal-state-map "S" #'rg-menu)
+
+(rg-define-search lag13-rg-literal-project
+  "Search for a literal string within the current project"
+  :format literal
+  :dir project)
+
+(defun lag13-rg-visual-dwim (beg end)
+  "Does a literal search for the visually selected region in the
+project."
+  (interactive "r")
+  (evil-exit-visual-state)
+  (lag13-rg-literal-project (buffer-substring-no-properties beg end) "*"))
+
+(define-key evil-visual-state-map "S" #'lag13-rg-visual-dwim)
+
+;; TODO: rg let's you list the available buffers in ibuffer mode but I
+;; think it would also be nice to start a completing-read session and
+;; let the user select the buffer.
+(defun lag13-rg-switch-buffer ()
+  (interactive)
+  (let (res)
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+	(when (equal major-mode 'rg-mode)
+	  (push (buffer-name buf) res))))
+    (switch-to-buffer-other-window (completing-read "RG buffer: " res))))
+
+(defun lag13-query-replace-rg-mode-modified ()
+  "Does the same thing as the regular `query-replace' command but
+with a twist that if the major mode is `rg-mode' (and we started
+`wgrep' of course), it will autofill the thing to be replaced
+with the previously searched term to speedup that process."
+  (interactive)
+  (if (eq major-mode 'rg-mode)
+      (progn
+	(barf-if-buffer-read-only)
+	;; TODO: Is it considered better practice have these things be
+	;; arguments to this function and then read them in the
+	;; interactive bit? Not really sure. Also, it seems a shame to
+	;; kind of reinvent the wheel with reading this stuff but I
+	;; don't think I can do the default stuff I want to do.
+	(let* ((from-string (read-from-minibuffer "RG Query replace: " (rg-search-pattern rg-cur-search)))
+	       (to-string (read-from-minibuffer (format "RG Query replace %s with: " from-string))))
+	  (query-replace from-string to-string)))
+    (call-interactively #'query-replace)))
+
+(evil-define-key '(normal visual) 'global "Q" #'lag13-query-replace-rg-mode-modified)
