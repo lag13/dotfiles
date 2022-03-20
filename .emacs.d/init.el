@@ -34,6 +34,7 @@
  '(debug-on-quit nil)
  '(delete-selection-mode t)
  '(desktop-save-mode t)
+ '(ediff-split-window-function 'split-window-horizontally)
  '(eval-expression-print-length 1000)
  '(eval-expression-print-level 10)
  '(evil-cross-lines t)
@@ -107,7 +108,7 @@
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
- '(js-indent-level 8)
+ '(js-indent-level 2)
  '(js-js-switch-tabs t)
  '(lsp-ui-doc-border "#9eacac")
  '(message-log-max 10000)
@@ -124,7 +125,12 @@
  '(nrepl-message-colors
    '("#ec423a" "#db5823" "#c49619" "#687f00" "#c3d255" "#0069b0" "#3cafa5" "#e2468f" "#7a7ed2"))
  '(objed-cursor-color "#ff6c6b")
- '(orderless-matching-styles '(orderless-regexp orderless-literal))
+ '(org-link-frame-setup
+   '((vm . vm-visit-folder-other-frame)
+     (vm-imap . vm-visit-imap-folder-other-frame)
+     (gnus . org-gnus-no-new-news)
+     (file . find-file)
+     (wl . wl-other-frame)))
  '(org-src-block-faces 'nil)
  '(org-startup-indented t)
  '(package-selected-packages
@@ -996,7 +1002,18 @@ better. Kind of makes it a bit more like fido honestly."
 ;; using it to build a personal knowledgebase which I feel like is
 ;; something I've wanted and kind of hack by just putting files in
 ;; various directories which maybe is just fine but also I'm curious
-;; what note management things help with.
+;; what note management things help with. Yeah, I'm revisiting this on
+;; 2022-02-23 and I feel much more strongly that it would be something
+;; helpful for me. It just feels like one of those things that make
+;; sense to do. Like, I feel like this situation happened so often:
+;; when I was in APUSH and taking notes in that hierarchical manner I
+;; was taught. I'd read about some notable fact that I wanted to write
+;; down but there were multiple sections I wanted to put it under! I'd
+;; have to just pick one and move on. With networked note taking
+;; though, who cares! Just link the fact to both relevant things and
+;; move on. Other documentation:
+;; https://www.youtube.com/watch?v=-TpWahIzueg&ab_channel=SystemCrafters,
+;; https://www.orgroam.com/manual.html
 
 ;; TOOD: For vterm I do rather like the RET character which copies the
 ;; last command that was run. I think I would also love one more
@@ -1483,100 +1500,27 @@ of automatically."
 (require 'undo-tree)
 (global-undo-tree-mode)
 (add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
-;; Remove this command remapping so I can rebind C-/ to just the undo
-;; command so I can do regular undo's while in insert mode and, after
-;; leaving insert mode, the whole thing will just be treated as one
-;; undoable unit. Side note, Why does undo-tree do this remap binding
-;; anyway? They already bind C-/ after all. Man, what a saga this
-;; was... I noticed that when using undo-tree SOMETIMES when after
-;; exiting insert mode, the entire insert mode session was not
-;; undoable as a single unit. I didn't like that because I kind of got
-;; used to being able to mess about in insert mode and undo at will
-;; but know that when exiting insert mode the whole thing would just
-;; be undoable as one unit. I think it was actually on an old TODO
-;; list of mine for vim! It turns out that this would happen if did an
-;; undo within insert mode. I typed a bunch of stuff in insert mode
-;; and went back to normal mode, the entire insert mode session was
-;; not undoable as one chunk. was in insert mode and wrote a bunch of
-;; stuff and did undo a couple of times, then EVERY undoable unit was
-;; undoable from and exited insert mode then that was all undoable as
-;; one chunk. So far so good. Then I noticed that if I added an undo
-;; command within that insert mode session, after exiting insert mode
-;; ALL the undoable units within insert mode were undoable from normal
-;; mode.
+;; Bind C-/ to the undo command so I can do regular emacs undo's while
+;; in insert mode and, after leaving insert mode, the whole thing will
+;; be treated as one undoable unit. Side note, Why does undo-tree do
+;; this remap binding anyway? They already rebind C-/ after all. Man,
+;; what a saga it was to figure this out. The reason I'm doing this is
+;; because I want to be able to undo while in insert mode but after
+;; exiting insert mode I want everything entered to be undoable as one
+;; unit and when using undo-tree this does not happen by default. The
+;; reason for this is that if you execute the undo-tree-undo command
+;; while in insert mode, it will copy all the undo information
+;; accumulated in buffer-undo-list to undo-tree's local variable
+;; buffer-undo-tree. Then, after exiting insert mode, even though evil
+;; restores the value of buffer-undo-list, it does nothing about
+;; buffer-undo-tree and thus the insert mode changes are no longer
+;; undoable in one chunk. TODO: PR material. I feel like evil should
+;; also take care to restore the value of buffer-undo-tree to before
+;; insert mode was entered because as it stands now using undo-tree
+;; will not necessarily respect the evil-want-fine-undo setting which
+;; feels wrong.
 (define-key undo-tree-map [remap undo] nil)
 (define-key undo-tree-map (kbd "C-/") nil)
-;; Man, I swear that manually turning off undo-tree before entering
-;; insert and then turning it on after worked but apparently not.
-;; Piece of shit. I think the way to actually get this working in the
-;; way I kind of want then I probably need to try and bind C-/ to just
-;; regular undo but I was having trouble with that too. Something
-;; about remapping is making this difficult... piece of shit. Piece of
-;; shit. I think the solution here for me (if I really want this
-;; still) is to bind Turn off/on undo-tree-mode when entering/exiting
-;; insert mode so evil is guaranteed to treat the entire insert mode
-;; activity as one undoable chunk. Normally this is how evil-mode
-;; already behaves (assuming evil-want-fine-undo is nil) because evil
-;; saves the value of buffer-undo-list before insertion mode and
-;; reverts buffer-undo-list after (plus modifies it to include the
-;; newly added text). The problem is that undo-tree gets around this
-;; because it maintains it's own internal data structure (called
-;; buffer-undo-tree) for undo's, so even though evil reverts
-;; buffer-undo-list, it does not touch buffer-undo-tree and thus, back
-;; in normal mode, undo will traverse every change made in insert
-;; mode. Note that this copying from buffer-undo-list to
-;; buffer-undo-tree only happens when executing an undo/redo within
-;; insert mode, so if you don't do that then you'll probably never
-;; observe this behavior. It could also happen if undo-tree-limit is
-;; null, you leave emacs in insert mode, and don't do anything for 5
-;; seconds. As I'm writing this I'm kind of confused because I would
-;; think that when evil-mode messes with buffer-undo-list, undo-tree
-;; wouldn't know how to interpret that kind of history rewrite, but in
-;; practice it doesn't seem to care.
-;;
-;; Also, I was hoping I could toggle undo tree by using the insert
-;; state's entry/exit hooks but they're not unusable here because we
-;; need to turn off undo-tree BEFORE/AFTER the undo chunking stuff
-;; happens and that happens in the insert state entry/exit body code
-;; but the order of code execution when changing states is:
-;; entry-state-body, run-entry-hooks, run-exit-hooks, exit-state-body.
-;; TODO: PR material. This all feels like something that evil mode
-;; should handle or at least mention because it kind of nullifies the
-;; evil-want-fine-undo setting. Plus it would be nice to put the
-;; undo-tree enabling/disabling right next to the undo chunking stuff.
-;; Or perhaps we could add new hooks that run at the times I need and
-;; add this code there? Or (perhaps the best solution actually because
-;; then undo-tree's undo style is used all the time unlike what I've
-;; got here where emacs style undoing is done while in insert mode but
-;; undo-tree is used otherwise) bind and restore buffer-undo-list as
-;; part of the undo chunking code. Assuming this is all something the
-;; maintainers would even want, at the very least though it feels
-;; worth mentioning.
-;; (add-hook
-;;  'evil-normal-state-entry-hook
-;;  (lambda ()
-;;    (message "entering normal state and turning on undo tree, evil-undo-list-pointer is %s" (not (null evil-undo-list-pointer)))
-;;    (turn-on-undo-tree-mode 1)))
-;; (add-hook
-;;  'evil-insert-state-entry-hook
-;;  (lambda ()
-;;    (message "entering insert state, evil-undo-list-pointer is %s" (not (null evil-undo-list-pointer)))))
-;; (add-hook
-;;  'evil-insert-state-exit-hook
-;;  (lambda ()
-;;    (message "exiting insert state, evil-undo-list-pointer is %s" (not (null evil-undo-list-pointer)))))
-;; (add-hook
-;;  'evil-normal-state-exit-hook
-;;  (lambda ()
-;;    (when (eq evil-next-state 'insert)
-;;      (message "exiting normal state and turning off undo tree, evil-undo-list-pointer is %s" (not (null evil-undo-list-pointer)))
-;;      (undo-tree-mode 0))))
-;; (add-hook
-;;  'evil-visual-state-exit-hook
-;;  (lambda ()
-;;    (when (eq evil-next-state 'insert)
-;;      (message "exiting visual state and turning off undo tree, evil-undo-list-pointer is %s" (not (null evil-undo-list-pointer)))
-;;      (undo-tree-mode 0))))
 
 ;; I am only one man so I have not read EVERYTHING that this does but
 ;; it seems to be a fantastic package which makes sure that evil mode
@@ -1815,7 +1759,20 @@ lines."
 		   (<= (point) start-point))
 	      (and (equal evil-ex-search-direction 'backward)
 		   (>= (point) start-point)))
-      (ding))))
+      ;; TODO: I think I need to give this arg so the 'gn' text object
+      ;; works properly. Double check this. I'm curious on the exact
+      ;; situations that trigger this but if I don't do this I see an
+      ;; error message: After 0 kbd macro iterations:
+      ;; evil-motion-range: Keyboard macro terminated by a command
+      ;; ringing the bell. Oh, actually I think I know what's
+      ;; happening. When the cursor is on the search tearm and gn is
+      ;; pressed, it changes the current search term which (I guess)
+      ;; means that a search happens but doesn't move and thus the
+      ;; ding happens. I feel like that's fine and easily avoidable by
+      ;; adding the argument to 'ding' but it's a bit ugly and should
+      ;; be fixed. Looks like there's some more work to do before this
+      ;; is truly PR ready.
+      (ding 1))))
 (advice-add 'evil-ex-search :around #'lag13-make-evil-search-ding-on-wraparound)
 
 ;; TODO: https://github.com/PythonNut/evil-easymotion is listed in
@@ -3467,6 +3424,9 @@ lines."
 ;; https://github.com/emacs-eaf/emacs-application-framework which
 ;; feels quite interesting. I also see this video:
 ;; https://www.youtube.com/watch?v=y1k_lA2VUYg&ab_channel=AnandTamariya
+;; Maybe this too since I feel like functionality like this is at a
+;; minimum what I might want:
+;; https://www.reddit.com/r/emacs/comments/syih7g/fuzzy_searching_apples_online_docs_w_ivy/
 
 ;; TODO: I did a ripgrep in a new repo I was exploring and basically
 ;; it returned a lot of test and non-test files and I only wanted to
@@ -3765,6 +3725,7 @@ mode-line-inactive face even darker."
 ;; did with that bs-show stuff with this because I think it will feel
 ;; more natural.
 (defun lag13-switch-buffer-on-complete-filepath ()
+  (interactive)
   (let* ((buffer-alist (->> (buffer-list)
 			    (seq-filter #'buffer-file-name)
 			    (seq-map (lambda (b) (cons (buffer-file-name b) b)))))
@@ -3867,7 +3828,10 @@ mode-line-inactive face even darker."
 ;; doesn't already exist. I think it would be super cool to also
 ;; somehow combine that plugin with the grep functionality within
 ;; emacs because then you can see which top level form the items
-;; matched against.
+;; matched against. I think it could also be a neat idea if you can
+;; toggle a "show all context" sort of thing where it will show all
+;; branch points that led to the code you're looking at or something
+;; like that.
 
 ;; TODO: PR material. I think I should extend the visual start plugin
 ;; so that it works for g* as well mostly for completeness. The use
@@ -4081,7 +4045,9 @@ mode-line-inactive face even darker."
 ;; jumplist and then repeated spams of it should not. If you're
 ;; repeating the 'n' command then that gives me the impression that
 ;; you haven't found what you were looking for so why remember all
-;; those extra spots you know?
+;; those extra spots you know? Actually, I'm kind of starting to think
+;; that ALL repeated jump commands should not add to the jump list
+;; unless the previous command was a non-jumping command.
 
 ;; Doing g; will put the cursor one character past the end of the most
 ;; recent change (at least for typing). Repeated uses of g; will jump
@@ -4110,7 +4076,11 @@ mode-line-inactive face even darker."
 ;; position in this buffer-undo-list variable when I kind of feel like
 ;; it should just visit the first item after a nil.
 
-;; https://www.emacswiki.org/emacs/AutoFillMode
+;; TODO: I don't think this quite gets me what I want. It only
+;; autofills paragraphs as I type them but doesn't retroactively fill
+;; them like M-q does. See if I can get this fixed. Also, this isn't
+;; even enabled everywhere, so I should probably figure out how to do
+;; that. https://www.emacswiki.org/emacs/AutoFillMode
 (setq comment-auto-fill-only-comments t)
 (auto-fill-mode 1)
 
@@ -4171,3 +4141,701 @@ with the previously searched term to speedup that process."
     (call-interactively #'query-replace)))
 
 (evil-define-key '(normal visual) 'global "Q" #'lag13-query-replace-rg-mode-modified)
+(evil-define-key '(normal visual) 'global (kbd "C-Q") #'query-replace-regexp)
+
+;; TODO: Learn more about working with corfu:
+;; https://github.com/minad/corfu. I'd like to better understand the
+;; built in completion stuff especially as it compares to dabbrev and
+;; pcomplete.
+(corfu-global-mode)
+(setq tab-always-indent 'complete)
+
+(defun corfu-enable-always-in-minibuffer ()
+  "Enable Corfu in the minibuffer if Vertico/Mct are not active."
+  (unless (or (bound-and-true-p mct--active)
+              (bound-and-true-p vertico--input))
+    ;; (setq-local corfu-auto nil) Enable/disable auto completion
+    (corfu-mode 1)))
+
+(add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
+(add-hook 'eshell-mode-hook
+          (lambda ()
+            (setq-local corfu-auto nil)
+            (corfu-mode)))
+
+;; TODO: This looks like a nice theme!
+;; https://www.reddit.com/r/emacs/comments/slsvpq/i_created_a_new_dark_theme/.
+;; Based on https://github.com/rebelot/kanagawa.nvim.
+
+;; TODO: That ^^ has inspired me a bit. I think my favorite painting
+;; is Nighthawks and I'd be curious about making that into a color
+;; theme.
+
+;; TODO: Rgrep but just within the open buffers which are beneath a
+;; particular directory? I guess I'm trying to optimize here but my
+;; use case is that I work in a very large codebase so ripgrep's can
+;; take a little while sometimes but if I know that something is in a
+;; file I've recently opened (but I just can't remember the name) it
+;; could be convenient to do.
+
+;; TODO: For whatever narrowing operator I end up making I feel like
+;; it should center the narrowed text on the window.
+
+;; TODO: Have C-o/C-i ding or something when it jumps across files?
+;; Again, sometimes I think I just get lost in what is going on. Again
+;; though, maybe I should just slow down a bit. I guess in general I'm
+;; playing around with the idea of adding more context clues to these
+;; sorts of jumping things.
+
+;; Make it nicer to read lines that wrap
+(setq-default word-wrap t)
+;; Primary motivation for using this visual-fill-column-mode stuff is
+;; to make README.md files nicer to read within emacs. Because most
+;; README's I encounter have super long lines.
+(setq-default visual-fill-column-width 90)
+(add-hook 'markdown-mode-hook #'visual-fill-column-mode)
+
+;; TODO: Default ediff to do a vertical split.
+
+;; TODO: When doing M-g M-n I feel like it could be nice to center the
+;; cursor? Might be nice when searching with / for that matter.
+
+;; TODO: Code splunking idea. 1. Make named perspective buffer group.
+;; 2. Start looking through the code, if we find something promising
+;; do a clone-indirect-buffer, narrow the buffer to the relevant area
+;; of interest, and add that buffer to the perspective buffer group.
+;; EDIT: A quick dive into perspective and I'm not sure if it's really
+;; what I want tbh... It seems more about opening up a perspective and
+;; then starting to explore but I feel like that seems a little messy
+;; because then every file you explore (even the dead ends) end up
+;; getting added to this perpsective. I feel like I want to explore
+;; and not worry about making a cluttered list and then when I find
+;; something I add JUST that thing to a curated list. Who knows
+;; though, maybe perspective is a good first step since the buffer
+;; list will be smaller. Hmmm I wonder if this could be useful too!
+;; https://github.com/bastibe/annotate.el. I feel like you could
+;; annotate the code you're interested in and then jump around those
+;; annotations? I'd also be curious about building my own tree like
+;; structure of files. I wonder if poking around undo-tree could be
+;; useful inspiration here. Or maybe this thread
+;; https://lists.gnu.org/archive/html/help-gnu-emacs/2014-11/msg00022.html
+;; which mentions a tree-widget package within emacs. This might be
+;; the next evolution from tree-widget:
+;; https://github.com/DamienCassou/hierarchy (oh man! That hierarchy
+;; thing also mentions using it for navigating json which I know was a
+;; previous ask of mine). More inspiration for other splunking related
+;; things:
+;; https://ag91.github.io/blog/2020/12/18/emacs-as-your-code-compass-finding-code-hotspots/,
+;; https://news.ycombinator.com/item?id=8263402,
+;; https://news.ycombinator.com/item?id=9784008
+;;
+;; Another good point brought up in some of those articles is that a
+;; good general "understand this codebase" thing could be to see the
+;; frequency that developers work on certain files. I also feel like
+;; perhaps I should just get better with chrome developer tools? Maybe
+;; that could help? Or maybe that's difficult to do with minified
+;; files. ALSO, I feel like there should be some code analysis tools
+;; out there make a relationship graph or whatever. Why do I have to
+;; manually do this when the machine should already know!
+;;
+;; New method proposal. Just make org links to file locations and add
+;; descriptive names to those links. I can just organize them however
+;; I feel is useful. I'll always write a human readable description
+;; for each link I insert which will force me to slow down. I think I
+;; might always want to write the full path to the file from the
+;; project root in the link description to force me to slow down and
+;; get a better grasp of which files I'm looking at. It could be cool
+;; to be able to tab complete it though (like maybe a shadowed version
+;; is displayed which I can then type out or just tab complete). It's
+;; funny because I used to kind of do this (I think I just inserted
+;; the link with no description though) so I guess I'm returning to
+;; this. I suppose at GR the depth of the code wasn't as great though
+;; so maybe I didn't need to do it. I think this method is kind of
+;; free form though and making your own curated list will help me
+;; remember more I think.
+
+;; (persp-mode 1)
+
+;; TODO: Looks like emacs also has tabs in the vim sense (window
+;; layout holders):
+;; https://www.youtube.com/watch?v=C7ZlNRbWdVI&ab_channel=SystemCrafters
+;; Might want to poke around with that.
+
+;; TODO: Under what condition can I cycle through entries in the
+;; compliation buffer but do NOT cause that buffer to pop up? I feel
+;; like it could be nice to just keep a vertical split window layout
+;; where I cycle through matches in one buffer and take notes in
+;; another.
+
+;; TODO: The org link face (or maybe every link face?) has an
+;; underline which makes it hard to see '_' characters in the text.
+
+;; TODO: Any org link to a file location seem jump to a location based
+;; off a text search (which is cool because then those links could
+;; keep working as files change) but if the same string exists in two
+;; places then it would go to the first one! Is there a way to
+;; alleviate this? Like it would be cool to add a line number too and
+;; it will pick the closer string match to the given line or
+;; something.
+
+;; TODO: For some reason gj and gk to move by visual lines don't seem
+;; to register until I do something like look up the help
+;; documentation on them.
+
+;; TODO: Mode line customization ideas:
+;; https://www.reddit.com/r/emacs/comments/6ftm3x/share_your_modeline_customization/
+;; https://seagle0128.github.io/doom-modeline/
+
+;; TODO: My cursor was between the last search result and the line "rg
+;; finished (x matches found)" in a rg buffer and pressing 'k' would
+;; not move the cursor up a line. It was strange.
+
+;; TAB STUFF
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+
+;; TODO: I think I'm starting to need my own internal database of
+;; "useful things". Like I feel like sometimes I get a "unit" of
+;; knowledge which I want to save off somewhere and search for later
+;; but I don't have a good way to do that. At the moment I usually
+;; just accumulate things in a giant text file which quickly gets
+;; unwieldy since there's a lot of junk in there too.
+
+;; TODO: I feel like I want to make a function in org mode to sort
+;; tables by multiple columns and sensible defaults. NOTE that using
+;; the org-sort function (which calls out to org-table-sort-lines) CAN
+;; work to sort multiple columns, you just have to call it on each
+;; column in question but I thought it'd be nice to be able to just do
+;; it one one fell swoop? Or maybe what I really want is to somehow
+;; lock a table in a particular sorting setup?
+
+;; Trying out org roam
+(make-directory "~/org-roam" t)
+(setq org-roam-directory (file-truename "~/org-roam"))
+(org-roam-db-autosync-mode)
+(global-set-key (kbd "C-c r f") #'org-roam-node-find)
+(global-set-key (kbd "C-c r i") #'org-roam-node-insert)
+(global-set-key (kbd "C-c r l") #'org-roam-buffer-toggle)
+;; TODO: Things I want from org-roam and questions. 1. Be able to find
+;; all the work-items/jira-tickets I've been involved with. More
+;; generally I think I want to be able to query for all nodes of a
+;; particular "type". Does that mean the process here would be to
+;; create a node per work item (totally on board with that, it makes
+;; sense) and then somehow tag them? Or if there is no tagging
+;; mechanism would I somehow need to maintain a separate node just
+;; linking to all the other work items? That seems silly if so. Maybe
+;; this:
+;; https://www.reddit.com/r/emacs/comments/p6w3dx/org_roam_can_i_filtercomplete_on_a_subset_based/
+;; 2. How to see all links OUT of the current node.
+;; org-roam-buffer-toggle displays a buffer which shows backlinks INTO
+;; the current node but we don't see outgoing links. 2. I'm not sure
+;; which direction I should make a link in. Like, if person X teaches
+;; me topic Y, in Y should I link to X? Or the other way around? Both?
+;; Not sure what a good methedology here is. Maybe just establish one
+;; link in either direction and it doesn't really matter since the
+;; backlinks stuff essentially establishes a bidirectional thing?
+;; Gotta think through this more. 3. It feels like it could be nice to
+;; pull a subset of nodes into ONE document for a presentation or
+;; something like that. Basically a particular view on the network
+;; that has been built out. 4. Should I keep one giant TODO document?
+;; Or put TODOs local to nodes? I want to find them all later though.
+;; How do I do that? 5. If I rename a node title, how do I propagate
+;; that to all links into that renamed node? What about renaming the
+;; file as well? 6. Similar to the TODO thing I think. I feel like I
+;; might, in separate nodes, add notes like how to do a splunk query
+;; to analyze the data. But I also feel like I might want to get a
+;; view into ALL the splunk queries I know? Do I just make a new node
+;; for each splunk query? Or maybe this view is less useful than I
+;; think? Still it feels like an operation I can "imagine" so maybe
+;; it's useful and partly I just want to have the ability anyway. 7. I
+;; feel like I want to categorize EVERYTHING because I want to be able
+;; to think about things in different ways. Like maybe I created a
+;; node about HAR files but sometimes I know I want to find that HAR
+;; file node but I just can't remember the "HAR" name but I DO
+;; remember that I'm trying to think of a "file type". I feel like I
+;; should be able to look for "file type" and pull it up. I guess I
+;; could just grep for it too? Maybe I'm trying to much to
+;; pre-optimize this stuff though, this hasn't been an issue yet and
+;; maybe I shouldn't address it until it is. I feel like I might want
+;; to do more complicated things too which might involve some parsing
+;; of files like: pull up all "recipe" nodes which use a particular
+;; ingredient or pull up all "song" nodes which have a particular
+;; chord progression. There's so many types of queries I would like to
+;; be able to do!! Seems like a potentially good source of
+;; organization tips:
+;; https://www.youtube.com/watch?v=ljyo_WAJevQ&ab_channel=ShuOmi. Also
+;; maybe good
+;; https://www.reddit.com/r/emacs/comments/lhqwyw/orgroam_and_tags_for_querying_philosophy_issues/
+;; 8. Find out a good methedology of using tags vs refs vs just
+;; linking to specific pages who's main purpose is to serve as a
+;; grouping of other ideas (i.e. similar pages will link to this one
+;; so when you visit that page you can see all the backlinks). This
+;; guy seems to exclusively create dedicated pages with specific
+;; categories: https://www.nateliason.com/blog/roam. It's a great
+;; article honestly. Roam seems super neat. I like that it can do
+;; renames and that it has a feature where you can basically recursive
+;; grep for a node title and anywhere that title shows up in other
+;; nodes but is NOT a link then it optionally let's you make it a
+;; link.
+
+;; TODO: Open a new buffer, hit G to go the bottom of it, then hit C-o
+;; and you end up in a different file. I think this only works for non
+;; file buffers? There's definitely something wonky going on though. I
+;; think you get the same behavior if you type '' instead of C-o
+
+;; Looks like this is a way to display and complete on tags when
+;; running a find on a node. TODO: I feel like it could be cool if in
+;; addition to the tags I could define a section of the org mode
+;; document where I link to other pages AND those pages also show up
+;; when completing. Because I feel like I might want to have both a
+;; dedicated page I can navigate to and see a bunch of backlinks
+;; related to it OR just start completing on that page and then it'll
+;; bring up the backlinked things as well which I can more quickly
+;; complete and select.
+(setq org-roam-node-display-template
+      (concat "${title} "
+              (propertize "${tags}" 'face 'org-tag)))
+
+(add-to-list 'display-buffer-alist
+             '("\\*org-roam\\*"
+               (display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.33)
+               (window-height . fit-window-to-buffer)))
+
+;; Just makes sense doesn't it?
+(define-key org-roam-mode-map (kbd "C-<return>") (lambda ()
+                                                   (interactive)
+                                                   (let ((current-prefix-arg '(4)))
+                                                     (call-interactively #'org-roam-preview-visit))))
+
+;; TODO: The docs
+;; https://www.orgroam.com/manual.html#Browsing-History-with-winner_002dmode
+;; reccommended this as a way to browse history. Get a better
+;; understanding of how this works. Does every buffer switch count as
+;; a window change? Does it add to the jumplist?
+(winner-mode 1)
+(define-key winner-mode-map (kbd "<M-left>") #'winner-undo)
+(define-key winner-mode-map (kbd "<M-right>") #'winner-redo)
+
+;; TODO: Feels like we should create an org-roam function to rename a
+;; node which renames both the title and the file name.
+;; https://org-roam.discourse.group/t/how-to-rename-a-note-with-everything-updated-at-the-same-time/300/4
+;; https://github.com/org-roam/org-roam/pull/124
+
+;; TODO: Make an org roam function to follow the link under the cursor
+;; to another node which references it. Gonna use org-roam-ref-find
+;; for this one. Just seems convenient to be able to paste a link but
+;; still be able to follow it internally if I want.
+
+;; TODO: Hitting TAB on the "backlinks" section for org roam actually
+;; does evil-jump-forward. Why is that?
+
+;; TODO: In org roam I think it would be neat to navigate to backlinks
+;; (or heck, any forward links within the current document?) via
+;; completing-read and be able to repeat this to traverse multiple
+;; nodes in one go. You would be on a node and then start the
+;; completing-read UI but all the completion candidates would be
+;; backlinks to the current node or links coming out of the current
+;; node. When you select one, you navigate there and it brings up the
+;; same completing-read interface again but, of course, updated to
+;; work with the current node's place within the network. Use case was
+;; that I wanted to find "something" (I couldn't even remember what it
+;; was called) but I knew that my coworker "Julie" created it so I
+;; navigated there, opened the backlinks, and then found it within
+;; there but it would have been faster to have this completing
+;; navigation style I think. We could probably have two bindings
+;; actually, one to navigate to a node just like org-roam-node-find
+;; and THEN start navigating to neighboring nodes and another to start
+;; visiting neighboring nodes from the current node.
+(defun lag13-org-roam-get-node-neighbors (node-id)
+  "Returns a list of NODE-ID's neighbors (i.e. nodes which NODE-ID
+links to or nodes which link to NODE-ID)."
+  (let ((outgoing-link-ids
+         (seq-map #'car (org-roam-db-query
+                         [:select
+                          dest
+                          :from :links
+                          :where (= type "id")
+                          :and (= source $s1)]
+                         node-id)))
+        (incoming-link-ids
+         (seq-map #'car (org-roam-db-query
+                         [:select
+                          source
+                          :from :links
+                          :where (= type "id")
+                          :and (= dest $s1)]
+                         node-id))))
+    (seq-uniq (append outgoing-link-ids incoming-link-ids))))
+
+(defun lag13-org-roam-node-find-neighbors ()
+  "Find and open an org-roam node that is a neighbor of the
+current one by it's title or alias."
+  (interactive)
+  (let* ((current-node-id (org-id-get))
+         (neighbors (lag13-org-roam-get-node-neighbors current-node-id)))
+    (org-roam-node-find nil
+                        nil
+                        (lambda (node)
+                          (seq-contains neighbors (org-roam-node-id node))))))
+
+(defun lag13-org-roam-node-find-traverse-neighbors ()
+  "Continually travels to neighboring nodes."
+  (interactive)
+  (while t (lag13-org-roam-node-find-neighbors)))
+
+(defun lag13-org-roam-node-find-journey ()
+  "First travels to a specific node and then travels by neighbors
+from there."
+  (interactive)
+  (org-roam-node-find)
+  (while t (lag13-org-roam-node-find-neighbors)))
+
+(global-set-key (kbd "C-c r n") #'lag13-org-roam-node-find-traverse-neighbors)
+(global-set-key (kbd "C-c r j") #'lag13-org-roam-node-find-journey)
+
+;; https://zettelkasten.de/posts/overview/
+
+;; TODO: Make a binding for emacs' M-q in normal mode
+
+;; TODO: Add a splunk major mode so I can add org mode source blocks
+;; with splunk as the language. My use case atm is that I'm doing
+;; some... literate code spelunking I guess I'll call it where I
+;; explore code and data and documentation to try and figure out how
+;; some code is working and I want to be able to add "splunk" source
+;; blocks so, when my file gets really large, I can easily find them
+;; again.
+
+;; TODO: Org mode links break when they get split over a couple lines
+;; (which is not uncommon when I'm spamming M-q). It's interesting
+;; actually, when you are initially in a session and do M-q then the
+;; link still seems fine but if you kill and reload the file then the
+;; link is broken. Is there a way to fix this?
+
+;; TODO: This guy seems to have some super quick and good videos about
+;; emacs: https://www.youtube.com/channel/UCifbsgGiPLXEBPDKe8_NggQ
+
+;; TODO: Another code spelunking thought. I think I want something
+;; like perspective but less... restrictive? Maybe I should revisit
+;; perspective honestly (or https://github.com/Bad-ptr/persp-mode.el
+;; perhaps?) because I wouldn't be surprised if it could be configured
+;; to do what I want but from what I remember I didn't like how it
+;; felt hard to switch to files that were not in the perspective (for
+;; example I always have notes I work on regardless of what project
+;; I'm in or I always visit init.el whenever ideas strike). Also, I
+;; didn't like how a buffer added in a perspective was not part of the
+;; main buffer list. Again, I should revisit that plugin. I think all
+;; I really want is to ALWAYS explicitly add a buffer to a perspective
+;; and every buffer I open will get added to the global list of
+;; buffers as is the norm. I seem to remember that when I briefly
+;; played around with perspective I still ended up accumulating more
+;; buffers than I wanted (like dired buffers, buffers I'd step through
+;; from RG results but didn't find helpful, the *Messages* buffer,
+;; help buffers, etc...) and I feel like I want a truly hand curated
+;; list of just files I'm interested in. I'm writing this after
+;; watching Anitha do some code spelunking and man is she fast and I
+;; don't think I'm that good but I think I could be better if I had a
+;; tool like this to lean on. I know earlier I said that the way I'm
+;; gonna do code spelunking is just keeping org mode links and I still
+;; feel like that is something I'll do but I am also kind of thinking
+;; that that org link approach is kind of heavy and not always
+;; necessary where this is kind of lightweight and just helps give a
+;; little strength to my brain to remember what I've looked at
+;; recently that is relevant to the research at hand. In addition I
+;; feel I should write a function (which is probably separate from
+;; this functionality) which takes a list of buffers and inserts a
+;; bunch of org links into the current file for every buffer that was
+;; a file. In theory this one two punch means I could explore new code
+;; and have a higher likelihood of keeping track of it and then save
+;; that knowledge off to some documentation somewhere for future me.
+;; I'd also like to be able to do things like grep just within this
+;; set of files.
+
+;; TODO: I think I wrote this somewhere before but in case not. I
+;; think if could be useful to setup the hjkl functionality such that
+;; if you repeatedly hit only those keys "enough" times (which I might
+;; do when reading a file) that it adds a jump point at where you
+;; started hitting those keys. Then, after kind of travelling around
+;; for a while, I can just jump back to where I started.
+
+;; TODO: I feel like I might want C-e and C-y to scroll the cursor as
+;; well. Or maybe keep the cursor in the middle of the page? Because I
+;; feel like I'm always pretty much just staring at the middle of the
+;; page here.
+
+;; TODO: Define the org-link-make-description-function function so
+;; that when inserting a link toa file it just inserts the file name
+;; because I think that's all I want most of the time.
+
+;; TODO: I learned that org-insert-link can be given a C-u argument
+;; and with that argument it prompts for a file to link to which I
+;; think is pretty cool but I think I would be more useful to me if it
+;; could complete a file path from a buffer name. I could also just
+
+;; TODO: I think it could be helpful in the RG buffer to display files
+;; with a different highlighting if I already have them open. That way
+;; I'll know at a glance if I've already looked at that file.
+
+;; TODO: Is there a way to continue executing a macro until it hits an
+;; "error" which could be something like "the search wrapped around to
+;; the beginning of the buffer".
+
+;; TODO: When I have a list of org links representing a manually
+;; constructed call stack I think it would be nice to put that list in
+;; a dedicated window off to the side and then whenever we click on
+;; one it opens in a split. Perhaps perhaps.
+
+;; TODO: Getting this error. I think it's somehow not properly
+;; constructring the path to the GPG keys:
+;;
+;; Failed to verify signature sql-indent-1.6.tar.sig:
+;; No public key for 066DAFCB81E42C40 created at 2021-06-27T09:10:02+0000 using RSA
+;; Command output:
+;; gpg: keyblock resource '/c/Users/lgroenendaal/.emacs.d/c:/Users/lgroenendaal/.emacs.d/elpa/gnupg/pubring.kbx': No such file or directory
+;; gpg: Signature made Sun Jun 27 09:10:02 2021 CUT
+;; gpg:                using RSA key C433554766D3DDC64221BFAA066DAFCB81E42C40
+;; gpg: Can't check signature: No public key
+
+;; TODO: It's so annoying to me that each package seems to handle
+;; indentation completely uniquely. Why can't they all lean on the
+;; same variables or something so I always know how to customize it. I
+;; want https://github.com/tpope/vim-sleuth but for emacs. Maybe this
+;; is what I need: https://github.com/jscheid/dtrt-indent
+;; https://blog.meain.io/2021/Emacs-alternatives-for-the-Vim-plugins-you-know-and-love/
+
+;; TODO: I've been battling with trying to get indentation working
+;; properly for our transact sql sprocs and it's not looking
+;; promising. First off the indentation in our files is all over the
+;; place, it's a mess. Secondly though is that I can't seem to find a
+;; package I'm satisfied with in terms of indentation. The
+;; sqlind-minor-mode thing doesn't work well because it will indent
+;; anything after that "GO" statement when I don't think you're
+;; supposed to. sql-indent seemed potentially the nicest I guess but
+;; it still made indentation more different than expected compared to
+;; the file so I'm not sure. I think at this point I think I want to
+;; just manually handle indentation. I got these two files from:
+;; https://www.emacswiki.org/emacs/tsql-indent.el and
+;; http://nullman.net/emacs/files/local-modules/tsql.el.html On first
+;; pass this online converter thing actually didn't seem half bad:
+;; http://poorsql.com/ from https://stackoverflow.com/a/8592300
+(comment (add-hook 'sql-mode-hook (lambda ()
+                                    (setq indent-tabs-mode t)
+                                    (setq sqlind-basic-offset 8))))
+;; Let's just do indentation ourselves
+(setq sql-use-indent-support nil)
+(comment
+ (with-eval-after-load "sql"
+   (load "~/.emacs.d/tsql-indent")
+   (load "~/.emacs.d/tsql"))
+
+ )
+
+;; TODO: Sometimes when exploring code I manually build out the tree
+;; of execution but I still haven't developed a good method of doing
+;; that. I'd like to perfect that a bit or at least get more of a
+;; process going with it. Some ideas. Use org mode headers. Only link
+;; to files at "function calls" i.e. places that add to the stack.
+;; What do I do if I want to document something about the function
+;; call itself? Like, maybe the function does a lot of setup and I
+;; want to explain that a bit before linking to other function calls.
+;; Always go increase the indentation for nested calls. Do I add
+;; documentation about the function being called next to the actual
+;; function definition or where a caller calls out to it. Probably the
+;; former right? Does this mean I should really define like flat a
+;; list of functions and what they do and then just link out to those
+;; definitions when constructing my manual call stack? Could I also
+;; have the option of visualizing this as a graph? Heck, at this point
+;; should I just be taking notes in elisp? Or could there be a benefit
+;; to doing it in org mode and then parsing it somehow? I think I
+;; would be curious to try both actually.
+
+;; TODO: Is this something cool I should learn about?
+;; https://www.reddit.com/r/emacs/comments/kxdr7x/programming_proving_orgmode_lists_as_proof_trees/
+
+;; TODO: Is there a way to do a ripgrep in all my open buffers?
+;; There's a query I'm searching for and I remember part of it and
+;; know I have it open but can't remember where it is.
+
+;; TODO: Sometimes I feel like I should have a separate sort jump list
+;; for when I'm scrolling around files so I can just scroll around but
+;; then go right back to where I was before.
+
+;; TODO: I think it could be useful to be able to just pull a list of
+;; questions I have out of org mode documents. Then I could just write
+;; questions as I have them but not lose them.
+
+(defun lag13-orderless-flex-if-twiddle (pattern _index _total)
+  (cond
+   ((string-prefix-p "~" pattern)
+    `(orderless-flex . ,(substring pattern 1)))
+   ((string-suffix-p "~" pattern)
+    `(orderless-flex . ,(substring pattern 0 -1)))))
+
+(defun lag13-orderless-without-if-bang (pattern _index _total)
+  (cond
+   ((equal "!" pattern)
+    '(orderless-literal . ""))
+   ((string-prefix-p "!" pattern)
+    `(orderless-without-literal . ,(substring pattern 1)))))
+
+;; TODO: With this orderless stuff I think it could be fun to add a
+;; customization to allow us to do one of the "orderless-initialism"
+;; matching style so it's super quick to complete some emacs specific
+;; stuff. I feel like I'd only want it for emacs things (functions,
+;; variables, commands) so maybe we can modify the functions which
+;; start completions for those candidates? Or I could have a generic
+;; character (like how we have '~' and '!) for triggering this
+;; behavior.
+(setq orderless-matching-styles '(orderless-regexp)
+      orderless-style-dispatchers '(lag13-orderless-flex-if-twiddle
+                                    lag13-orderless-without-if-bang))
+
+;; TODO: My markdown files have that visual line wrapping thing which
+;; I like but I don't think I want the indication that the lines are
+;; wrapping on the right side of the window. I've already got it on
+;; the left side, why do I need more visual noise.
+
+;; TODO: Why can't I have nice wrapping in org mode like I have with
+;; markdown but it just knows not to wrap on things like tables? Seems
+;; like that should just work. Or maybe I just need to get something
+;; which aggressively does M-q for me as I type and not care about it.
+
+;; TODO: I think I'd like a command which like * but it goes to the
+;; first occurrence of the search term in the file. A little cleaner
+;; than what I do now namely *, gg, n. Not the worst but it adds an
+;; extra thing to the jumplist which is annoying.
+
+;; TODO: One time I wanted to look at a bunch of files with a similar
+;; name so I feel like I want to type out completions until I the
+;; files I want and then just open them all. How can I do that? I
+;; think embark might be able to help.
+
+(global-set-key (kbd "C-,") #'embark-act)
+
+;; TODO: Figure out what this really gets me. Originally I thought it
+;; would correctly annotate the projectile-find-file stuff so it could
+;; export the results to a dired buffer but that's not the case. Seems
+;; that there's more that needs doing to get something like that
+;; working: https://github.com/bbatsov/projectile/issues/1664. <--
+;; That last comment also makes me wonder if I should just ditch
+;; projectile and start using project.el
+(marginalia-mode 0)
+
+;; TODO: I feel like I sometimes want to be able to bring up the
+;; completion thing I typed rather the thing that was completed on in
+;; the history. How can I do that? I guess my use case is that
+;; sometimes a set of files look similar and I want to look through
+;; them all so I want to keep brining up that same set of completions.
+;; Maybe there's a better way to do this like using embark. I was
+;; curious though.
+
+;; TODO: I want to get my keybindings consistent for selecting some
+;; item from a menu but opening it in a new buffer. ibuffer and dired
+;; is my only use case at the moment. ibuffer uses C-o (and I think
+;; also doesn't move the cursor to the other window?) and dired uses
+;; S-SPC. I feel like it could be cool to have a "go to next
+;; file/buffer" too like how you can iterate through ripgrep stuff.
+;; Basically my use cas is that I wanted to look at a set of files for
+;; some string. As I say that though maybe I should be leaning more
+;; heavily on things like trying to get ripgrep working on a set of
+;; files. I think ibuffer let's you just do plain searches too, I
+;; wonder what that looks like. I feel like the bindings are:
+;; - RET - open the file/buffer under cursor and replace the window
+;; - C-RET - open in another window but maintain CONTROL and the cursor stays in the window
+;; - S-RET - open in another window and SHIFT the cursor to the other window
+;;
+;; I also had a thought that, should those bindings ^^ change
+;; depending on the kind of window it is? Like for org-roam, that
+;; "links" buffer I have configured to open up small so I don't think
+;; I'd ever want to have the buffer I select open up in that window.
+;; More thought is needed. Another option too is to just have
+;; universal arguments control the kind of behavior that goes on with
+;; these things. Whatever I do for the universal argument for this
+;; could then apply to other window things too like when I lookup help
+;; documentation or open the messages buffer. These are the situations
+;; I think of where I open a split window:
+;;
+;; - Executing a command that opens dedicated window (like messages)
+;; - Starting a completion to open another buffer
+;; - Selecting a buffer to open from a displayed list
+
+;; TODO: I feel like I want to get better about being able to pull
+;; "important" information out of org files. Like, I feel like I end
+;; up writing a lot of prose and then sometimes the more important
+;; things get lost in the shuffle. Maybe that means I should just
+;; write less prose... but I think it would be cool to be able to say
+;; "give me all the links in this file and the sentence preceding it
+;; (assuming that that preceding sentence describes what the link
+;; does). Or "get me all the source code blocks in this file. I don't
+;; know... again, maybe I just need to get rid of my fluffy prose and
+;; just keep the essential commands, links, queries, etc...
+
+;; TODO: This seems like it could be a good file tree:
+;; https://github.com/jojojames/dired-sidebar. I'm curious about all
+;; the things they talk about on this thread too:
+;; https://www.reddit.com/r/emacs/comments/rm8hl1/dirvish_a_minimalistic_file_manager_based_on/
+;; I never really have used dired much, would using it help in some
+;; way? I guess I just don't really know what I'd use it for even? I
+;; guess I feel like all I've really used dired for is renaming files
+;; because it renames the file and the buffer. I don't know if I feel
+;; like I need a file explorer, really I think I'd just like
+;; https://github.com/tpope/vim-eunuch but for emacs. Or maybe I
+;; should change my perspective and embrace dired? On a similar sort
+;; of note, I feel like I should be able to right click on the current
+;; file name in the mode line and copy it. It just feels like it
+;; should be possible. It seems to be possible with the centaur tabs,
+;; why not the modeline? It feels like you should be able to rename
+;; the file from there too. Just contextually I feel like this should
+;; all be possible. Or maybe dired is really the correct textual
+;; scenario? After all, what is in the mode line is just a buffer name
+;; I think, not the file name. Looks like VScode behaves like this too
+;; actually, you can right click the tab and do some things but only
+;; right clicking on the file explorer is where you can actually
+;; rename a file. I guess I could get behind this but I also guess I
+;; sometimes see my list of completion options as kind of a contextual
+;; list of things I should be able to act properly on. Maybe this
+;; could help with the buffer name thing:
+;; https://emacs.stackexchange.com/questions/10779/how-can-i-display-a-list-of-all-buffers-when-clicking-on-the-buffer-name
+
+;; TODO: I might want to install this:
+;; https://www.emacswiki.org/emacs/download/dired%2b.el to be able to
+;; do a grep in just the files that appear in a dired buffer. It's not
+;; on melpa, just gotta download it from the emacswiki:
+;; https://emacs.stackexchange.com/questions/38553/dired-missing-from-melpa
+
+;; TODO: Modify embark so it can copy the buffer name that you are
+;; trying to switch to. This is useful for documentation where I want
+;; to reference other scripts by name. The alternative that I see is
+;; switching to the buffer, dired-jump, switch back and this seems a
+;; little cleaner. Similarly I think I'd like to have the option to
+;; copy the full file path for the buffer.
+
+;; TODO: I feel like page-wise movements with C-f are too much,
+;; scrolling line by line is much better because the code stays on the
+;; screen longer thus you have more time to recognize the "shape" of
+;; certain bits of code you are interested in. Just rambling here
+;; because I knew the code I was interested in was "nearby"
+
+;; TODO: In my org roam usage I've sometimes created pages who's main
+;; purpose is to be a page for others to link back to. Kind of a way
+;; to categorize things. Not sure if it's useful but that's another
+;; story. For example I have a "sql queries" page and usually any
+;; other page which adds a sql query I'll add a link back to that "sql
+;; queries" page. I'm still kind of curiouse if this is a good
+;; approach, I'm also curious about if putting the links at the top or
+;; just kind of scattering them around the page is better. I like to
+;; be able to just look at the top of the page and see what links are
+;; there but at the same time should I just add links adjacent to
+;; where I'm writing things? Even if there are multiple links from
+;; A->B I think there's still just one actual link so there's no
+;; cluttering. I was also wondering if I should add links to the "sql
+;; queries" pages whenever I add a query but I'm not sure if that's a
+;; good idea or maybe it's a moot point. ANYWAY. I thought it could be
+;; cool if I could somehow SHOW all sql queries on that page. Like, is
+;; there a way to create some sort of "view" in org mode? Because it
+;; feels like it could be neat to find all linked pages, grap all
+;; "sql" source blocks and display them. Then I could get a high level
+;; view of sql stuff I know.
+
+;; TODO: How could I run sql queries from emacs. I'm just curious.

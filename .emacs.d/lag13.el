@@ -1396,7 +1396,7 @@ be different depending on the dates I'm staying with someone),
 then I'll multiply that by a something like 1.25 since I want to
 pay a little extra to thank them for hosting me."
   (if-let* ((places-to-stay '(((people . ("Emily" "Evan"))
-			       (total-rent . 2400.0)
+			       (total-rent . 3300.0)
 			       (multiplier . 1.0))
 			      ((people . ("Jane" "Tori"))
 			       (total-rent . 2300.0)
@@ -2390,3 +2390,222 @@ advice which debugs."
 ;; TODO: Checkout
 ;; https://www.youtube.com/watch?v=QU1pPzEGrqw&ab_channel=ClearCode.
 ;; Seems like it would be pretty cool.
+
+;; TODO: I feel like I've seen it so often now where, over time, tests
+;; become ignored and then future people don't even know what they do
+;; or if they're even useful. Would it be useful to create a language
+;; which would refuse to compile (or something like that) if tests
+;; failed?
+
+;; TODO: I had a company call once where one activity you could do is
+;; play bingo based on the words they say. So if they say the word
+;; "success" then you mark that down. I feel like that is just begging
+;; to be automated. I guess you tell the program what words/phrases to
+;; listen for, the program listen to the broadcast, and marks the
+;; matching words it hears. It could even add a timestamp for when it
+;; heard those words for further verification.
+
+;; TODO: Seems like a neat project:
+;; https://www.youtube.com/watch?v=bJUl3OAIT0k&ab_channel=Fireship
+
+;; (require 'hierarchy)
+;; (setq animals (hierarchy-new))
+;; (let ((parentfn
+;;        (lambda (item)
+;; 	 (cl-case item
+;; 	   (dove 'bird)
+;; 	   (pigeon 'bird)
+;; 	   (bird 'animal)
+;; 	   (dolphin 'animal)
+;; 	   (cow 'animal)))))
+;;   (hierarchy-add-tree animals 'dove parentfn)
+;;   (hierarchy-add-tree animals 'pigeon parentfn)
+;;   (hierarchy-add-tree animals 'dolphin parentfn)
+;;   (hierarchy-add-tree animals 'cow parentfn))
+
+;; (setq animals2 (hierarchy-from-list '(animal
+;; 				      (bird
+;; 				       (dove)
+;; 				       (pigeon))
+;; 				      (cow)
+;; 				      (dolphin))))
+;; (hierarchy-leafs animals2)
+;; (with-temp-buffer
+;;   (hierarchy-map
+;;    (hierarchy-labelfn-indent
+;;     (lambda (animal _) (insert (symbol-name animal) "\n")))
+;;    animals)
+;;   (buffer-substring (point-min) (point-max)))
+;; (switch-to-buffer
+;;  (hierarchy-tabulated-display
+;;   animals
+;;   (hierarchy-labelfn-indent
+;;    (hierarchy-labelfn-button
+;;     (lambda (item _) (insert (symbol-name item)))
+;;     (lambda (item _) (message "You clicked on: %s" item))))))
+;; (switch-to-buffer
+;;  (hierarchy-tree-display
+;;   animals
+;;   (lambda (item _) (insert (symbol-name item)))))
+;; (hierarchy-examples-fs-display-filesystem "~/.emacs.d")
+
+;; TODO: Look through all build configurations beneath a team city
+;; project and see if a certain parameter on those build
+;; configurations is set properly. I think I need to login to
+;; teamcity, get the cookies, and use them in an emacs http request
+;; https://askubuntu.com/questions/161778/how-do-i-use-wget-curl-to-download-from-a-site-i-am-logged-into
+
+(defun get-digits (num)
+  "Breaks a number into it's component digits"
+  (if (zerop num)
+      '(0)
+    (when (< num 0)
+      (setq num (* num -1)))
+    (let (digits)
+      (while (> num 0)
+	(push (mod num 10) digits)
+	(setq num (/ num 10)))
+      digits)))
+
+(comment
+
+ ;; Writing some code to help solve a https://nerdlegame.com/ game.
+ ;; Basically I knew that the operation was division and that the
+ ;; equation ended in "= 5 _". 
+ (cl-loop for j in '(50 52 56 55 58)
+	  do (progn
+	       (cl-loop for i in '(0 2 6 5 8)
+		        do
+		        (when (set-equal? '(2 5 6 8 0)
+					  (-union (get-digits i) (-union (get-digits j) (get-digits (* i j)))))
+			  (insert (format "%d * %d = %d\n" i j (* j i)))))
+	       (insert "\n")))
+
+
+ (defun something-something (word)
+   "Man, I can't think today, I just want to generate a list of a
+word with all it's letters rearranged in every possible way... I
+feel like I'm getting worse at programming..."
+   (message "%s" (apply #'string word))
+   (let (res)
+     (seq-do (lambda (c)
+               (setq res (append res
+                                 (seq-map (lambda (word) (cons c word))
+                                          (something-something (seq-remove-first-elt word c))))))
+             word)
+     res))
+
+ ;; Just curious how much dad's birthday dinner at
+ ;; https://aproposrestaurant.com/our-menu/dinner-menu/ might cost.
+ (* 1.20 (seq-reduce (-lambda (sum (_ cost)) (+ sum cost))
+                     (list '("orecchiette" 23)
+                           '("poached pear" 14)
+                           '("local burrata flatbread" 14)
+                           '("crispy polenta" 10)
+                           '("crispy golden potatoes" 8)
+                           '("short rib tomahawk" 78)
+                           '("rack of lamb" 48)
+                           '("cavatelli" 21)
+                           '("sticky date pudding" 11)
+                           '("eggnog creme brulee" 9)
+                           '("abbey chocolate cake" 10)
+                           '("peekskill sour" 15)
+                           '("misc cocktail" 15)
+                           '("misc cocktail" 15)
+                           '("misc cocktail" 15)
+                           '("misc cocktail" 15)
+                           '("misc cocktail" 15)
+                           )
+                     0))
+
+ )
+
+;; TODO: There's a woman.el package in emacs for browsing unix things
+;; without (wo) man lol. I wonder what that looks like.
+
+;; TODO: read book: "Crafting interpreters"
+
+;; TODO: This guy made a video about writing a program to solve
+;; wordle:
+;; https://www.youtube.com/watch?v=v68zYyaEmEA&ab_channel=3Blue1Brown.
+;; It was super cool. I want to learn how to do stuff like that. The
+;; probabilities, the visualizations, all that jazz. Here's the source
+;; code: https://github.com/3b1b/videos/tree/master/_2022/wordle
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; PLAYING AROUND WITH MUSIC
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; I want to do programmatic music stuff. The initial inspiration for
+;; this section is to make a list of songs and their chord
+;; progressions partially for memory and partially to be able to
+;; analyze them and say things like "see, in these 100 famous songs
+;; they all use the same chord progression" or something like that.
+;; Not really sure what will come of it, we'll see we'll see.
+(setq
+ music-semitone 1
+ music-half-step 1
+ music-tone 2
+ music-whole-step 2
+ music-minor-third 3
+ music-major-third 4
+ music-perfect-fourth 5
+ music-perfect-fifth 7
+ music-major-sixth 9
+ music-major-seventh 11
+ )
+
+(defun music-note-sym->num (note-sym)
+  "Converts a symbol representing one of the 12 notes of the
+chromatic scale to a number. Created mostly because it's easier
+for me to think \"C\" than a number like \"3\"."
+  (ht-get
+   (ht (:a 0)
+       (:a-sh 1)
+       (:b 2)
+       (:c 3)
+       (:c-sh 4)
+       (:d 5)
+       (:d-sh 6)
+       (:e 7)
+       (:f 8)
+       (:f-sh 9)
+       (:g 10)
+       (:g-sh 11)
+       )
+   note-sym))
+
+(defun music-make-major-chord (root)
+  "Given a note ROOT, returns a list of notes making up a major
+chord"
+  (list (mod root 12)
+        (mod (+ root 4) 12)
+        (mod (+ root 7) 12)))
+
+(defun music-make-minor-chord (root)
+  "Given a note ROOT, returns a list of notes making up a minor
+chord"
+  (list (mod root 12)
+        (mod (+ root 3) 12)
+        (mod (+ root 7) 12)))
+
+(defun music-make-major-seventh-chord (root)
+  "Given a note ROOT, returns a list of notes making up a major
+7th chord"
+  (list (mod root 12)
+        (mod (+ root 4) 12)
+        (mod (+ root 7) 12)
+        (mod (+ root 10) 12)))
+
+(setq music-blue-moon-of-kentucky
+      (let ((tonic 11))))
+
+;; TODO: I feel like I want something like this:
+;; https://github.com/karlicoss/HPI or maybe this?
+;; https://beepb00p.xyz/orger.html.
+;; https://www.reddit.com/r/emacs/comments/gtpoag/annotating_any_file_in_orgmode/
+
+;; TODO: Similarly to wanting a way to represent musical concepts in
+;; emacs, how could I do that with chess move sequences? I've been
+;; playing a bit of chess recently and it feels like it would be cool
+;; to do this. Maybe I should just use existing tools though and see
+;; what they can do.
