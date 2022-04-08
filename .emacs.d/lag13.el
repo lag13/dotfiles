@@ -17,6 +17,9 @@
 ;; I've used that code then my code just breaks one day. I hate that
 ;; action at a distance stuff. Or maybe some of them were installed by
 ;; default as part of emacs?
+
+;; TODO: There is a benchmark-call function in emacs 28. Does that
+;; mean we don't need to require the 'benchmark library anymore?
 (require 'benchmark)
 (require 'thunk)
 (require 'dom)
@@ -2540,7 +2543,11 @@ feel like I'm getting worse at programming..."
 ;; progressions partially for memory and partially to be able to
 ;; analyze them and say things like "see, in these 100 famous songs
 ;; they all use the same chord progression" or something like that.
-;; Not really sure what will come of it, we'll see we'll see.
+;; Not really sure what will come of it, we'll see we'll see. TODO:
+;; Maybe it would be better to check out http://web.mit.edu/music21/.
+;; Another potential option I THINK is using lilypond. At the very
+;; least I think I want to notate music using it because it will let
+;; me use regular text files!
 (setq
  music-semitone 1
  music-half-step 1
@@ -2609,3 +2616,521 @@ chord"
 ;; playing a bit of chess recently and it feels like it would be cool
 ;; to do this. Maybe I should just use existing tools though and see
 ;; what they can do.
+
+(defun lag13-s-remove-common-prefix (s1 s2)
+  "Removes the common prefix from S1 and S2 and returns S1"
+  (s-replace (s-shared-start s1 s2) "" s1))
+
+(comment
+
+ '((?a ?b ?c ?d)
+   (?d ?e ?f ?g)
+   (?h ?i ?j ?k)
+   (?l ?m ?n ?o))
+
+ )
+
+(defun lag13-matrix-find-elt-coordinates (matrix elt)
+  "Finds all coordinates where ELT exists in MATRIX."
+  (let ((res nil))
+    (dotimes (row (length matrix))
+      (dotimes (col (length (nth row matrix)))
+        (when (equal elt (nth col (nth row matrix)))
+          (push (cons row col) res))))
+    (nreverse res)))
+
+(ert-deftest lag13-matrix-find-elt-coordinates ()
+  (should (equal? nil
+                  (lag13-matrix-find-elt-coordinates nil 1)))
+  (should (equal? '((0 . 0))
+                  (lag13-matrix-find-elt-coordinates '((1 2 3)) 1)))
+  (should (equal? '((0 . 0) (2 . 2))
+                  (lag13-matrix-find-elt-coordinates '((1 2 3)
+                                                       (4 5 6)
+                                                       (7 8 1))
+                                                     1))))
+
+(defun lag13-moore-neighborhood (max-row max-col coord)
+  "Returns the coordinates making up the moore neighborhood of
+COORD within MATRIX:
+https://en.wikipedia.org/wiki/Moore_neighborhood"
+  (let ((coord-row (car coord))
+        (coord-col (cdr coord)))
+    (seq-filter
+     (-lambda ((row . col))
+       (and (>= row 0) (< row max-row)
+            (>= col 0) (< col max-col)))
+     (list (cons (1- coord-row) (1- coord-col))
+           (cons (1- coord-row) coord-col)
+           (cons (1- coord-row) (1+ coord-col))
+           (cons coord-row (1- coord-col))
+           (cons coord-row (1+ coord-col))
+           (cons (1+ coord-row) (1- coord-col))
+           (cons (1+ coord-row) coord-col)
+           (cons (1+ coord-row) (1+ coord-col))))))
+
+(ert-deftest lag13-moore-neighborhood ()
+  (should (equal '((0 . 0) (0 . 1) (0 . 2)
+                   (1 . 0)         (1 . 2)
+                   (2 . 0) (2 . 1) (2 . 2))
+                 (lag13-moore-neighborhood 5 5 '(1 . 1))))
+  (should (equal '(        (0 . 1)
+                   (1 . 0) (1 . 1))
+                 (lag13-moore-neighborhood 5 5 '(0 . 0))))
+  (should (equal '((3 . 3) (3 . 4)
+                   (4 . 3))
+                 (lag13-moore-neighborhood 5 5 '(4 . 4)))))
+
+(defun lag13-find-elt-coords-in-moore-neighborhood (matrix elt coord)
+  "Finds all coordinates in MATRIX that contain ELT within the
+moore neighborhood of COORD."
+  (let (res)
+    (dolist (neighbor-coord (lag13-moore-neighborhood (length matrix) (length (car matrix)) coord))
+      (when (equal elt (nth (cdr neighbor-coord) (nth (car neighbor-coord) matrix)))
+        (push neighbor-coord res)))
+    (nreverse res)))
+
+(ert-deftest lag13-find-elt-coords-in-moore-neighborhood ()
+  (should (equal (lag13-find-elt-coords-in-moore-neighborhood
+                  '((?a ?b ?c)
+                    (?a ?d ?e)
+                    (?f ?g ?a))
+                  ?z
+                  '(1 . 1))
+                 nil))
+  (should (equal (lag13-find-elt-coords-in-moore-neighborhood
+                  '((?a ?b ?c)
+                    (?a ?d ?e)
+                    (?f ?g ?a))
+                  ?a
+                  '(1 . 1))
+                 '((2 . 2) (1 . 0) (0 . 0)))))
+
+(defun lag13-boggle-find-string-neighboring-coord (boggle s-list coords)
+  "Finds the sequence of coordinates in BOGGLE that create the
+string S-LIST."
+  (if (null s-list)
+      (nreverse coords)
+    (let (res
+
+          ;; seq-remove to make sure we don't use a letter we've
+          ;; already used.
+          (neighboring-coords (seq-remove (lambda (neighboring-coord)
+                                            (seq-contains-p coords neighboring-coord))
+                                          (lag13-find-elt-coords-in-moore-neighborhood boggle (car s-list) (car coords))))
+          (i 0))
+      (if (null neighboring-coords)
+          nil
+        (while (and (< i (length neighboring-coords))
+                    (not res))
+          (setq res (lag13-boggle-find-string-neighboring-coord boggle (cdr s-list) (cons (nth i neighboring-coords) coords)))
+          (setq i (1+ i))))
+      res)))
+
+(defun lag13-boggle-find-string-helper (boggle s-list)
+  (if (null s-list)
+      nil
+    (let (res
+          (coords (lag13-matrix-find-elt-coordinates boggle (car s-list)))
+          (i 0))
+      (while (and (< i (length coords))
+                  (not res))
+        (setq res (lag13-boggle-find-string-neighboring-coord boggle (cdr s-list) (list (nth i coords))))
+        (setq i (1+ i)))
+      res)))
+
+(defun lag13-boggle-find-string (boggle s)
+  "Finds a given string within the boggle puzzle BOGGLE and
+returns the coordinates that spell out the string."
+  (lag13-boggle-find-string-helper boggle (append s nil)))
+
+(ert-deftest lag13-boggle-find-string ()
+  "Tests that the function can correctly find a string within a
+boggle puzzle."
+  (should (equal (lag13-boggle-find-string
+                  '((?a ?b ?c ?d)
+                    (?d ?e ?f ?g)
+                    (?h ?i ?j ?k)
+                    (?l ?m ?n ?o))
+                  "")
+                 nil))
+  (should (equal (lag13-boggle-find-string
+                  '((?a ?b ?c ?d)
+                    (?d ?e ?f ?g)
+                    (?h ?i ?j ?k)
+                    (?l ?m ?n ?o))
+                  "a")
+                 '((0 . 0))))
+  (should (equal (lag13-boggle-find-string
+                  '((?a ?b ?c ?d)
+                    (?d ?e ?f ?g)
+                    (?h ?i ?j ?k)
+                    (?l ?m ?n ?o))
+                  "abc")
+                 '((0 . 0) (0 . 1) (0 . 2))))
+  (should (equal (lag13-boggle-find-string
+                  '((?a ?b ?c ?d)
+                    (?d ?e ?f ?g)
+                    (?h ?i ?a ?k)
+                    (?l ?m ?n ?o))
+                  "aea")
+                 '((0 . 0) (1 . 1) (2 . 2))))
+  (should (equal (lag13-boggle-find-string
+                  '((?a ?b ?c ?d)
+                    (?d ?e ?f ?g)
+                    (?h ?i ?j ?k)
+                    (?l ?m ?n ?o))
+                  "aea")
+                 nil)))
+
+;; every letter in the key of the adjacency matrix is a letter to be
+;; placed. We only remove a letter from the key of the adjacency
+;; matrix if it is next to ALL the letters it needs to be next to.
+;; Even then though, I'm not sure if this guarantees that we won't
+;; need to place another letter... because what if it's next to all
+;; the things it needs to be next to but it's neighbors are unable to
+;; finish THEIR word because there are no open spots next to them or
+;; something and a way of solving this is simply placing another copy
+;; of the letter. It's kind of a situation where you start something
+;; innocuous and all seems well in your immediate area but it sets off
+;; a chain reaction which leads to a dead end later down the line and
+;; the only solution is adding more copies of the same letter and
+;; building anew. I don't even know if this kind of thing is possible
+;; but I feel like it could be. So... what does this mean for us...
+;; When are we able to remove a key from this thing? Never? Do we just
+;; not modify this adj matrix at all and check what words we have made
+;; so far? Do we do some sort of word+adj-matrix hybrid where we kind
+;; of intersect the adj-matrix with just the word we're working on at
+;; that moment and build it out to completion and then move onto the
+;; next one? Maybe I don't have to worry about coming up with a
+;; perfect solution too... maybe I can try some half baked thing and,
+;; if it works then great, I've accomplished my goal of making my
+;; specific puzzle and if not then I have to keep tweaking.
+(defun lag13-boggle-generate-puzzle-containing-words-helper (boggle adj-matrix)
+  "God this is fucking hard."
+  ;; if the adjacency matrix is empty then we've solved it!
+  (if (ht-empty? adj-matrix)
+      boggle
+    ;; next, try to place TO-PLACE in every possible neighboring spot
+
+    ;; next, since there are no neighbors of TO-PLACE already in place
+    ;; or the neighbors of TO-PLACE have no open spaces next to them.
+    ;; Put TO-PLACE in every possible spot in the boggle board and try
+    ;; to solve again. Hmmm wait, this doesn't really work either
+    ;; since we could just keep placing the same letter over and over
+    ;; again. Do we have to place a letter AND do all of it's
+    ;; neighbors on the first pass through? I think we might actually.
+
+    ;; Okay, new plan. Whenever we enter this function we will be
+    ;; placing a letter... man the fact that there can be two
+    ;; duplicates of a letter is really tripping me up... And the fact
+    ;; that we might need, say, 3 instances of the same letter even if
+    ;; it's only used within one word two times. Also... shit, this
+    ;; duplicate letter thing again. When building this adjacency
+    ;; matrix I don't know if it can accurately represent things...
+    ;; For example if I need the word "aa" then the adjacency matrix
+    ;; is going to look like a -> (a a) in other words we place a
+    ;; letter 'a' and then it needs to be next to two other 'a's...
+    ;; That's not right. A similar problem arises whenever any
+    ;; particular letter is next to the same letter in multiple
+    ;; distinct words. like ("add" "cad") the mapping for 'a' will
+    ;; look like a -> (d d c) when it really only needs one d in
+    ;; there.
+    (let ((key (ht-key adj-matrix))
+          (row 0)
+          (col 0)
+          res)
+      ;; Maybe I'm going about this wrong. Maybe this function should
+      ;; ALWAYS be trying to place a letter adjacent to an existing
+      ;; letter and only if it can't does it add the letter to every
+      ;; possible other location. Yeah... I think that makes sense.
+      ;; The non-helper function can put it one of the 4 spots because
+      ;; those 4 spots are just reflected 4 times to the other
+      ;; locations so whatever letter is placed will have to go in one
+      ;; of those spots. Then again if it's going to try and put the
+      ;; letter in every possible position anyway... then maybe that
+      ;; isn't useful. Regardless we should probably try to add
+      ;; letters adjacent to others as the first thing though.
+      (while (and (not res)
+                  (< row (length boggle)))
+        (setq col 0)
+        (while (and (not res)
+                    (< col (length (nth row boggle))))
+          (when (not (equal (nth col (nth row boggle))
+                            ?-))
+            ;; I'll probably have to deep copy boggle so I don't have
+            ;; to manually revert this stuff. Same with the adjacency
+            ;; matrix.
+            (setf (nth col (nth row boggle))
+                  key)
+            ;; I need to try every combination of placing letters next
+            ;; to the current letter we're looking at. Need to add
+            ;; early termination in case we find the result?
+
+            ;; finds all empty adjacent spots
+            (dolist (coord (lag13-find-elt-coords-in-moore-neighborhood boggle ?- (cons row col)))
+              ;; tries putting every letter in the open adjacent spot
+              ;; and seeing if it will yield a complete puzzle.
+              (dolist (adj-letter (ht-get adj-matrix key))
+                (setq res (lag13-boggle-generate-puzzle-containing-words-helper boggle adj-matrix))))
+            ;; loop over letters adjacent to key and try to place as
+            ;; many as possible next to key within boggle
+            )
+          (setq res (lag13-boggle-generate-puzzle-containing-words-helper))
+          ;; 
+          (setq col (1+ col)))))))
+
+;; Not a lot of luck finding details about this:
+;; https://stackoverflow.com/questions/28500285/algorithm-for-generating-a-grid-with-the-given-words-shuffled-like-boggle-word
+;; https://stackoverflow.com/questions/21593925/how-to-create-a-boggle-board-from-a-list-of-words-reverse-boggle-solver
+(defun lag13-boggle-generate-puzzle-containing-words (words)
+  "Generates a boggle puzzle that contains the strings in WORDS."
+  (let ((adj-matrix (ht)))
+    (dolist (word words)
+      (let ((word-list (append word nil)))
+        (dotimes (i (length word-list))
+          (when (> i 0)
+            (ht-set adj-matrix
+                    (nth i word-list)
+                    (cons (nth (1- i) word-list)
+                          (ht-get adj-matrix (nth i word-list) '()))))
+          (when (< i (1- (length word-list)))
+            (ht-set adj-matrix
+                    (nth i word-list)
+                    (cons (nth (1+ i) word-list)
+                          (ht-get adj-matrix (nth i word-list) '())))))))
+    adj-matrix))
+
+(defun lag13-gen-all-boggle-puzzles-with-first-letter-placed (boggle last-coord letters-left acc)
+  "Again, I'm faced with one of those recursive situations where
+I want to build up a flat list but with a more functional style
+of programming it feels... strange. Like "
+  (if (null letters-left)
+      (push boggle acc)
+    (dolist (coord 
+             (lag13-find-elt-coords-in-moore-neighborhood boggle nil last-coord)
+             acc)
+      (let ((copy-boggle (copy-tree boggle)))
+        (setf (nth (cdr coord) (nth (car coord) copy-boggle))
+              (car letters-left))
+        (setq acc (lag13-gen-all-boggle-puzzles-with-first-letter-placed copy-boggle coord (cdr letters-left) acc))))))
+
+(defun lag13-gen-all-boggle-puzzles-with-just-word (word)
+  "Generates all the possible boggle puzzles that contain just
+  one word."
+  (let ((word-list (append word nil))
+        res)
+    (dotimes (row 4)
+      (dotimes (col 4)
+        (let ((boggle (copy-tree '((nil nil nil nil)
+                                   (nil nil nil nil)
+                                   (nil nil nil nil)
+                                   (nil nil nil nil)))))
+          (setf (nth col (nth row boggle)) (car word-list))
+          (setq res (lag13-gen-all-boggle-puzzles-with-first-letter-placed
+                     boggle
+                     (cons row col)
+                     (cdr word-list)
+                     res)))))
+    res))
+
+(setq lag13-friends-names '("veronica" "anais" "danny" "lucas" "jane" "tory" "sari" "joe"))
+(setq lag13-possible-boggle-puzzle-with-just-friend-name
+      (seq-map #'lag13-gen-all-boggle-puzzles-with-just-word lag13-friends-names))
+
+(defun lag13-boggle-can-overlay (puzzle1 puzzle2)
+  (let ((can t))
+    (catch 'done
+      (dotimes (row 4)
+        (dotimes (col 4)
+          (let ((p1-char (nth col (nth row puzzle1)))
+                (p2-char (nth col (nth row puzzle2))))
+            (unless (or (equal p1-char p2-char)
+                        (null p1-char)
+                        (null p2-char))
+              (setq can nil)
+              (throw 'done can))))))
+    can))
+
+(defun lag13-overlay-boggle-puzzles (puzzle1 puzzle2)
+  "Combines PUZZLE1 and PUZZLE2."
+  (let ((res (copy-tree puzzle1)))
+    (dotimes (row 4)
+      (dotimes (col 4)
+        (when (nth col (nth row puzzle2))
+          (setf (nth col (nth row res))
+                (nth col (nth row puzzle2))))))
+    res))
+
+;; I tried to run this combining the veronica and jane puzzles but I
+;; killed it after 1 hour. I think I need to come up with a less than
+;; perfect solution that will actually finish on time. I'm also
+;; curious if I could make the overlay test faster somehow. Like,
+;; could I convert the board representation into a big number, do some
+;; bit masking thing, and then somehow if the number has certain
+;; properties it means the masking worked? I kind of feel like no and
+;; besides, that would just speed up the comparison operation but the
+;; number of iterations is still so large that maybe it's miniscule.
+;; But yeah, maybe the solution here is to kind of try a depth first
+;; approach where we try to build a solution as quickly as possible
+;; instead of trying to generate all possible puzzles that can work
+;; between two sets of possible puzzles and then repeating that. In
+;; other words, maybe we need to be a little lazy. Because if we're
+;; lucky we could hit upon a solution really early on or something and
+;; not need to check nearly all of them. That should be good enough
+;; because, after all, we don't need any sort of optimal solution, we
+;; just need a solution.
+
+(defun lag13-boggle-combine-set-of-sets-of-puzzles-helper (set-of-set-of-puzzles depth acc)
+  (if (null set-of-set-of-puzzles)
+      (progn
+        (message (pp-to-string acc))
+        (list 'done acc))
+    (catch 'done
+      (let ((set-of-puzzles (car set-of-set-of-puzzles)))
+        (dotimes (i (length set-of-puzzles))
+          (message "depth is %d, trying to overlay puzzle %d/%d" depth (1+ i) (length set-of-puzzles))
+          (when (lag13-boggle-can-overlay acc (nth i set-of-puzzles))
+            (let ((res (lag13-boggle-combine-set-of-sets-of-puzzles-helper (cdr set-of-set-of-puzzles) (1+ depth) (lag13-overlay-boggle-puzzles acc (nth i set-of-puzzles)))))
+              (when (eq (car res) 'done)
+                (throw 'done res)))))))))
+
+(defun lag13-boggle-combine-set-of-sets-of-puzzles (set-of-set-of-puzzles)
+  (let ((first-set (car set-of-set-of-puzzles)))
+    (catch 'done
+      (dotimes (i (length first-set))
+        (message "depth 0, trying to overlay puzzle %d/%d" (1+ i) (length first-set))
+        (let ((res (lag13-boggle-combine-set-of-sets-of-puzzles-helper (cdr set-of-set-of-puzzles) 1 (nth i first-set))))
+          (when (eq (car res) 'done)
+            (throw 'done (-second-item res))))))))
+
+
+;; Information about how brute forcing this stuff is likely going to
+;; be too difficult. Side note, it's moments like this (where I want
+;; to document code) when I think to myself that I should be using org
+;; mode. This comment block will have to do though:
+(comment
+ ;; I'm now starting to think the brute force implementation alone is
+ ;; simply not feasible. To elaborate... let's think about how long
+ ;; this will take to run. First off, notice how the number of
+ ;; possible boggle puzzles containing a single word increases
+ ;; exponentially with the number of letters in the word:
+ (setq boggle-words-of-differing-length '("a" "ab" "abc" "abcd" "abcde" "abcdef" "abcdefg" "abcdefgh"))
+ (setq set-of-possible-puzzles-for-single-words
+       (seq-map #'lag13-gen-all-boggle-puzzles-with-just-word
+                boggle-words-of-differing-length))
+ (seq-mapn (lambda (word possible-puzzles) (cons word (length possible-puzzles)))
+           boggle-words-of-differing-length
+           set-of-possible-puzzles-for-single-words)
+
+ ;; Outputs:
+ ;; (("a" . 16) ("ab" . 84) ("abc" . 408) ("abcd" . 1764) ("abcde" . 6712) ("abcdef" . 22672) ("abcdefg" . 68272) ("abcdefgh" . 183472))
+
+ ;; I'm not sure what function is the exponentiation but it seems to
+ ;; roughly follow the exponentiation of 4:
+ (seq-map (lambda (exp) (cons exp (expt 4 exp))) (cl-loop for i from 1 to 15 collect i))
+
+ ;; Outputs:
+ ;; ((1 . 4) (2 . 16) (3 . 64) (4 . 256) (5 . 1024) (6 . 4096) (7 . 16384) (8 . 65536) (9 . 262144) (10 . 1048576) (11 . 4194304) (12 . 16777216) (13 . 67108864) (14 . 268435456) (15 . 1073741824))
+
+ ;; For simplicity let's say that we're working with just 5 letter
+ ;; words (which means 6712 possible boggle boards containing just
+ ;; that word) and that it takes 1 second to check/overlay 6712 boards
+ ;; onto an existing board. For simpler math let's say that there are
+ ;; only 6000 boards and not 6712. That means that if we are trying to
+ ;; build a board containing two words then there will be 6000 initial
+ ;; boards and for each of those boards we try to overlay 6000 boards
+ ;; on top of them each take 1 second and you do that 6000 times so
+ ;; that makes for 6000 seconds which is 100 minutes! Granted, if
+ ;; we're overlaying only one board on another board and both boards
+ ;; contain just one 5 letter word then we will find a solution pretty
+ ;; quickly since there are 16 open slots but if we WERE to iterate
+ ;; over everything then it would take 100 minutes. As we can see
+ ;; already, we're dealing with a long running algorithm. For every
+ ;; set of 6000 boards we add to this overlaying process it's going to
+ ;; multiply the runtime by another 100 minutes... yes folks, we're in
+ ;; exponentiation land. So, doing every combination of 3 boards will
+ ;; take 10,000 minutes, 4 boards will take 1,000,000 minutes, etc...
+ ;; As we know from "Rent", 525,600 minutes makes up a year so already
+ ;; we're looking at two years of runtime to generate all possible
+ ;; combinations of puzzles that contain just 4 words. Again, it won't
+ ;; take this long to find just ONE solution (we could even get lucky
+ ;; and get it on the first try) because, unless no solution exists,
+ ;; we won't be checking all of these possibilities AND since some
+ ;; overlays won't be possible, this will eliminate entire branches of
+ ;; computation beneath it. But even if cut that number by a factor of
+ ;; 1000 (assuming that stumble upon the solution well before the end
+ ;; and that failed overlays higher up in the call stack eliminate
+ ;; lots of unnecessary work) then we're still looking at 1,000
+ ;; minutes which is 16.66 hours. If we were to write an
+ ;; implementation that was 2 times faster then it would take ~2
+ ;; hours:
+
+ ;; (/ 16.66 (expt 2 3)) 2.0825 
+
+ ;; That honestly might be worth trying. We could use a faster
+ ;; language and see how long it takes to run to get a sense if that
+ ;; "1000" factor is actually realistic. If it takes the full amount
+ ;; of time estimated above then the brute force solution is
+ ;; completely infeasible because this is only 4 words and we want to
+ ;; mash together 6 words. Granted, the remaining two words are 4 and
+ ;; 3 letters respectively but if those can't fit then I feel like
+ ;; we're potentially kind of back at square one to some extent. But
+ ;; if a language improves things sufficiently and it only takes, say,
+ ;; 30 minutes then perhaps it's doable and I just let run overnight
+ ;; or something. Returning any more values beyond our immediate
+ ;; boggle group though then it's gonna be tight. This code below
+ ;; returns 15 letters but in reality it's 16 because of the two a's
+ ;; in "anais":
+
+ (length (seq-uniq (seq-reduce (lambda (acc elt) (append acc (append elt nil))) '("veronica" "anais" "danny" "lucas" "jane" "tory" "sari" "joe") '())))
+
+ ;; Including nicknames like issy, janey, and joey is not possible if
+ ;; we include the SO's (well, janey and joey might be possible since
+ ;; they add no letters but issy wouldn't since it adds an extra
+ ;; letter). That upper limit is good to know. Let's stick with the
+ ;; classic 4x4 for now though.
+
+ ;; But yeah, this should give some insight into how it seems fairly
+ ;; unlikely that this brute force solution will be a complete
+ ;; solution.
+
+ ;; This is the same day I started writing this comment block but when
+ ;; I first started writing it was like 16:00 and now it is the next
+ ;; day at 01:00 and I come with glad tidings... the brute force
+ ;; solution is sufficient! I re-wrote it in golang but what I think
+ ;; REALLY made the difference was removing all symmetries from the
+ ;; list of seed boards before we try overlaying other boards on top
+ ;; of. With that change, the list of seed boards for the word
+ ;; "veronica" went from 183,472 to 22,934 which is huge because it
+ ;; means it increases the odds of stumbling onto a viable solution
+ ;; much more quickly (8 fold exactly I suppose since that's what you
+ ;; get when dividing those numbers). A bit of sad news is that I
+ ;; learned that, unfortunately, we cannot fit all of our names onto
+ ;; the puzzle (the names being: veronica, lucas, danny, anais, jane,
+ ;; joe). Turns out that there is no solution. On the bright side that
+ ;; means that I could try moving to the 5x5 where I'm sure I'll be
+ ;; able to add the rest of our names and nicknames and the SO's
+ ;; names. That being said... I do worry that 5x5 might cause this
+ ;; approach to not work again but we will see. Wow wow wow. My mind
+ ;; feels so much more at peace. It's honestly crazy. Before I
+ ;; literally could not focus on work things because this problem was
+ ;; in my brain but now it's gone, it's quiet. I still want to mess
+ ;; around with it but I don't feel as much of a need to do so.
+ )
+
+;; I'm not sure what the function is here 
+;; let's say or, at the very least, I might
+;; need to add a human element where I present a seed board that I
+;; built by hand which I think could be the foundation on which the
+;; true solution is built
+(ert-deftest lag13-boggle-generate-puzzle-containing-words ()
+  "Checks that the function to generate a boggle puzzle
+containing a set of words works as expected."
+  (let* ((words '("abc" "def"))
+         (boggle (lag13-boggle-generate-puzzle-containing-words words)))
+    (should (-every? (lambda (s) (lag13-boggle-find-string boggle s)) words))))
+
+;; TODO: I really need to explore emacs' native sequence/collection
+;; related functions more. I just learned that in emacs 28 there is a
+;; map.el library.

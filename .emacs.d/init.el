@@ -19,22 +19,24 @@
  '(bs-attributes-list '(("File" 12 12 left bs--get-file-name)))
  '(bs-string-current "/")
  '(centaur-tabs-cycle-scope 'tabs)
- '(centaur-tabs-mode t nil (centaur-tabs))
  '(centaur-tabs-set-bar 'under)
  '(centaur-tabs-show-count t)
  '(clean-buffer-list-delay-general 5)
  '(compilation-message-face 'default)
+ '(completions-detailed t)
  '(cua-global-mark-cursor-color "#3cafa5")
  '(cua-normal-cursor-color "#8d9fa1")
  '(cua-overwrite-cursor-color "#c49619")
  '(cua-read-only-cursor-color "#93a61a")
  '(custom-enabled-themes '(vscode-dark-plus))
  '(custom-safe-themes
-   '("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "7397cc72938446348521d8061d3f2e288165f65a2dbb6366bb666224de2629bb" "a226e096b9c4924c93b920ba50e545fb2d37c6d95d6b62b44e62cb6f03b081fa" "97db542a8a1731ef44b60bc97406c1eb7ed4528b0d7296997cbb53969df852d6" "da186cce19b5aed3f6a2316845583dbee76aea9255ea0da857d1c058ff003546" "23c806e34594a583ea5bbf5adf9a964afe4f28b4467d28777bcba0d35aa0872e" "e19ac4ef0f028f503b1ccafa7c337021834ce0d1a2bca03fcebc1ef635776bea" "d6844d1e698d76ef048a53cefe713dbbe3af43a1362de81cdd3aefa3711eae0d" "333958c446e920f5c350c4b4016908c130c3b46d590af91e1e7e2a0611f1e8c5" "f6665ce2f7f56c5ed5d91ed5e7f6acb66ce44d0ef4acfaa3a42c7cfe9e9a9013" "cf922a7a5c514fad79c483048257c5d8f242b21987af0db813d3f0b138dfaf53" "4b0e826f58b39e2ce2829fab8ca999bcdc076dec35187bf4e9a4b938cb5771dc" "7a7b1d475b42c1a0b61f3b1d1225dd249ffa1abb1b7f726aec59ac7ca3bf4dae" "c5ded9320a346146bbc2ead692f0c63be512747963257f18cc8518c5254b7bf5" "0d01e1e300fcafa34ba35d5cf0a21b3b23bc4053d388e352ae6a901994597ab1" "830877f4aab227556548dc0a28bf395d0abe0e3a0ab95455731c9ea5ab5fe4e1" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "2809bcb77ad21312897b541134981282dc455ccd7c14d74cc333b6e549b824f3" "c433c87bd4b64b8ba9890e8ed64597ea0f8eb0396f4c9a9e01bd20a04d15d358" "0fffa9669425ff140ff2ae8568c7719705ef33b7a927a0ba7c5e2ffcfac09b75" "835868dcd17131ba8b9619d14c67c127aa18b90a82438c8613586331129dda63" default))
+   '("9f1d0627e756e58e0263fe3f00b16d8f7b2aca0882faacdc20ddd56a95acb7c2" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "7397cc72938446348521d8061d3f2e288165f65a2dbb6366bb666224de2629bb" "a226e096b9c4924c93b920ba50e545fb2d37c6d95d6b62b44e62cb6f03b081fa" "97db542a8a1731ef44b60bc97406c1eb7ed4528b0d7296997cbb53969df852d6" "da186cce19b5aed3f6a2316845583dbee76aea9255ea0da857d1c058ff003546" "23c806e34594a583ea5bbf5adf9a964afe4f28b4467d28777bcba0d35aa0872e" "e19ac4ef0f028f503b1ccafa7c337021834ce0d1a2bca03fcebc1ef635776bea" "d6844d1e698d76ef048a53cefe713dbbe3af43a1362de81cdd3aefa3711eae0d" "333958c446e920f5c350c4b4016908c130c3b46d590af91e1e7e2a0611f1e8c5" "f6665ce2f7f56c5ed5d91ed5e7f6acb66ce44d0ef4acfaa3a42c7cfe9e9a9013" "cf922a7a5c514fad79c483048257c5d8f242b21987af0db813d3f0b138dfaf53" "4b0e826f58b39e2ce2829fab8ca999bcdc076dec35187bf4e9a4b938cb5771dc" "7a7b1d475b42c1a0b61f3b1d1225dd249ffa1abb1b7f726aec59ac7ca3bf4dae" "c5ded9320a346146bbc2ead692f0c63be512747963257f18cc8518c5254b7bf5" "0d01e1e300fcafa34ba35d5cf0a21b3b23bc4053d388e352ae6a901994597ab1" "830877f4aab227556548dc0a28bf395d0abe0e3a0ab95455731c9ea5ab5fe4e1" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "2809bcb77ad21312897b541134981282dc455ccd7c14d74cc333b6e549b824f3" "c433c87bd4b64b8ba9890e8ed64597ea0f8eb0396f4c9a9e01bd20a04d15d358" "0fffa9669425ff140ff2ae8568c7719705ef33b7a927a0ba7c5e2ffcfac09b75" "835868dcd17131ba8b9619d14c67c127aa18b90a82438c8613586331129dda63" default))
  '(debug-on-quit nil)
  '(delete-selection-mode t)
  '(desktop-save-mode t)
  '(ediff-split-window-function 'split-window-horizontally)
+ '(ediff-use-long-help-message t)
+ '(ediff-window-setup-function 'ediff-setup-windows-plain)
  '(eval-expression-print-length 1000)
  '(eval-expression-print-level 10)
  '(evil-cross-lines t)
@@ -121,7 +123,6 @@
       (projectile-project-name))
      vc-mode mode-line-end-spaces))
  '(mouse-wheel-progressive-speed nil)
- '(mouse-wheel-scroll-amount '(1 ((shift) . 1) ((meta)) ((control) . text-scale)))
  '(nrepl-message-colors
    '("#ec423a" "#db5823" "#c49619" "#687f00" "#c3d255" "#0069b0" "#3cafa5" "#e2468f" "#7a7ed2"))
  '(objed-cursor-color "#ff6c6b")
@@ -141,7 +142,7 @@
  '(projectile-indexing-method 'alien)
  '(projectile-mode t nil (projectile))
  '(recentf-mode t)
- '(rg-command-line-flags '("--max-columns 1000" "--hidden"))
+ '(rg-command-line-flags '("--max-columns 1000" "--hidden" "--multiline"))
  '(rg-ignore-case 'force)
  '(rustic-ansi-faces
    ["#282c34" "#ff6c6b" "#98be65" "#ECBE7B" "#51afef" "#c678dd" "#46D9FF" "#bbc2cf"])
@@ -177,6 +178,7 @@
  '(vc-annotate-very-old-color nil)
  '(vterm-max-scrollback 100000)
  '(vterm-toggle-hide-method 'reset-window-configration)
+ '(warning-suppress-log-types '((comp)))
  '(weechat-color-list
    '(unspecified "#002732" "#01323d" "#ae1212" "#ec423a" "#687f00" "#93a61a" "#936d00" "#c49619" "#0069b0" "#3c98e0" "#a81761" "#e2468f" "#008981" "#3cafa5" "#8d9fa1" "#60767e"))
  '(window-divider-mode nil)
@@ -224,7 +226,8 @@
 ;; luckly I can configure something else. Thank you
 ;; https://www.emacswiki.org/emacs/AlarmBell for inspiration.
 (defun lag13-ding-flash ()
-  (dolist (face '(centaur-tabs-unselected centaur-tabs-selected mode-line mode-line-inactive))
+  (dolist (face '(mode-line mode-line-inactive))
+      ;; (face '(centaur-tabs-unselected centaur-tabs-selected mode-line mode-line-inactive))
     ;; TODO: Instead of invert-face, I wonder what it would look on if
     ;; we made the background color literally the "opposite" color of
     ;; whatever is being shown.
@@ -338,13 +341,17 @@
 ;; 	(setq gofmt-command "goimports")
 ;; 	(add-hook 'before-save-hook 'gofmt-before-save)))
 
+(require 'lsp-mode)
+(add-hook 'go-mode-hook #'lsp-deferred)
+;; Set up before-save hooks to format buffer and add/delete imports.
+;; Make sure you don't have other gofmt/goimports hooks enabled.
+;; https://github.com/dominikh/go-mode.el#gopls-integration
 ;; https://github.com/golang/tools/blob/master/gopls/doc/emacs.md#loading-lsp-mode-in-emacs
 ;; https://geeksocket.in/posts/emacs-lsp-go/
 ;; https://endlessparentheses.com/get-in-the-habit-of-using-sharp-quote.html
 (defun lsp-go-install-save-hooks ()
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
-(add-hook 'go-mode-hook #'lsp-deferred)
 (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
 ;; TODO: Do haskell stuff one thing that looked cool was configuring
@@ -1347,14 +1354,7 @@ of automatically."
 ;; Names.
 ;; (global-set-key (kbd "<S-tab> f") #'company-files)
 
-(require 'lsp)
-(lsp-register-client
- (make-lsp-client :new-connection (lsp-stdio-connection '("terraform-ls" "serve"))
-                  :major-modes '(terraform-mode)
-                  :server-id 'terraform-ls))
-(add-hook 'terraform-mode-hook #'lsp-deferred)
-
-;; (yas-global-mode 1)
+(yas-global-mode 1)
 
 ;; TODO: For that golang table driven test yasnippet, make it so it is
 ;; more dynamic (i.e. upon expansion, it will ask how many function
@@ -1419,7 +1419,15 @@ of automatically."
 ;; in that syntax is helpful to me and I think it would be nice to be
 ;; able to write it as a regular data structure in lisp because... I
 ;; don't know what I want to do with it but if something is just data
-;; then I can do... something with it!
+;; then I can do... something with it! Along this line of reasoning, I
+;; was learning about the slot architecture and was writing out the
+;; definitions for a bunch of terms and I thought it would be really
+;; neat if when you defined something and it used a previously used
+;; term that that term would be highlighted or something. Again I feel
+;; like it would just be useful to get rid of the fluff of
+;; descriptions and see how these different components relate to one
+;; another. I feel like it would be a helpful and sort of abstract way
+;; to gain an understanding of game rules too.
 
 ;; TODO: I've heard a couple mentions of org mode's "agenda" feature
 ;; for managing the stuff you have to do next like meetings or just
@@ -1526,6 +1534,15 @@ of automatically."
 ;; it seems to be a fantastic package which makes sure that evil mode
 ;; is consistently used in "all" emacs modes. Go community!
 (evil-collection-init)
+
+;; TODO: PR material. In evil-collection they bind gd to godef-jump
+;; and I don't believe they should do that by default seeing as how if
+;; you use some sort of lsp related package (lsp-mode or eglot) then
+;; gd should "just work" because I think it integrates with xref or
+;; whatever:
+;; https://github.com/emacs-evil/evil-collection/blob/8342a50830d4ba20c589396ee4c9fce6284f7981/modes/go-mode/evil-collection-go-mode.el#L40
+(evil-collection-define-key 'normal 'go-mode-map
+    "gd" 'nil)
 
 (require 'evil-nerd-commenter-operator)
 (evil-define-key '(normal visual) 'global "gc" #'evilnc-comment-operator)
@@ -1917,6 +1934,9 @@ lines."
 ;; the function completing-read and that will return the empty string
 ;; if I hit RET with no input which then results in a call to
 ;; (switch-to-buffer "") and leads to our error message.
+;;
+;; TODO: As of emacs 28 there is an icomplete-vertical-mode so do I
+;; need vertico anymore?
 (vertico-mode 1)
 
 ;; TODO: Holy shit I think I have some more packages to check out
@@ -3555,25 +3575,17 @@ lines."
 ;; general I feel like I'm starting to want more dwim sorts of things)
 ;; but maybe I just need to learn how to do json stuff in emacs.
 
-;; TODO: I feel like it should be more possible in an interactive
-;; environment to doing some computation, pause it, do something else,
-;; then resume that computation. Like maybe in emacs we start telling
-;; it to do a query replace and we've typed in a really complicated
-;; regex but then we realize we want to do something else before
-;; coming back to this regex. What do we do? (side note, would
-;; continuations be helpful here? i.e. you take a continuation at that
-;; point in time, exit, do something else, then evaluate your saved
-;; continuation?). Ideally I feel like we could pause it and come back
-;; to it but right now I feel like I have to quit out of the query
-;; replace entirely and start that flow over again later. All these
-;; things use the minibuffer so surely it feels like, at the very
-;; least, the text I typed could be saved and then recalled? Or like,
-;; I try to switch buffers but then don't realize that the buffer I'm
-;; looking for isn't loaded so I quit and run the find-file command
-;; and have to retype what I had just typed before. It would be nice
-;; to keep the same minibuffer contents but just switch the command
-;; they're getting passed to. I wonder if enabling this could help
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Recursive-Mini.html
+;; TODO: I wonder if it would be possible in emacs to implement
+;; continuations. I feel like it would be so cool to have in an
+;; interactive environment because I feel like you could kick off some
+;; long running process and, if you want to do something else, you
+;; stop it and grab a little continuation of it. Whenever you want to
+;; resume said process you just tell the continuation to go again. I
+;; feel like once you had that continuation too, then you could
+;; analyze it to see how far along the process is or things like that.
+;; Maybe I'm misunderstanding how they're used or maybe there's a way
+;; to get what I'm asking for without them but at least in my head it
+;; feels like a super neat thing that one could have.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; mode line stuff
@@ -3707,7 +3719,10 @@ mode-line-inactive face even darker."
 			  1))
 		   (buffer-name (centaur-tabs-tab-value cur-tab))
 		 cur-tab-filename)))))))
-(centaur-tabs-mode 1)
+;; I'm disabling this for now. I think I still want something like it
+;; when exploring new code but I notice that I really don't look at it
+;; normally.
+(centaur-tabs-mode 0)
 (centaur-tabs-headline-match)
 ;; TODO: PR material. Only add the buffers to the list of previously
 ;; visited buffers if you do something within that buffer or remain on
@@ -3723,28 +3738,29 @@ mode-line-inactive face even darker."
 
 ;; TODO: Continue this experiment. I want to try replacing the stuff I
 ;; did with that bs-show stuff with this because I think it will feel
-;; more natural.
+;; more natural. TODO: Also make sure that embark export properly
+;; exports buffers selected in this way to an ibuffer.
 (defun lag13-switch-buffer-on-complete-filepath ()
   (interactive)
   (let* ((buffer-alist (->> (buffer-list)
-			    (seq-filter #'buffer-file-name)
-			    (seq-map (lambda (b) (cons (buffer-file-name b) b)))))
-	 (presorted-completions (seq-map #'car buffer-alist))
-	 ;; Seems that we have to do all this nonsense just to get
-	 ;; completion to not alphabetically sort the list I give
-	 ;; it... Seems like too much. Thanks for these links for
-	 ;; inspiration:
-	 ;; https://emacs.stackexchange.com/questions/41801/how-to-stop-completing-read-ivy-completing-read-from-sorting,
-	 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffer-List.html,
-	 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion.html,
-	 ;; https://kisaragi-hiu.com/emacs-completion-metadata
-	 (completion-table
-	  (lambda (string pred action)
-	    (if (eq action 'metadata)
-		'(metadata (category . buffer)
-			   (display-sort-function . identity)
-			   (cycle-sort-function . identity))
-	      (complete-with-action action presorted-completions string pred)))))
+                            (seq-filter #'buffer-file-name)
+                            (seq-map (lambda (b) (cons (buffer-file-name b) b)))))
+         (presorted-completions (seq-map #'car buffer-alist))
+         ;; Seems that we have to do all this nonsense just to get
+         ;; completing-read to not alphabetically sort the list I give
+         ;; it... Seems like too much. Thanks for these links for
+         ;; inspiration:
+         ;; https://emacs.stackexchange.com/questions/41801/how-to-stop-completing-read-ivy-completing-read-from-sorting,
+         ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffer-List.html,
+         ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion.html,
+         ;; https://kisaragi-hiu.com/emacs-completion-metadata
+         (completion-table
+          (lambda (string pred action)
+            (if (eq action 'metadata)
+                '(metadata (category . buffer)
+                           (display-sort-function . identity)
+                           (cycle-sort-function . identity))
+              (complete-with-action action presorted-completions string pred)))))
     (switch-to-buffer (cdr (assoc (completing-read "Buffer: " completion-table) buffer-alist)))))
 
 ;; TODO: PR material. Looks like centaur-tabs-buffer-groups does not
@@ -4253,6 +4269,8 @@ with the previously searched term to speedup that process."
 ;; so maybe I didn't need to do it. I think this method is kind of
 ;; free form though and making your own curated list will help me
 ;; remember more I think.
+;;
+;; TODO: hierarchy.el is part of emacs as of v 28.
 
 ;; (persp-mode 1)
 
@@ -4310,8 +4328,8 @@ with the previously searched term to speedup that process."
 ;; lock a table in a particular sorting setup?
 
 ;; Trying out org roam
-(make-directory "~/org-roam" t)
-(setq org-roam-directory (file-truename "~/org-roam"))
+;; (make-directory "G:/My Drive/org-roam" t)
+(setq org-roam-directory (file-truename "G:/My Drive/org-roam"))
 (org-roam-db-autosync-mode)
 (global-set-key (kbd "C-c r f") #'org-roam-node-find)
 (global-set-key (kbd "C-c r i") #'org-roam-node-insert)
@@ -4319,50 +4337,85 @@ with the previously searched term to speedup that process."
 ;; TODO: Things I want from org-roam and questions. 1. Be able to find
 ;; all the work-items/jira-tickets I've been involved with. More
 ;; generally I think I want to be able to query for all nodes of a
-;; particular "type". Does that mean the process here would be to
-;; create a node per work item (totally on board with that, it makes
-;; sense) and then somehow tag them? Or if there is no tagging
+;; particular type/category. Does that mean the process here would be
+;; to create a node per work item (totally on board with that, it
+;; makes sense) and then somehow tag them? Or if there is no tagging
 ;; mechanism would I somehow need to maintain a separate node just
-;; linking to all the other work items? That seems silly if so. Maybe
-;; this:
+;; linking to all the other work items? Like I could have a node
+;; called "person" and then any other node linking to this "person"
+;; node could be interpreted as meaning that that node is a person. A
+;; directed arrow from A -> B basically could mean that A is a B. Or
+;; maybe I just do use tags whenever I want to categorize something.
+;; I'm really torn... maybe that means it doesn't really matter and I
+;; should just pick something. Tags seem nice because I know how I can
+;; make them appear when switching to a node which means I can select
+;; on them easily. But I feel like tags aren't really part of the
+;; graph? Like if I have 10 nodes and each one is a person (and is
+;; tagged as such) then it feels like they should be related somehow
+;; on a graphical level but the tag doesn't feel like you get this
+;; kind of added relationship. Maybe it doesn't matter though, I
+;; should probably just focus on actual use cases here and just do
+;; what works. Queries I can think to write with categories or
+;; potential relationship quoted: See all "resturants" in "new york"
+;; that I've been too with the "boggle" group. Find all "vegan"
+;; "recipes". Find all "recipes" that I made with "Juanita". Find all
+;; "recipes" with a specific "set of ingredients". Maybe this could be
+;; helpful:
 ;; https://www.reddit.com/r/emacs/comments/p6w3dx/org_roam_can_i_filtercomplete_on_a_subset_based/
-;; 2. How to see all links OUT of the current node.
-;; org-roam-buffer-toggle displays a buffer which shows backlinks INTO
-;; the current node but we don't see outgoing links. 2. I'm not sure
-;; which direction I should make a link in. Like, if person X teaches
-;; me topic Y, in Y should I link to X? Or the other way around? Both?
-;; Not sure what a good methedology here is. Maybe just establish one
-;; link in either direction and it doesn't really matter since the
-;; backlinks stuff essentially establishes a bidirectional thing?
-;; Gotta think through this more. 3. It feels like it could be nice to
-;; pull a subset of nodes into ONE document for a presentation or
-;; something like that. Basically a particular view on the network
-;; that has been built out. 4. Should I keep one giant TODO document?
-;; Or put TODOs local to nodes? I want to find them all later though.
-;; How do I do that? 5. If I rename a node title, how do I propagate
-;; that to all links into that renamed node? What about renaming the
-;; file as well? 6. Similar to the TODO thing I think. I feel like I
-;; might, in separate nodes, add notes like how to do a splunk query
-;; to analyze the data. But I also feel like I might want to get a
-;; view into ALL the splunk queries I know? Do I just make a new node
-;; for each splunk query? Or maybe this view is less useful than I
-;; think? Still it feels like an operation I can "imagine" so maybe
-;; it's useful and partly I just want to have the ability anyway. 7. I
-;; feel like I want to categorize EVERYTHING because I want to be able
-;; to think about things in different ways. Like maybe I created a
-;; node about HAR files but sometimes I know I want to find that HAR
-;; file node but I just can't remember the "HAR" name but I DO
-;; remember that I'm trying to think of a "file type". I feel like I
-;; should be able to look for "file type" and pull it up. I guess I
-;; could just grep for it too? Maybe I'm trying to much to
-;; pre-optimize this stuff though, this hasn't been an issue yet and
-;; maybe I shouldn't address it until it is. I feel like I might want
-;; to do more complicated things too which might involve some parsing
-;; of files like: pull up all "recipe" nodes which use a particular
-;; ingredient or pull up all "song" nodes which have a particular
-;; chord progression. There's so many types of queries I would like to
-;; be able to do!! Seems like a potentially good source of
-;; organization tips:
+;; https://www.reddit.com/r/orgmode/comments/iljluu/tags/. I notice
+;; too that apparently org has the concept of a "category" already, I
+;; wonder if I should use that:
+;; https://github.com/org-roam/org-roam/issues/1844. Maybe I need to
+;; be reading up on just org mode itself and getting good with that:
+;; https://orgmode.org/worg/org-glossary.html. I was also kind of
+;; curious if it would be possible to find a node based on the nodes
+;; it relates to. Like in all those example I gave (like find all
+;; "recipes" I made with "Juanita") I could go to the "Juanita" node
+;; and then search for neighbors and assuming "recipes" is a tag then
+;; that works but what if I want to find a node related to MULTIPLE
+;; other nodes? I can't do that neighbor trick. Maybe it doesn't
+;; really matter but I'm curious if there is a way to easily find a
+;; node based on related nodes like it seems to be possible for tags.
+;; I feel like if I was to do this I'd need to change the minibuffer
+;; completion interface. Maybe
+;; https://karthinks.com/software/fifteen-ways-to-use-embark/ or
+;; https://github.com/minad/marginalia or
+;; https://www.reddit.com/r/emacs/comments/tnih4d/vertico_marginalia_miniframe_lot_of_hacks/
+;; could offer some inspiration. 2. I'm not sure which direction I
+;; should make a link in. Like, if person X teaches me topic Y, in Y
+;; should I link to X? Or the other way around? Both? Not sure what a
+;; good methedology here is. Maybe it doesn't really matter and it's
+;; just whatever makes sense to you. Maybe just establish one link in
+;; either direction and it doesn't really matter since the backlinks
+;; stuff essentially establishes a bidirectional thing? Gotta think
+;; through this more. 3. It feels like it could be nice to pull a
+;; subset of nodes into ONE document for a presentation or something
+;; like that. Basically a particular view on the network that has been
+;; built out. 4. Should I keep one giant TODO document? Or put TODOs
+;; local to nodes? I want to find them all later though. How do I do
+;; that? 5. If I rename a node title, how do I propagate that to all
+;; links into that renamed node? What about renaming the file as well?
+;; 6. Similar to the TODO thing I think. I feel like I might, in
+;; separate nodes, add notes like how to do a splunk query to analyze
+;; the data. But I also feel like I might want to get a view into ALL
+;; the splunk queries I know? Do I just make a new node for each
+;; splunk query? Or maybe this view is less useful than I think? Still
+;; it feels like an operation I can "imagine" so maybe it's useful and
+;; partly I just want to have the ability anyway. 7. I feel like I
+;; want to categorize EVERYTHING because I want to be able to think
+;; about things in different ways. Like maybe I created a node about
+;; HAR files but sometimes I know I want to find that HAR file node
+;; but I just can't remember the "HAR" name but I DO remember that I'm
+;; trying to think of a "file type". I feel like I should be able to
+;; look for "file type" and pull it up. I guess I could just grep for
+;; it too? Maybe I'm trying to much to pre-optimize this stuff though,
+;; this hasn't been an issue yet and maybe I shouldn't address it
+;; until it is. I feel like I might want to do more complicated things
+;; too which might involve some parsing of files like: pull up all
+;; "recipe" nodes which use a particular ingredient or pull up all
+;; "song" nodes which have a particular chord progression. There's so
+;; many types of queries I would like to be able to do!! Seems like a
+;; potentially good source of organization tips:
 ;; https://www.youtube.com/watch?v=ljyo_WAJevQ&ab_channel=ShuOmi. Also
 ;; maybe good
 ;; https://www.reddit.com/r/emacs/comments/lhqwyw/orgroam_and_tags_for_querying_philosophy_issues/
@@ -4430,24 +4483,6 @@ with the previously searched term to speedup that process."
 
 ;; TODO: Hitting TAB on the "backlinks" section for org roam actually
 ;; does evil-jump-forward. Why is that?
-
-;; TODO: In org roam I think it would be neat to navigate to backlinks
-;; (or heck, any forward links within the current document?) via
-;; completing-read and be able to repeat this to traverse multiple
-;; nodes in one go. You would be on a node and then start the
-;; completing-read UI but all the completion candidates would be
-;; backlinks to the current node or links coming out of the current
-;; node. When you select one, you navigate there and it brings up the
-;; same completing-read interface again but, of course, updated to
-;; work with the current node's place within the network. Use case was
-;; that I wanted to find "something" (I couldn't even remember what it
-;; was called) but I knew that my coworker "Julie" created it so I
-;; navigated there, opened the backlinks, and then found it within
-;; there but it would have been faster to have this completing
-;; navigation style I think. We could probably have two bindings
-;; actually, one to navigate to a node just like org-roam-node-find
-;; and THEN start navigating to neighboring nodes and another to start
-;; visiting neighboring nodes from the current node.
 (defun lag13-org-roam-get-node-neighbors (node-id)
   "Returns a list of NODE-ID's neighbors (i.e. nodes which NODE-ID
 links to or nodes which link to NODE-ID)."
@@ -4473,14 +4508,14 @@ links to or nodes which link to NODE-ID)."
   "Find and open an org-roam node that is a neighbor of the
 current one by it's title or alias."
   (interactive)
-  (let* ((current-node-id (org-id-get))
+  (let* ((current-node-id (org-roam-id-at-point))
          (neighbors (lag13-org-roam-get-node-neighbors current-node-id)))
     (org-roam-node-find nil
                         nil
                         (lambda (node)
                           (seq-contains neighbors (org-roam-node-id node))))))
 
-(defun lag13-org-roam-node-find-traverse-neighbors ()
+(defun lag13-org-roam-node-find-neighbors-walk ()
   "Continually travels to neighboring nodes."
   (interactive)
   (while t (lag13-org-roam-node-find-neighbors)))
@@ -4492,12 +4527,11 @@ from there."
   (org-roam-node-find)
   (while t (lag13-org-roam-node-find-neighbors)))
 
-(global-set-key (kbd "C-c r n") #'lag13-org-roam-node-find-traverse-neighbors)
+(global-set-key (kbd "C-c r n") #'lag13-org-roam-node-find-neighbors)
+(global-set-key (kbd "C-c r w") #'lag13-org-roam-node-find-neighbors-walk)
 (global-set-key (kbd "C-c r j") #'lag13-org-roam-node-find-journey)
 
 ;; https://zettelkasten.de/posts/overview/
-
-;; TODO: Make a binding for emacs' M-q in normal mode
 
 ;; TODO: Add a splunk major mode so I can add org mode source blocks
 ;; with splunk as the language. My use case atm is that I'm doing
@@ -4620,6 +4654,9 @@ from there."
 ;; pass this online converter thing actually didn't seem half bad:
 ;; http://poorsql.com/ from https://stackoverflow.com/a/8592300
 (comment (add-hook 'sql-mode-hook (lambda ()
+                                    ;; TODO: This is apparently a
+                                    ;; minor mode as of emacs 28. What
+                                    ;; does that mean for us?
                                     (setq indent-tabs-mode t)
                                     (setq sqlind-basic-offset 8))))
 ;; Let's just do indentation ourselves
@@ -4836,6 +4873,335 @@ from there."
 ;; there a way to create some sort of "view" in org mode? Because it
 ;; feels like it could be neat to find all linked pages, grap all
 ;; "sql" source blocks and display them. Then I could get a high level
-;; view of sql stuff I know.
+;; view of sql stuff I know. Maybe something like:
+;; https://github.com/nobiot/org-transclusion
 
 ;; TODO: How could I run sql queries from emacs. I'm just curious.
+
+;; TODO: Might be a good blog about org-roam and org mode:
+;; https://d12frosted.io/posts/2020-06-23-task-management-with-roam-vol1.html
+
+;; TODO: Seems interesting:
+;; https://org-roam.discourse.group/t/implementing-hierarchies-namespaces-in-org-roam-v2/1504/10
+;; He talks about https://www.dendron.so/about which seems cool too.
+
+;; TODO: Embark open up a file in another program. For example I
+;; wanted to open a CSV in excel or whatever.
+;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
+
+;; ;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
+;; (defun rename-file-and-buffer (new-name)
+;;   "Renames both current buffer and file it's visiting to NEW-NAME."
+;;   (interactive "sNew name: ")
+;;   (let ((name (buffer-name))
+;;         (filename (buffer-file-name)))
+;;     (if (not filename)
+;;         (message "Buffer '%s' is not visiting a file!" name)
+;;       (if (get-buffer new-name)
+;;           (message "A buffer named '%s' already exists!" new-name)
+;;         (progn
+;;           (rename-file filename new-name 1)
+;;           (rename-buffer new-name)
+;;           (set-visited-file-name new-name)
+;;           (set-buffer-modified-p nil))))))
+
+(defun lag13-rename-buffer-and-file-fn (buf newname)
+  "Function to rename a buffer and it's corresponding file. It
+will just rename the buffer if there is no corresponding file."
+  (with-current-buffer buf
+    (when (buffer-file-name)
+      (rename-file (buffer-file-name) newname 1))
+    (set-visited-file-name newname)))
+
+(defun lag13-rename-buffer-and-file (buf newname)
+  "Renames a buffer and it's corresponding file if it has one.
+
+Writing this function was a slight breakthrough in me
+understanding how the interactive special form works. Basically,
+the logic for when emacs executes a command is that it will look
+for this interactive special form and evaulate it. What is
+returned is just a list of arguments which emacs passes to the
+function itself. So in many ways \"interactive\" is a completely
+separate thing from the function execution. It's executed by the
+emacs command framework/infrastructure logic to get arguments and
+then passes in those arguments to the function. It also does
+double duty of marking a function as a command. I learned this by
+reading the docs if you can believe it:
+https://www.gnu.org/software/emacs/manual/html_node/elisp/Using-Interactive.html"
+  (interactive
+   (let* ((presorted-completions (seq-map #'buffer-name (buffer-list)))
+          (completion-table
+           (lambda (string pred action)
+             (if (eq action 'metadata)
+                 '(metadata (category . buffer)
+                            (display-sort-function . identity)
+                            (cycle-sort-function . identity))
+               (complete-with-action action presorted-completions string pred))))
+          (buf (completing-read "Buffer: " completion-table))
+          (new-buf-name (read-string "New Name: " buf)))
+     (list buf new-buf-name)))
+  (lag13-rename-buffer-and-file-fn buf newname))
+
+(defun lag13-embark-dired-jump (buffer-or-file-name)
+  "Perform `dired-jump' for a specified buffer or file name.
+Intended to be invoked via `embark-act'. Definitely not a
+strictly speaking necessary thing since I could just switch to a
+buffer or file then do `dired-jump' once there but... I've wanted
+to do this so I think that's a good enough reason as any to add
+it."
+  (interactive
+   (list (read-string "buffer or file: ")))
+  (if (get-buffer buffer-or-file-name)
+      (with-current-buffer buffer-or-file-name
+        (dired-jump))
+    (dired-jump nil buffer-or-file-name)))
+
+;; TODO: Sometimes I load a list of buffers or whatever and I
+;; sometimes want to just execute this command DIRECTLY and not even
+;; invoke it via embark-act. I'm just curious how that might be
+;; possible.
+(define-key minibuffer-local-map (kbd "C-x C-j") #'lag13-embark-dired-jump)
+
+;; TODO: In this talk
+;; https://www.youtube.com/watch?v=oJTwQvgfgMM&ab_channel=GoogleTechTalks
+;; the guy talked about how org mode is his default mode for any
+;; buffer I think I'd like to do that too actually because I feel like
+;; sometimes I'll open up an empty buffer to just jot some random
+;; thing down that I don't even want to remember later and it could be
+;; nice if it was org mode. That was a very good talk too by the way.
+;; It's cool to see the origins of org mode.
+
+;; TODO: I think I might have already written something down about
+;; some org mode addon to do a kind of "flashcard quiz" style thing
+;; with stuff you've written. I think I want that for org roam nodes
+;; too where it showed you nodes that you have not visited in a while.
+;; Maybe it could even prioritize nodes that have fewer connections or
+;; something. Because a couple of times now I've forgotten about a
+;; node which could have helped me.
+
+(defun lag13-get-file-path-relative-to-project ()
+  (lag13-s-remove-common-prefix (buffer-file-name) (cdr (project-current))))
+
+;; TODO: I feel like I should be able to invoke this within a dired
+;; buffer (like make it an embark target or whatever). I also feel
+;; like I should be able to invoke this via embark-act in the
+;; minibuffer. It seems like I'm wanting a bunch of little entrypoints
+;; to this functionality aren't I? I feel like I need to get this
+;; stuff straight in my head so I remember that it exists AND that it
+;; works in every context that "makes sense" to my mind so there is
+;; less friction. I notice that there is a function
+;; "embark-save-relative-path" which is accessible when invoking
+;; embark-act in a dired buffer. For the example of getting a file
+;; path of a buffer relative to the project root I think there could
+;; be 3 contexts: 1. Invoke the command on it's own, it will bring up
+;; a buffer prompt with the default being the current buffer. Part of
+;; me is curious if this use case should be replaced by just having
+;; the command work on the current buffer without a prompt because we
+;; can effectively get the prompt via embark. Hmmm. 2. Invoke
+;; embark-act a buffer in ibuffer (I assume we could have this same
+;; command work for dired too) 3. Invoke the command via embark-act.
+(defun lag13-copy-file-path-relative-to-project ()
+  (interactive)
+  (let ((path (lag13-s-remove-common-prefix (buffer-file-name) (cdr (project-current)))))
+    (kill-new
+     (if (seq-contains-p '(ms-dos windows-nt cygwin) system-type)
+         (s-replace "/" "\\" path)
+       path))))
+
+(defun lag13-get-github-url ()
+  (let ((ref (s-trim (shell-command-to-string "git rev-parse HEAD")))
+        (url 
+         (s-replace ".git" "" (s-replace "git@" "https://" (s-replace ":" "/" (s-trim (shell-command-to-string "git remote get-url origin"))))))
+        (project-path-to-file (lag13-get-file-path-relative-to-project (buffer-file-name))))
+    (kill-new (if (evil-visual-state-p)
+                  (let ((start-line-number (line-number-at-pos (car (evil-visual-range))))
+                        (end-line-number (line-number-at-pos
+                                          (if (equal (evil-visual-type) 'line)
+                                              (1- (cadr (evil-visual-range)))
+                                            (cadr (evil-visual-range))))))
+                    (if (= start-line-number end-line-number)
+                        (format "%s/blob/%s/%s#L%d" url ref project-path-to-file start-line-number)
+                      (format "%s/blob/%s/%s#L%d-L%d" url ref project-path-to-file start-line-number end-line-number)))
+                (format "%s/blob/%s/%s" url ref project-path-to-file)))))
+
+;; TODO: Could I perform a rg for something but then remove duplicates
+;; to avoid clutter? More detail, if I'm looking for a link I
+;; documented somewhere in my org-roam files I feel like it could be
+;; cool to grep from "https://" but then remove any items from the
+;; result which had the same link in them. This was just a random
+;; thought I had, I don't actually have a use case for this so it
+;; could be pointless. I guess we would mess with one of those filter
+;; function things that sit on the other side of a process though? It
+;; could look at every item that comes in and keep track of the urls
+;; it sees and toss out any duplicates.
+
+;; TODO: This seems cool: https://github.com/storax/graph.el. It
+;; hasn't been maintained in 5 years though, I wonder if it still
+;; works. Woaaa!!! This seems even cooler:
+;; https://github.com/storax/graph.el/issues/1 (which is actually
+;; https://www.reddit.com/r/emacs/comments/eyuehj/orggraphviewgraphviz_interactive_visual_org/)
+
+;; TODO: Oh interesting, there's a package in emacs for writing
+;; screenplays! https://github.com/rnkn/fountain-mode. Stumbled on
+;; this when I was searching for a way to automatically tangle source
+;; code blocks:
+;; https://emacs.stackexchange.com/questions/12889/syncing-changes-on-a-tangled-file-back-to-the-original-org-file
+;; The package https://github.com/phillord/lentic also came up and it
+;; seemed pretty neat.
+
+;; TODO: The org babel tangle feature seems super nifty (i.e. writing
+;; source code blocks to files) because then you can do your literate
+;; programming within emacs but still export artifacts in case that is
+;; needed. I think manually exporting that data seems silly though,
+;; why can't it automatically export everytime you edit that source
+;; block? Also, I suspsect that this could be useful for doing the
+;; reverse: https://gitlab.com/mtekman/org-tanglesync.el. Maybe
+;; https://emacs.stackexchange.com/questions/45182/exit-hook-for-org-src-mode?
+;; Or maybe https://github.com/yilkalargaw/org-auto-tangle
+
+;; TODO: Org mode's TODO gather feature, although I have not used it,
+;; seems pretty cool because then you can write little todo's right in
+;; the context of where it came up. But you need to have a heading to
+;; do that right? And doesn't that break the flow of writing? What if
+;; you are in some "Summary" heading and you want to create a TODO but
+;; can't because then everything after that TODO heading will exist
+;; underneath it. Is there a way to write inline sort of TODOs that
+;; can later get gathered?
+
+;; TODO: https://orgmode.org/worg/org-faq.html and
+;; https://www.reddit.com/r/orgmode/comments/tptwum/i_created_an_in_depth_guide_for_new_org_mode/
+;; for some potential org mode reading.
+
+;; TODO: I made a very wide table in org mode and needed to
+;; horizontally scroll to see all of it. On first pass, horizontal
+;; scrolling in emacs seems abysmal or at least the defaults seem to
+;; be. Why can I not just scroll side to side with the mouse? Why does
+;; C-x < prevent the cursor from going back to the true beginning of
+;; the line? Why do your defaults seem so bad Emacs... Figure this
+;; out.
+
+;; TODO: Would it be possible to qualify what kind of relationship two
+;; nodes have? I was picturing using org-roam as kind of a hacky way
+;; to map out a db relationship diagram but to really do that I think
+;; I would need to be able to somehow say: "this edge in this
+;; direction represents a 1 to many relationship". Just seems like it
+;; would be fun to do seeing as how org-roam already offers graphing
+;; capabilities based on it's org-roam-ui-mode. This discussion seems
+;; semi-promising
+;; https://www.reddit.com/r/emacs/comments/ljms7v/does_orgroam_support_different_link_types/gnh57qs/
+;; I also notice that there is a "type" and "properties" columns on
+;; the "links" table. The above reddit thing seems to be related to
+;; the type which is an org mode concept of "what type of link this
+;; is". The properties thing seems to always be
+;;
+;; (list :outline (org-get-outline-path 'with-self 'use-cache))
+;;
+;; Where that function returns a list of headers that the current text
+;; falls on or within. I suppose I could even hack that to work by
+;; having a special header called "relationship type" or something I
+;; know to look for. Not sure how I'd change the UI portion though
+;; which I feel like is definitely something I'd like to do.
+
+;; TODO: I feel like I should start thinking about a "leader" key to
+;; do start doing a completion and same for things like switching
+;; buffers. I sort of have one for window management (C-w) but it
+;; doesn't work in insert mode so that should be fixed. All in all I
+;; think I need better organization of my keybindings.
+
+;; https://github.com/org-roam/org-roam-ui/issues/213
+(setq org-roam-ui-open-on-start nil)
+
+;; TODO: Whenever I search I feel like it should show the number of
+;; search results and also maybe which search item I'm currently on?
+;; It seems silly that this does not exist. I feel like these days I
+;; want more context in all situations. If it is not helpful fine,
+;; then I ignore it but if it is helpful wonderful! I don't have to go
+;; hunting for it, I can just see it.
+
+;; TODO: Again, going back to the code spelunking stuff. Where I'm at
+;; currently is still that it would be nice to have a perspective like
+;; thing but that is a little less rigid namely that I can still
+;; access ALL files/buffers when in the perspective and when I open a
+;; file/buffer it doesn't automatically get added to the current
+;; perspective, rather, I have to explicitly add it. Anyway. I also
+;; wonder if it could be cool to build out a little tree relationship
+;; between files and how they relate? Like if you open file A from
+;; file B with some special keybinding could it make a parent child
+;; relationship between them? I was also wondering about a situation
+;; where you could get a set of strings (which are probably functions
+;; to be called) and a set of files containing those functions and it
+;; would build out a little call tree for you because it would look
+;; for those function names in those files and show the relationship
+;; between files. Again, especially for code bases with super nested
+;; function calls I want to get better about seeing new code and
+;; understanding it quickly. Maybe I just need to be more rigourous
+;; about using some diagramming tool too (graphviz or plantuml?) but I
+;; also like the idea of trying to automate it a bit somehow.
+
+;; TODO: Maybe has some good stuff?
+;; https://zeekat.nl/articles/making-emacs-work-for-me.html#sec-10-6
+
+(setq-default ediff-ignore-similar-regions t)
+(setq-default ediff-ignore-case t)
+
+;; TODO: I learned about flymake mode recently that I can use to jump
+;; to errors automatically. I feel like it would be cool to have
+;; keybindings for flymake-goto-next-error and the like? I'd like to
+;; make sure that the keybindings are consistent with other
+;; functionality too.
+
+;; TODO: I notice that if I'm on a line with an org mode link with a
+;; description then evil-last-non-blank doesn't seem to work properly.
+;; evil-end-of-line works just fine though. On a related note, it
+;; seems that having links messes up org-fill-paragraph
+
+;; TODO: I think it would be interesting if we had an alternative to
+;; the 'n/N' commands which "slowly" scroll the window to get to the
+;; next match to help give better awareness about how close some code
+;; is to other code. I think I've written stuff like this before.
+;; Basically it's happened before where I've been working on code and
+;; trying to jump back and forth only to realize that the to code
+;; blocks were pretty much right next to eachother but I never
+;; realized because I usually don't scroll.
+
+;; TODO: Could we mark files in the rg buffer that are currently being
+;; visited? I think that could be useful so we don't revisit files
+;; we've already looked at.
+
+;; TODO: I made a macro one time which used undo in it and when I
+;; tried to execute it on multiple visual lines it completely froze
+;; emacs. Not sure if undo was the culprit but maybe we test this out
+;; again sometime.
+
+;; TODO: How can I tell rg to grep in all files EXCEPT files mathing
+;; some sort of regex.
+
+;; TODO: I think I should allow the evil cursor to travel one
+;; character past the last character on the line. Without something
+;; like that we could never have the option to highlight from the end
+;; of the line to a semicolon several lines down and have it snap to
+;; the end of the line.
+
+;; TODO: I feel like I could learn a lot from this guy:
+;; https://mullikine.github.io/posts/universal-antlr-parser-in-emacs/
+
+;; TODO: I wonder if I could learn anything from this post
+;; https://www.reddit.com/r/emacs/comments/fmxwd6/gnu_emacs_as_a_lightweight_sql_ide/
+
+;; TODO: context-menu-mode was added in emacs 28. I wonder if we could
+;; add generic buffer things there like renaming the buffer and file
+;; or copying the full path to the buffer.
+
+;; TODO: As of emacs 28 there's a standalone M-y command which allows
+;; for interactive selection from previous kills. I think I'd like
+;; something like that, it would make registers mostly obsolete. Evil
+;; mode has it's own binding though so I'd need to mess with that.
+
+;; TODO: eshell-hist-ignoredups is a thing in emacs 28
+
+;; TODO: Woa there's a function called group-function in emacs 28 for
+;; grouping candidates. Just seems interesting. I feel like consult
+;; related functions would do something like this. There's also a
+;; completion function affixation-function. They really seemed to have
+;; beefed up completion stuff in emacs 28. Feels like marginallia kind
+;; of stuff.
