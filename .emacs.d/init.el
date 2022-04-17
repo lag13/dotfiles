@@ -5120,7 +5120,8 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Programmed-Completion.
                            )
               (complete-with-action action presorted-completions string pred))))
          (buf (completing-read "Buffer: " completion-table)))
-    buf))
+    (message buf)
+    (lag13-test-completion)))
 
 (defun lag13-test-completion ()
   (let* ((completion-candidates
@@ -5156,7 +5157,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Programmed-Completion.
 ;; these functions with embark. I could also define a special key
 ;; binding to switch I guess? It would be a keybinding in the
 ;; minibuffer map.
-(defun lag13-org-roam-find-node-based-on-neighbors ()
+(defun lag13-org-roam-find-node-based-on-neighbors (&optional selected-neighboring-nodes)
   "SUPER proof of concept but it seems to work! Stuff we could do
 to improve:
 
@@ -5165,18 +5166,11 @@ filter only for nodes that have a distance 2 away from the node
 selected.
 
 Allow for unselecting the already chosen neighbor nodes?
-
-I would love to always have the list of nodes that we will
-ultimately select at the top but it seems that if a list is empty
-then nothing shows and it seems to keep the group at the top
-which was last completed.
-
-Do we have ot have the global variable? It just makes it more of
-a pain to remember to null it out later.kj
 "
+  (interactive)
   (let* ((neighbor-nodes (org-roam-node-read--completions))
          (all-neighbors-of-neighbor-nodes
-          (->> lag13-nodes-to-filter
+          (->> selected-neighboring-nodes
                (seq-map #'org-roam-node-id)
                (seq-map #'lag13-org-roam-get-node-neighbors)))
          (shared-neighbors-of-neighbor-nodes
@@ -5188,11 +5182,11 @@ a pain to remember to null it out later.kj
                    (seq-contains shared-neighbors-of-neighbor-nodes (org-roam-node-id node))))))
     (consult--multi
      (list (list
-            :name "Nodes"
+            :name "Node to visit"
             :narrow ?N
+            :default t
             :category 'org-roam-node
             :action (lambda (node)
-                      (setq lag13-nodes-to-filter nil)
                       (org-roam-node-visit (cdr (assoc node nodes))))
             :items (lambda ()
                      (seq-map #'car nodes)))
@@ -5201,7 +5195,9 @@ a pain to remember to null it out later.kj
             :narrow ?n
             :category 'org-roam-node
             :action (lambda (node)
-                      (push (cdr (assoc node neighbor-nodes)) lag13-nodes-to-filter)
-                      (lag13-org-roam-find-node-based-on-neighbors))
+                      (push (cdr (assoc node neighbor-nodes)) selected-neighboring-nodes)
+                      (lag13-org-roam-find-node-based-on-neighbors
+                       (cons (cdr (assoc node neighbor-nodes))
+                             selected-neighboring-nodes)))
             :items (lambda ()
                      (seq-map #'car neighbor-nodes)))))))
