@@ -520,10 +520,10 @@ website, save the results so far, and continue crawling at a
 later time."
   (if (stringp url-or-hash-table)
       (let ((normalized-url (url-recreate-url (url-normalize-url-for-sitecrawl (url-generic-parse-url url-or-hash-table)))))
-	;; TODO: I'm not sure if I like this :crawl-me keyword getting
-	;; repeated everywhere, how do we fix that? A let binding over
-	;; these two functions?
-	(fixed-point #'crawl-site-one-level (ht (normalized-url :crawl-me)) depth-limit))
+	    ;; TODO: I'm not sure if I like this :crawl-me keyword getting
+	    ;; repeated everywhere, how do we fix that? A let binding over
+	    ;; these two functions?
+	    (fixed-point #'crawl-site-one-level (ht (normalized-url :crawl-me)) depth-limit))
     (fixed-point #'crawl-site-one-level url-or-hash-table depth-limit)))
 
 (defun crawl-site-just-one-url (site-hash-table)
@@ -1833,7 +1833,8 @@ nEnter the year: ")
   ;; I can easily convert stuff like this.
   (let ((salary (float salary))
 	(401k-limit (most-frequent (get-monetary-amounts-from-html (parse-html-from-url (construct-google-search-url (format "401k contribution limit for %d" year))))))
-	(annual-additions-limit (apply #'max (get-monetary-amounts-from-html (parse-html-from-url (construct-google-search-url (format "what is the maximum annual additions limit contribution for %d" year)))))))
+	(annual-additions-limit 61000.0 ;; (apply #'max (get-monetary-amounts-from-html (parse-html-from-url (construct-google-search-url (format "what is the maximum annual additions limit contribution for %d" year)))))
+     ))
     ;; TODO: Could I print out a table in a temporary buffer which
     ;; will close if I hit 'q'? I'm curious if emacs has a standard
     ;; way of doing that (rgrep does it for example) or if you have to
@@ -3134,3 +3135,205 @@ containing a set of words works as expected."
 ;; TODO: I really need to explore emacs' native sequence/collection
 ;; related functions more. I just learned that in emacs 28 there is a
 ;; map.el library.
+
+(comment
+
+ ;; TODO: I made a graph of some code (names changed below a bit) and
+ ;; the resulting visualized graph is also quite messy and hard to
+ ;; follow than I want it to be. I want to see if I can make it easier
+ ;; to view. Some gripes are that I feel like the entrypoint should be
+ ;; front and center when currently it gets drawn off to the size.
+ ;; Another issue is that for some nodes the edges are too close
+ ;; together as they leave the node so it's tough to tell that there
+ ;; are actually multiple edges. Are there parameters to dot/graphviz
+ ;; that can display this better? Maybe I could topologically sort the
+ ;; nodes and color them differently based on their depth? Or maybe try
+ ;; to influence layout based on distance from the root node? Like,
+ ;; there's this "constraint" attribute and maybe we could mess with
+ ;; that. I should probably read
+ ;; https://www.graphviz.org/pdf/dotguide.pdf When we generate the
+ ;; dotfile does ordering matter (I doubt it)? Is there another tool we
+ ;; should use instead? For example the org-roam-ui tool generates
+ ;; something in the browser which I bet we could leverage.
+ ;; https://medium.com/macoclock/doxygen-with-graphviz-to-generate-call-graph-on-mac-f9a3160db641
+ ;; https://www.wikiwand.com/en/Call_graph
+ ;; https://golangexample.com/visualize-call-graph-of-a-go-program-using-graphviz/
+ ;; https://correl.phoenixinquis.net/2015/07/12/git-graphs.html This is
+ ;; https://codefreezr.github.io/awesome-graphviz/
+ ;;
+ ;; When I was reading through
+ ;; https://graphviz.org/doc/info/attrs.html these were the only
+ ;; attributes that seemed to have a noticable effect that I also kind
+ ;; of liked.
+ ;;
+ ;; mclimit=200.0 // the higher this was the better the layout seemed
+ ;; rankdir="LR" // I kind of liked this ordering for the graph
+ ;; ranksep=1.5
+ ;; "nodeName" [shape=box]
+ ;; splines=polyline
+ ;;
+ ;; the graph that I was trying to generate a nice picture of:
+ (setq lucas-test-graph
+       (ht<-alist '(("dbo.LucasListDeleteTennisBatch_FailedItems_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteListProcessingState_Archive_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteListProcessingState_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteListProcessingBatchState_Success_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteListProcessingBatchState_Processing_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteListProcessingBatchState_Error_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteListProcessingBatchState_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_BatchFailedItems_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_Staging_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_Queue_forExpedited_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_Queue_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_Properties_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_Mapping_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_Log_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_BatchSuccess_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_BatchStatus_DeprecateData" "dbo.LucasDeleteBkgrdTennis_BatchFailedItems_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_BatchIgnored_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_BatchError_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasDeleteBkgrdTennis_Batch_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByScope_forListProcessingStateModel" "dbo.DeprecateLucasDeleteFrameworkTables_StartStep" "dbo.LucasDeleteListProcessingBatchState_DeprecateData" "dbo.LucasDeleteListProcessingBatchState_Error_DeprecateData" "dbo.LucasDeleteListProcessingBatchState_Processing_DeprecateData" "dbo.LucasDeleteListProcessingBatchState_Success_DeprecateData" "dbo.LucasDeleteListProcessingState_DeprecateData" "dbo.LucasDeleteListProcessingState_Archive_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_EndStep" "dbo.DeprecateLucasDeleteFrameworkTables_HandleException")
+                    ("dbo.LucasDeleteState_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennisStaging_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennisProperties_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennisLog_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennisBatch_Success_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennisBatch_Status_DeprecateData" "dbo.LucasListDeleteTennisBatch_FailedItems_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennisBatch_Staging_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennisBatch_SoftDeleted_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennisBatch_Ignored_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennisBatch_Error_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennisBatch_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennis_Queue_forExpedited_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennis_Queue_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennis_Mapping_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren")
+                    ("dbo.LucasListDeleteTennis_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.LucasListDeleteTennis_Aggregation_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByScope_forSuppressPhase_ApplyCoverageForTennisData" "dbo.LucasListDeleteTennis_Mapping_DeprecateData" "dbo.LucasListDeleteTennis_Queue_DeprecateData" "dbo.LucasListDeleteTennis_Queue_forExpedited_DeprecateData" "dbo.LucasListDeleteTennisBatch_DeprecateData" "dbo.LucasListDeleteTennisBatch_Error_DeprecateData" "dbo.LucasListDeleteTennisBatch_Ignored_DeprecateData" "dbo.LucasListDeleteTennisBatch_SoftDeleted_DeprecateData" "dbo.LucasListDeleteTennisBatch_Staging_DeprecateData" "dbo.LucasListDeleteTennisBatch_Status_DeprecateData" "dbo.LucasListDeleteTennisBatch_Success_DeprecateData" "dbo.LucasListDeleteTennisLog_DeprecateData" "dbo.LucasListDeleteTennisProperties_DeprecateData" "dbo.LucasListDeleteTennisStaging_DeprecateData" "dbo.LucasDeleteState_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTablesByScope_forListProcessingStateModel")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByScope_forSuppressPhase_AggregationCoverage" "dbo.SettingGetValue" "dbo.DeprecateLucasDeleteFrameworkTables_StartStep" "dbo.DeprecateLucasDeleteFrameworkTables_EndStep" "dbo.DeprecateLucasDeleteFrameworkTables_HandleException" "dbo.DeprecateLucasDeleteFrameworkTablesByScope_forSuppressPhase_ApplyCoverageForTenniss")
+                    ("dbo.LucasDeleteBkgrdTennis_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_GetSqlForTennisChildren" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByScope_forDeletePhase_ApplyCoverageForTennisData" "dbo.LucasDeleteBkgrdTennis_Batch_DeprecateData" "dbo.LucasDeleteBkgrdTennis_BatchError_DeprecateData" "dbo.LucasDeleteBkgrdTennis_BatchIgnored_DeprecateData" "dbo.LucasDeleteBkgrdTennis_BatchStatus_DeprecateData" "dbo.LucasDeleteBkgrdTennis_BatchSuccess_DeprecateData" "dbo.LucasDeleteBkgrdTennis_Log_DeprecateData" "dbo.LucasDeleteBkgrdTennis_Mapping_DeprecateData" "dbo.LucasDeleteBkgrdTennis_Properties_DeprecateData" "dbo.LucasDeleteBkgrdTennis_Queue_DeprecateData" "dbo.LucasDeleteBkgrdTennis_Queue_forExpedited_DeprecateData" "dbo.LucasDeleteBkgrdTennis_Staging_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTablesByScope_forListProcessingStateModel")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByScope_forSuppressPhase_CascadingCoverage" "dbo.DeprecateLucasDeleteFrameworkTables_StartStep" "dbo.DeprecateLucasDeleteFrameworkTables_EndStep" "dbo.DeprecateLucasDeleteFrameworkTables_HandleException" "dbo.DeprecateLucasDeleteFrameworkTablesByScope_forSuppressPhase_ApplyCoverageForTenniss")
+                    ("dbo.sp_uteSQL")
+                    ("dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable" "dbo.DeprecateLucasDeleteFrameworkTables_StartStep" "dbo.DeprecateLucasDeleteFrameworkTables_CheckForYield" "dbo.sp_uteSQL" "dbo.DeprecateLucasDeleteFrameworkTables_EndStep" "dbo.DeprecateLucasDeleteFrameworkTables_HandleException")
+                    ("dbo.Utility")
+                    ("dbo.DeprecateLucasDeleteFrameworkTables_CheckForYield" "dbo.LucasDeleteProcessLogInsert")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByScope_forDeletePhase_ApplyCoverageForTenniss" "dbo.SettingGetValue" "dbo.DeprecateLucasDeleteFrameworkTables_StartStep" "dbo.DeprecateLucasDeleteFrameworkTablesByScope_forSuppressPhase_CascadingCoverage" "dbo.DeprecateLucasDeleteFrameworkTablesByScope_forDeletePhase_ApplyCoverageForTennisData" "dbo.LucasDeleteBkgrdTennis_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_EndStep" "dbo.DeprecateLucasDeleteFrameworkTables_HandleException")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByScope_forSuppressPhase_ApplyCoverageForTenniss" "dbo.SettingGetValue" "dbo.DeprecateLucasDeleteFrameworkTables_StartStep" "dbo.DeprecateLucasDeleteFrameworkTablesByScope_forSuppressPhase_AggregationCoverage" "dbo.DeprecateLucasDeleteFrameworkTablesByScope_forSuppressPhase_ApplyCoverageForTennisData" "dbo.LucasListDeleteTennis_Aggregation_DeprecateData" "dbo.LucasListDeleteTennis_DeprecateData" "dbo.DeprecateLucasDeleteFrameworkTables_EndStep" "dbo.DeprecateLucasDeleteFrameworkTables_HandleException")
+                    ("dbo.sp_set_session_context")
+                    ("dbo.DeprecationMasterUpdate")
+                    ("dbo.sp_utesql")
+                    ("dbo.DeprecateLucasDeleteFrameworkTables_HandleException" "dbo.LucasDeleteProcessLogInsert" "dbo.DeprecationMasterUpdate" "dbo.sp_set_session_context")
+                    ("dbo.DeprecateLucasDeleteFrameworkTables_EndStep" "dbo.LucasDeleteProcessLogInsert" "dbo.DeprecationMasterUpdate" "dbo.sp_set_session_context")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByDate_forSuppressPhaseTenniss" "dbo.DeprecateLucasDeleteFrameworkTables_StartStep" "dbo.SettingGetValue" "dbo.DeprecateLucasDeleteFrameworkTables_EndStep" "dbo.DeprecateLucasDeleteFrameworkTables_HandleException" "dbo.DeprecateLucasDeleteFrameworkTablesByScope_forSuppressPhase_ApplyCoverageForTenniss")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByDate_forDeletePhaseTenniss" "dbo.DeprecateLucasDeleteFrameworkTables_StartStep" "dbo.SettingGetValue" "dbo.DeprecateLucasDeleteFrameworkTables_EndStep" "dbo.DeprecateLucasDeleteFrameworkTables_HandleException" "dbo.DeprecateLucasDeleteFrameworkTablesByScope_forDeletePhase_ApplyCoverageForTenniss")
+                    ("dbo.DeprecateLucasDeleteFrameworkTables_StartStep" "dbo.sp_set_session_context" "dbo.DeprecateLucasDeleteFrameworkTables_CheckForYield" "dbo.LucasDeleteProcessLogInsert")
+                    ("dbo.DeprecateLucasDeleteFrameworkTables_LucasDeleteRevertTennissByDate" "dbo.DeprecationMasterUpdate")
+                    ("dbo.DeprecateLucasDeleteFrameworkTables_BackgroundTennissByDate" "dbo.DeprecationMasterUpdate")
+                    ("dbo.DataDeprecationHandleFailure" "dbo.DataDeprecationLogIns" "dbo.Utility")
+                    ("dbo.DeprecateLucasDeleteFrameworkTables_ListDeleteTennissByDate" "dbo.LucasDeleteProcessLogInsert" "dbo.DeprecateLucasDeleteFrameworkTables_ApplyCoverageToTable" "dbo.DeprecateLucasDeleteFrameworkTables_StartStep" "dbo.DeprecateLucasDeleteFrameworkTables_CheckForYield" "dbo.DeprecateLucasDeleteFrameworkTables_EndStep" "dbo.DeprecateLucasDeleteFrameworkTables_HandleException" "dbo.DeprecationMasterUpdate")
+                    ("dbo.DataDeprecationLogIns")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByDate_v1" "dbo.DataDeprecationLogIns" "dbo.DeprecateLucasDeleteFrameworkTables_ListDeleteTennissByDate" "dbo.DataDeprecationHandleFailure" "dbo.DeprecateLucasDeleteFrameworkTables_BackgroundTennissByDate" "dbo.DeprecateLucasDeleteFrameworkTables_LucasDeleteRevertTennissByDate")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByDate_v2" "dbo.DeprecateLucasDeleteFrameworkTables_StartStep" "dbo.DeprecateLucasDeleteFrameworkTablesByDate_forDeletePhaseTenniss" "dbo.DeprecateLucasDeleteFrameworkTablesByDate_forSuppressPhaseTenniss" "dbo.DeprecateLucasDeleteFrameworkTables_EndStep" "dbo.DeprecateLucasDeleteFrameworkTables_HandleException")
+                    ("dbo.LucasDeleteProcessLogInsert")
+                    ("dbo.SettingGetValue" "dbo.sp_utesql")
+                    ("dbo.DeprecateLucasDeleteFrameworkTablesByDate" "dbo.SettingGetValue" "dbo.LucasDeleteProcessLogInsert" "dbo.DeprecateLucasDeleteFrameworkTablesByDate_v2" "dbo.DeprecateLucasDeleteFrameworkTablesByDate_v1"))))
+
+ )
+
+;; TODO: This could also be a fun thing to do with org mode files:
+;; https://emacs.stackexchange.com/questions/18386/convert-org-mode-structure-to-dot-source
+
+(defun lag13-hash-table-to-dot (h filename)
+  (let ((res (list "digraph {")))
+    (map-do (lambda (key values)
+              (seq-do (lambda (value)
+                        (setq res (append res (list (s-concat "\"" key "\" -> \"" value "\"")))))
+                      values))
+            h)
+    (setq res (append res '("}")))
+    (with-temp-file filename
+      (dolist (line res)
+        (insert line)
+        (newline)))
+    (shell-command (s-concat "dot " filename " -Tsvg > ~/test.svg"))
+    (browse-url-of-file "~/test.svg")))
+
+;; TODO: I think being able to invoke graphviz would indeed be nice
+;; for literate programming:
+;; https://www.worthe-it.co.za/blog/2019-05-07-illustrate-your-point-with-literate-programming.html
+
+(defun lag13-sproc-to-source-code (sproc-name repo-root)
+  "Given SPROC-NAME which exists within a file inside of REPO-ROOT,
+return the source code of that sproc."
+  ;; shell-command-to-string
+  ;; rg --ignore-case -e "N'CREATE PROCEDURE \[?dbo\]?\.\[?DeprecateContactDeleteFrameworkTables_BackgroundOperationsByDate\]?" --files-with-matches --type sql .\Procedures\DeprecateContactDeleteFrameworkTables_ApplyCoverageToTable.sql
+  (let* ((rg-command (s-concat "rg --ignore-case --type sql --files-with-matches "
+                               "-e \"N'CREATE PROCEDURE "
+                               (s-join "\\." (seq-map (lambda (db-part)
+                                                        (s-concat "\\[?" db-part "\\]?"))
+                                                      (s-split "\\." sproc-name)))
+                               " \""))
+         (rg-res (s-split "\n" (shell-command-to-string rg-command)))
+         (matched-files (seq-take rg-res (1- (length rg-res)))))
+    (if (= (length matched-files) 1)
+        (with-temp-buffer
+          (insert-file-contents (car matched-files))
+          (buffer-string)) 
+        "")))
+
+;; TODO: Other ideas to parse this code instead of just using regexes:
+;; https://mullikine.github.io/posts/universal-antlr-parser-in-emacs/,
+;; https://github.com/antlr/grammars-v4/tree/master/sql/tsql
+(defun lag13-sproc-source-code-to-invoked-sprocs (sproc-src)
+  "Takes SPROC-SRC (the source code for a sproc) and returns a list
+of sprocs that get called within it."
+  (->> sproc-src
+       (s-split "\n")
+       (seq-map (lambda (line) (car (s-match "EXEC +\\(\\[?dbo\\]?\\.\\)?\\[?[a-zA-Z_0-9]+\\]?" line))))
+       (seq-filter #'identity)
+       (seq-map (lambda (sproc)
+                  (let ((sproc-cleaned (->> sproc
+                                            (s-replace "EXEC " "")
+                                            (s-replace "[" "")
+                                            (s-replace "]" "")
+                                            (s-replace " " ""))))
+                    (if (s-contains? "dbo" sproc-cleaned)
+                        sproc-cleaned
+                      (s-concat "dbo." sproc-cleaned)))))
+       (seq-uniq)))
+
+(defun lag13-crawl-sprocs-helper (sproc-hash-table)
+  (let ((sprocs-to-crawl (ht-collect-keys (lambda (_ value) (eq value :crawl-me)) sproc-hash-table)))
+    (if (zerop (length sprocs-to-crawl))
+        sproc-hash-table
+      (let ((sprocs-sproc-invocations
+             (seq-map (lambda (sproc)
+                        (lag13-sproc-source-code-to-invoked-sprocs (lag13-sproc-to-source-code sproc "laksjd")))
+                      sprocs-to-crawl)))
+        (seq-mapn (lambda (sproc sproc-calls-made-by-sproc)
+                    (ht-set! sproc-hash-table sproc sproc-calls-made-by-sproc))
+                  sprocs-to-crawl
+                  sprocs-sproc-invocations)
+        (seq-do (lambda (sproc) (ht-set! sproc-hash-table sproc :crawl-me))
+                (->> sprocs-sproc-invocations
+                     (-flatten-n 1)
+                     (seq-uniq)
+                     (seq-filter (lambda (sproc) (eq :not-found (ht-get sproc-hash-table sproc :not-found))))))
+        (lag13-crawl-sprocs-helper sproc-hash-table)))))
+
+(defun lag13-crawl-sprocs (sproc-or-hash-table)
+  "Generates a graph of what sprocs call what other sprocs. Pretty
+much identical to the crawl-site algorithm."
+  (if (stringp sproc-or-hash-table)
+      (lag13-crawl-sprocs-helper (ht (sproc-or-hash-table :crawl-me)))
+    (lag13-crawl-sprocs-helper sproc-or-hash-table)))
+
+(comment
+ ;; called from the file which just so happens to work because these
+ ;; files all exist in that directory
+ (setq lucas-v1-date (lag13-crawl-sprocs "dbo.DeprecateContactDeleteFrameworkTablesByDate_v1"))
+ (setq lucas-v2-date (lag13-crawl-sprocs "dbo.DeprecateContactDeleteFrameworkTablesByDate_v2"))
+ )
