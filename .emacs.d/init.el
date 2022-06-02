@@ -1,7 +1,27 @@
-;; My Emacs configuration file. The path to this file is determined by
-;; user-init-file which gets dynamically set when emacs starts. I
-;; believe that when emacs starts up it does something like "find the
-;; first non empty file in the list (~/.emacs ~/.emacs.d/init.el).
+;; My Emacs configuration file -*- lexical-binding: t; -*-
+
+;; Profile emacs startup: https://config.daviwil.com/emacs
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "*** Emacs loaded in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+
+;; Load work specific customizations after emacs loads the init file
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (let ((custom-work-elisp-file "~/.emacs.d/work.el"))
+              (when (file-exists-p custom-work-elisp-file)
+                (load-file custom-work-elisp-file)))))
+
+(setq use-package-always-ensure t)
+
+;; The path to this file is determined by user-init-file which gets
+;; dynamically set when emacs starts. I believe that when emacs starts
+;; up it does something like "find the first non empty file in the
+;; list (~/.emacs ~/.emacs.d/init.el).
 
 ;; I like being able to seperate changes I manually make vs ones
 ;; automatically made by the system. Some of the custom changes ARE
@@ -236,10 +256,6 @@
 ;; space seems to be the norm.
 (setq sentence-end-double-space nil)
 
-;; To make it easy to store a link that can be inserted into an org
-;; document.
-(global-set-key (kbd "C-c l") 'org-store-link)
-
 (defun lag13-left-char-or-previous-buffer ()
   "Repeats `previous-buffer' if the last command was
 `previous-buffer' or `next-buffer', otherwise it does
@@ -340,12 +356,11 @@ get the major mode of the current buffer."
 ;; probably switch to evil mode (I think I want to get back to vim
 ;; like keybindings eventually anyway) but I'll start with this.
 (setq auto-save-visited-interval 1)
-(auto-save-visited-mode 1)
+(auto-save-visited-mode 0)
 
-;; I've never had any use for specific settings for particular files
-;; or directories so I figured I'd disable those features. (setq
-;; enable-local-variables t)
-(setq enable-dir-local-variables nil)
+(use-package super-save
+  :config
+  (super-save-mode +1))
 
 ;; Highlight matches immediately as you type.
 (setq lazy-highlight-initial-delay 0)
@@ -1438,6 +1453,9 @@ of automatically."
 (define-key evil-motion-state-map "`" 'evil-goto-mark-line)
 
 (define-key evil-motion-state-map (kbd "SPC") #'switch-to-buffer)
+;; TODO: Feels like I should have a keybinding to switch to a buffer
+;; NOT within the current project list. Or just generally some sort of
+;; list that doesn't intersect with another.
 (evil-global-set-key 'motion (kbd "C-SPC") #'projectile-switch-to-buffer)
 
 ;; TODO: PR material. Add functionality to the rg package so we can
@@ -3566,8 +3584,8 @@ mode-line-inactive face even darker."
 ;; TODO: PR material. Only add the buffers to the list of previously
 ;; visited buffers if you do something within that buffer or remain on
 ;; that buffer for more than X seconds or something like that.
-(define-key evil-normal-state-map (kbd "<C-tab>") 'centaur-tabs-forward)
-(define-key evil-normal-state-map (kbd "<S-C-tab>") 'centaur-tabs-backward)
+;; (define-key evil-normal-state-map (kbd "<C-tab>") 'centaur-tabs-forward)
+;; (define-key evil-normal-state-map (kbd "<S-C-tab>") 'centaur-tabs-backward)
 
 ;; TODO: If I have a vertically split window and 5 tabs open (or at
 ;; least enough to cover >=3/4 of the screen) and I navigate to the
@@ -3663,9 +3681,17 @@ mode-line-inactive face even darker."
 ;; to do it within emacs instead of constantly googling.
 
 ;; TODO: I think I should start looking into improving emacs' startup
-;; speed. Obviously it's not a huge priority but with desktop mode,
-;; starting up probably takes like 30 seconds. Without desktop mode I
-;; think it takes like 10 seconds.
+;; speed. Obviously it's not a huge priority but on 2022-05-20 I used
+;; my work laptop (a windows machine which runs emacs via mingw) and
+;; there wer 258 buffers (desktop mode was enabled) and it took 8
+;; MINUTES to startup. I'm also wondering why I have so many buffers
+;; actually. I thought midnight mode should clean some of those up.
+;; Anyway. That's way too slow. Not that I'm starting up emacs a lot
+;; but still. Also worth mentioning though that my work laptop seems a
+;; bit slow in general. Even unzipping something was apparently
+;; instant on my friends work computer but took mine like 1 minute or
+;; so. 
+;; https://www.youtube.com/watch?v=9i_9hse_Y08&ab_channel=SystemCrafters
 
 ;; TODO: Mess around with https://github.com/gabesoft/evil-mc (this is
 ;; the one we need for evil mode) and see if it can be improved. I was
@@ -4167,12 +4193,14 @@ with the previously searched term to speedup that process."
 ;; lock a table in a particular sorting setup?
 
 ;; Trying out org roam
-;; (make-directory "G:/My Drive/org-roam" t)
-(setq org-roam-directory (file-truename "G:/My Drive/org-roam"))
+(setq org-roam-directory (file-truename "D:/src/github.com/lgroenendaal-salesforce/work-notes/"))
 (org-roam-db-autosync-mode)
 (global-set-key (kbd "C-c r f") #'org-roam-node-find)
 (global-set-key (kbd "C-c r i") #'org-roam-node-insert)
 (global-set-key (kbd "C-c r l") #'org-roam-buffer-toggle)
+(require 'org-roam-dailies)
+(global-set-key (kbd "C-c r d") org-roam-dailies-map)
+
 ;; TODO: Things I want from org-roam and questions. 1. Be able to find
 ;; all the work-items/jira-tickets I've been involved with. More
 ;; generally I think I want to be able to query for all nodes of a
@@ -4285,7 +4313,7 @@ with the previously searched term to speedup that process."
 ;; bring up the backlinked things as well which I can more quickly
 ;; complete and select.
 (setq org-roam-node-display-template
-      (concat "${title}" (propertize "${tags}" 'face 'org-tag)))
+      (concat "${title}" (propertize "${todo}" 'face 'org-todo) (propertize "${tags}" 'face 'org-tag)))
 
 (add-to-list 'display-buffer-alist
              '("\\*org-roam\\*"
@@ -4300,14 +4328,13 @@ with the previously searched term to speedup that process."
                                                    (let ((current-prefix-arg '(4)))
                                                      (call-interactively #'org-roam-preview-visit))))
 
-;; TODO: The docs
+;; Originally added because the docs
 ;; https://www.orgroam.com/manual.html#Browsing-History-with-winner_002dmode
-;; reccommended this as a way to browse history. Get a better
-;; understanding of how this works. Does every buffer switch count as
-;; a window change? Does it add to the jumplist?
+;; reccommended using winner mode as a way to browse history.
+;; Originally I used it and bound it to their recommended keys (meta
+;; left and right) but abandoned that because it interfered with org
+;; modes default bindings for these keys.
 (winner-mode 1)
-(define-key winner-mode-map (kbd "<M-left>") #'winner-undo)
-(define-key winner-mode-map (kbd "<M-right>") #'winner-redo)
 
 ;; TODO: Feels like we should create an org-roam function to rename a
 ;; node which renames both the title and the file name.
@@ -4322,13 +4349,22 @@ with the previously searched term to speedup that process."
 ;; TODO: Hitting TAB on the "backlinks" section for org roam actually
 ;; does evil-jump-forward. Why is that?
 (defun lag13-org-roam-get-node-neighbors (node-id)
-  "Returns a list of NODE-ID's neighbors (i.e. nodes which NODE-ID
-links to or nodes which link to NODE-ID)."
+  "Returns a list of NODE-ID's neighbors. I consider nodes X and Y
+to be neighbors if:
+
+1. Node X has a link going to Y and vice versa.
+2. Node X is contained within node Y and vice versa
+
+That first definition is pretty self explanatory. For the second
+one it felt right to me to have one node that contains another to
+have a relationship.
+
+"
   (let ((outgoing-link-ids
          (seq-map #'car (org-roam-db-query
                          [:select
                           dest
-                          :from :links
+                          :from links
                           :where (= type "id")
                           :and (= source $s1)]
                          node-id)))
@@ -4336,11 +4372,43 @@ links to or nodes which link to NODE-ID)."
          (seq-map #'car (org-roam-db-query
                          [:select
                           source
-                          :from :links
+                          :from links
                           :where (= type "id")
                           :and (= dest $s1)]
-                         node-id))))
-    (seq-uniq (append outgoing-link-ids incoming-link-ids))))
+                         node-id)))
+        ;; Currently this implementation assumes no more than one
+        ;; level of node nesting (i.e. at most a file node and a
+        ;; header node but no header nodes inside the other header
+        ;; nodes). It won't break if you have more nesting but I don't
+        ;; think I would like the result this function produces. In my
+        ;; head I think it makes sense that node X is a neighbor of
+        ;; node Y if X DIRECTLY contains Y. For example, in the
+        ;; situation of node X contains Y contains Z, I don't think X
+        ;; and Z should have a direct relationship. X and Y would be
+        ;; neighbors and Y and Z would be neighbors. I haven't had the
+        ;; desire to do nesting beyond a file and a header node so I'm
+        ;; leaving this simpler implementation for now. If I wanted to
+        ;; get fancier I'd probably need to use org-roam-node-olp
+        ;; which returns a list of org headings which I could feed
+        ;; into org-roam-node-from-title-or-alias to find out which
+        ;; are actual nodes and which are just headings and then get
+        ;; the containing node that way. I'd also need to do something
+        ;; different than just using org-roam-db-map-nodes because I
+        ;; just want the nodes that are immediately contained by the
+        ;; file, not every node.
+        (nodes-within-nodes
+         (let (res
+               (node (org-roam-node-from-id node-id)))
+           (if (equal (org-roam-node-title node)
+                      (org-roam-node-file-title node))
+               (org-roam-db-map-nodes
+                (list (lambda () (push (org-roam-id-at-point) res))))
+             (push (org-roam-node-id (org-roam-node-from-title-or-alias (org-roam-node-file-title node)))
+                   res))
+           ;; TODO: This needs to be fixed so I'm just returning nil
+           ;; for now. I have a org todo about it somewhere
+           nil)))
+    (seq-uniq (append outgoing-link-ids incoming-link-ids nodes-within-nodes))))
 
 (defun lag13-org-roam-node-find-neighbors ()
   "Find and open an org-roam node that is a neighbor of the
@@ -4368,6 +4436,7 @@ travels by neighbors from there."
 (global-set-key (kbd "C-c r n") #'lag13-org-roam-node-find-neighbors)
 (global-set-key (kbd "C-c r w") #'lag13-org-roam-node-find-neighbors-walk)
 (global-set-key (kbd "C-c r j") #'lag13-org-roam-node-find-journey)
+(global-set-key (kbd "C-c r r") #'org-roam-refile)
 
 ;; https://zettelkasten.de/posts/overview/
 
@@ -4565,6 +4634,7 @@ travels by neighbors from there."
 (setq orderless-matching-styles '(orderless-regexp)
       orderless-style-dispatchers '(lag13-orderless-flex-if-twiddle
                                     lag13-orderless-without-if-bang))
+
 
 ;; TODO: My markdown files have that visual line wrapping thing which
 ;; I like but I don't think I want the indication that the lines are
@@ -4946,8 +5016,16 @@ it."
 ;; doesn't work in insert mode so that should be fixed. All in all I
 ;; think I need better organization of my keybindings.
 
+;; TODO: I think I want this mostly just as a cool visual way to see
+;; my knowledge graph and show friends but I've consistently had
+;; trouble with this on windows so I'm just not touching it. It seems
+;; that even if I actively deactivate the mode during startup, it
+;; throws an error (something weird like the *scratch* buffer doesn't
+;; have a process). Maybe I'm just holding it wrong.
+;;
+;; (org-roam-ui-mode 0)
 ;; https://github.com/org-roam/org-roam-ui/issues/213
-(setq org-roam-ui-open-on-start nil)
+;; (setq org-roam-ui-open-on-start nil)
 
 ;; TODO: Whenever I search I feel like it should show the number of
 ;; search results and also maybe which search item I'm currently on?
@@ -5136,68 +5214,474 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Programmed-Completion.
               (complete-with-action action completion-candidates string pred)))))
     (completing-read "hello " completion-table)))
 
-;; TODO: Thoughts on making an org roam interface for selecting nodes
-;; based on nodes they're connected to. One implication of something
-;; like this is that I wouldn't necessarily need tags because the
-;; relationship between nodes could serve as a kind of tag. It feels
-;; like it could be useful in general though because it gives me the
-;; power to answer questions like "find all recipes I made with person
-;; XYZ" assuming that on the recipe I made a link to that person.
-;; Doing something like that seems preferable to tagging the recipe
-;; with the XYZ name since we already have XYZ as a node so why
-;; duplicate it? org-roam-node-read is the completing read interface
-;; which just returns an org-roam-node. This will probably be the
-;; basis of a lot of this. I could have two commands, one which adds
-;; to a list of nodes that must be neighbors of the node we ultimately
-;; want to select and one which is just a thin wrapper around
-;; org-roam-node-find which calls it and gives it a filter function
-;; which requires that the selected node be neighbors to all the nodes
-;; selected with the first function and after we visit the node it
-;; nullifies this list of neighboring nodes. I could switch between
-;; these functions with embark. I could also define a special key
-;; binding to switch I guess? It would be a keybinding in the
-;; minibuffer map.
 (defun lag13-org-roam-find-node-based-on-neighbors (&optional selected-neighboring-nodes)
-  "SUPER proof of concept but it seems to work! Stuff we could do
-to improve:
+  "Selects a node based on a shared set of neighbors.
 
-When selecting the neighboring nodes on successive iterations,
-filter only for nodes that have a distance 2 away from the node
-selected.
+Stuff we could do to improve:
 
-Allow for unselecting the already chosen neighbor nodes?
+Figure out what we want for history with this thing. At the
+moment I'm not even sure how the order of this stuff is
+happening.
+
+I think I do want to add another neighbor node sort of selection.
+I was picturing that I might want to do something like:
+\"find all the restaurants I've been to with person XYZ\"
+
+I picture that the relationship between person XYZ and a
+restaurant might not be direct, it'll probably be a situation
+where I write in my journal \"hey, I went to this restaurant with
+XYZ\"
+
+In that case then I think the imperfect way of narrowing this
+down would be something like:
+1. Select the \"journal\" category which links to all journal entries
+2. Select the XYZ person so we'll just have journal entries where I've interacted with that person
+3. Select the \"restaurant\" category so we get all restaurants
+
+That 3rd bullet is where I need to make the modification. Because
+right now (1) and (2) are just the usual intersection of
+neighbors thing but with (3) we're basically taking the union of
+the neighbors of all restaurant nodes and intersecting that with
+what we've produced so far.
+
+At that point part of me starts to wonder if I should just be
+writing sql queries instead? I think I like the idea of being
+able to do this interactively though. I should probably figure
+out what that sql query would look like though.
 "
   (interactive)
-  (let* ((neighbor-nodes (org-roam-node-read--completions))
-         (all-neighbors-of-neighbor-nodes
-          (->> selected-neighboring-nodes
-               (seq-map #'org-roam-node-id)
-               (seq-map #'lag13-org-roam-get-node-neighbors)))
-         (shared-neighbors-of-neighbor-nodes
-          (seq-reduce #'seq-intersection
-                      (cdr all-neighbors-of-neighbor-nodes)
-                      (car all-neighbors-of-neighbor-nodes)))
-         (nodes (org-roam-node-read--completions
-                 (lambda (node)
-                   (seq-contains shared-neighbors-of-neighbor-nodes (org-roam-node-id node))))))
-    (consult--multi
+  ;; get the node ids from the passed in list of selected neighboring
+  ;; nodes because my functions work off of the org-roam-node-id for
+  ;; better or worse.
+  (let* ((selected-neighboring-nodes-ids (seq-map #'org-roam-node-id selected-neighboring-nodes))
+         ;; this is the filter function which, when plugged into
+         ;; org-roam-node-read--completions, will return all possible
+         ;; nodes we can visit.
+         (all-possible-nodes-to-visit-filter-fn
+          (let ((possible-nodes
+                 (-reduce
+                  (lambda (&optional set1 set2)
+                    (if (and (null set1)
+                             (null set2))
+                        nil
+                      (if (null set2)
+                          set1
+                        (seq-intersection set1 set2))))
+                  (->> selected-neighboring-nodes-ids
+                       (seq-map #'lag13-org-roam-get-node-neighbors)))))
+            (lambda (node)
+              (seq-contains possible-nodes (org-roam-node-id node)))))
+         ;; Get all possible nodes that we could visit
+         (all-possible-nodes-to-visit
+          (org-roam-node-read--completions
+           all-possible-nodes-to-visit-filter-fn))
+         ;; this is the filter function which, when plugged into
+         ;; org-roam-node-read--completions, will return all possible
+         ;; neighbor nodes which are possible to select based on the
+         ;; other neighbors which have already been selected.
+         (all-possible-neighbor-nodes-filter-fn
+          (let ((possible-nodes
+                 (->> all-possible-nodes-to-visit
+                      (seq-map #'cdr)
+                      (seq-map #'org-roam-node-id)
+                      (seq-mapcat #'lag13-org-roam-get-node-neighbors)
+                      (seq-uniq)
+                      (seq-remove (lambda (node-id) (seq-contains selected-neighboring-nodes-ids node-id))))))
+            (lambda (node)
+              (if possible-nodes
+                  (seq-contains possible-nodes (org-roam-node-id node))
+                (lag13-org-roam-get-node-neighbors (org-roam-node-id node))))))
+         ;; Get all possible neighbor nodes left to select. The only
+         ;; neighbor nodes that can be selected are ones which share
+         ;; common neighbors with the other selected neighbor nodes
+         ;; AND we have not already selected it.
+         (all-possible-neighbor-nodes-to-select
+          (org-roam-node-read--completions
+           all-possible-neighbor-nodes-filter-fn))
+         ;; The list of nodes that have been selected transformed into
+         ;; an alist which will work with the completing-read thing
+         ;; we've got going on.
+         (selected-neighbor-nodes-items
+          (org-roam-node-read--completions
+           (lambda (org-roam-node)
+             (seq-contains selected-neighboring-nodes org-roam-node)))))
+    (consult-buffer
      (list (list
             :name "Node to visit"
-            :narrow ?N
+            :narrow ?v
             :default t
             :category 'org-roam-node
             :action (lambda (node)
-                      (org-roam-node-visit (cdr (assoc node nodes))))
+                      (org-roam-node-visit (cdr (assoc node all-possible-nodes-to-visit))))
             :items (lambda ()
-                     (seq-map #'car nodes)))
+                     (seq-map #'car all-possible-nodes-to-visit)))
            (list
             :name "Neighboring Nodes"
             :narrow ?n
             :category 'org-roam-node
-            :action (lambda (node)
-                      (push (cdr (assoc node neighbor-nodes)) selected-neighboring-nodes)
+            :action (lambda (selected-neighbor-node)
                       (lag13-org-roam-find-node-based-on-neighbors
-                       (cons (cdr (assoc node neighbor-nodes))
+                       (cons (cdr (assoc selected-neighbor-node all-possible-neighbor-nodes-to-select))
                              selected-neighboring-nodes)))
             :items (lambda ()
-                     (seq-map #'car neighbor-nodes)))))))
+                     (seq-map #'car all-possible-neighbor-nodes-to-select)))
+           ;; Allows one to unselect a selected neighboring node
+           (list
+            :name "Selected Neighboring Nodes"
+            :narrow ?s
+            :category 'org-roam-node
+            :action (lambda (selected-neighboring-node)
+                      (lag13-org-roam-find-node-based-on-neighbors
+                       (seq-remove-first (lambda (neighboring-org-roam-node)
+                                           (equal (org-roam-node-id (cdr (assoc selected-neighboring-node selected-neighbor-nodes-items)))
+                                                  (org-roam-node-id neighboring-org-roam-node)))
+                                         selected-neighboring-nodes)))
+            :items (lambda ()
+                     (seq-map #'car selected-neighbor-nodes-items)))))))
+
+(defun lag13-org-roam-perform-action-on-selected-nodes (fn)
+  "Runs an arbitrary function FN within the context of a node's
+file for selected nodes. Original use case was for quickly adding
+tags to a list of selected nodes which I wanted to do after I had
+already accumulated a bunch of nodes and realized that maybe it
+would be useful to have certain groupings of things."
+  (let* ((node-completions (org-roam-node-read--completions))
+         (selected-nodes (completing-read-multiple
+                          "nodes:"
+                          node-completions)))
+    (dolist (selected-node selected-nodes)
+      (org-roam-with-file
+          (org-roam-node-file (alist-get selected-node node-completions nil nil #'equal))
+          nil
+        (funcall fn)))))
+
+(defun lag13-org-roam-add-tags-to-nodes (tags)
+  "Adds a list of tags TAGS to the selected nodes."
+  (interactive
+   (list (completing-read-multiple "Tag: " (org-roam-tag-completions))))
+  (let ((fn (lambda () (org-roam-tag-add tags))))
+    (lag13-org-roam-perform-action-on-selected-nodes fn)))
+
+;; TODO: Great talk: William Byrd on "The Most Beautiful Program Ever
+;; Written" [PWL NYC]
+;; https://www.youtube.com/watch?v=OyfBQmvr2Hc&ab_channel=PapersWeLove
+;; Also, read "cons should not evaluate its arguments" and "cons
+;; should not cons its arguments". Also there's this fun tutorial:
+;; https://eblong.com/zarf/zweb/lists/. Also
+;; https://matt.might.net/articles/i-love-you-in-racket/ Honestly
+;; there's a lot of nice offshoots from this talk.
+
+(add-hook 'fsharp-mode-hook
+          (lambda ()
+            ;; Too many files don't have newlines in the repo I'm
+            ;; working on so this just makes things noisy with it's
+            ;; original value of "visit-save"
+            (setq require-final-newline nil)))
+
+;; TODO: It would be interesting if I could define "aliases" with my
+;; completion where typing XYZ would also match ABC assuming that ABC
+;; is an alias/synonym of XYZ. My use case was that I was trying to
+;; lookup an org roam node but couldn't find it but I WOULD have found
+;; it if one of the words was switched out to be an alias. Then I
+;; wouldn't have to remember to put every alias for something on a
+;; given node I create. Maybe this is the kind of thing I'd only need
+;; to enable when searching org roam nodes. The node in this case was
+;; "Investigation W-10668021: Slow creation/update of DE fields" and I
+;; needed "DE" to be an alias for "custom object".
+
+;; TODO: Get a better understanding of the org-roam-ref stuff. I
+;; notice that if I do org-roam-ref-find, the leading "https:" is
+;; missing. Not that it matters much since I don't use it but it makes
+;; me think I'm not using it properly. Also I think it would be cool
+;; if when a node represents a link like a work item, that there could
+;; be a command to just open up that work item in a browser.
+
+(require 'engine-mode)
+(engine-mode t)
+
+(defengine google
+  "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
+  :keybinding "G")
+
+(defengine duckduckgo
+  "https://duckduckgo.com/?q=%s"
+  :keybinding "d")
+
+(defengine ecosia
+  "https://www.ecosia.org/search?q=%s"
+  :keybinding "e")
+
+;; TODO: When completing on org roam nodes, I think it should omit the
+;; current file from possible selection. No sense in switching to a
+;; buffer that you're already visiting! Really I think it should order
+;; them by whenever the file was visited last REGARDLESS of how it was
+;; visited. Like if we just do a buffer switch to a file, that should
+;; count as having switched to that file. I guess we'd have to modify
+;; the history of the org roam file switching command or something.
+
+(setq org-agenda-files (list org-roam-directory))
+(setq org-archive-location (concat org-roam-directory "archive/archive.org::datetree/"))
+;; I figure it could be nice to save as much context as possible so I
+;; listed everything
+(setq org-archive-save-context-info '(time file ltags itags todo category olpath))
+(setq org-enforce-todo-dependencies t)
+(setq org-log-into-drawer "LOGBOOK")
+;; I like the idea of having a state to represent work that I'm
+;; actively working on. I'm calling it "ACHIEVING" because it feels
+;; positive and because the first two letters don't match any other
+;; todo states which is handy when finding a node via
+;; org-roam-node-find. I feel like it'll be handy for me to have this
+;; extra state because I tend to accumulate a LOT of TODOs and I'm
+;; working on could get lost in the mix. Ideally I should remember
+;; what I'm working on and I bet most of the time I will but there are
+;; definitely moments where you get totally torn away from something
+;; and forget to come back to it at all. I suppose that if you forget
+;; to come back it, that could be an indication that it is not really
+;; important but on the flip side, very few things I do are truly
+;; important. Relatively speaking the only things that are important
+;; are life necessities
+(setq org-todo-keywords
+        '((sequence "TODO(!)" "ACHIEVING(!)" "|" "DONE(@)")))
+;; I know I'm already tracking todo state changes above so in some
+;; ways this is redundant but I thought that it might be nice to get
+;; the CLOSED date of the item so if I archive into a datetree then it
+;; will get put at the spot when it was closed which might be neat if
+;; I mark something as DONE and then forget to archive it.
+(setq org-log-done 'note)
+
+;; TODO: I was listening to some of the Johnny Depp court stuff and it
+;; got me curious if emacs has a mode to emulate the kind of typing
+;; that the folks do in court so they record everything. Stenographer
+;; right? Isn't it supposed to be super fast to type or something? I
+;; wonder how it works and if I could do it with emacs.
+
+;; TODO: Check out the other org-modules. I first learned about this
+;; variable when I learned about habit:
+;; https://orgmode.org/manual/Tracking-your-habits.html and some of
+;; the other options sounded interesting. Such as
+;; https://www.emacswiki.org/emacs/OrgAnnotateFile
+
+;; TODO: If g; takes me to a place of an org mode document that is
+;; folded, the fold doesn't open automatically. I kind of feel like it
+;; should though.
+
+;; TODO: Can I use org mode to look for tasks I've recently completed?
+;; I think that should be possible since I've started timestamping
+;; them.
+
+;; TODO: In org mode could we set something up where every time a file
+;; is changed it adds a timestamp for that day indicating that a
+;; change was made? My use case is I'm curious if it would be useful
+;; to be able to see all the things I was working on during the
+;; previous day or something like that. Maybe it would be possible to
+;; search through just those files that were touched as well?
+
+;; TODO: Cool!! https://github.com/Chobbes/org-chef
+
+;; TODO: I was making a presentation of what I had been working on and
+;; I wanted to define some terms up front (RFC style) and I thought it
+;; would be cool if I could do that and then have those terms be
+;; automatically highlighted whenever they appeared on the page to
+;; draw attention to these small important bits. Words are important!
+
+(setq org-tree-slide-slide-in-blank-lines 3)
+
+;; TODO: On the README for org-tree-slide mode it mispelled the option
+;; org-tree-slide-slide-in-brank-lines: "brank" -> "blank"
+
+;; TODO: I learned that you can display images in org mode but ONLY
+;; for images which are file links (you can't for example paste the
+;; url to a file and expect that image to display). It looks like you
+;; can write some code to do this though! I'd be curious to see how
+;; this work:
+;; https://emacs.stackexchange.com/questions/26613/is-it-possible-to-insert-images-from-the-web-with-its-url
+;; Although apprently this should be possible by configuring
+;; org-display-remote-inline-images... didn't work for me though.
+
+;; TODO: I gave a demo in org mode about some code changes I made and
+;; I thought it could be cool to have a section in my presentation
+;; which documents all the files I've changed. I imagine giving a list
+;; of GH commits and maybe it spits out two headers, one with a list
+;; of file links to the files that got changed and maybe another with
+;; the actual changes? Not sure. I guess I want to be able to be like
+;; "hey team, these are the changes I've made". Maybe I just gather a
+;; list of GH commit urls and call it a day?
+
+(setq org-table-convert-region-max-lines 5000)
+
+(setq org-ellipsis " ▾")
+
+;; TODO: I feel like fairly often I'll have 2 sets of lines and I want
+;; to turn them into a list with one item per line and intersect these
+;; two sets. I guess it's not to hard to write the code but it feels
+;; like it would be cool to make this faster somehow.
+
+;; TODO: Checkout https://github.com/alphapapa/org-ql (mentioned on
+;; https://www.youtube.com/watch?v=PNE-mgkZ6HM&ab_channel=SystemCrafters).
+;; I'm imagining it can help with writing queries to pull back certain
+;; data from org mode files which I imagine I'd like.
+
+;; TODO: See how evil-auto-indent interacts with the rest of emacs's
+;; indenting stuff. I think this must have been the setting that was
+;; messing up 
+
+;; TODO: Inserting dates with the org mode date time prompt seems
+;; pretty cool:
+;; https://orgmode.org/manual/The-date_002ftime-prompt.html. I wonder
+;; if it could be configured to understand other strings like
+;; "christmas" meaning the 25th or "easter" meaning whenever the heck
+;; easter is.
+
+;; TODO: I created bindings to insert dates C-c d and C-c t but I feel
+;; like it would be cool to be able to just use org mode's date
+;; inserting mechanisms EVERYWHERE. Because then you get the cool
+;; features like being able to insert a date X days in the past or
+;; something like that. It just gives more power. Speaking of that, is
+;; there an easy way in this date completion UI to say "a specific day
+;; earlier this year". I guess I can just type the year, no biggie.
+;; Just curious since it always tries to go forward.
+
+;; TODO: I learned that doing org-timer-set-timer will do a little
+;; desktop popup thingy. I'd be curious to see how that works.
+
+;; I thought it might be nice to have this piece of info
+(setq org-treat-insert-todo-heading-as-state-change t)
+;; I thought it would be nice to easily see habits regardless of the
+;; day. Then I could show friends or something without having to find
+;; this info somehow.
+(setq org-habit-show-all-today t)
+;; I wanted to see roughly a month's worth of habit
+(setq org-habit-preceding-days 31)
+(setq org-habit-graph-column 55)
+
+;; TODO: Feels like it could be useful to jump to different links
+;; within the same org mode file. Maybe even a consult style jumping
+;; menu where you can see the context around the link as you try to
+;; filter for one particular one.
+
+;; TODO: Function to turn a table into a bulleted list for when I want
+;; to copy data in a table to another system like jira. The first
+;; column could be the top level list and then I start a sublist which
+;; starts with the column name and then has the value.
+
+;; TODO: Could I give temporary aliases for buffers? Sometimes when I
+;; start working on something I feel like a might assign a "short
+;; name" of it in my head and I keep referring to it as that. Like I
+;; was basing a script I was writing off of another guy Doug's script
+;; and in my head I kept wanting to say "switch to Doug's script" and
+;; thought that would be neat if something like that could be done.
+;; This desire to quickly switch to code related to what I'm working
+;; on also probably falls within the "organize my buffers by the task
+;; at hand" sort of desire.
+
+;; TODO: How are the consult buffer previews so quick but actually
+;; opening a buffer takes a second or two?
+
+;; Trying out the capture feature and keeping it next to my org roam
+;; files.
+(setq org-default-notes-file (concat org-roam-directory "/capture.org"))
+(setq org-capture-templates '(("c" "Generic capture (no structure)" entry (file "") "* %?")))
+(defun lag13-org-capture (&optional goto)
+  (interactive "P")
+  (org-capture goto "c"))
+;; So we start in insert mode
+(add-hook 'org-capture-mode-hook 'evil-insert-state)
+;; https://orgmode.org/manual/Activation.html
+(global-set-key (kbd "C-c l") #'org-store-link)
+(global-set-key (kbd "C-c a") #'org-agenda)
+;; At this moment in time I don't have any desire to setup multiple
+;; capture templates. In my mind I only want to use the capture
+;; feature to quickly jot something down so I remember it and then get
+;; back to whatever and then, at a later point in time, move it to a
+;; more proper location. As such I'm binding this to a more specific
+;; keybinding to save a keystroke.
+(global-set-key (kbd "C-c c") #'lag13-org-capture)
+(setq org-catch-invisible-edits 'show)
+
+(which-key-mode)
+(setq which-key-idle-delay 0.5)
+
+;; TODO: I want to play around more with imenu mode more. It's really
+;; handy for jumping around elisp files and I'd love it if I could get
+;; that kind of functionality elsewhere too:
+;; https://www.reddit.com/r/emacs/comments/ujuokl/my_take_on_dotemacsorg/
+
+;; TODO: Ooooo org mode can do that embedding thing which I saw in
+;; logseq: https://github.com/nobiot/org-transclusion
+
+;; TODO: Stop using projectil in favor of the built in emacs project
+;; stuff. Or at least look into if that is possible. Also, when doing
+;; this I'd like the ability to be looking at a file in one project
+;; and start trying to find a file in a different project. Currently I
+;; have it configured to only looks for a buffer in a different
+;; project. Could use a capital letter B and F to indicate buffer or
+;; file from a different project.
+
+;; TODO:
+;; https://www.youtube.com/watch?v=VXL_2S86g2E&ab_channel=JeffreyWebber
+;; on that video he mentions that logseq can be used to annotate PDFs
+;; where you can even highlight sections and jump back to them. I
+;; think that would be super cool to have in org mode because then I
+;; could be reading a textbook or something and be able to quickly
+;; jump to bits I found interesting.
+
+;; TODO: Categorizations of buffers/files that I want to be able to
+;; work with: Maybe C-j is how I'll control "jumping" to different buffers
+;; 1. All buffers
+;; 1. Different categorizations of special buffers (like maybe shell buffers or a repl?)
+;; 1. All buffers belonging to a particular repo (and not). Maybe just file buffers corresponding to a repo as well.
+;; 1. All files belonging to a particular repo
+;; 1. All files recursively below a particular directory (like project search but in any arbitrary directory)
+;; 1. An arbitrarily user defined collection of buffers. Like I could have a list of buffers that correspond to a feature that I work on. (and not)
+;; 1. My org roam notes
+;; 1. Recently opened files I guess? I need to learn about that feature more
+;; 1. "Alternate" files/buffers (like a test file corresponding to the current file)
+;; 1. A buffer that exists within the same directory as the current buffer
+;; 1. A not yet opened file in the same directory as the current buffer
+;; 1. A buffer that is recursively contained by the directory of the current buffer
+;; 1. "Special" files. Like maybe my init.el file or the README of a repo or whatever other files like that I can think of
+;; 1. Maybe bookmarks? I've never used them but I know they're there. Heck, maybe I can use them for some of the project specific things I had been thinking about
+
+;; TODO: This was a fun video:
+;; https://www.youtube.com/watch?v=grbtRhFiPrw&ab_channel=VaibhavPatil
+
+(setq org-roam-dailies-capture-templates
+      '(("d" "default" entry "* %?" :target
+         (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>
+#+filetags: :%<%Y-%m-%d>:journal:
+"))))
+
+(setq org-roam-capture-templates '(("d" "default" plain "%?" :target
+  (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}
+")
+  :unnarrowed t)))
+
+(use-package org-drill)
+
+(add-hook 'org-clock-out-hook
+          (lambda ()
+            (org-entry-put nil
+                           "LAST_CLOCKED_OUT_TIME"
+                           (format-time-string
+					        (org-time-stamp-format t t)))))
+
+;; TODO: I don't fully understand this tbh. When I followed the
+;; installation instructions to the T
+;; (http://lilypond.org/doc/v2.21/Documentation/usage/text-editor-support.html)
+;; it didn't work and I guess that is because load-path doesn't load
+;; things it just, gives a place for things like "require" to look. I
+;; tried use-package and I guess the package name has to actually map
+;; to one of those provide'd things. Bah. Well, I think this works so
+;; we'll stick with this.
+(use-package lilypond-mode
+  :load-path "lilypond"
+  :ensure nil)
+
+;; https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-lilypond.html
+(require 'ob-lilypond)
+
+;; Original motivation was because I wanted to open pdfs in something
+;; that could actually display them as opposed to emacs.
+(use-package openwith
+  :config
+  (openwith-mode 1))

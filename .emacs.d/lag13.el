@@ -3337,3 +3337,22 @@ much identical to the crawl-site algorithm."
  (setq lucas-v1-date (lag13-crawl-sprocs "dbo.DeprecateContactDeleteFrameworkTablesByDate_v1"))
  (setq lucas-v2-date (lag13-crawl-sprocs "dbo.DeprecateContactDeleteFrameworkTablesByDate_v2"))
  )
+
+;; TODO: I feel like there's a strategy with multiple choice tests to
+;; just avoid the "extreme" sounding answers. I think it'd be pretty
+;; funny to write a program to try and solve them using this strategy
+;; as best as possible.
+
+(defun lag13-org-roam-add-date-tag-to-past-journal-entries ()
+  "I wanted to start adding tags to my dailies journal entries
+which were the date because I wanted to try adding sub-nodes
+within those entries to have more accurate associations between
+things and I thought it was nice when going to the node switching
+interface to be able to see dates associated to the nodes. This
+function was run to backfill these tags. Just keeping it around
+for fun."
+  (lag13-org-roam-perform-action-on-selected-nodes
+   (lambda ()
+     (org-roam-tag-add
+      (list "journal"
+            (org-roam-node-title (org-roam-node-from-id (org-roam-id-at-point))))))))
