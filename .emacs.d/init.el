@@ -18,6 +18,19 @@
 
 (setq use-package-always-ensure t)
 
+;; On 2022-06-02 I was having EXTREME slowness when editing files with
+;; emacs and it seemed to only be when editing files that were managed
+;; by version control. This was while using my job's windows machine.
+;; Setting this seemed to alleviate the issue and it would make sense
+;; that it would because, from what I understand, windows is TERRIBLY
+;; slow at launching sub processes and I think emacs does a ton of
+;; that with this VC feature. Not sure if it was the true issue
+;; because, just after I found this, I tried toggling it back on and
+;; even with it on the file manipulation was faster... Classic
+;; heisenbug jazz. But still, it makes sense that it would cause
+;; slowness and I don't use this anyway so begone!
+(setq vc-handled-backends nil)
+
 ;; The path to this file is determined by user-init-file which gets
 ;; dynamically set when emacs starts. I believe that when emacs starts
 ;; up it does something like "find the first non empty file in the
@@ -357,7 +370,16 @@ get the major mode of the current buffer."
 ;; like keybindings eventually anyway) but I'll start with this.
 (setq auto-save-visited-interval 1)
 (auto-save-visited-mode 0)
-
+;; Replacing the auto save stuff with this package. Originally this
+;; happened because I was experiencing EXTREME slowness when using
+;; emacs on my windows work laptop and I attributed it to saving.
+;; Technically I think the issue was the VC related features that
+;; emacs has that would trigger upon save but on the path to figure
+;; that out I tried reducing the number of saves that happen. I wanted
+;; to do something like this anyway because for a language like go for
+;; which I run goimports on save, I don't want to be saving just
+;; because I'm idle, I want to save at a "proper time" and this
+;; package gives that.
 (use-package super-save
   :config
   (super-save-mode +1))
