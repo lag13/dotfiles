@@ -24,11 +24,12 @@
 ;; Setting this seemed to alleviate the issue and it would make sense
 ;; that it would because, from what I understand, windows is TERRIBLY
 ;; slow at launching sub processes and I think emacs does a ton of
-;; that with this VC feature. Not sure if it was the true issue
-;; because, just after I found this, I tried toggling it back on and
-;; even with it on the file manipulation was faster... Classic
-;; heisenbug jazz. But still, it makes sense that it would cause
-;; slowness and I don't use this anyway so begone!
+;; that with this VC feature and I don't use this anyway so begone!
+;; This also fixed an issue I was having where emacs would be
+;; extremely slow to startup (once I clocked it in at 8 minutes!!) and
+;; I suspect that too was because it was opening all the files it had
+;; open previously (via the desktop feature) and almost all of those
+;; files were managed by version control.
 (setq vc-handled-backends nil)
 
 ;; The path to this file is determined by user-init-file which gets
@@ -381,6 +382,8 @@ get the major mode of the current buffer."
 ;; because I'm idle, I want to save at a "proper time" and this
 ;; package gives that.
 (use-package super-save
+  :init
+  (setq super-save-hook-triggers '(focus-out-hook))
   :config
   (super-save-mode +1))
 
@@ -1479,7 +1482,24 @@ of automatically."
 ;; NOT within the current project list. Or just generally some sort of
 ;; list that doesn't intersect with another.
 (evil-global-set-key 'motion (kbd "C-SPC") #'projectile-switch-to-buffer)
+(evil-global-set-key 'normal (kbd "j") #'evil-next-visual-line)
+(evil-global-set-key 'normal (kbd "gj") #'evil-next-line)
+(evil-global-set-key 'normal (kbd "k") #'evil-previous-visual-line)
+(evil-global-set-key 'normal (kbd "gk") #'evil-previous-line)
+(evil-global-set-key 'visual (kbd "j") #'evil-next-visual-line)
+(evil-global-set-key 'visual (kbd "gj") #'evil-next-line)
+(evil-global-set-key 'visual (kbd "k") #'evil-previous-visual-line)
+(evil-global-set-key 'visual (kbd "gk") #'evil-previous-line)
+;; In org mode these get bound to going to the next previous heading
+;; level but I don't want that. TODO: Find out where these get bound.
+;; I didn't see them in evil-collection like I was expecting.
+(evil-define-key 'normal org-mode-map (kbd "gj") nil)
+(evil-define-key 'normal org-mode-map (kbd "gk") nil)
+(evil-define-key 'insert org-mode-map (kbd "g") #'org-self-insert-command)
+(evil-global-set-key 'insert (kbd "C-v") #'yank)
 
+(evil-global-set-key 'motion (kbd "gL") #'evil-end-of-visual-line)
+(evil-global-set-key 'motion (kbd "gH") #'evil-first-non-blank-of-visual-line)
 ;; TODO: PR material. Add functionality to the rg package so we can
 ;; tell it to do whole word searches.
 
@@ -4097,6 +4117,7 @@ with the previously searched term to speedup that process."
 ;; README's I encounter have super long lines.
 (setq-default visual-fill-column-width 90)
 (add-hook 'markdown-mode-hook #'visual-fill-column-mode)
+(global-visual-line-mode 1)
 
 ;; TODO: Default ediff to do a vertical split.
 
@@ -5463,7 +5484,7 @@ would be useful to have certain groupings of things."
 ;; important. Relatively speaking the only things that are important
 ;; are life necessities
 (setq org-todo-keywords
-        '((sequence "TODO(!)" "ACHIEVING(!)" "|" "DONE(@)")))
+        '((sequence "TODO(t!)" "ACHIEVING(a!)" "|" "DONE(d@)")))
 ;; I know I'm already tracking todo state changes above so in some
 ;; ways this is redundant but I thought that it might be nice to get
 ;; the CLOSED date of the item so if I archive into a datetree then it
@@ -5610,7 +5631,17 @@ would be useful to have certain groupings of things."
 (add-hook 'org-capture-mode-hook 'evil-insert-state)
 ;; https://orgmode.org/manual/Activation.html
 (global-set-key (kbd "C-c l") #'org-store-link)
-(global-set-key (kbd "C-c a") #'org-agenda)
+(defun lag13-org-agenda ()
+  "Calls `org-agenda' and sets the value of `org-agenda-files'
+before doing so. Useful for me because at the moment my only
+desired value of `org-agenda-files' is `org-roam-directory' and I
+have a buffer local value of that so with this it will load a
+different agenda based on the buffer local value of
+`org-roam-directory'."
+  (interactive)
+  (setq org-agenda-files (list org-roam-directory))
+  (org-agenda))
+(global-set-key (kbd "C-c a") #'lag13-org-agenda)
 ;; At this moment in time I don't have any desire to setup multiple
 ;; capture templates. In my mind I only want to use the capture
 ;; feature to quickly jot something down so I remember it and then get
@@ -5618,6 +5649,25 @@ would be useful to have certain groupings of things."
 ;; more proper location. As such I'm binding this to a more specific
 ;; keybinding to save a keystroke.
 (global-set-key (kbd "C-c c") #'lag13-org-capture)
+(defun lag13-org-capture-next-task (&optional goto)
+  "I'm trying out a system where I have a dedicated file for
+small'ish atomic'ish tasks that I immediately want to be working
+on and I'll lean on the org-capture feature to accomplish this.
+
+Use case is that I find myself in a situation (as of 2022-06-10)
+where I have an \"ACHIEVING\" TODO state which I like because
+then I can start the day and see what it is that I'm working on
+at a high level. But sometimes those tasks are fairly large and
+sometimes I have more than one happening at the same time so I
+find it tough to think to myself \"atomically, what action should
+I take next\". That's what I intend this file to be, a place
+where I take small tasks and add them and then chug through them.
+Probably archiving them as I go."
+  (interactive "P")
+  (let ((org-default-notes-file (concat org-roam-directory "/next-tasks.org")))
+    (org-capture goto "c")))
+(global-set-key (kbd "C-c n") #'lag13-org-capture-next-task)
+
 (setq org-catch-invisible-edits 'show)
 
 (which-key-mode)
@@ -5702,8 +5752,142 @@ would be useful to have certain groupings of things."
 ;; https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-lilypond.html
 (require 'ob-lilypond)
 
+(defun lag13-replacement-org-babel-execute:lilypond (body params)
+  "A function which will, via advice, replace the
+`org-babel-execute:lilypond' function defined in ob-lilypond.
+
+The reason I'm replacing that function is simply because it
+doesn't do what I want it to do. What I want out of my lilypond
+org babel integration is:
+
+1. C-c C-c compiles a SINGLE source code block
+2. Display compilation warnings/errors (stdout in general really)
+3. Let me specify a file where this compiled score is being written to
+4. Don't open the compiled score or anything, I'll just open it myself
+
+I'm honestly surprised ob-lilypond doesn't do this stuff already
+because this feels like the bare minimum to me. Maybe I missed
+something but from what I could see in the babel code, there were
+two little sub modes \"basic\" and \"arrangement\". \"basic\" did
+everything I wanted EXCEPT it didn't show warnings/errors/stdout
+which is a bummer because then you won't see things like bar
+checks:
+https://lilypond.org/doc/v2.23/Documentation/learning/bar-lines-and-bar-checks.
+\"arrangement\" mode seemed to go completely in a different
+direction where it unconditionally tangles ALL source blocks into
+a SINGLE file (which is always the name of the org file with an
+.ly extension) and then compiles that file. I'm assuming this is
+helpful because then you could have a separate source block per
+part/instrument and then they'd all get stitched together? I'm
+not sure though and either way it holds no interest for me."
+  (let* ((out-file (cdr (assq :file params)))
+	     (cmdline (or (cdr (assq :cmdline params))
+		              ""))
+	     (in-file (org-babel-temp-file "lilypond-"))
+         (lilypond-stdout-buffer "*lilypond*"))
+    (with-temp-file in-file
+      (insert (org-babel-expand-body:generic body params)))
+    (org-switch-to-buffer-other-window lilypond-stdout-buffer)
+    (erase-buffer)
+    (call-process org-babel-lilypond-ly-command
+                  nil
+                  lilypond-stdout-buffer
+                  t
+                  ;; TODO: If I wanted to be more general, I suppose I
+                  ;; could look for the file extension in the file
+                  ;; parameter of the source block and add the
+                  ;; appropriate switch to the lilypond executable but
+                  ;; I only want pdf's now anyway so I'm fine with
+                  ;; this.
+                  "--pdf"
+                  (concat "--output=" (file-name-sans-extension out-file))
+                  in-file)
+    (goto-char (point-min))
+    (when (org-babel-lilypond-check-for-compile-error in-file)
+      (error "Error in Compilation!"))))
+
+(advice-add 'org-babel-execute:lilypond :override #'lag13-replacement-org-babel-execute:lilypond)
+
 ;; Original motivation was because I wanted to open pdfs in something
 ;; that could actually display them as opposed to emacs.
 (use-package openwith
   :config
   (openwith-mode 1))
+
+;; Trying out including the diary in the agenda view:
+;; https://orgmode.org/manual/Weekly_002fdaily-agenda.html. I'm not
+;; sure if I'll use the diary feature standalone but I think it
+;; already has holidays and stuff built into it which I feel like is
+;; nice to display as part of the org mode agenda.
+(setq org-agenda-include-diary t)
+
+(setq org-agenda-custom-commands
+      '(("n" "Everything that is/can-be worked on today. The current day's agenda and the ACHIEVING items are self explanatory. TODO's within subheadings will, for me, indicate subtasks."
+         ((agenda "" ((org-agenda-span 'day)))
+          (todo "ACHIEVING")
+          (tags "+LEVEL>1+TODO=\"TODO\"")))))
+
+(setq ob-lilypond-header-args
+      '((:tangle . "yes")
+        (:noweb . "yes")
+        (:results . "silent")
+        (:cache . "yes")
+        (:comments . "yes")))
+
+(setq-default ediff-highlight-all-diffs nil)
+
+(add-hook 'org-agenda-mode-hook (lambda () (hl-line-mode 0)))
+
+;; TODO: Make this an actual function call instead of a macro
+;;; Sample
+
+;; 	at D:\src\github.com\sfdc-mc-mj\monolith\MetaDataServices\DataQueryEngine\DataQueryEngine.Impl\MetaExpressionGenerator\MetaDataExpressionGenerator.cs(74)
+;; SFMC.MetaDataServices.DataQueryEngine.Impl.dll!SFMC.MetaDataServices.DataQueryEngine.Impl.MetaDataQuery.BuildDataSource() Line 85
+;; 	at D:\src\github.com\sfdc-mc-mj\monolith\MetaDataServices\DataQueryEngine\DataQueryEngine.Impl\MetaDataQuery.cs(85)
+;; SFMC.MetaDataServices.DataQueryEngine.Impl.dll!SFMC.MetaDataServices.DataQueryEngine.Impl.MetaDataQuery.ProjectFinalResults.AnonymousMethod__0() Line 101
+;; 	at D:\src\github.com\sfdc-mc-mj\monolith\MetaDataServices\DataQueryEngine\DataQueryEngine.Impl\MetaDataQuery.cs(101)
+;; [External Code]
+;; SFMC.MetaDataServices.MetaModel.MetaModelImpl.dll!SFMC.MetaDataServices.MetaModel.MetaModelImpl.Client.Diagnostics.MetaStats.Time(string tag, System.Action action, SFMC.MetaDataServices.MetaModel.MetaModelImpl.Client.MetaRequestContext requestContext, SFMC.MetaDataServices.MetaModel.MetaModelImpl.Diagnostics.LogLevelEnum SplunkLogLevel, System.Collections.Generic.List<string> paramsList) Line 37
+
+;; TODO: It would be cool to take a macro like this and turn it into emacs code
+;; https://stackoverflow.com/questions/22817120/how-can-i-save-evil-mode-vim-style-macros-to-my-init-el
+(fset 'c-sharp-stacktrace-to-org-link
+   (kmacro-lambda-form [?J ?H ?/ ?  ?a ?t ?  return ?l ?d ?a ?w ?x ?L ?d ?l ?H ?P ?r ?\] ?F ?\( ?c ?l ?: ?: escape ?I ?\[ ?\[ escape ?m ?a ?\[ escape ?A ?\] ?\] escape] 0 "%d"))
+(evil-define-key 'normal org-mode-map (kbd "C-c s") #'c-sharp-stacktrace-to-org-link)
+
+;; TODO: Would it be possible to show the last modified time of the
+;; file when asking emacs to open files? Feels interesting. Use case
+;; was I wanted to open a file I downloaded but it had a name similar
+;; to other files and having the date would have been a quick way to
+;; pick out the one I wanted
+
+;; TODO: Is it possible to search/complete on past rg searches? That
+;; seems handy. Like "I know I've grep'd for something like XYZ before
+;; but I can't quite remember, can I look for that.
+
+(setq-default major-mode 'org-mode)
+
+;; TODO: I'm having trouble getting this package to load at all using
+;; these methods. I was able to load it manually as per the directions
+;; (which is yet another one of those moments which make me feel like
+;; I'd prefer to just manage my own damn packages) but even when I
+;; loaded it myself it still ran into an error when doing go-play.....
+
+;; (defmacro defsetf (name setter)
+;;   `(gv-define-simple-setter ,name ,setter))
+;; (use-package el-go
+;;   :straight '(el-go :type git :host github :repo "eschulte/el-go"))
+;; (straight-use-package '(el-go :type git :host github :repo "eschulte/el-go"))
+
+
+;; Very frickin' cool:
+;; https://www.reddit.com/r/emacs/comments/knj5gz/play_go_in_orgmode/,
+;; https://github.com/misohena/el-igo
+(use-package igo-org
+  :straight
+  '(igo-org :type git :host github :repo "misohena/el-igo")
+  :init
+  (igo-org-setup)
+  :bind (:map igo-editor-graphical-mode-map
+              ("x" . igo-editor-cut-current-node))
+  :after org)

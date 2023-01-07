@@ -317,6 +317,11 @@ end
 ## Search for a string in all past commits
 `git rev-list --all | xargs git grep something`
 
+## Search for a string in the history a particular file
+`git log -G 'regex' -- SharedFiles/AssemblyVersionInfo.cs`
+
+note that this only works if you're on the branch where you expect to see the change.
+
 ## Search for a string in just the head commit of all branches
 
 ```

@@ -3356,3 +3356,6 @@ for fun."
      (org-roam-tag-add
       (list "journal"
             (org-roam-node-title (org-roam-node-from-id (org-roam-id-at-point))))))))
+
+
+

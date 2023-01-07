@@ -132,6 +132,7 @@
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(org-src-block-faces 'nil)
  '(org-startup-indented t)
+ '(org-startup-truncated nil)
  '(package-selected-packages
    '(use-package org-roam-ui csharp-mode embark visual-fill-column graphviz-dot-mode emacsql-sqlite3 org-roam corfu undo-tree solaire-mode vscode-dark-plus-theme powershell evil-replace-with-register centaur-tabs multiple-cursors evil-mc evil-multiedit evil-visualstar evil-exchange evil-surround evil-indent-plus evil-numbers orderless evil-args evil-nerd-commenter evil-commentary evil-collection rg deadgrep vertico helm ivy projectile fsharp-mode expand-region evil xmlgen web-server go-snippets company yasnippet lsp-mode dumb-jump solarized-theme doom-themes vterm-toggle vterm magit paredit plantuml-mode groovy-mode nginx-mode jinja2-mode systemd terraform-mode cider typescript-mode edit-indirect clojure-mode haskell-mode php-mode dockerfile-mode elm-mode restclient yaml-mode markdown-mode go-guru editorconfig go-mode))
  '(pdf-view-midnight-colors (cons "#bbc2cf" "#282c34"))
@@ -190,6 +191,13 @@
  '(vc-annotate-very-old-color nil)
  '(vterm-max-scrollback 100000)
  '(vterm-toggle-hide-method 'reset-window-configration)
+ '(warning-suppress-log-types
+   '((use-package)
+     (use-package)
+     (use-package)
+     (use-package)
+     (use-package)))
+ '(warning-suppress-types '((use-package) (use-package) (use-package) (use-package)))
  '(weechat-color-list
    '(unspecified "#002732" "#01323d" "#ae1212" "#ec423a" "#687f00" "#93a61a" "#936d00" "#c49619" "#0069b0" "#3c98e0" "#a81761" "#e2468f" "#008981" "#3cafa5" "#8d9fa1" "#60767e"))
  '(window-divider-mode nil)
