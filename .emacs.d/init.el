@@ -43,6 +43,11 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
+;; I think I wasn't loading use-package before? God I really need to
+;; cleanup my emacs file. I feel like it's getting sooooo crufty.
+(eval-when-compile
+  (require 'use-package))
+
 ;; straight.el seems to be all the rage so I thought I'd give it a
 ;; shot. The real motivation for installing this though is that I
 ;; wanted to install https://github.com/noctuid/targets.el but it is
@@ -333,11 +338,6 @@ get the major mode of the current buffer."
 ;; keep it around for now I guess.
 (global-set-key (kbd "<left>") 'lag13-left-char-or-previous-buffer)
 (global-set-key (kbd "<right>") 'lag13-right-char-or-next-buffer)
-;; Faster buffer switching. The shifted '9' character is '(' and the
-;; shifted '0' character is ')' which feel like backwards and forwards
-;; to me respectively hence these bindings.
-(global-set-key (kbd "C-9") #'previous-buffer)
-(global-set-key (kbd "C-0") #'next-buffer)
 
 
 ;; If there is a key binding for the command just run, let us know
@@ -1477,11 +1477,7 @@ of automatically."
 (define-key evil-motion-state-map "'" 'evil-goto-mark)
 (define-key evil-motion-state-map "`" 'evil-goto-mark-line)
 
-(define-key evil-motion-state-map (kbd "SPC") #'switch-to-buffer)
-;; TODO: Feels like I should have a keybinding to switch to a buffer
-;; NOT within the current project list. Or just generally some sort of
-;; list that doesn't intersect with another.
-(evil-global-set-key 'motion (kbd "C-SPC") #'projectile-switch-to-buffer)
+;; (define-key evil-motion-state-map (kbd "SPC") #'switch-to-buffer)
 (evil-global-set-key 'normal (kbd "j") #'evil-next-visual-line)
 (evil-global-set-key 'normal (kbd "gj") #'evil-next-line)
 (evil-global-set-key 'normal (kbd "k") #'evil-previous-visual-line)
@@ -1739,104 +1735,6 @@ lines."
 ;; It all seems rather annoying though. C-] IS escape by definition
 ;; and there also just seems to be a lot of old cruft with emacs'
 ;; keybinding stuff.
-
-;; Around 2022-01-31 I started noticing that my emacs would hang for a
-;; couple seconds when trying to open a file for the first time from
-;; the results of doing a https://github.com/dajva/rg.el search. I ran
-;; the command toggle-debug-on-quit and hit C-g during the next lag
-;; and saw this:
-;;
-;; call-process("C:\\Program Files\\Git\\usr\\bin\\bash.exe" nil (t "c:/Users/lgroenendaal/AppData/Local/Temp/scor48hAj...") nil "-c" "git submodule --quiet foreach 'echo $displaypath' ...")
-;; call-process-shell-command("git submodule --quiet foreach 'echo $displaypath' ..." nil (t "c:/Users/lgroenendaal/AppData/Local/Temp/scor48hAj..."))
-;; shell-command("git submodule --quiet foreach 'echo $displaypath' ..." t "*projectile-files-errors*")
-;; projectile-files-via-ext-command("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/" "git submodule --quiet foreach 'echo $displaypath' ...")
-;; projectile-get-immediate-sub-projects("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
-;; projectile-get-all-sub-projects("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
-;; projectile-get-sub-projects-files("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/" git)
-;; projectile-dir-files-alien("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
-;; projectile-project-files("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
-;; projectile-project-dirs("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
-;; projectile-current-project-dirs()
-;; compilation-find-file-projectile-find-compilation-buffer(#f(compiled-function (marker filename directory &rest formats) "Find a buffer for file FILENAME.\nIf FILENAME is not found at all, ask the user where to find it.\nPop up the buffer containing MARKER and scroll to MARKER if we ask\nthe user where to find the file.\nSearch the directories in `compilation-search-path'.\nA nil in `compilation-search-path' means to try the\n\"current\" directory, which is passed in DIRECTORY.\nIf DIRECTORY is relative, it is combined with `default-directory'.\nIf DIRECTORY is nil, that means use `default-directory'.\nFORMATS, if given, is a list of formats to reformat FILENAME when\nlooking for it: for each element FMT in FORMATS, this function\nattempts to find a file whose name is produced by (format FMT FILENAME)." #<bytecode 0x94eade4af1>) #<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil)
-;; apply(compilation-find-file-projectile-find-compilation-buffer #f(compiled-function (marker filename directory &rest formats) "Find a buffer for file FILENAME.\nIf FILENAME is not found at all, ask the user where to find it.\nPop up the buffer containing MARKER and scroll to MARKER if we ask\nthe user where to find the file.\nSearch the directories in `compilation-search-path'.\nA nil in `compilation-search-path' means to try the\n\"current\" directory, which is passed in DIRECTORY.\nIf DIRECTORY is relative, it is combined with `default-directory'.\nIf DIRECTORY is nil, that means use `default-directory'.\nFORMATS, if given, is a list of formats to reformat FILENAME when\nlooking for it: for each element FMT in FORMATS, this function\nattempts to find a file whose name is produced by (format FMT FILENAME)." #<bytecode 0x94eade4af1>) (#<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil))
-;; compilation-find-file(#<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil)
-;; apply(compilation-find-file #<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil nil)
-;; compilation-next-error-function(0 nil)
-;; next-error-internal()
-;; compile-goto-error(return)
-;; funcall-interactively(compile-goto-error return)
-;; call-interactively(compile-goto-error nil nil)
-;; command-execute(compile-goto-error)
-;;
-;; From there I figured out that the reason this is slow is because
-;; projectile adds advice around the compilation-find-file function
-;; which will first load ALL directories within the project and add it
-;; to the search path. Apparently the motivation was that
-;; compilation-mode doesn't work well with java stack traces:
-;; https://github.com/bbatsov/projectile/issues/331. I don't want it
-;; here though so I'm removing it. Note that without that advice (i.e.
-;; the more vanilla behavior) selecting a new buffer takes 0.316906
-;; seconds but with that advice it takes a whopping 1.445613. So yeah,
-;; I don't want it. Timings achieved by running this code:
-;; (benchmark-elapse (compile-goto-error))
-(add-hook
- 'projectile-mode-hook
- (lambda ()
-   (advice-remove 'compilation-find-file #'compilation-find-file-projectile-find-compilation-buffer)))
-(projectile-mode 1)
-(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-;; TODO: Revisit this to see if I like it. Originally I did it because
-;; I was working in a really large repo so switching to another
-;; project would just cause things to hang while it tried to get the
-;; list of files. I need to work on that too but that's a separate
-;; thing.back to a project
-(setq projectile-switch-project-action #'projectile-switch-to-buffer)
-
-;; The inspiration for using vertico was:
-;;
-;; 1. I've wanted a minibuffer completion thing that stacks the
-;; results vertically since it's easier to read than horizontally like
-;; icomplete does.
-;;
-;; 2. I briefly briefly (i.e. like over 1 hour) tried ivy and helm and
-;; liked vertico better out-of-the-box than the other two. One reason
-;; for that is because it used emacs' built in completion capabilities
-;; (https://www.gnu.org/software/emacs/manual/html_node/emacs/Completion.html)
-;; by default and I was already used to how those worked. Ivy and helm
-;; on the other hand seemed to do their own thing and I wasn't sure
-;; how to change them. I liked the default bindings too (RET to select
-;; from the list and C-RET to use the text as is just makes sense to
-;; me). Ivy also seemed to replace built in emacs commands with it's
-;; own functions (like C-x b became ivy-switch-buffer) which I'm not
-;; sure I like. It's not bad but I guess I trust that the stuff that
-;; is core to emacs will get better over time and has more force
-;; behind it to get better than some random package (I suppose the
-;; opposite could be true too lol, smaller things like a single
-;; package can have more agility than a big thing like emacs). Still,
-;; I am a fan of using the "built in" stuff as much as possible and
-;; only going outside for truly novel things. Helm didn't work out of
-;; the box for things like M-x so that was a dealbreaker. The whole
-;; interface just felt different too.
-;;
-;; 3. I was trying out projectile while using icomplete and noticed
-;; that if I ran the projectile-switch-to-buffer command and hit RET
-;; WITHOUT entering anything, then I'd get the error
-;; "window-normalize-buffer-to-switch-to: Empty string for buffer name
-;; is not allowed" but I wanted it to switch to the alternate buffer
-;; since that's the default behavior if you do a regular ol' "C-x b".
-;; I realize there is the command
-;; projectile-project-buffers-other-buffer as well but I'm used to
-;; buffer switching going to the previous buffer if there is no input.
-;; Anyway, using vertico (ivy and helm did this too) just so happens
-;; to make that behavior happen. I believe that using icomplete mode
-;; results in that error because projectile will get the input with
-;; the function completing-read and that will return the empty string
-;; if I hit RET with no input which then results in a call to
-;; (switch-to-buffer "") and leads to our error message.
-;;
-;; TODO: As of emacs 28 there is an icomplete-vertical-mode so do I
-;; need vertico anymore?
-(vertico-mode 1)
 
 ;; TODO: Holy shit I think I have some more packages to check out
 ;; thanks to our good friend:
@@ -4699,17 +4597,6 @@ travels by neighbors from there."
 ;; files I want and then just open them all. How can I do that? I
 ;; think embark might be able to help.
 
-(global-set-key (kbd "C-,") #'embark-act)
-
-;; TODO: Figure out what this really gets me. Originally I thought it
-;; would correctly annotate the projectile-find-file stuff so it could
-;; export the results to a dired buffer but that's not the case. Seems
-;; that there's more that needs doing to get something like that
-;; working: https://github.com/bbatsov/projectile/issues/1664. <--
-;; That last comment also makes me wonder if I should just ditch
-;; projectile and start using project.el
-;; (marginalia-mode 0)
-
 ;; TODO: I feel like I sometimes want to be able to bring up the
 ;; completion thing I typed rather the thing that was completed on in
 ;; the history. How can I do that? I guess my use case is that
@@ -4892,26 +4779,6 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Using-Interactive.html
           (new-buf-name (read-string "New Name: " buf)))
      (list buf new-buf-name)))
   (lag13-rename-buffer-and-file-fn buf newname))
-
-(defun lag13-embark-dired-jump (buffer-or-file-name)
-  "Perform `dired-jump' for a specified buffer or file name.
-Intended to be invoked via `embark-act'. Definitely not a
-strictly speaking necessary thing since I could just switch to a
-buffer or file then do `dired-jump' once there but... I've wanted
-to do this so I think that's a good enough reason as any to add
-it."
-  (interactive
-   (list (read-string "buffer or file: ")))
-  (if (get-buffer buffer-or-file-name)
-      (with-current-buffer buffer-or-file-name
-        (dired-jump))
-    (dired-jump nil buffer-or-file-name)))
-
-;; TODO: Sometimes I load a list of buffers or whatever and I
-;; sometimes want to just execute this command DIRECTLY and not even
-;; invoke it via embark-act. I'm just curious how that might be
-;; possible.
-(define-key minibuffer-local-map (kbd "C-x C-j") #'lag13-embark-dired-jump)
 
 ;; TODO: In this talk
 ;; https://www.youtube.com/watch?v=oJTwQvgfgMM&ab_channel=GoogleTechTalks
@@ -5256,6 +5123,14 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Programmed-Completion.
                   )
               (complete-with-action action completion-candidates string pred)))))
     (completing-read "hello " completion-table)))
+
+(use-package consult
+  :straight t
+  :ensure t
+  :bind (("SPC" . consult-buffer)
+         ("C-x b" . consult-buffer) ;; orig. switch-to-buffer
+         ("M-y" . consult-yank-pop) ;; orig. yank-pop
+))
 
 (defun lag13-org-roam-find-node-based-on-neighbors (&optional selected-neighboring-nodes)
   "Selects a node based on a shared set of neighbors.
@@ -5670,8 +5545,13 @@ Probably archiving them as I go."
 
 (setq org-catch-invisible-edits 'show)
 
-(which-key-mode)
-(setq which-key-idle-delay 0.5)
+;; I don't think I actually use this and I just thought it was cool. I
+;; think what I'd really be interested in is being able to start
+;; entering some keys then hit C-h or whatever and have it open up a
+;; minibuffer with commands that start with these keys.
+;;
+;; (which-key-mode)
+;; (setq which-key-idle-delay 0.5)
 
 ;; TODO: I want to play around more with imenu mode more. It's really
 ;; handy for jumping around elisp files and I'd love it if I could get
@@ -5880,9 +5760,10 @@ not sure though and either way it holds no interest for me."
 ;; (straight-use-package '(el-go :type git :host github :repo "eschulte/el-go"))
 
 
-;; Very frickin' cool:
+;; SO FRICKIN' COOL!!!
 ;; https://www.reddit.com/r/emacs/comments/knj5gz/play_go_in_orgmode/,
-;; https://github.com/misohena/el-igo
+;; https://github.com/misohena/el-igo I feel like I gotta reach out to
+;; this person and thank them or something.
 (use-package igo-org
   :straight
   '(igo-org :type git :host github :repo "misohena/el-igo")
@@ -5891,3 +5772,292 @@ not sure though and either way it holds no interest for me."
   :bind (:map igo-editor-graphical-mode-map
               ("x" . igo-editor-cut-current-node))
   :after org)
+
+(use-package dired
+  :ensure nil
+  :bind (:map dired-mode-map
+              (" " . nil)))
+;; I still don't really have one unified way of binding keys it would
+;; seem. Feels like it would be nice to have that. Maybe I should look
+;; into https://github.com/noctuid/general.el or something
+(evil-collection-define-key 'normal 'dired-mode-map
+    " " nil)
+
+(evil-collection-define-key 'normal 'help-mode-map
+    " " nil)
+
+;; TODO: I feel like I've heard whispers of "icicles" and I'd be
+;; curious what features it might have that I'd be interested in:
+;; https://www.reddit.com/r/emacs/comments/vr81n6/understanding_minibuffer_completion/
+
+;; Around 2022-01-31 I started noticing that my emacs would hang for a
+;; couple seconds when trying to open a file for the first time from
+;; the results of doing a https://github.com/dajva/rg.el search. I ran
+;; the command toggle-debug-on-quit and hit C-g during the next lag
+;; and saw this:
+;;
+;; call-process("C:\\Program Files\\Git\\usr\\bin\\bash.exe" nil (t "c:/Users/lgroenendaal/AppData/Local/Temp/scor48hAj...") nil "-c" "git submodule --quiet foreach 'echo $displaypath' ...")
+;; call-process-shell-command("git submodule --quiet foreach 'echo $displaypath' ..." nil (t "c:/Users/lgroenendaal/AppData/Local/Temp/scor48hAj..."))
+;; shell-command("git submodule --quiet foreach 'echo $displaypath' ..." t "*projectile-files-errors*")
+;; projectile-files-via-ext-command("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/" "git submodule --quiet foreach 'echo $displaypath' ...")
+;; projectile-get-immediate-sub-projects("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
+;; projectile-get-all-sub-projects("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
+;; projectile-get-sub-projects-files("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/" git)
+;; projectile-dir-files-alien("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
+;; projectile-project-files("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
+;; projectile-project-dirs("d:/src/github.com/sfdc-mc-mj/APPCORE.Wiki/")
+;; projectile-current-project-dirs()
+;; compilation-find-file-projectile-find-compilation-buffer(#f(compiled-function (marker filename directory &rest formats) "Find a buffer for file FILENAME.\nIf FILENAME is not found at all, ask the user where to find it.\nPop up the buffer containing MARKER and scroll to MARKER if we ask\nthe user where to find the file.\nSearch the directories in `compilation-search-path'.\nA nil in `compilation-search-path' means to try the\n\"current\" directory, which is passed in DIRECTORY.\nIf DIRECTORY is relative, it is combined with `default-directory'.\nIf DIRECTORY is nil, that means use `default-directory'.\nFORMATS, if given, is a list of formats to reformat FILENAME when\nlooking for it: for each element FMT in FORMATS, this function\nattempts to find a file whose name is produced by (format FMT FILENAME)." #<bytecode 0x94eade4af1>) #<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil)
+;; apply(compilation-find-file-projectile-find-compilation-buffer #f(compiled-function (marker filename directory &rest formats) "Find a buffer for file FILENAME.\nIf FILENAME is not found at all, ask the user where to find it.\nPop up the buffer containing MARKER and scroll to MARKER if we ask\nthe user where to find the file.\nSearch the directories in `compilation-search-path'.\nA nil in `compilation-search-path' means to try the\n\"current\" directory, which is passed in DIRECTORY.\nIf DIRECTORY is relative, it is combined with `default-directory'.\nIf DIRECTORY is nil, that means use `default-directory'.\nFORMATS, if given, is a list of formats to reformat FILENAME when\nlooking for it: for each element FMT in FORMATS, this function\nattempts to find a file whose name is produced by (format FMT FILENAME)." #<bytecode 0x94eade4af1>) (#<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil))
+;; compilation-find-file(#<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil)
+;; apply(compilation-find-file #<marker at 4526 in *rg*> #(".\\docs\\docker\\tagging_and_branching.md" 0 38 (fontified t font-lock-face rg-filename-face)) nil nil)
+;; compilation-next-error-function(0 nil)
+;; next-error-internal()
+;; compile-goto-error(return)
+;; funcall-interactively(compile-goto-error return)
+;; call-interactively(compile-goto-error nil nil)
+;; command-execute(compile-goto-error)
+;;
+;; From there I figured out that the reason this is slow is because
+;; projectile adds advice around the compilation-find-file function
+;; which will first load ALL directories within the project and add it
+;; to the search path. Apparently the motivation was that
+;; compilation-mode doesn't work well with java stack traces:
+;; https://github.com/bbatsov/projectile/issues/331. I don't want it
+;; here though so I'm removing it. Note that without that advice (i.e.
+;; the more vanilla behavior) selecting a new buffer takes 0.316906
+;; seconds but with that advice it takes a whopping 1.445613. So yeah,
+;; I don't want it. Timings achieved by running this code:
+;; (benchmark-elapse (compile-goto-error))
+(add-hook
+ 'projectile-mode-hook
+ (lambda ()
+   (advice-remove 'compilation-find-file #'compilation-find-file-projectile-find-compilation-buffer)))
+(projectile-mode 1)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+(setq projectile-project-root-files-bottom-up
+      (cons "BUILD.proj"
+            projectile-project-root-files-bottom-up))
+;; TODO: Feels like I should have a keybinding to switch to a buffer
+;; NOT within the current project list. Or just generally some sort of
+;; list that doesn't intersect with another.
+
+;; As I've seen before, completing-read by default will sort the list
+;; it is given alphabetically but it ALSO seems to be the case that it
+;; will put items closer to the top of the list based on how recently
+;; they were selected. That recency of selection ordering is
+;; determined by the HIST argument to completing-read which by default
+;; is the variable minibuffer-history:
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-History.html.
+;; It appears that the switch-to-buffer command uses a SEPARATE
+;; history list than that default which explains why switching to a
+;; buffer within a project using that command and then using the
+;; project buffer switching command, that buffer will not appear as a
+;; recently switched to buffer. The switch-to-buffer command seems to
+;; not even use completing-read instead it calls read-buffer-to-switch
+;; which calls read-buffer and read-buffer is written in C so I have
+;; NO idea what it does.
+;;
+;; TODO: PR IDEA. Add this functionality into projectile so I don't
+;; need my own custom thing. Not sure the cleanest way to do that...
+;; Just kind of feels like it's gonna be messy because every caller of
+;; projectile-completing-read is going to have to tell it what is the
+;; type of thing being completed. Maybe it's fine but it seems a bit
+;; annoying no? For buffers we'd set the display-sort-function but for
+;; files we'd probably leave it out so it could fallback to the
+;; default behavior.
+(defun lag13-projectile-switch-to-buffer (&optional switch-project)
+  "Switch to a project buffer but order the possible completions to
+match the order of the recently switched to buffers. I like this
+because then if I switch to buffers within a project via
+`switch-to-buffer' and then later use the project focused buffer
+switching functionality, the order will be consistent."
+  (interactive "P")
+  (if switch-project
+      (let ((projectile-switch-project-action #'lag13-projectile-switch-to-buffer))
+        (projectile-switch-project))
+    (let* ((project-buffers
+            (delete (buffer-name (current-buffer))
+                    (projectile-project-buffer-names)))
+           (completion-table
+            (lambda (string pred action)
+              (if (eq action 'metadata)
+                  '(metadata (category . buffer)
+                             (display-sort-function . identity)
+                             (cycle-sort-function . identity))
+                (complete-with-action action project-buffers string pred)))))
+      ;; (consult-buffer )
+      (switch-to-buffer
+       (completing-read
+        (projectile-prepend-project-name "Switch to buffer: ")
+        completion-table)))))
+
+(evil-global-set-key 'motion (kbd "C-SPC") #'lag13-projectile-switch-to-buffer)
+
+;; TODO: I think it makes more sense to have a separate jump list per
+;; buffer that just stays within the buffer. I'd want a separate jump
+;; list for jumps across files as well. I think I'd want these lists
+;; to not have duplicates in them.
+
+;; The inspiration for using vertico was:
+;;
+;; 1. I've wanted a minibuffer completion thing that stacks the
+;; results vertically since it's easier to read than horizontally like
+;; icomplete does.
+;;
+;; 2. I briefly briefly (i.e. like over 1 hour) tried ivy and helm and
+;; liked vertico better out-of-the-box than the other two. One reason
+;; for that is because it used emacs' built in completion capabilities
+;; (https://www.gnu.org/software/emacs/manual/html_node/emacs/Completion.html)
+;; by default and I was already used to how those worked. Ivy and helm
+;; on the other hand seemed to do their own thing and I wasn't sure
+;; how to change them. I liked the default bindings too (RET to select
+;; from the list and C-RET to use the text as is just makes sense to
+;; me). Ivy also seemed to replace built in emacs commands with it's
+;; own functions (like C-x b became ivy-switch-buffer) which I'm not
+;; sure I like. It's not bad but I guess I trust that the stuff that
+;; is core to emacs will get better over time and has more force
+;; behind it to get better than some random package (I suppose the
+;; opposite could be true too lol, smaller things like a single
+;; package can have more agility than a big thing like emacs). Still,
+;; I am a fan of using the "built in" stuff as much as possible and
+;; only going outside for truly novel things. Helm didn't work out of
+;; the box for things like M-x so that was a dealbreaker. The whole
+;; interface just felt different too.
+;;
+;; 3. I was trying out projectile while using icomplete and noticed
+;; that if I ran the projectile-switch-to-buffer command and hit RET
+;; WITHOUT entering anything, then I'd get the error
+;; "window-normalize-buffer-to-switch-to: Empty string for buffer name
+;; is not allowed" but I wanted it to switch to the alternate buffer
+;; since that's the default behavior if you do a regular ol' "C-x b".
+;; I realize there is the command
+;; projectile-project-buffers-other-buffer as well but I'm used to
+;; buffer switching going to the previous buffer if there is no input.
+;; Anyway, using vertico (ivy and helm did this too) just so happens
+;; to make that behavior happen. I believe that using icomplete mode
+;; results in that error because projectile will get the input with
+;; the function completing-read and that will return the empty string
+;; if I hit RET with no input which then results in a call to
+;; (switch-to-buffer "") and leads to our error message.
+;;
+;; TODO: As of emacs 28 there is an icomplete-vertical-mode so do I
+;; need vertico anymore?
+(use-package vertico
+  :ensure t
+  :straight t
+  :init
+  (vertico-mode))
+
+;; TODO: I think I should just start using "straight" by default with
+;; use-package. I feel like elpa and the like are just too far behind.
+;; Better to get it all from the source I say!
+
+;; TODO: Figure out what this really gets me. Originally I thought it
+;; would correctly annotate the projectile-find-file stuff so it could
+;; export the results to a dired buffer but that's not the case. Seems
+;; that there's more that needs doing to get something like that
+;; working: https://github.com/bbatsov/projectile/issues/1664. <--
+;; That last comment also makes me wonder if I should just ditch
+;; projectile and start using project.el
+(use-package marginalia
+  :ensure t
+  :init
+  (marginalia-mode))
+
+(defun lag13-embark-dired-jump (buffer-or-file-name)
+  "Perform `dired-jump' for a specified buffer or file name.
+Intended to be invoked via `embark-act'. Definitely not a
+strictly speaking necessary thing since I could just switch to a
+buffer or file then do `dired-jump' once there but... I've wanted
+to do this so I think that's a good enough reason as any to add
+it."
+  (interactive
+   (list (read-string "buffer or file: ")))
+  (if (get-buffer buffer-or-file-name)
+      (with-current-buffer buffer-or-file-name
+        (dired-jump))
+    (dired-jump nil buffer-or-file-name)))
+
+(use-package embark
+  :ensure t
+  :bind
+  (("C-," . embark-act)
+   ("C-h B" . embark-bindings))
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command))
+
+(use-package embark-consult
+  :ensure t
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+
+;; TODO: Sometimes I load a list of buffers or whatever and I
+;; sometimes want to just execute this command DIRECTLY and not even
+;; invoke it via embark-act. I'm just curious how that might be
+;; possible.
+(define-key minibuffer-local-map (kbd "C-x C-j") #'lag13-embark-dired-jump)
+
+;; TODO: What do I about stuff like this which is already installed as
+;; part of emacs but apparently just not loaded or something. Should I
+;; still use use-package somehow?
+(require 'dired-subtree)
+
+;; TODO: When I do C-x C-f on a dired subtree, I feel like it should
+;; use the subtree value as the base directory instead of the
+;; directory of the dired buffer iteslf.
+
+;; TODO: Is it possible to drag a file from a file explorer into
+;; dired? Probably not. I wonder how I could do a "drag and drop" sort
+;; of thing between dired buffers or if that's even possible.
+
+;; TODO: In any language I want to be able to be execute a command
+;; which prompts me for a symbol/function/variable/whatever and I'll
+;; jump to it when I select it. xref-find-definitions does this for
+;; elisp but I'm not sure to get it working generally. I'm also not
+;; sure how this all jives with evil-goto-definition or if I even want
+;; to use that. I'd like the same sort of thing for finding references
+;; like xref-find-references does.
+
+;; TODO: I don't understand what is so hard about getting a buffer
+;; previous thing working. Neither of these packages are working like
+;; I expect. I just want a previous buffer thing that will go through
+;; buffers in the same order that switch-to-buffer would show them.
+;; Maybe I should look at consult-buffer. And... actually... I think
+;; I'm speaking too soon. It's true that I don't like these packages
+;; because they are showing EVERY buffer (although I bet that could be
+;; configured) but more importantly, I'm definitely seeing that
+;; switch-to-buffer is not showing buffers in the minibuffer in the
+;; order that they were recently visited. WTH. I had seen this before
+;; but I thought it might have been a fluke or something, but no, it's
+;; happening. Like, I had opened the file consult.el via C-h f and now
+;; it's listed as number 97 (out of 400) buffers when I do
+;; switch-to-buffer. What the hell is that?? buffer-list properly
+;; shows consult.el as like 4th or whatever as does consult-buffer.
+;; I'm thinking it's time to just move away from switch-to-buffer. If
+;; I could figure out why this is happening I would but I don't think
+;; I can because the functionality is being controlled by read-buffer
+;; which is defined in C and there doesn't seem to be anything obvious
+;; I can do to change it's behavior via parameters. Heck I suppose I
+;; could write my own buffer switching function too just using
+;; buffer-list but I suppose I might as well use consult-buffer. I
+;; should take a closer look at that function too though, feel like it
+;; might have some interesting things.
+;;
+;; (use-package nswbuff
+;;   :ensure t
+;;   :straight t
+;;   :bind (("C-9" . nswbuff-switch-to-previous-buffer)
+;;          ("C-0" . nswbuff-switch-to-next-buffer)))
+
+;; (use-package swbuff
+;;   :ensure t
+;;   :straight t
+;;   :bind (("C-9" . swbuff-switch-to-previous-buffer)
+;;          ("C-0" . swbuff-switch-to-next-buffer)))
+
+;; Faster buffer switching. The shifted '9' character is '(' and the
+;; shifted '0' character is ')' which feel like backwards and forwards
+;; to me respectively hence these bindings.
+(global-set-key (kbd "C-9") #'previous-buffer)
+(global-set-key (kbd "C-0") #'next-buffer)
