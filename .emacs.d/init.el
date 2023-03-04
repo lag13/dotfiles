@@ -1477,7 +1477,6 @@ of automatically."
 (define-key evil-motion-state-map "'" 'evil-goto-mark)
 (define-key evil-motion-state-map "`" 'evil-goto-mark-line)
 
-;; (define-key evil-motion-state-map (kbd "SPC") #'switch-to-buffer)
 (evil-global-set-key 'normal (kbd "j") #'evil-next-visual-line)
 (evil-global-set-key 'normal (kbd "gj") #'evil-next-line)
 (evil-global-set-key 'normal (kbd "k") #'evil-previous-visual-line)
@@ -3623,7 +3622,7 @@ mode-line-inactive face even darker."
 ;; TODO: I think I should start looking into improving emacs' startup
 ;; speed. Obviously it's not a huge priority but on 2022-05-20 I used
 ;; my work laptop (a windows machine which runs emacs via mingw) and
-;; there wer 258 buffers (desktop mode was enabled) and it took 8
+;; there wer 258 buffers (Desktop mode was enabled) and it took 8
 ;; MINUTES to startup. I'm also wondering why I have so many buffers
 ;; actually. I thought midnight mode should clean some of those up.
 ;; Anyway. That's way too slow. Not that I'm starting up emacs a lot
@@ -4244,6 +4243,19 @@ with the previously searched term to speedup that process."
 ;; file buffers? There's definitely something wonky going on though. I
 ;; think you get the same behavior if you type '' instead of C-o
 
+(cl-defmethod org-roam-node-closed-time ((node org-roam-node))
+  "Returns the value of the CLOSED property which is the time that
+an item moves from TODO to DONE. This CLOSED property gets added
+due to the `org-log-done' setting.
+
+My thought for having this was that I could include the date
+things get closed in the `org-roam-node-display-template' just to
+add even MORE context in case it can help with selecting a node."
+  (alist-get "CLOSED"
+             (org-roam-node-properties node)
+             nil
+             nil
+             #'equal))
 ;; Looks like this is a way to display and complete on tags when
 ;; running a find on a node. TODO: I feel like it could be cool if in
 ;; addition to the tags I could define a section of the org mode
@@ -4254,7 +4266,10 @@ with the previously searched term to speedup that process."
 ;; bring up the backlinked things as well which I can more quickly
 ;; complete and select.
 (setq org-roam-node-display-template
-      (concat "${title}" (propertize "${todo}" 'face 'org-todo) (propertize "${tags}" 'face 'org-tag)))
+      (concat "${title}"
+              (propertize "${todo}" 'face 'org-todo)
+              (propertize "${tags}" 'face 'org-tag)
+              (propertize "${closed-time}" 'face 'org-date)))
 
 (add-to-list 'display-buffer-alist
              '("\\*org-roam\\*"
@@ -4417,13 +4432,13 @@ travels by neighbors from there."
 ;; help buffers, etc...) and I feel like I want a truly hand curated
 ;; list of just files I'm interested in. I'm writing this after
 ;; watching Anitha do some code spelunking and man is she fast and I
-;; don't think I'm that good but I think I could be better if I had a
-;; tool like this to lean on. I know earlier I said that the way I'm
-;; gonna do code spelunking is just keeping org mode links and I still
-;; feel like that is something I'll do but I am also kind of thinking
-;; that that org link approach is kind of heavy and not always
-;; necessary where this is kind of lightweight and just helps give a
-;; little strength to my brain to remember what I've looked at
+;; don't think I'm naturally that good but I think I could be better
+;; if I had a tool like this to lean on. I know earlier I said that
+;; the way I'm gonna do code spelunking is just keeping org mode links
+;; and I still feel like that is something I'll do but I am also kind
+;; of thinking that that org link approach is kind of heavy and not
+;; always necessary where this is kind of lightweight and just helps
+;; give a little strength to my brain to remember what I've looked at
 ;; recently that is relevant to the research at hand. In addition I
 ;; feel I should write a function (which is probably separate from
 ;; this functionality) which takes a list of buffers and inserts a
@@ -4656,7 +4671,7 @@ travels by neighbors from there."
 ;; because it renames the file and the buffer. I don't know if I feel
 ;; like I need a file explorer, really I think I'd just like
 ;; https://github.com/tpope/vim-eunuch but for emacs. Or maybe I
-;; should change my perspective and embrace dired? On a similar sort
+;; should change my point of view and embrace dired? On a similar sort
 ;; of note, I feel like I should be able to right click on the current
 ;; file name in the mode line and copy it. It just feels like it
 ;; should be possible. It seems to be possible with the centaur tabs,
@@ -5127,10 +5142,11 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Programmed-Completion.
 (use-package consult
   :straight t
   :ensure t
-  :bind (("SPC" . consult-buffer)
-         ("C-x b" . consult-buffer) ;; orig. switch-to-buffer
+  :bind (("C-x b" . consult-buffer) ;; orig. switch-to-buffer
          ("M-y" . consult-yank-pop) ;; orig. yank-pop
-))
+         )
+  :init
+  (define-key evil-motion-state-map (kbd "SPC") #'consult-buffer))
 
 (defun lag13-org-roam-find-node-based-on-neighbors (&optional selected-neighboring-nodes)
   "Selects a node based on a shared set of neighbors.
@@ -5600,7 +5616,7 @@ Probably archiving them as I go."
 (setq org-roam-dailies-capture-templates
       '(("d" "default" entry "* %?" :target
          (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>
-#+filetags: :%<%Y-%m-%d>:journal:
+#+filetags: :%<%Y_%m_%d>:journal:
 "))))
 
 (setq org-roam-capture-templates '(("d" "default" plain "%?" :target
@@ -5764,14 +5780,21 @@ not sure though and either way it holds no interest for me."
 ;; https://www.reddit.com/r/emacs/comments/knj5gz/play_go_in_orgmode/,
 ;; https://github.com/misohena/el-igo I feel like I gotta reach out to
 ;; this person and thank them or something.
+;;
+;; TODO: I still need to figure out how to properly load this with
+;; use-package. I've tried using :after "org" thinking it would match
+;; the README which has this bit of code but it didn't work:
+(comment (with-eval-after-load "org"
+           (require 'igo-org)
+           (igo-org-setup)))
 (use-package igo-org
   :straight
   '(igo-org :type git :host github :repo "misohena/el-igo")
-  :init
+  :config
   (igo-org-setup)
   :bind (:map igo-editor-graphical-mode-map
               ("x" . igo-editor-cut-current-node))
-  :after org)
+  )
 
 (use-package dired
   :ensure nil
@@ -5866,17 +5889,11 @@ not sure though and either way it holds no interest for me."
 ;; annoying no? For buffers we'd set the display-sort-function but for
 ;; files we'd probably leave it out so it could fallback to the
 ;; default behavior.
-(defun lag13-projectile-switch-to-buffer (&optional switch-project)
-  "Switch to a project buffer but order the possible completions to
-match the order of the recently switched to buffers. I like this
-because then if I switch to buffers within a project via
-`switch-to-buffer' and then later use the project focused buffer
-switching functionality, the order will be consistent."
-  (interactive "P")
-  (if switch-project
-      (let ((projectile-switch-project-action #'lag13-projectile-switch-to-buffer))
-        (projectile-switch-project))
-    (let* ((project-buffers
+;;
+;; Originaly I just did a completing-read call but I think I'm going
+;; all in on consult. Keeping this around for posterity though:
+(comment
+ (let* ((project-buffers
             (delete (buffer-name (current-buffer))
                     (projectile-project-buffer-names)))
            (completion-table
@@ -5886,11 +5903,31 @@ switching functionality, the order will be consistent."
                              (display-sort-function . identity)
                              (cycle-sort-function . identity))
                 (complete-with-action action project-buffers string pred)))))
-      ;; (consult-buffer )
-      (switch-to-buffer
-       (completing-read
-        (projectile-prepend-project-name "Switch to buffer: ")
-        completion-table)))))
+   (switch-to-buffer
+    (completing-read
+     (projectile-prepend-project-name "Switch to buffer: ")
+     completion-table))))
+(defun lag13-projectile-switch-to-buffer (&optional switch-project)
+  "Switch to a project buffer but order the possible completions to
+match the order of the recently switched to buffers. I like this
+because then if I switch to buffers within a project via
+`switch-to-buffer' or `consult-buffer' and then later use this
+project focused buffer switching functionality, the order will be
+consistent."
+  (interactive "P")
+  (if switch-project
+      (let ((projectile-switch-project-action #'lag13-projectile-switch-to-buffer))
+        (projectile-switch-project))
+    (let ((project-buffers
+           (delete (buffer-name (current-buffer))
+                   (projectile-project-buffer-names))))
+      (consult-buffer
+       (list (list
+              :category 'buffer
+              :items project-buffers
+              :name (projectile-prepend-project-name "Switch to buffer: ")
+              :state #'consult--buffer-state
+              :default t))))))
 
 (evil-global-set-key 'motion (kbd "C-SPC") #'lag13-projectile-switch-to-buffer)
 
@@ -6061,3 +6098,143 @@ it."
 ;; to me respectively hence these bindings.
 (global-set-key (kbd "C-9") #'previous-buffer)
 (global-set-key (kbd "C-0") #'next-buffer)
+
+;; TODO: Yet again I'm thinking about keeping more curated lists of
+;; buffers via perspective. I recently learned that this package
+;; (https://github.com/Bad-ptr/persp-mode.el) could be closer to what
+;; I want than https://github.com/nex3/perspective-el because the
+;; former has configurations which make it so buffers do NOT get added
+;; to the perspective by default where the latter does not seem to
+;; make that possible. So even though I seemingly found a package that
+;; would fit my needs, I've started thinking that what I REALLY want
+;; is to be able to tag a buffer with a string and then when I swtich
+;; buffers that string will show up in the minibuffer like:
+;;
+;; mybuffer-name             #category1#category2
+;;
+;; In other words, this would be just like how I can tag org roam
+;; headings and those tags come up as selectable entities when I
+;; complete on them. I feel like this sort of thing could be super
+;; simple too? As I glance through the perpective code it all seems a
+;; bit complicated because you have to worry about things like "if I
+;; kill this buffer in one perspective should it be killed in all
+;; perspectives?" and all this kind of state stuff. With this though,
+;; killing a buffer is just killing a buffer. End of story. The tag
+;; will still remain so if we later load that file again then all
+;; those tags will be there. I'll probably want to integrate it with
+;; projectile so that all the project names that could be associated
+;; with the file are associated with it. I guess the data structure
+;; would just be a list of alists lists so it's easy to write to a
+;; file and re-load later. Something like:
+(comment
+ (("file1.txt" "tag1" "tag2")
+  ("file2.org" "tag3" "tag1")))
+;; Then I would just need a way to display the categories in the
+;; minibuffer and that they can be selected and junk.
+
+;; TODO: backspace, S-backspace, C-backspace is a good key that I
+;; haven't utilized in my code. In my vim setup it used to go to the
+;; previous buffer.
+
+;; TODO: Using the C-f and C-b keys when doing a vim search don't do
+;; the emacs things like I would want them to.
+
+
+;; TODO: There are no marks that get set when you yank like there were
+;; in vim.
+
+;; TODO: I need to get pasting via register going while in insert
+;; mode. I think the only reason I haven't enabled it is because if I
+;; use a shell in emacs I'd want C-r to be the reverse history search.
+
+;; TODO: I think I want to do a grep of all the buffers I have open or
+;; something akin to it. My actual use case was that I knew I wrote
+;; the string UseSubscriberStatus in one of my buffers and I wanted to
+;; find it quick. I guess I envisioned a consult like approach where I
+;; just started typing that string and it popped up with buffers that
+;; matched it. Then I could switch to that buffer and copy said string
+;; or whatever.
+
+;; TODO: I did an embark export of some org-roam buffers and when I
+;; selected one then tried to go back to the previous buffer I was
+;; viewing BEFORE doing the embark export, it was not the previous
+;; buffer according to the (buffer-list). It was like the 2nd
+;; alternate. I wonder why?
+
+;; TODO: Would it be useful to be able to mark certain org-roam nodes
+;; also as tags? They wouldn't be official tags but the idea is that
+;; if the node was marked as a tag then it would show up in the
+;; completion window. So basically I'd add another function which
+;; would get the neighbors of a node that have that special tag marker
+;; and then add that to org-roam-node-display-template.
+
+;; TODO: g; should open org mode headings
+
+;; TODO: Could have configure consult-line on the fly so it puts the
+;; line in question at the top/bottom of the screen? Use case was the
+;; line pattern I was looking for was at the top of a structure that I
+;; wanted to see and compare with other lines+structures.
+
+;; TODO: There is a "clone indirect buffer" I think it could be
+;; interesting to have a "clone indirect org roam node". Use case is
+;; that you want to clone an indirect buffer of the org roam node
+;; (maybe to have one window on one part of the roam node and another
+;; on another) but you want to still use the org-roam find
+;; functionality.
+
+;; TODO: I really like how in visual studio when doing C-t to jump to
+;; a different file, you can jump to functions. This should be a thing
+;; in emacs too! Having more "hooks" into a file just seems good
+;; because maybe you don't remember the name of the file but you
+;; remember the name of a function in the file. Or maybe you just want
+;; to jump to a function!
+
+;; TODO: I think I should be able to add places of interest (maybe
+;; this would be the bookmarks feature of emacs?) and jump to them.
+;; Doing so with a consult like interface seems like it would be nice.
+
+;; TODO: There should be a consult for the "g;" change list.
+
+;; TODO: I think it could be cool to be at a function and then be able
+;; to traverse up the call stack. Like, I picture basically
+;; constructing a potential call graph/tree and then being able to
+;; traverse it. So it would basically show all the places this
+;; function gets called and you can pick one and then you can pick
+;; another one and go up further etc... Use case was I wanted to get
+;; back to a spot in code within a huge file and I knew that it was
+;; just a couple jumps up from the function and I thought navigating
+;; in this way felt like it would be really fun.
+
+;; TODO: the ripgrep tool (or I suppose the tool it's built on) should
+;; remember a history of searches then I can recall them... I suppose
+;; I could create some functionality to save every rg I perform and
+;; include the search term in the buffer name? Use case was I know I
+;; grepped for something in the past and I wanted to jump there. I
+;; suppose it's not hard to reconstruct the query too... this seems
+;; fun though.
+
+;; TODO: Might be nice to have a "search only visible things". I had a
+;; situation where I wanted to search for a number I could see on
+;; screen to copy it so I did a search but there were some folded org
+;; headings in the way and so it went into them rather than just going
+;; straight to the number like I really wanted.
+
+;; TODO: Run a grep on a select number of files. Use case is I wanted
+;; to search for the word TODO in some files I had modified in a PR.
+
+;; TODO: I should have a more structured way of filing todos because I
+;; KNOW I repeat myself and it would be cool if I could start filing a
+;; todo and see which other todo's I've filed and if I see a duplicate
+;; then I can increment a count somewhere which will be representative
+;; of how much I want the thing.
+;; 
+
+(setq org-src-preserve-indentation t)
+
+;; TODO: I should add some embark stuff for copying absolute file
+;; names from dired and then pasting it into another location:
+;; https://emacs.stackexchange.com/questions/39116/simple-ways-to-copy-paste-files-and-directories-between-dired-buffers
+
+;; TODO: I think it would be cool if the annotations that marginella
+;; adds could actually be selected on. Like if I download a file and
+;; then go to open it I can search for "min ago" to pull that up.
