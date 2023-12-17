@@ -3357,5 +3357,235 @@ for fun."
       (list "journal"
             (org-roam-node-title (org-roam-node-from-id (org-roam-id-at-point))))))))
 
+(defmacro lag13-defun-memoize (name arglist &optional docstring &rest body)
+  "I'm surprised I didn't make something like this when I was on my
+kick of defining a bunch of stuff wtihin elisp. Aesthetically, I
+like the implementation of this memoize macro better than my
+other one but this one only works if the function body is a
+single sexp because the body gets evaluated inside a let. There's
+definitely a way to make it work but I don't feel like making the
+effort, this is only for fun anyway."
+  (declare (doc-string 3) (indent 2))
+  (let ((memoize-store-var-name (gensym))
+        (memoize-key-var-name (gensym)))
+    `(let ((,memoize-store-var-name (ht)))
+         (defun ,name ,arglist
+	       ,docstring
+           (let ((,memoize-key-var-name ,(cons 'list arglist)))
+             (if (ht-contains? ,memoize-store-var-name ,memoize-key-var-name)
+                 (ht-get ,memoize-store-var-name
+                         ,memoize-key-var-name)
+               (let ((res ,@body))
+                 (ht-set ,memoize-store-var-name ,memoize-key-var-name res)
+                 res)))))))
+
+(defmacro lag13-defun-memoize2 (name arglist &optional docstring &rest body)
+  "This one works generally (i.e. even if the function definition
+has more than one sexp) but it I think it's pretty much useless
+because (I suspect) the local function definition really slows
+this down to the point of the memoization not doing much."
+  (declare (doc-string 3) (indent 2))
+  (let ((memoize-store-var-name (gensym))
+        (memoize-key-var-name (gensym)))
+    `(let ((,memoize-store-var-name (ht)))
+         (defun ,name ,arglist
+	       ,docstring
+           (let ((,memoize-key-var-name ,(cons 'list arglist)))
+             (ht-get ,memoize-store-var-name
+                     ,memoize-key-var-name
+                     (cl-flet ((inner-function ,arglist ,@body))
+                       (let ((res (apply #'inner-function ,memoize-key-var-name)))
+                         (ht-set ,memoize-store-var-name ,memoize-key-var-name res)
+                         res))))))))
+
+(comment
+ (macroexpand '(lag13-defun-memoize lag13-fib (n)
+                 "fibonacci"
+                 'hey
+                 (cond ((= n 0) 0)
+                       ((= n 1) 1)
+                       (t (+ (lag13-fib (- n 1))
+                             (lag13-fib (- n 2)))))))
+
+ (lag13-defun-memoize lag13-fib (n)
+   "fibonacci"
+   (cond ((= n 0) 0)
+         ((= n 1) 1)
+         (t (+ (lag13-fib (- n 1))
+               (lag13-fib (- n 2))))))
+
+ (lag13-fib 25)
 
 
+ (lag13-defun-memoize geb-G (n)
+  "The strict definition as per the book with my memoization macro
+for speed."
+  (if (= n 0)
+      0
+    (- n (geb-G (geb-G (- n 1))))))
+ (geb-G 100)
+
+ )
+
+(defun lag13-decode-html-entities-fn (html)
+  "https://emacs.stackexchange.com/questions/3138/built-in-way-of-decoding-html-entities-i-e-quot-or-39"
+  (with-temp-buffer
+    (save-excursion (insert html))
+    (xml-parse-string)))
+
+(defun lag13-decode-html-entities (beg end)
+  "Decodes html entities in a region"
+  (interactive "r")
+  (let ((str (buffer-substring-no-properties beg end)))
+    (delete-region beg end)
+    (insert (lag13-decode-html-entities-fn str))))
+
+
+;; TODO: Might be cool that if the parameters are strings then we
+;; interpret them as file names and parse out the file and take the
+;; set difference of that. I wonder if you can tell elisp to complete
+;; a function argument as a file path so you can get autocompletion in
+;; the command prompt. Alternatively I should probably just write that
+;; damn function which gives me the absolute path to the file
+;; currently being visited. https://emacs.stackexchange.com/questions/33586/how-to-read-elisp-file-into-s-expression
+(defun lag13-set-abs-difference (s1 s2)
+  "Computes the absolute difference between two sets which I'm defining as a set difference both ways."
+  (list (-difference s1 s2)
+        (-difference s2 s1)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Elementary Cellular Automata
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; While reading the "Crab Canon" dialogue before chapter 8 in GEB he
+;; dislpayed the following diagram at the start of the dialogue (and
+;; then repeated the diagram but in reverse at the end of the
+;; dialogue):
+;;
+;;                      *
+;;                     * * 
+;;                      *
+;;                      *
+;;                      *
+;;                      *
+;;                      *
+;;                     * *
+;;                    * - *
+;;                   * --- *
+;;                * --- * --- *
+;;             * --- * --- * --- *
+;;          * --- * --- * --- * --- *
+;;       * --- * --- * --- * --- * --- *
+;;    * --- * --- * --- * --- * --- * --- *
+;; * --- * --- * --- * --- * --- * --- * --- *
+;;
+;; And it reminded me of elementary cellular automaton and it made me
+;; want to write some elisp to visualize them to show the boys. None
+;; of the ECA's have crab canon structures as far as I know but
+;; that's fine:
+;; https://en.wikipedia.org/wiki/Elementary_cellular_automaton
+
+(defun lag13-eca-num-to-bits-helper (num)
+  (if (= num 0)
+      '()
+    (let ((quot (/ num 2))
+          (rem (mod num 2)))
+      (cons rem
+            (lag13-eca-num-to-bits quot)))))
+
+(defun lag13-eca-num-to-8-bit (num)
+  "Converts an 8 bit number to a list of 1's and 0's representing the number in binary."
+  (let ((bits (nreverse (lag13-eca-num-to-bits-helper num))))
+    (append (-repeat (- 8 (length bits)) 0)
+            bits)))
+
+(defun lag13-eca-num-to-wolfram-code (num)
+  (let ((bits (lag13-eca-num-to-8-bit num)))
+   (ht
+    ('(1 1 1) (nth 0 bits))
+    ('(1 1 0) (nth 1 bits))
+    ('(1 0 1) (nth 2 bits))
+    ('(1 0 0) (nth 3 bits))
+    ('(0 1 1) (nth 4 bits))
+    ('(0 1 0) (nth 5 bits))
+    ('(0 0 1) (nth 6 bits))
+    ('(0 0 0) (nth 7 bits)))))
+
+(defun lag13-eca-get-cell-neighborhood (eca index)
+  "Returns a list of three elements which represent the cell and it's left and right neighbors. The eca list is toroidal."
+  (cond
+   ((= index 0)
+    (list (nth (1- (length eca)) eca)
+          (nth index eca)
+          (nth (1+ index) eca)))
+   ((= index (1- (length eca)))
+    (list (nth (1- index) eca)
+          (nth index eca)
+          (nth 0 eca)))
+   (t
+    (list (nth (1- index) eca)
+          (nth index eca)
+          (nth (1+ index) eca)))))
+
+(defun lag13-eca-evolve-1-step (eca wolfram-code)
+  "Takes an eca and evolves it one step using the wolfram code."
+  (-map-indexed (lambda (index _)
+                  (ht-get wolfram-code (lag13-eca-get-cell-neighborhood eca index)))
+                eca))
+
+(defun lag13-eca-eca-to-characters (eca)
+  (mapcar (lambda (cell)
+            (if (= cell 0)
+                " "
+              "#"))
+          eca))
+
+(defun lag13-eca-make-grid (width background-char)
+  "Creates a 1d grid of spaces "
+  (insert (concat (make-list width background-char))))
+
+(defun lag13-eca-draw-char (x y width char)
+  "Draws a character at a particular spot in the buffer."
+  (goto-char (+ 1 x (* y width)))
+  (delete-char 1)
+  (insert char))
+
+(defun lag13-eca-draw-eca-line (eca y)
+  ;; Because of the newline, width is actually one extra and we need
+  ;; to account for that so goto-char works as expected
+  (let ((width (1+ (length eca))))
+    (-each-indexed (lag13-eca-eca-to-characters eca)
+      (lambda (index char)
+        (lag13-eca-draw-char index y width char))))
+  (newline))
+
+(defun lag13-eca-draw-and-update (eca-buffer y)
+  (when (eq eca-buffer (current-buffer))
+    (lag13-eca-make-grid (length *lag13-eca-eca*) ?.)
+    (lag13-eca-draw-eca-line *lag13-eca-eca* y)
+    (setq *lag13-eca-eca* (lag13-eca-evolve-1-step *lag13-eca-eca* *lag13-eca-wolfram-code*))))
+
+(defvar *lag13-eca-eca* nil)
+(defvar *lag13-eca-wolfram-code* nil)
+(defvar *lag13-eca-timer* nil)
+
+(defun lag13-eca-cancel-timer ()
+  (when *lag13-eca-timer*
+    (cancel-timer *lag13-eca-timer*)
+    (setq *lag13-eca-timer* nil)))
+
+(defun lag13-eca-init (rule-number)
+  (add-hook 'kill-buffer-hook #'lag13-eca-cancel-timer nil t)
+  (lag13-eca-cancel-timer)
+  (let ((num-cells (1- (window-max-chars-per-line))))
+    (setq *lag13-eca-wolfram-code* (lag13-eca-num-to-wolfram-code rule-number))
+    (setq *lag13-eca-eca* (-repeat num-cells 0))
+    (setf (nth (/ num-cells 2) *lag13-eca-eca*) 1)))
+
+(defun lag13-eca-main ()
+  (interactive)
+  (switch-to-buffer "*lag13-eca*")
+  (erase-buffer)
+  (lag13-eca-init 110)
+  (setq *lag13-eca-timer* (run-at-time 0.1 0.1 'lag13-eca-draw-and-update (current-buffer))))

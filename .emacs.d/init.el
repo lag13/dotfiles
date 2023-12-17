@@ -117,8 +117,12 @@
 ;; underneath a projectile project but projectile still had knowledge
 ;; of the project. I wonder if there's a way to configure projectile
 ;; so it deletes projects when they have no buffers underneath them.
-(require 'midnight)
-(midnight-delay-set 'midnight-delay "9:00am")
+;; 2023-04-14 I'm turning this off. I feel like buffer management is
+;; good enough with projects and recent things showing up at the top
+;; that it's not necessary and in fact more helpful to just keep
+;; everything.
+;; (require 'midnight)
+;; (midnight-delay-set 'midnight-delay "9:00am")
 
 (toggle-frame-fullscreen)
 
@@ -1020,6 +1024,13 @@ newlines and I wanted to collapse them."
       (paredit-delete-region (point) (mark))
     (paredit-backward-delete)))
 
+(defun lag13/paredit-ret ()
+    "from https://www.reddit.com/r/emacs/comments/101uwgd/enable_paredit_mode_for_evalexpression_mini/"
+    (interactive)
+    (if (minibufferp)
+        (read--expression-try-read)
+      (paredit-RET)))
+
 ;; I believe that a good candidate for using eval-after-load is making
 ;; keybindings within a mode. Because the keybindings of a mode are
 ;; defined only initially when the mode's code is loaded (i.e. there
@@ -1030,7 +1041,8 @@ newlines and I wanted to collapse them."
 (eval-after-load 'paredit
   '(progn
      (define-key paredit-mode-map (kbd "DEL")
-       'lag13/paredit-delete-region-or-backward)))
+       'lag13/paredit-delete-region-or-backward)
+     (define-key paredit-mode-map (kbd "RET") #'lag13/paredit-ret)))
 
 ;; TODO: I feel like I'd like to have the option of killing backwards
 ;; in paredit. Keep an eye on that thought to see if it's legitimate.
@@ -4501,13 +4513,13 @@ travels by neighbors from there."
 ;; is what I need: https://github.com/jscheid/dtrt-indent
 ;; https://blog.meain.io/2021/Emacs-alternatives-for-the-Vim-plugins-you-know-and-love/
 
-;; TODO: I've been battling with trying to get indentation working
-;; properly for our transact sql sprocs and it's not looking
-;; promising. First off the indentation in our files is all over the
-;; place, it's a mess. Secondly though is that I can't seem to find a
-;; package I'm satisfied with in terms of indentation. The
-;; sqlind-minor-mode thing doesn't work well because it will indent
-;; anything after that "GO" statement when I don't think you're
+;; TODO: sql tab stuff. I've been battling with trying to get
+;; indentation working properly for our transact sql sprocs and it's
+;; not looking promising. First off the indentation in our files is
+;; all over the place, it's a mess. Secondly though is that I can't
+;; seem to find a package I'm satisfied with in terms of indentation.
+;; The sqlind-minor-mode thing doesn't work well because it will
+;; indent anything after that "GO" statement when I don't think you're
 ;; supposed to. sql-indent seemed potentially the nicest I guess but
 ;; it still made indentation more different than expected compared to
 ;; the file so I'm not sure. I think at this point I think I want to
@@ -4516,12 +4528,13 @@ travels by neighbors from there."
 ;; http://nullman.net/emacs/files/local-modules/tsql.el.html On first
 ;; pass this online converter thing actually didn't seem half bad:
 ;; http://poorsql.com/ from https://stackoverflow.com/a/8592300
-(comment (add-hook 'sql-mode-hook (lambda ()
-                                    ;; TODO: This is apparently a
-                                    ;; minor mode as of emacs 28. What
-                                    ;; does that mean for us?
-                                    (setq indent-tabs-mode t)
-                                    (setq sqlind-basic-offset 8))))
+(add-hook 'sql-mode-hook (lambda ()
+                           ;; TODO: This is apparently a
+                           ;; minor mode as of emacs 28. What
+                           ;; does that mean for us?
+                           (setq indent-tabs-mode t)
+                           (setq sqlind-basic-offset 8)
+                           (setq tab-width 8)))
 ;; Let's just do indentation ourselves
 (setq sql-use-indent-support nil)
 (comment
@@ -5613,10 +5626,18 @@ Probably archiving them as I go."
 ;; TODO: This was a fun video:
 ;; https://www.youtube.com/watch?v=grbtRhFiPrw&ab_channel=VaibhavPatil
 
+;; TODO: It could be fun to have the capture template ask me for where
+;; I am when I'm journaling. The completion candidates could be
+;; previous locations that I've picked ordered with the current place
+;; on top and then the most recent places I journaled about.
+
+;; TODO: Could be interesting to have certain dates automatically get
+;; tagged with something special. Use case right now is just people's
+;; birthdays.
 (setq org-roam-dailies-capture-templates
       '(("d" "default" entry "* %?" :target
          (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>
-#+filetags: :%<%Y_%m_%d>:journal:
+#+filetags: :%<%Y_%m_%d>:%<%A>:journal:
 "))))
 
 (setq org-roam-capture-templates '(("d" "default" plain "%?" :target
@@ -5780,21 +5801,18 @@ not sure though and either way it holds no interest for me."
 ;; https://www.reddit.com/r/emacs/comments/knj5gz/play_go_in_orgmode/,
 ;; https://github.com/misohena/el-igo I feel like I gotta reach out to
 ;; this person and thank them or something.
-;;
-;; TODO: I still need to figure out how to properly load this with
-;; use-package. I've tried using :after "org" thinking it would match
-;; the README which has this bit of code but it didn't work:
-(comment (with-eval-after-load "org"
-           (require 'igo-org)
-           (igo-org-setup)))
 (use-package igo-org
-  :straight
-  '(igo-org :type git :host github :repo "misohena/el-igo")
+  :no-require t
+  :straight '(igo-org :type git :host github :repo "misohena/el-igo")
   :config
-  (igo-org-setup)
-  :bind (:map igo-editor-graphical-mode-map
-              ("x" . igo-editor-cut-current-node))
-  )
+  (with-eval-after-load "org"
+    (require 'igo-org)
+    (igo-org-setup)))
+
+;; TODO: How would I define this keybinding via use-package? Using
+;; :bind doesn't work because there seems to be some weird ordering
+;; thing going on.
+(comment (define-key igo-editor-graphical-mode-map "x" 'igo-editor-cut-current-node))
 
 (use-package dired
   :ensure nil
@@ -6016,13 +6034,18 @@ it."
         (dired-jump))
     (dired-jump nil buffer-or-file-name)))
 
+(define-prefix-command 'ctl-l-map)
+(global-set-key (kbd "C-l") 'ctl-l-map)
 (use-package embark
   :ensure t
   :bind
   (("C-," . embark-act)
    ("C-h B" . embark-bindings))
   :init
-  (setq prefix-help-command #'embark-prefix-help-command))
+  (setq prefix-help-command #'embark-prefix-help-command)
+  :bind (
+         ("C-l C-l" . consult-line)
+         ("C-l C-o" . consult-org-heading)))
 
 (use-package embark-consult
   :ensure t
@@ -6238,3 +6261,179 @@ it."
 ;; TODO: I think it would be cool if the annotations that marginella
 ;; adds could actually be selected on. Like if I download a file and
 ;; then go to open it I can search for "min ago" to pull that up.
+
+;; TODO: I'm getting errors when trying to archive org roam nodes to a
+;; different file. Warning (org-roam): SQL constraint violation:
+;; "UNIQUE constraint failed: nodes.id" for SubID Recycling (Automated
+;; Alert) | Low AvailableIDs | < 1 Year Remaining [NA]
+;; (ExactTarget7038) (f30d5faa-2b6c-47a9-8275-96b7339d5ddf) in
+;; d:/src/github.com/lgroenendaal-salesforce/work-notes/archive/archive.org
+;; Disable showing Disable logging. I think the issue is that
+;; org-archive-subtree unconditionally calls the org-narrow-to-subtree
+;; when doing the date archive tree thing and whenever org roam saves
+;; a narrowed buffer it fails. Looks like it's been fixed though so I
+;; should just have to update my local copy I think:
+;; https://github.com/org-roam/org-roam/issues/2139
+
+;; PS> Set-PSReadLineOption -EditMode Emacs
+;; PS> Set-PSReadLineKeyHandler  -Chord Ctrl+E -Function SelectLine
+
+(defun lag13-xml-pretty-print (beg end &optional arg)
+  "Reformat the region between BEG and END.
+    With optional ARG, also auto-fill."
+  (interactive "*r\nP")
+  (let ((fill (or (bound-and-true-p auto-fill-function) -1)))
+    (sgml-mode)
+    (when arg (auto-fill-mode))
+    (sgml-pretty-print beg end)
+    (nxml-mode)
+    (auto-fill-mode fill)
+    ;; I found a situation where it didn't get indented properly? just gonna do this for now...
+    (evil-indent beg end)))
+
+
+;; TODO: There's a consult-org-roam package
+
+;; TODO: create a org source block for restclient content https://github.com/pashky/restclient.el
+
+
+;; TODO: Hey there, got another source code perusing ask. I browsed
+;; some source code and I wanted to basically just grab the last 7 or
+;; so buffers I looked at and just throw them in a document for future
+;; reference because they all pertained to what I was looking at. I
+;; did an embark export but that format wasn't the best. Some org
+;; links or whatever would have been better.
+
+;; TODO: I've copied down the output of a sql script before and it's
+;; just one row of data but it's really long such that I can't really
+;; intelligbly view it as a row of data. I feel like it could be neat
+;; in such times to transpose the columns and rows (or something like
+;; that) where the column headers get lined up along the left side
+;; with the values grouped together in the cell neighboring them. Or
+;; just make it a list, it doesn't need to be a table or whatever.
+
+;; TODO: There should be an embark command that when you are in dired
+;; you can copy the full path to the file.
+
+
+;; TODO: Check out this editor: https://github.com/helix-editor/helix
+
+
+(setq org-babel-default-header-args:emacs-lisp '((:lexical . t)))
+
+;; TODO: It would be nice if igo had a way to take a snapshot of the
+;; currently displayed board state and make that into the fixed board
+;; position. Use case is having a problem based on a professional
+;; game, I could play out the professional game then just freeze it so
+;; I'd be ready to mess with the variations.
+
+;; TODO: Is there a way with igo mode to extract JUST the setup
+;; portion of the sgf igo block? Seems like it could be nice to have
+;; that functionality for the purposes of sharing because you could
+;; play out all your variations but then give it to someone else to
+;; play around with.
+
+;; TODO: In igo mode I should be able to jump to a specific move number
+
+;; TODO: In igo mode you should be able to take an SGF and convert it
+;; into a static state. Use case is that I might want to take a game
+;; and present it as a problem (i.e. what move to make next?) but I
+;; don't care at all about the moves leading up to whatever state I
+;; want to show, so, it would be nice to be able to just make the game
+;; static as if I "Fill'd" everything in manually.
+
+
+;; TODO: With org roam dailies I should be able to do a "find node"
+;; but only for dates in the future/past of the current daily note I'm
+;; looking at and have the completion candidates ordered by date
+;; ascending/descending
+
+;; TODO: For rg, I want it to save every single search I do and have
+;; the name of the save contain the search as well as the directory.
+;; Or perhaps I could just add more refined navigation through the
+;; rg-history stuff. There's a literal rg-history variable which seems
+;; to have the literal rg search string that was done. Then there's
+;; this history thing which seems to keep the same history but in a
+;; more structured format. Not sure which would be better to mess
+;; around with.
+;;
+; (defun rg-back-history () }
+;   "Navigate back in the search history." }
+;   (interactive) }
+;   (if-let (prev (rg-history-back rg-search-history)) }
+;       (progn }
+;         (setq rg-cur-search (rg-search-copy prev)) }
+;         (rg-rerun 'no-history)) }
+;     (message "No more history elements for back."))) }
+
+;; TODO: Sometimes I'll have two windows open and navigate to a spot
+;; in buffer X in the left window, do some stuff, then navigate to
+;; buffer X but in the other window and I'm totally disoriented
+;; because it could be a different spot because different windows
+;; maintain different state for where they were last looking at the
+;; buffer. I think it would be fun to have a consult command or
+;; something which could let me, in the window I'm looking at, to a
+;; spot that a different window is holding for that buffer.
+
+;; TODO: consult for jumping through the g; change list
+
+;; TODO: The consult-org-heading does NOT show TODO states but a I
+;; feel like it should? I would like it at any rate. Or 
+
+;; TODO: constul-org-heading but just for the current top level
+;; subtree. I think the thing will be using something like
+;; org-up-heading-all to go to the top and then doing
+;; consult-org-heading with a 'tree scope argument. Also look at
+;; function org-find-top-headline for how to go to the top headline.
+
+;; TODO: I think I should consider having org-roam-find also narrow to
+;; a subtree whenever I execute it.
+
+;; TODO: I think it would be cool if, when transcluding some code and
+;; the file link to the code searches for a particular string, that
+;; transclude will include the current S-expression if you will. Like
+;; if you're at the top of an if statement it show the entire if
+;; statement and no more. Seems better than specifying precise line
+;; numbers. I wonder how github does it when you link things within
+;; that website?
+
+;; TODO: Modify C-c C-o (i.e. org-open-at-point) to still work if
+;; we're looking at transclusion text. Also, I want C-c C-o to be
+;; smarter i.e. if you run it on a line it should find the nearest
+;; link within that line.
+
+;; TODO: I feel like I stil would like to see the file link even when
+;; the transcluded content is expanded. Seems like a nice indication
+;; that "hey this is transcluded content!" and knowing what the file
+;; is called at a glance just seems like nice info to have?
+
+;; TODO: Why can org-transclusion not automatically decide which src
+;; file type to use based on the type in the file link?
+
+;; TODO: The :end property is not working for me for some reason:
+;; https://nobiot.github.io/org-transclusion/#end-property-to-specify-a-search-term-to-dynamically-look-for-the-end-of-a-range
+(use-package org-transclusion
+  :after org)
+
+(add-to-list 'safe-local-eval-forms '(progn
+                                           (org-babel-goto-named-src-block "startup")
+                                           (org-babel-execute-src-block)
+                                           (outline-hide-sublevels 1)))
+
+(defun lag13-elisp-string-contains-only-lag13-defuns (elisp-str)
+  "A helper function to determine if a string of elisp codecontains
+only defun forms that start with \"lag13-\"."
+  (let* ((sexps (car (read-from-string (format "(%s)" elisp-str)))))
+    (-reduce-from (lambda (acc sexp)
+                    (and acc
+                         (equal (car sexp) 'defun)
+                         (string-match-p "^lag13-" (symbol-name (cadr sexp)))))
+                  t
+                  sexps)))
+
+;; Sometimes I create a src block which just defines elisp functions
+;; and I think evaluating those without prompting makes sense.
+(setq org-confirm-babel-evaluate
+  (lambda (language body-str)
+    (and (equal language "elisp")
+         (not (lag13-elisp-string-contains-only-lag13-defuns body-str)))))

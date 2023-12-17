@@ -122,3 +122,9 @@ jq '.Roles[] |
 .AssumeRolePolicyDocument.Statement |= map(select(.Principal | has("AWS"))) |
 select(.AssumeRolePolicyDocument.Statement | length > 0) |
 {Arn, "assumableBy": [.AssumeRolePolicyDocument.Statement[].Principal.AWS] | flatten}'
+
+
+Output a file on windows (apparently the '>' operator in windows uses UTF16LE encoding i.e. Unicode): https://stackoverflow.com/questions/67506478/how-to-write-to-json-file-using-jq-without-changing-binary-file-at-powershell
+#+begin_src powershell
+echo '{}' | jq . | Out-File  queryengine_q2_test_values_oauth.json -Encoding UTF8
+#+end_src
