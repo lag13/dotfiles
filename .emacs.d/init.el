@@ -6278,6 +6278,8 @@ it."
 ;; PS> Set-PSReadLineOption -EditMode Emacs
 ;; PS> Set-PSReadLineKeyHandler  -Chord Ctrl+E -Function SelectLine
 
+;; TODO: This should only temporarily enter sgml-mode and revert
+;; afterwards.
 (defun lag13-xml-pretty-print (beg end &optional arg)
   "Reformat the region between BEG and END.
     With optional ARG, also auto-fill."
@@ -6387,7 +6389,8 @@ it."
 ;; function org-find-top-headline for how to go to the top headline.
 
 ;; TODO: I think I should consider having org-roam-find also narrow to
-;; a subtree whenever I execute it.
+;; a subtree whenever I execute it. Or even just make the visited node
+;; the top line of the screen.
 
 ;; TODO: I think it would be cool if, when transcluding some code and
 ;; the file link to the code searches for a particular string, that
@@ -6437,3 +6440,43 @@ only defun forms that start with \"lag13-\"."
   (lambda (language body-str)
     (and (equal language "elisp")
          (not (lag13-elisp-string-contains-only-lag13-defuns body-str)))))
+
+(define-key org-mode-map (kbd "S-C-<return>") #'org-insert-subheading)
+
+(setq dired-dwim-target t)
+
+;; TODO: Seems like it would be nice to have an embark key to which,
+;; when you are on a particular directory or file, it will open the
+;; root project directory with the directory tree expanded to that
+;; directory (or the directory containing the file). My use case was I
+;; wanted to see what neighboring files were next to a new file I was
+;; looking at AND I wanted to see where it fit within the project
+;; hierarchy.
+
+;; TODO: I made a graph of zoro's family relationship and I thought it
+;; would be nice if I could write function to convert org mode
+;; headings into this structure. The logic would probably just look
+;; for org mode links and that will establish the relationships.
+;; #+begin_src text
+;; digraph G {
+;;   "Shimotsuki Ryuma" -> "Shimotsuki Furiko";
+;;   "Shimotsuki Furiko" -> "Roronoa Arashi";
+;;   "Roronoa Pinzoro" -> "Roronoa Arashi";
+;;   "Roronoa Arashi" -> "Roronoa Zoro";
+;;   "Tera" -> "Roronoa Zoro";
+
+;;   "Shimotsuki Ryuma" [color=green,style=filled]
+;;   "Roronoa Zoro" [color=green,style=filled]
+;; }
+;; #+end_src
+
+;; TODO: I feel like doing C-x C-f should be able to sort the results
+;; based on last time modified or other things like that
+
+;; TODO: I was editing some text and I accidentally did autocomplete
+;; on "said" and completed it as "saidar" and I was like "hooo boy!
+;; That's a trip down memory lane". Anyway, it got me wondering if I
+;; can introspect and see what file(s) that completion came from. I
+;; could always just grep for it too of course.
+
+;; debugging tutorial: https://www.youtube.com/watch?v=LfwSc-lfFxM&ab_channel=SystemCrafters

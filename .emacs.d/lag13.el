@@ -26,6 +26,48 @@
 (require 'iso8601)
 (require 'dash)
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Expanding on the dash library (https://github.com/magnars/dash.el)
+;; by adding functions from clojure.core
+;; (https://clojuredocs.org/clojure.core) plus adding functions from
+;; Paul Rutledge's wonderful https://github.com/RutledgePaulV/missing
+;; In short I want to make emacs better to program in AND I wouldn't
+;; mind if it more closely resembled clojure because then it would be
+;; easier for me to use that language if I so choose.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defalias '-fn #'-lambda "From clojure.core. Alias for `-lambda'")
+
+(defun -range (start end &optional increment)
+  "From clojure.core. Returns a sequence of numbers from
+START (inclusive) to END (exclusive) incrementing each successive
+element by INCREMENT (defaults to 1)."
+  (-let* ((increment (if (numberp increment) increment 1)))
+    (-iterate (-fn (x) (+ x increment)) start end)))
+
+(defalias '-inc #'1+)
+
+(defalias '-dec #'1-)
+
+(defun -reduce-indexed-from (fn init list)
+  "Similar to clojure's reduce-kv. Rduce the function FN across
+LIST, starting with INIT. Returns the result of applying FN to
+INIT, the first element of LIST, and the index of said element
+then the next element etc..."
+  (let ((acc init))
+    (seq-do-indexed (-fn (elm i)
+                      (setq acc (funcall fn acc elm i)))
+                    list)
+    acc))
+
+;; TODO: Add a reduce-kv, I'm shocked that this is not already present
+;; in the seq or dash library already.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; END expanding on the dash library
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defmacro comment (&rest body)
   "Evaluates the body and yields nil. Borrowed from clojure:
 https://clojuredocs.org/clojure.core/comment
@@ -3029,7 +3071,7 @@ of programming it feels... strange. Like "
 
  ;; I'm not sure what function is the exponentiation but it seems to
  ;; roughly follow the exponentiation of 4:
- (seq-map (lambda (exp) (cons exp (expt 4 exp))) (cl-loop for i from 1 to 15 collect i))
+ (comment (seq-map (lambda (exp) (cons exp (expt 4 exp))) (cl-loop for i from 1 to 15 collect i)))
 
  ;; Outputs:
  ;; ((1 . 4) (2 . 16) (3 . 64) (4 . 256) (5 . 1024) (6 . 4096) (7 . 16384) (8 . 65536) (9 . 262144) (10 . 1048576) (11 . 4194304) (12 . 16777216) (13 . 67108864) (14 . 268435456) (15 . 1073741824))
@@ -3084,7 +3126,7 @@ of programming it feels... strange. Like "
  ;; returns 15 letters but in reality it's 16 because of the two a's
  ;; in "anais":
 
- (length (seq-uniq (seq-reduce (lambda (acc elt) (append acc (append elt nil))) '("veronica" "anais" "danny" "lucas" "jane" "tory" "sari" "joe") '())))
+ (comment (length (seq-uniq (seq-reduce (lambda (acc elt) (append acc (append elt nil))) '("veronica" "anais" "danny" "lucas" "jane" "tory" "sari" "joe") '()))))
 
  ;; Including nicknames like issy, janey, and joey is not possible if
  ;; we include the SO's (well, janey and joey might be possible since
@@ -3492,7 +3534,7 @@ for speed."
     (let ((quot (/ num 2))
           (rem (mod num 2)))
       (cons rem
-            (lag13-eca-num-to-bits quot)))))
+            (lag13-eca-num-to-bits-helper quot)))))
 
 (defun lag13-eca-num-to-8-bit (num)
   "Converts an 8 bit number to a list of 1's and 0's representing the number in binary."
@@ -3551,24 +3593,31 @@ for speed."
   (delete-char 1)
   (insert char))
 
-(defun lag13-eca-draw-eca-line (eca y)
+(defun lag13-eca-draw-eca-line (eca y stay-on-one-line)
   ;; Because of the newline, width is actually one extra and we need
   ;; to account for that so goto-char works as expected
   (let ((width (1+ (length eca))))
     (-each-indexed (lag13-eca-eca-to-characters eca)
       (lambda (index char)
         (lag13-eca-draw-char index y width char))))
-  (newline))
+  (unless stay-on-one-line
+    (newline)))
 
-(defun lag13-eca-draw-and-update (eca-buffer y)
-  (when (eq eca-buffer (current-buffer))
-    (lag13-eca-make-grid (length *lag13-eca-eca*) ?.)
-    (lag13-eca-draw-eca-line *lag13-eca-eca* y)
-    (setq *lag13-eca-eca* (lag13-eca-evolve-1-step *lag13-eca-eca* *lag13-eca-wolfram-code*))))
 
 (defvar *lag13-eca-eca* nil)
 (defvar *lag13-eca-wolfram-code* nil)
 (defvar *lag13-eca-timer* nil)
+(defvar *lag13-eca-generation* 0)
+
+(defun lag13-eca-draw-and-update (eca-buffer stay-on-one-line)
+  (when (eq eca-buffer (current-buffer))
+    (when stay-on-one-line
+        (erase-buffer)
+        (setq *lag13-eca-generation* 0))
+    (lag13-eca-make-grid (length *lag13-eca-eca*) ?.)
+    (lag13-eca-draw-eca-line *lag13-eca-eca* *lag13-eca-generation* stay-on-one-line)
+    (setq *lag13-eca-eca* (lag13-eca-evolve-1-step *lag13-eca-eca* *lag13-eca-wolfram-code*))
+    (setq *lag13-eca-generation* (1+ *lag13-eca-generation*))))
 
 (defun lag13-eca-cancel-timer ()
   (when *lag13-eca-timer*
@@ -3581,11 +3630,265 @@ for speed."
   (let ((num-cells (1- (window-max-chars-per-line))))
     (setq *lag13-eca-wolfram-code* (lag13-eca-num-to-wolfram-code rule-number))
     (setq *lag13-eca-eca* (-repeat num-cells 0))
-    (setf (nth (/ num-cells 2) *lag13-eca-eca*) 1)))
+    (setf (nth (/ num-cells 2) *lag13-eca-eca*) 1)
+    (setq *lag13-eca-generation* 0)))
 
-(defun lag13-eca-main ()
-  (interactive)
+;; https://en.wikipedia.org/wiki/Elementary_cellular_automaton
+;; I like rule 18, 22, 28 is kind of fun how it just takes over and rule 110 of course. 30 is fun, makes me think of some old ruins with vines on them. 60, 90, 150, 73
+(defun lag13-eca-main (rule-num stay-on-one-line)
   (switch-to-buffer "*lag13-eca*")
+  ;; https://200ok.ch/posts/2020-09-29_comprehensive_guide_on_handling_long_lines_in_emacs.html
+  (fundamental-mode)
+  (font-lock-mode -1)
+  (buffer-disable-undo (current-buffer))
+  (display-line-numbers-mode 0)
   (erase-buffer)
-  (lag13-eca-init 110)
-  (setq *lag13-eca-timer* (run-at-time 0.1 0.1 'lag13-eca-draw-and-update (current-buffer))))
+  (lag13-eca-init rule-num)
+  (setq *lag13-eca-timer* (run-at-time nil 0.05 'lag13-eca-draw-and-update (current-buffer) stay-on-one-line)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; START: 2d stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun lag13-chebyshev-distance (num-rows num-cols i1 i2)
+  "Returns the number of moves it would take for a king in chess to
+travel between indices I1 and I2:
+https://en.wikipedia.org/wiki/Chebyshev_distance"
+  (let ((row1 (/ i1 num-rows))
+        (col1 (mod i1 num-cols))
+        (row2 (/ i2 num-rows))
+        (col2 (mod i2 num-cols)))
+    (max (abs (- row1 row2))
+         (abs (- col1 col2)))))
+
+(defun lag13-1d-moore-neighborhood (max-row max-col index)
+  "Returns the indices making up the moore neighborhood of INDEX
+assuming we are working with a 2d grid represented with a flat/1d
+list: https://en.wikipedia.org/wiki/Moore_neighborhood"
+  (seq-filter
+   (lambda (index)
+     (and (>= index 0) 
+          (< index (* max-row max-col))))
+   (cond
+    ;; on left edge
+    ((= 0 (mod index max-col))
+     (list
+      (- index max-col)
+      (+ (- index max-col) 1)
+      (+ index 1)
+      (+ index max-col 1)
+      (+ index max-col)))
+    ;; on right edge
+    ((= (- max-col 1) (mod index max-col))
+     (list
+      (- index 1)
+      (- index max-col 1)
+      (- index max-col)
+      (+ index max-col)
+      (+ index max-col -1)))
+    (t
+     (list (- index 1)
+           (- index max-col 1)
+           (- index max-col)
+           (+ (- index max-col) 1)
+           (+ index 1)
+           (+ index max-col 1)
+           (+ index max-col)
+           (+ index max-col -1))))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; END: 2d stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; START: Code to generate a chess board with signposts for the Elle
+;; Cordova+Toni Lindgren gift idea
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'chess-pgn)
+
+(defun lag13-chess-square-is-occupied (square)
+  "Given the numerical value SQUARE representing the piece present
+on a chess board, returns t if that square is occupied and nil
+otherwise. Note that in emacs's chess package, empty squares are
+represented by the space character."
+  (not (equal ?  square)))
+
+(defun lag13-chess->sunr-multiple-signposts-on-single-squares (chess-game)
+  "Generates the sun runner (sunr) data structure and allows
+multiple signposts to be drawn on single squares. This algorithm
+is simpler so I thought it worth making first PLUS I believe it
+could be the only algorithm needed because I have the feeling it
+gets us close enough to the finished design and then the
+remaining signposts can be placed by a human (and thus optimized
+for maximum aesthetic beauty)."
+  (-let* ((initial-signposts
+           (->> (seq-subseq chess-starting-position 0 64)
+                (seq-map (-fn (square)
+                           (if (lag13-chess-square-is-occupied square)
+                               "cant-place-signpost"
+                             nil)))))
+          (squares->signposts
+           (->> chess-game
+                (chess-game-plies)
+                (seq-rest)
+                ;; The last item in the list of ply's doesn't seem to contain a valid move
+                (butlast)
+                (seq-map-indexed
+                 (-fn (cur-ply move-num)
+                   (-let* ((prev-ply (chess-pos-preceding-ply (chess-ply-pos cur-ply)))
+                           (source-index (chess-ply-source prev-ply))
+                           (new-signpost (list source-index (+ 2 move-num) (chess-ply-to-algebraic cur-ply))))
+                     new-signpost)))
+                (seq-group-by #'seq-first)
+                (seq-map (-fn ((source-index . signposts)) (cons source-index (-map #'seq-rest signposts)))))))
+    `(:signposts-for-you-dear-menderbug
+      ((1 ,(chess-ply-to-algebraic (chess-game-ply chess-game 0))))
+      :chessboard-with-signposts
+      ,(seq-map-indexed
+        (-fn (cant-place-signpost square)
+          (or (seq-rest (assoc square squares->signposts))
+              cant-place-signpost))
+        initial-signposts))))
+
+(defun lag13-chess->sunr-single-signpost-per-square-fill-nearest-white-squares (chess-game)
+  "Generates the sun runner (sunr) data structure but after placing
+signposts on squares that pieces move off of, we place signposts
+on the nearest available squares that are white. I figure this is
+probably a good way to go about placing extra signposts from an
+artistic/visual point of view because the art on the white
+squares will pop more. As with my other attempted algorithms, if
+it is impossible to place a signpost via this method then they
+will have to be manually placed by you dear reader. Be sure to
+channel your inner menderbug'esque energy and take joy in the
+signpost placing: https://hollowknight.fandom.com/wiki/Menderbug"
+  (-let* (((&plist :signposts-for-you-dear-menderbug signposts-to-place-manually
+                   :chessboard-with-signposts chessboard-with-signposts)
+           (lag13-chess->sunr-multiple-signposts-on-single-squares chess-game))
+          (all-signposts-to-place
+           (->> (-zip (-range 0 (length chessboard-with-signposts))
+                      chessboard-with-signposts)
+                (seq-filter (-fn ((_ . signposts))
+                              (and (not (stringp signposts))
+                                   (> (length signposts) 1))))
+                (seq-map (-fn ((index . signposts))
+                           (->> signposts
+                                (seq-rest)
+                                (seq-map (-fn (signpost) (cons index signpost))))))
+                (-flatten-n 1)
+                (seq-sort-by (-fn ((_ move-num _)) move-num) #'<)))
+          (chessboard-with-signposts
+           (->> chessboard-with-signposts
+                (seq-map (-fn (signposts)
+                           (if (and (listp signposts)
+                                    (> (length signposts) 1))
+                               (list (seq-first signposts))
+                             signposts)))))
+          (available-white-indices
+           (->> (-range 0 64)
+                (seq-filter (lambda (index)
+                              (= 0 (mod (- index (mod (/ index 8) 2)) 2))))
+                (-remove (lambda (index) (nth index chessboard-with-signposts))))))
+    ;; I have a feeling that this greedy algorithm of immediately
+    ;; placing an individual signpost on the closest available white
+    ;; square is not technicallyyyyy optimal in terms of minimizing
+    ;; OVERALL distance between all signposts and their desired
+    ;; placements... but it's good enough. I think we might need to do
+    ;; some dynamic programming'esque stuff to accomplish true minimum
+    ;; distance but I'm not feeling like doing it. Besides, I've been
+    ;; leaning towards just using the other algorithm which place
+    ;; multiple signposts on the same squares.
+    (while (and all-signposts-to-place
+                available-white-indices)
+      (-let* (((desired-placement . signpost)
+               (pop all-signposts-to-place))
+              (closest-square
+               (-min-by (-on #'> (-partial #'lag13-chebyshev-distance 8 8 desired-placement))
+                        available-white-indices)))
+        (setf (nth closest-square chessboard-with-signposts) (list signpost))
+        (setq available-white-indices (-remove-item closest-square available-white-indices))))
+    `(:signposts-for-you-dear-menderbug
+      ,(append signposts-to-place-manually (seq-map #'seq-rest all-signposts-to-place))
+      :chessboard-with-signposts
+      ,chessboard-with-signposts)))
+
+(ert-deftest lag13-chess->sunr-multiple-signposts-on-single-squares ()
+  "Tests that the algorithm which creates a sun runner data
+structure with multiple signposts on each square looks as
+expected."
+  (should (equal (lag13-chess->sunr-multiple-signposts-on-single-squares
+                  (chess-pgn-to-game "[Event \"18th DSB Kongress\"]
+[Site \"Breslau GER\"]
+[Date \"1912.07.20\"]
+[EventDate \"1912.07.15\"]
+[Round \"6\"]
+[Result \"0-1\"]
+[White \"Stefan Levitsky\"]
+[Black \"Frank James Marshall\"]
+[ECO \"B23\"]
+[WhiteElo \"?\"]
+[BlackElo \"?\"]
+[PlyCount \"46\"]
+
+1.d4 e6 2.e4 d5 3.Nc3 c5 4.Nf3 Nc6 5.exd5 exd5 6.Be2 Nf6 7.O-O
+Be7 8.Bg5 O-O 9.dxc5 Be6 10.Nd4 Bxc5 11.Nxe6 fxe6 12.Bg4 Qd6
+13.Bh3 Rae8 14.Qd2 Bb4 15.Bxf6 Rxf6 16.Rad1 Qc5 17.Qe2 Bxc3
+18.bxc3 Qxc3 19.Rxd5 Nd4 20.Qh5 Ref8 21.Re5 Rh6 22.Qg5 Rxh3
+23.Rc5 Qg3 0-1"))
+                 '(:signposts-for-you-dear-menderbug
+                   ((1 "d4"))
+                   :chessboard-with-signposts (((27 "Qd2")) ((9 "exd5")) ((19 "Nd4")) ((25 "Bh3")) ((17 "dxc5") (41 "Re5")) ((15 "Bg5") (31 "Rad1")) ((13 "O-O")) "cant-place-signpost" "cant-place-signpost" "cant-place-signpost" ((7 "Nf3")) ((5 "Nc3")) ((3 "e4") (21 "Nxe6")) ((23 "Bg4")) "cant-place-signpost" "cant-place-signpost" nil nil ((39 "Qh5")) ((33 "Qe2")) ((11 "Be2")) ((43 "Qg5")) nil ((45 "Rc5")) nil nil ((29 "Bxf6") (37 "Rxd5")) ((42 "Rh6")) ((46 "Qg3")) nil ((30 "Rxf6")) ((44 "Rxh3")) nil ((35 "bxc3")) nil ((18 "Be6") (22 "fxe6")) ((10 "exd5")) nil ((26 "Rae8")) nil nil nil nil nil nil ((20 "Bxc5")) nil nil "cant-place-signpost" ((36 "Qxc3")) "cant-place-signpost" ((2 "e6") (34 "Bxc3")) ((4 "d5") (24 "Qd6") (40 "Ref8")) "cant-place-signpost" "cant-place-signpost" "cant-place-signpost" ((32 "Qc5")) ((6 "c5")) ((16 "O-O")) ((28 "Bb4") (38 "Nd4")) ((14 "Be7")) ((12 "Nf6")) ((8 "Nc6")) "cant-place-signpost")))))
+
+(ert-deftest lag13-chess->sunr-single-signpost-per-square-fill-nearest-white-squares ()
+    (should (equal (lag13-chess->sunr-single-signpost-per-square-fill-nearest-white-squares
+                    (chess-pgn-to-game "[Event \"Cista\"]
+[Site \"Cista\"]
+[Date \"1940.??.??\"]
+[EventDate \"?\"]
+[Round \"?\"]
+[Result \"1-0\"]
+[White \"Ludek Pachman\"]
+[Black \"Eckert\"]
+[ECO \"C13\"]
+[WhiteElo \"?\"]
+[BlackElo \"?\"]
+[PlyCount \"47\"]
+
+1.e4 e6 2.d4 d5 3.Nc3 Nf6 4.Bg5 Be7 5.e5 Nfd7 6.h4 Bxg5 7.hxg5
+Qxg5 8.Nh3 Qh6 9.Bd3 g6 10.Qg4 c5 11.f4 cxd4 12.Nb5 Kd8 13.Ng5
+Qxh1+ 14.Kf2 Qxa1 15.Nxf7+ Ke7 16.Qg5+ Kxf7 17.Nd6+ Kg7
+18.Qe7+ Kh6 19.Nf7+ Kg7 20.Ng5 Kh6 21.Nxe6 Nf6 22.Qg7+ Kh5
+23.Qxf6 h6 24.Be2# 1-0"))
+                   '(:signposts-for-you-dear-menderbug
+ ((1 "e4") (45 "Qxf6") (46 "h6"))
+ :chessboard-with-signposts
+ ("cant-place-signpost" "cant-place-signpost" "cant-place-signpost" ((15 "Nh3")) ((25 "Ng5")) ((9 "e5")) ((7 "Bg5")) "cant-place-signpost" "cant-place-signpost" "cant-place-signpost" ((21 "f4")) ((5 "Nc3")) ((3 "d4")) ((35 "Qe7+")) ((19 "Qg4")) ((47 "Be2#")) ((44 "Kh5")) nil ((31 "Qg5+")) ((38 "Kg7")) ((13 "hxg5")) ((11 "h4")) ((36 "Kh6")) ((27 "Kf2")) nil ((34 "Kg7")) ((23 "Nb5")) ((37 "Nf7+")) nil ((33 "Nd6+")) ((17 "Bd3")) ((30 "Ke7")) ((43 "Qg7+")) nil ((40 "Kh6")) nil ((10 "Nfd7")) nil ((32 "Kxf7")) ((14 "Qxg5")) nil ((42 "Nf6")) ((24 "Kd8")) ((41 "Nxe6")) nil ((39 "Ng5")) nil ((26 "Qxh1+")) "cant-place-signpost" "cant-place-signpost" "cant-place-signpost" ((4 "d5")) ((2 "e6")) ((22 "cxd4")) "cant-place-signpost" ((12 "Bxg5")) "cant-place-signpost" ((6 "Nf6")) ((8 "Be7")) ((20 "c5")) ((28 "Qxa1")) ((18 "g6")) ((16 "Qh6")) ((29 "Nxf7+")))))))
+
+(defun lag13-sunr-signpost-to-str (sunr-signpost)
+  (format "(%s:%s)" (seq-first sunr-signpost) (nth 1 sunr-signpost)))
+
+(defun lag13-sunr-square-to-str (sunr-square)
+  (if (stringp sunr-square)
+      sunr-square
+      (s-join " " (seq-map #'lag13-sunr-signpost-to-str sunr-square))))
+
+(defun lag13-draw-sunr-data-structure (sunr)
+  (-let* ((signposts-to-place-manually (seq-map #'lag13-sunr-signpost-to-str (plist-get sunr :signposts-for-you-dear-menderbug)))
+          (board (seq-map #'lag13-sunr-square-to-str (plist-get sunr :chessboard-with-signposts)))
+          (longest-str-that-fits-nicely-on-screen 19)
+          (longest-str (min longest-str-that-fits-nicely-on-screen
+                            (apply #'max (seq-map #'length board)))))
+    (insert "SIGNPOSTS TO BE MANUALLY ADDED, EMBRACE YOUR INNER MENDERBUG:\n")
+    (seq-do (-fn (signpost) (insert (concat signpost "\n"))) signposts-to-place-manually)
+    (let ((beg (point)))
+      (insert (concat (s-join ";"
+                              (append (let ((two-d-board (-partition 8 board)))
+                                        (cl-loop for i = 0 then (+ i 1)
+                                                 while (< i (length two-d-board))
+                                                 collect (s-join "," (cons (number-to-string (- 8 i)) (nth i two-d-board)))))
+                                      (list (s-join "," (list "" "a" "b" "c" "d" "e" "f" "g" "h")))))
+                      ";"))
+      (table-capture beg (point) "," ";" 'center (+ 2 longest-str)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; END: Code to help generate a chess board with signposts for the
+;; gift idea
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
