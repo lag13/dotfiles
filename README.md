@@ -2,6 +2,30 @@
 I'm using the strategy outlined here to manage my dotfiles:
 https://developer.atlassian.com/blog/2016/02/best-way-to-store-dotfiles-git-bare-repo/
 
+## If setting this up on windows...
+Don't do it. jk... but still....
+
+It seems there are a couple options (https://www.reddit.com/r/emacs/comments/18k1m04/how_do_you_use_emacs_on_windows_11/) which are basically:
+- natively
+- the windows on linux stuff and there is some way to get graphical stuff shared (or you can just run emacs in a terminal)
+- msys2 (which is what I did once with a work computer and it worked swimmingly I think after I got it set up: https://www.msys2.org/)
+
+But yeah, one time I was using windows for work and decided to run the emacs app that was native for windows (I was just lazy and didn't want to do the msys2 route or maybe I wanted to try something new...) and a couple things I ended up doing were...
+
+For every personal repo I wanted to mess with, I ran commands like this so those repos used my personal key:
+```
+git config url."git@github.com:".insteadOf https://github.com/
+# because the global config had this as true
+git config commit.gpgsign false
+# ssh key for the personal repo
+git config core.sshCommand 'ssh -i c:/Users/lgroenendaal/.ssh/personalFuryKey'
+```
+
+I also created some symbolic links for the emacs files because I could be changing them. Is there a better way to do this? Probably... but this worked fine:
+```
+New-Item -ItemType SymbolicLink -Path c:/users/lgroenendaal/AppData/Roaming/.emacs.d/init.el -Value D:\dev\dotfiles\.emacs.d\init.el
+```
+
 ## New Machine Setup
 Run these commands to set up a new machine. Note the `dotgit` command is an
 alias in `.bash_profile`:
