@@ -1,5 +1,17 @@
 ;;; evil-cutlass.el --- When deleting text, do not copy it by default
 
+;; EDIT: The date is 2025-04-02, I have received a new computer,
+;; upgraded from emacs 28 to 30, and evil-cutlass has stopped
+;; working... The reason is that because of the upgrade, the
+;; evil-delete function is now byte compiled and the help page now
+;; reads "evil-delete is an interactive byte-code-function in
+;; ‘evil-commands.el’ where before it read "evil-delete is an
+;; interactive native compiled Lisp function in ‘evil-commands.el’".
+;; Apparently advice does not work with byte compiled stuff so here we
+;; are:
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Advice-and-Byte-Code.html.
+;; I guess shit like this is why they advise you to not use advice...
+
 ;; Copyright (C) 2022 by Lucas Groenendaal
 ;; Author: Lucas Groenendaal <groenendaal92@gmail.com>
 ;; Maintainer: Lucas Groenendaal <groenendaal92@gmail.com>
@@ -40,8 +52,8 @@
 ;;; Code:
 
 (require 'evil)
-(require 'nadvice)
-
+;; (require 'nadvice)
+(require 'evil-surround)
 ;; TODO: These are the bindings I'd want to override if I wanted to
 ;; make a true vim-cutlass sort of thing:
 
@@ -96,36 +108,61 @@
 ;; that all others called to delete text. Relying on an internal
 ;; implementation detail from an external library feels like it has no
 ;; place in code (at least if you want your code to continue
-;; working!).
+;; working!). EDIT: I was spot on about the dynamicness thing being
+;; delicate in light of the byte compilation breaking the advice...
 
-(defvar evil-cutlass-cut-text nil
-  "Whether the `evil-delete' function should cut text or not.")
+;; (defvar evil-cutlass-cut-text nil
+;;   "Whether the `evil-delete' function should cut text or not.")
 
-(evil-define-operator evil-cutlass-delete-advice (evil-delete-fn beg end type register yank-handler)
-  "Modifies `evil-delete' such that, by default, REGISTER is set
-to the black hole register and thus the deleted text is not
-copied. As of 2022-01-09 this ends up, conveniently, modifying
-all other commands which delete text such as x, s, c, etc...
-because, under the hood, those commands call out to
-`evil-delete'."
-  (interactive "<R><x><y>")
-  (if evil-cutlass-cut-text
-      (funcall evil-delete-fn beg end type register yank-handler)
-    (let ((register (or register ?_)))
-      (funcall evil-delete-fn beg end type register yank-handler))))
+;; (evil-define-operator evil-cutlass-delete-advice (evil-delete-fn beg end type register yank-handler)
+;;   "Modifies `evil-delete' such that, by default, REGISTER is set
+;; to the black hole register and thus the deleted text is not
+;; copied. As of 2022-01-09 this ends up, conveniently, modifying
+;; all other commands which delete text such as x, s, c, etc...
+;; because, under the hood, those commands call out to
+;; `evil-delete'."
+;;   (interactive "<R><x><y>")
+;;   (if evil-cutlass-cut-text
+;;       (funcall evil-delete-fn beg end type register yank-handler)
+;;     (let ((register (or register ?_)))
+;;       (funcall evil-delete-fn beg end type register yank-handler))))
 
-(evil-define-operator evil-cutlass-cut (beg end type register yank-handler)
-  "The same as the original definition of `evil-delete' (i.e. it
-always cuts text)."
-  (interactive "<R><x><y>")
-  (let ((evil-cutlass-cut-text t))
-    (evil-delete beg end type register yank-handler)))
+;; (evil-define-operator evil-cutlass-cut (beg end type register yank-handler)
+;;   "The same as the original definition of `evil-delete' (i.e. it
+;; always cuts text)."
+;;   (interactive "<R><x><y>")
+;;   (let ((evil-cutlass-cut-text t))
+;;     (evil-delete beg end type register yank-handler)))
 
-(advice-add 'evil-delete :around #'evil-cutlass-delete-advice)
-(evil-define-key '(normal visual) 'global "x" #'evil-cutlass-cut)
+;; (advice-add 'evil-delete :around #'evil-cutlass-delete-advice)
+;; (evil-define-key '(normal visual) 'global "x" #'evil-cutlass-cut)
 
 ;; TODO: Get this issue deleted because it doesn't seem to be valid (I
 ;; was able to advise just fine and not break anything):
-;; https://github.com/emacs-evil/evil/issues/1326
+;; htts://github.com/emacs-evil/evil/issues/1326
+
+;; (advice-remove 'evil-delete 'evil-cutlass-delete-advice)
+
+(evil-define-operator evil-cutlass-delete (beg end type register yank-handler)
+  (interactive "<R><x><y>")
+  (let ((register (or register ?_)))
+    (evil-delete beg end type register yank-handler)))
+
+(evil-define-operator evil-cutlass-change (beg end type register yank-handler)
+  (interactive "<R><x><y>")
+  (let ((register (or register ?_)))
+    (evil-change beg end type register yank-handler)))
+
+(evil-define-key '(normal visual) 'global "d" #'evil-cutlass-delete)
+(evil-define-key '(normal visual) 'global "c" #'evil-cutlass-change)
+(evil-define-key '(normal visual) 'global "x" #'evil-delete)
+
+;; Phew, turns out there was a way to just redefine new operators and
+;; not break the surround stuff.
+(setq evil-surround-operator-alist
+      '((evil-change . change)
+        (evil-delete . delete)
+        (evil-cutlass-delete . delete)
+        (evil-cutlass-change . change)))
 
 (provide 'evil-cutlass)

@@ -18,6 +18,12 @@
 
 (setq use-package-always-ensure t)
 
+;; The year is 2025 and I've just upgraded from emacs 28 to 30 while
+;; moving to a new computer: Ah the joys of using an editor who's
+;; functionality depends on a bazaar of user maintained packages:
+;; https://github.com/ianyepan/vscode-dark-plus-emacs-theme/issues/37
+(setq vscode-dark-plus-box-org-todo nil)
+
 ;; On 2022-06-02 I was having EXTREME slowness when editing files with
 ;; emacs and it seemed to only be when editing files that were managed
 ;; by version control. This was while using my job's windows machine.
@@ -59,18 +65,18 @@
 ;; I noticed that some packages were not added to the
 ;; package-selected-packages variable AND when I install them now they
 ;; STILL don't get added... What the hell man....
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+;; (defvar bootstrap-version)
+;; (let ((bootstrap-file
+;;        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+;;       (bootstrap-version 5))
+;;   (unless (file-exists-p bootstrap-file)
+;;     (with-current-buffer
+;;         (url-retrieve-synchronously
+;;          "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+;;          'silent 'inhibit-cookies)
+;;       (goto-char (point-max))
+;;       (eval-print-last-sexp)))
+;;   (load bootstrap-file nil 'nomessage))
 
 ;; NEAT COMMANDS:
 ;; C-h K/F - like their lowercase variants but opens any info docs.
@@ -1452,30 +1458,30 @@ of automatically."
 ;; this still worked which makes sense to me since we're specifying a
 ;; literal repo from where to get it. I guess the symbol must just
 ;; serve an organizational purpose for straight.el.
-(straight-use-package
- '(targets :type git :host github :repo "noctuid/targets.el"))
-(require 'targets)
-;; I'm used to typing "ib" to select parentheses so want it to be able
-;; to do target'y things.
-(setq targets-user-text-objects '((paren "(" ")" pair :more-keys "b")))
-;; Pretty neat! Not sure if I'll use it but they let you have one
-;; keybinding work for multiple kinds of text objects:
-;; https://github.com/noctuid/targets.el#targets-define-composite-to
-(setq targets-composite-text-objects
-      '((all-quotes
-	  (("\"" "\"" quote)
-	   ("'" "'" quote)
-	   ("`" "`" quote)
-	   ("‘" "’" quote)
-	   ("“" "”" quote))
-	  :bind t
-	  :keys "q")))
-(define-key evil-visual-state-map (kbd "RET") #'targets-last-text-object)
-(define-key evil-operator-state-map (kbd "RET") #'targets-last-text-object)
-(targets-setup t
-               :inside-key nil
-               :around-key nil
-               :remote-key nil)
+;; (straight-use-package
+;;  '(targets :type git :host github :repo "noctuid/targets.el"))
+;; (require 'targets)
+;; ;; I'm used to typing "ib" to select parentheses so want it to be able
+;; ;; to do target'y things.
+;; (setq targets-user-text-objects '((paren "(" ")" pair :more-keys "b")))
+;; ;; Pretty neat! Not sure if I'll use it but they let you have one
+;; ;; keybinding work for multiple kinds of text objects:
+;; ;; https://github.com/noctuid/targets.el#targets-define-composite-to
+;; (setq targets-composite-text-objects
+;;       '((all-quotes
+;; 	  (("\"" "\"" quote)
+;; 	   ("'" "'" quote)
+;; 	   ("`" "`" quote)
+;; 	   ("‘" "’" quote)
+;; 	   ("“" "”" quote))
+;; 	  :bind t
+;; 	  :keys "q")))
+;; (define-key evil-visual-state-map (kbd "RET") #'targets-last-text-object)
+;; (define-key evil-operator-state-map (kbd "RET") #'targets-last-text-object)
+;; (targets-setup t
+;;                :inside-key nil
+;;                :around-key nil
+;;                :remote-key nil)
 
 ;; Like many things it is, strictly speaking, unnecessary but I think
 ;; it's a useful action to have! I think the only thing really going
@@ -3979,7 +3985,7 @@ with the previously searched term to speedup that process."
 ;; https://github.com/minad/corfu. I'd like to better understand the
 ;; built in completion stuff especially as it compares to dabbrev and
 ;; pcomplete.
-(corfu-global-mode)
+(global-corfu-mode)
 (setq tab-always-indent 'complete)
 
 (defun corfu-enable-always-in-minibuffer ()
@@ -4145,7 +4151,7 @@ with the previously searched term to speedup that process."
 ;; lock a table in a particular sorting setup?
 
 ;; Trying out org roam
-(setq org-roam-directory (file-truename "D:/src/github.com/lgroenendaal-salesforce/work-notes/"))
+(setq org-roam-directory (file-truename "D:/dev/work-notes/"))
 (org-roam-db-autosync-mode)
 (global-set-key (kbd "C-c r f") #'org-roam-node-find)
 (global-set-key (kbd "C-c r i") #'org-roam-node-insert)
@@ -5153,7 +5159,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Programmed-Completion.
     (completing-read "hello " completion-table)))
 
 (use-package consult
-  :straight t
+  ;; :straight t
   :ensure t
   :bind (("C-x b" . consult-buffer) ;; orig. switch-to-buffer
          ("M-y" . consult-yank-pop) ;; orig. yank-pop
@@ -6000,7 +6006,7 @@ consistent."
 ;; need vertico anymore?
 (use-package vertico
   :ensure t
-  :straight t
+  ;; :straight t
   :init
   (vertico-mode))
 
