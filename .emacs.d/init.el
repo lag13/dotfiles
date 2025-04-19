@@ -6051,7 +6051,8 @@ it."
   (setq prefix-help-command #'embark-prefix-help-command)
   :bind (
          ("C-l C-l" . consult-line)
-         ("C-l C-o" . consult-org-heading)))
+         ("C-l C-o" . consult-org-heading)
+         ("C-l C-m" . consult-line-multi)))
 
 (use-package embark-consult
   :ensure t
@@ -6486,3 +6487,15 @@ only defun forms that start with \"lag13-\"."
 ;; could always just grep for it too of course.
 
 ;; debugging tutorial: https://www.youtube.com/watch?v=LfwSc-lfFxM&ab_channel=SystemCrafters
+
+;; TODO: I feel like there should be a % command (evil-jump-item) but
+;; it looks backwards first. Or maybe there generally should be a
+;; motion to go to a bracket or some other non alphanumeric character?
+;; Actually yeah, I think that would be nice to have a couple motions
+;; which jumped to: any punctuation, any bracket, any number, etc...
+
+
+;; TODO: Could it be nice to have a "search only what is visible"
+;; operator? might be too much hastle though tbh... but there can be a
+;; lot of stuff folded away in org files sometimes and maybe you don't
+;; want to dig through them!

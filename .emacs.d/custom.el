@@ -129,7 +129,7 @@
  '(mode-line-format
    '("" (eldoc-mode-line-string (" " eldoc-mode-line-string " ")) "%e"
      mode-line-mule-info mode-line-client mode-line-modified
-     mode-line-remote " " mode-line-position evil-mode-line-tag " "
+     mode-line-remote " " mode-line-position " "
      mode-line-buffer-identification " "
      (:eval (projectile-project-name)) vc-mode mode-line-end-spaces))
  '(mouse-wheel-progressive-speed nil)
