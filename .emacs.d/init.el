@@ -35,8 +35,11 @@
 ;; extremely slow to startup (once I clocked it in at 8 minutes!!) and
 ;; I suspect that too was because it was opening all the files it had
 ;; open previously (via the desktop feature) and almost all of those
-;; files were managed by version control.
-(setq vc-handled-backends nil)
+;; files were managed by version control. On 2024-04-20 I set it back
+;; to the original value because with my new computer I wanted to download
+;; igo.
+;; (setq vc-handled-backends '(RCS CVS SVN SCCS SRC Bzr Git Hg))
+(setq vc-handled-backends '())
 
 ;; The path to this file is determined by user-init-file which gets
 ;; dynamically set when emacs starts. I believe that when emacs starts
@@ -5808,8 +5811,8 @@ not sure though and either way it holds no interest for me."
 ;; https://github.com/misohena/el-igo I feel like I gotta reach out to
 ;; this person and thank them or something.
 (use-package igo-org
-  :no-require t
-  :straight '(igo-org :type git :host github :repo "misohena/el-igo")
+  ;; :no-require t
+  :vc (:url "https://github.com/misohena/el-igo")
   :config
   (with-eval-after-load "org"
     (require 'igo-org)
@@ -6499,3 +6502,254 @@ only defun forms that start with \"lag13-\"."
 ;; operator? might be too much hastle though tbh... but there can be a
 ;; lot of stuff folded away in org files sometimes and maybe you don't
 ;; want to dig through them!
+
+;; TODO: When I do org-roam-node-find I want to be able to sort my
+;; journal entries. Maybe something like this.
+;; https://www.reddit.com/r/emacs/comments/14o2n59/how_to_interactively_sort_completion_candidates/
+;; I'd love to do it within embark but the export buffer does not
+;; allow editing for some reason. If it did though I could do
+;; something like M-x sort-regexp-fields and then the
+;; first regex could be something like this: ^.*\(#20[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\).*$
+;;
+;; And the second would be just \1. My use case is that my mom just
+;; died and I want to read the journal entries where I've mentioned
+;; her in order. God I miss her so much. I do have a workaround which
+;; is to: 1. embark export her journal entries, copy them into a
+;; buffer, sort them using that sort-regexp-fields thing I mentioned,
+;; then make a macro where you highlight the line and do
+;; org-roam-node-insert which will turn it into a link
+
+
+;; TODO: Make a function that takes an org list like this:
+;; - black:
+;;   - black: count 1
+;;   - white: count 0
+;; - white:
+;;   - black: count 0
+;;   - white: count -1
+;;
+;; and then turns it into something like this:
+;; 
+;; miai 3/4 count -1/4 
+;; - black: miai 1/2 count 1/2
+;;   - black: count 1
+;;   - white: count 0
+;; - white: miai 1 count -1
+;;   - black: count 0
+;;   - white: count -2
+;;
+;; guess it could also be a list data structure but I'm sure there's
+;; already org functions to make that sort of conversion
+;;
+;; ACTUALLY, I feel like it would be even better if you added comments
+;; to the igo mode and then those comments would be analyzed and could
+;; even spit out an org document with the snapshotted positions and
+;; counts on them
+;;
+;; It would also be cool if you could have this list structure or
+;; whatever and when you edited it live it would update counts and
+;; such. Could be cool too where if it detects that miai values are
+;; increasing down the tree then it edits things to show just the
+;; sente calculation or something.
+
+;riginal setting
+;; (setq lisp-indent-function 'lisp-indent-function)
+
+
+
+;; TODO: This error happened once when I was cycling this list
+
+;; pos: count 
+;; - black crawled 2: 1 17/32 miai 1 15/32
+;;   - black crawled 3: count 3
+;;   - white atarid 2: count 1/16 miai 1 15/16
+;;     - black connected: count 2
+;;     - white captured 2: count -1 7/8 miai 7/8
+;;       - black atarid 1: count -1 miai 1
+;;         - black captured: count 0
+;;         - white connected: count -2
+;;       - white crawled 2: count -2 3/4 miai 1 1/4
+;;         - black atarid 2: count -1 1/2 miai 1 1/2
+;;           - black captured 2: count 0
+;;           - white connected: count -3
+;;         - white crawled 3: count -4
+;; - white atarid 1: count -1/6 miai 1 1/6
+;;   - black connected: count 1
+;;   - white took: count -1 1/3 miai 2/3
+;;     - black atarid: count -2/3 miai 1/3
+;;     - white crawled, black atarid, white connected: count -2 (we know this sequence is expected from another calculation)
+
+;;  ■  Warning (org-element): org-element--cache: Org parser error in 20220513023822-games.org::197190. Resetting.
+;;  The error was: (wrong-type-argument integer-or-marker-p nil)
+;;  Backtrace:
+;; "  backtrace-to-string(nil)
+;;   org-element-at-point()
+;;   org-at-item-p()
+;;   org-cycle-item-indentation()
+;;   org-cycle(nil)
+;;   funcall-interactively(org-cycle nil)
+;;   command-execute(org-cycle)
+;; "
+;;  Please report this to Org mode mailing list (M-x org-submit-bug-report).
+
+
+;; TODO: For igo mode it could be nice for endgame diagrams if you could make stones immortal if they're attached to the edge
+
+
+;; TODO: The sgf in igo mode does not seem to paste nicely into OGS. I
+;; suspect that when you drag the stones on igo mode it displays a
+;; slightly different format that includes a colon to indicate a range
+;; of moves and OGS doesn't know how to handle that but I feel like it
+;; should? Or perhaps this is some custom SGF shit this guy is doing?
+;; Here's the one I made in igo: (;FF[4]GM[1]SZ[13]AB[ca:da][fa:ha][bb][db:kb][ec:fd][ic][kc][md][fe:ge][af][ef][kf:mf][kg:kh][mg:mi][bh:fh][hh][bi:ci][fi][ji][bj][dj][fj:gj][lj:mj][bk:dk][fk][lk][al:bl][dl][kl:ml][bm][gm:jm][lm]AW[ba][cb][lb:lc][ac:dc][gc:hc][jc][ad][id:ld][ae:ee][he:ie][le:me][cf][ff:gf][if:jf][ag:jg][gh:gi][ih:jh][lh:li][di:ei][ii][aj:ak][ij:kj][ek][gk:hk][kk][fl:jl][cm:dm][fm])
+
+;; And here's ogs:
+;; (;FF[4]
+;; CA[UTF-8]
+;; GM[1]
+;; GN[gomagic]
+;; PC[https://online-go.com/review/1540281]
+;; PB[Black]
+;; PW[White]
+;; BR[3p]
+;; WR[3p]
+;; OT[Error: time control missing]
+;; RE[?]
+;; SZ[13]
+;; RU[AGA]
+
+;; ;AB[ca]
+;; ;AB[bb]
+;; ;AB[da]
+;; ;AB[db]
+;; ;AB[eb]
+;; ;AB[fb]
+;; ;AB[fa]
+;; ;AW[ba]
+;; ;AW[cb]
+;; ;AW[cc]
+;; ;AW[dc]
+;; ;AW[bc]
+;; ;AW[ac]
+;; ;AW[ad]
+;; ;AW[ae]
+;; ;AW[be]
+;; ;AW[ce]
+;; ;AW[de]
+;; ;AW[ee]
+;; ;AB[ed]
+;; ;AB[ec]
+;; ;AB[fd]
+;; ;AB[fc]
+;; ;AB[ge]
+;; ;AB[fe]
+;; ;AB[ef]
+;; ;AB[af]
+;; ;AW[cf]
+;; ;AW[cg]
+;; ;AW[bg]
+;; ;AW[ag]
+;; ;AW[ff]
+;; ;AW[eg]
+;; ;AW[dg]
+;; ;AW[gg]
+;; ;AW[fg]
+;; ;AW[gf]
+;; ;AW[he]
+;; ;AW[ie]
+;; ;AW[if]
+;; ;AW[jf]
+;; ;AW[jg]
+;; ;AW[ig]
+;; ;AW[hg]
+;; ;AW[hc]
+;; ;AW[gc]
+;; ;AB[ic]
+;; ;AB[ib]
+;; ;AB[hb]
+;; ;AB[gb]
+;; ;AB[ga]
+;; ;AB[ha]
+;; ;AB[jb]
+;; ;AB[kb]
+;; ;AB[kc]
+;; ;AB[md]
+;; ;AW[lb]
+;; ;AW[lc]
+;; ;AW[ld]
+;; ;AW[le]
+;; ;AW[me]
+;; ;AW[kd]
+;; ;AW[id]
+;; ;AW[jd]
+;; ;AW[jc]
+;; ;AB[kf]
+;; ;AB[mf]
+;; ;AB[lf]
+;; ;AB[kg]
+;; ;AB[kh]
+;; ;AB[mg]
+;; ;AB[mh]
+;; ;AB[mi]
+;; ;AB[mj]
+;; ;AB[lj]
+;; ;AB[lk]
+;; ;AB[ll]
+;; ;AB[lm]
+;; ;AB[ml]
+;; ;AB[kl]
+;; ;AB[jm]
+;; ;AB[im]
+;; ;AB[hm]
+;; ;AB[gm]
+;; ;AB[ji]
+;; ;AW[kj]
+;; ;AW[kk]
+;; ;AW[jl]
+;; ;AW[il]
+;; ;AW[jj]
+;; ;AW[li]
+;; ;AW[lh]
+;; ;AW[ij]
+;; ;AW[ii]
+;; ;AW[ih]
+;; ;AW[jh]
+;; ;AW[hl]
+;; ;AW[gk]
+;; ;AW[hk]
+;; ;AW[gl]
+;; ;AW[fl]
+;; ;AW[fm]
+;; ;AW[ek]
+;; ;AW[ei]
+;; ;AW[di]
+;; ;AB[bm]
+;; ;AB[bl]
+;; ;AB[al]
+;; ;AB[ck]
+;; ;AB[bk]
+;; ;AB[dk]
+;; ;AB[dj]
+;; ;AB[dl]
+;; ;AB[bj]
+;; ;AB[bi]
+;; ;AB[ch]
+;; ;AB[ci]
+;; ;AB[bh]
+;; ;AW[ak]
+;; ;AB[dh]
+;; ;AB[eh]
+;; ;AB[fh]
+;; ;AB[fi]
+;; ;AB[fj]
+;; ;AB[fk]
+;; ;AB[gj]
+;; ;AW[cm]
+;; ;AW[dm]
+;; ;AB[hh]
+;; ;AW[gh]
+;; ;AW[gi]
+;; ;AW[aj]
+;; )
+
+;; TODO: Make a function

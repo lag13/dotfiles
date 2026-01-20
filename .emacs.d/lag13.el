@@ -3892,3 +3892,17 @@ Qxh1+ 14.Kf2 Qxa1 15.Nxf7+ Ke7 16.Qg5+ Kxf7 17.Nd6+ Kg7
 ;; END: Code to help generate a chess board with signposts for the
 ;; gift idea
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; TODO: Mess around with adding this directly to the editor while in
+;; fill mode.
+(defun lag13-igo-display-stone-counts ()
+  "I was messing around with making go endgame puzzles and thought that maybe they should be accurate in the sense that if it's black's turn, then it REALLY should be black's turn (i.e. there are equal number of black and white stones on the board). I guess it's not necessary since these are just puzzles anyway and things like handicap stones exist but still!"
+  (interactive)
+  (let* ((board (igo-editor-board (igo-editor-at-input)))
+       (intersections (igo-board-intersections board)))
+    (message (format "%S"
+                     (list
+                      (cons 'black (length (seq-filter #'igo-black-p intersections)))
+                      (cons 'white (length (seq-filter #'igo-white-p intersections)))
+                      (cons 'empty (length (seq-filter #'igo-empty-p intersections))))))))
+

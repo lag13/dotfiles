@@ -123,7 +123,7 @@
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
  '(js-indent-level 2)
- '(js-js-switch-tabs t)
+ '(js-js-switch-tabs t t)
  '(lsp-ui-doc-border "#9eacac")
  '(message-log-max 10000)
  '(mode-line-format
@@ -148,7 +148,26 @@
  '(org-src-block-faces 'nil)
  '(org-startup-indented t)
  '(org-startup-truncated nil)
- '(package-selected-packages nil)
+ '(package-selected-packages
+   '(centaur-tabs chess cider company corfu deadgrep dired-subtree
+                  dockerfile-mode doom-themes dumb-jump edit-indirect
+                  elm-mode embark-consult engine-mode evil-args
+                  evil-collection evil-commentary evil-exchange
+                  evil-indent-plus evil-mc evil-multiedit
+                  evil-nerd-commenter evil-numbers
+                  evil-replace-with-register evil-surround
+                  evil-visualstar expand-region fsharp-mode go-guru
+                  go-snippets graphviz-dot-mode groovy-mode
+                  haskell-mode helm igo-org ivy jinja2-mode lsp-mode
+                  magit marginalia multiple-cursors nginx-mode
+                  openwith orderless org-drill org-roam-ui
+                  org-transclusion paredit php-mode plantuml-mode
+                  powershell projectile restclient rg solaire-mode
+                  solarized-theme super-save systemd terraform-mode
+                  typescript-mode undo-tree vertico visual-fill-column
+                  vscode-dark-plus-theme vterm-toggle web-server
+                  xmlgen yaml-mode))
+ '(package-vc-selected-packages '((igo-org :url "https://github.com/misohena/el-igo")))
  '(pdf-view-midnight-colors (cons "#bbc2cf" "#282c34"))
  '(pos-tip-background-color "#01323d")
  '(pos-tip-foreground-color "#9eacac")
@@ -156,7 +175,7 @@
  '(projectile-mode t nil (projectile))
  '(recentf-mode t)
  '(rg-command-line-flags '("--max-columns 1000" "--hidden" "--multiline"))
- '(rg-ignore-case 'force)
+ '(rg-ignore-case 'smart)
  '(rustic-ansi-faces
    ["#282c34" "#ff6c6b" "#98be65" "#ECBE7B" "#51afef" "#c678dd" "#46D9FF"
     "#bbc2cf"])
