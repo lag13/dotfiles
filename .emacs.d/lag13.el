@@ -3906,3 +3906,21 @@ Qxh1+ 14.Kf2 Qxa1 15.Nxf7+ Ke7 16.Qg5+ Kxf7 17.Nd6+ Kg7
                       (cons 'white (length (seq-filter #'igo-white-p intersections)))
                       (cons 'empty (length (seq-filter #'igo-empty-p intersections))))))))
 
+
+
+(defun lag13-weiqi101-copy-q-problem-id ()
+  (interactive)
+  (-let* ((q-id (nth 4 (org-heading-components)))
+          ((_ id) (string-split q-id "-"))
+          (url (s-concat "https://www.101weiqi.com/q/" id)))
+    (kill-new url)))
+
+(defun lag13-weiqi101-goto-local-problem-and-copy-url ()
+  "Intended to be called on a link to a header containing the problem. It
+then will show the problem and copy the link to the clipboard for later
+verification."
+  (interactive)
+  (org-open-at-point t)
+  (org-fold-show-entry)
+  (recenter 0)
+  (lag13-weiqi101-kill-q-problem-id))
