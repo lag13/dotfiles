@@ -39,6 +39,11 @@
 
 (defalias '-fn #'-lambda "From clojure.core. Alias for `-lambda'")
 
+(defun -repeatedly (n f)
+  "From coljure.core. Returns a sequence of length N where each item in the
+sequence is a call of the function F."
+  (cl-loop repeat n collect (funcall f)))
+
 (defun -range (start end &optional increment)
   "From clojure.core. Returns a sequence of numbers from
 START (inclusive) to END (exclusive) incrementing each successive
@@ -60,6 +65,10 @@ then the next element etc..."
                       (setq acc (funcall fn acc elm i)))
                     list)
     acc))
+
+(defun -num-things-satisfying-probability (num-things num-desired-outcomes total-num-outcomes)
+  (-count (-fn (v) (< v num-desired-outcomes))
+          (-repeatedly num-things (lambda () (random total-num-outcomes)))))
 
 ;; TODO: Add a reduce-kv, I'm shocked that this is not already present
 ;; in the seq or dash library already.
@@ -3923,4 +3932,4 @@ verification."
   (org-open-at-point t)
   (org-fold-show-entry)
   (recenter 0)
-  (lag13-weiqi101-kill-q-problem-id))
+  (lag13-weiqi101-copy-q-problem-id))

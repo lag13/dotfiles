@@ -133,7 +133,10 @@
 ;; (require 'midnight)
 ;; (midnight-delay-set 'midnight-delay "9:00am")
 
-(toggle-frame-fullscreen)
+;;(toggle-frame-fullscreen)
+
+(menu-bar-mode 0)
+(tool-bar-mode 0)
 
 ;; I don't know why but on windows I always get this error:
 ;; https://emacs.stackexchange.com/questions/233/how-to-proceed-on-package-el-signature-check-failure
@@ -150,7 +153,8 @@
 ;; of running GUI apps in WSL so I can just have emacs installed in a
 ;; linux environment and hopefully not face these issues.
 (when (seq-contains-p '(ms-dos windows-nt cygwin) system-type)
-  (setq package-check-signature nil))
+  (setq package-check-signature nil)
+  )
 
 ;; The order of these package related function calls I copied from
 ;; here: https://melpa.org/#/getting-started
@@ -168,7 +172,12 @@
 ;; only useful for new computers which do not have my selected
 ;; packages. The package-refresh-contents will slow things down on
 ;; start up but I don't startup emacs that often so its fine with me.
-(package-refresh-contents)
+;; On 2026-05-13T12:23:22Z windows had an update and it would hang
+;; when trying to contact http://elpa.gnu.org. I'm not sure why this
+;; was but commenting this out helped.
+
+;; (package-refresh-contents)
+
 (package-install-selected-packages)
 
 (load "~/.emacs.d/lag13")
@@ -6752,4 +6761,30 @@ only defun forms that start with \"lag13-\"."
 ;; ;AW[aj]
 ;; )
 
-;; TODO: Make a function
+
+;; TODO: This narrowing dwim thing seems like a great idea (i.e. it
+;; will narrow to a src block, the current subtree, or the current
+;; defun):
+;; https://endlessparentheses.com/emacs-narrow-or-widen-dwim.html
+
+;; TODO: I wanna revisit a window resizing operator. I think that
+;; german guy made a vim package to do it. I know emacs also has a
+;; function to size a window to match the size of the buffer (and so
+;; if the buffer is small because you did a narrow'ing then it'll snap
+;; to just what you need): fit-window-to-buffer
+
+;; TODO: I think if you paste a file path into a buffer switching
+;; command, it should check to see if it has a file with that name or
+;; something. Or maybe I should have a way to tell it to switch it's
+;; searching?
+
+;; TODO: I should have a way to switch directly to the indirect buffer
+;; of the buffer I'm currently looking at.
+
+;; TODO: Some igo things that would be nice... for endgame problems if
+;; some lines could be extended from the actualy playable border of
+;; the stones to indicate that the stones are out and alive. Because
+;; right now I literally make sure stones are alive so there's no
+;; confusion. Also clearing the entire board could be a good function
+;; to have. Also it would be nice if you could drag stones to a
+;; different intersection.
